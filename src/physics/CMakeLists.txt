@@ -8,6 +8,8 @@ add_library(physics STATIC
     demag.hpp
     effectivefield.hpp 
     effectivefield.cpp
+    elasticband.hpp
+    elasticband.cu
     energy.hpp 
     energy.cu
     exchange.hpp 
