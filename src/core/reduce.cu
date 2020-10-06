@@ -192,3 +192,43 @@ real dotSum(const Field& f, const Field& g) {
                                  cudaMemcpyDeviceToHost, getCudaStream()));
   return result;
 }
+
+__global__ void k_geodesicDistance(real* result, CuField f, CuField g) {
+  __shared__ real sdata[BLOCKDIM];
+  int ncells = f.grid.ncells();
+  int tid = threadIdx.x;
+
+  real threadValue = 0.0;
+  for (int i = tid; i < ncells; i += BLOCKDIM) {
+    real3 fi = f.vectorAt(i);
+    real3 gi = g.vectorAt(i);
+    // vincenty's formula
+    real l = atan2(norm(cross(fi, gi)), dot(fi, gi));
+    threadValue += l * l;
+  }
+  sdata[tid] = threadValue;
+  __syncthreads();
+
+  // Reduce the block
+  for (unsigned int s = BLOCKDIM / 2; s > 0; s >>= 1) {
+    if (tid < s)
+      sdata[tid] += sdata[tid + s];
+    __syncthreads();
+  }
+  // TODO: check if loop unrolling makes sense here
+
+  // Set the result
+  if (tid == 0)
+    *result = sqrt(sdata[0]);
+}
+
+real geodesicDistance(const Field& f, const Field& g) {
+  real* d_result = (real*)bufferPool.allocate(sizeof(real));
+  cudaLaunchReductionKernel(k_dotSum, d_result, f.cu(), g.cu());
+  // copy the result to the host and return
+  real result;
+  checkCudaError(cudaMemcpyAsync(&result, d_result, sizeof(real),
+                                 cudaMemcpyDeviceToHost, getCudaStream()));
+  bufferPool.recycle((void**)&d_result);
+  return result;
+}

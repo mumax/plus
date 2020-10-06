@@ -3,23 +3,25 @@
 #include <memory>
 #include <vector>
 
-#include"datatypes.hpp"
+#include "datatypes.hpp"
+#include "field.hpp"
 
 class Ferromagnet;
-class Field;
 
 class ElasticBand {
  public:
-  ElasticBand(Ferromagnet*, std::vector<Field*> images);
-  int nImages() const;
+  ElasticBand(Ferromagnet*, const std::vector<Field>& images);
+  int nImages() const { return images_.size(); }
   void relaxEndPoints();
-  void solve();
+  // void solve();
   void step(real);
   void selectImage(int);
+  real geodesicDistanceImages(int, int);
+  std::vector<real> energies();
+  std::vector<Field> perpendicularForces();
 
  private:
-  std::vector<std::unique_ptr<Field>> images_;
-  std::vector<std::unique_ptr<Field>> velocities_;
-  std::vector<std::unique_ptr<Field>> forces_;
+  std::vector<Field> images_;
+  std::vector<Field> velocities_;
   Ferromagnet* magnet_;
 };

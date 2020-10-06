@@ -10,6 +10,7 @@ from .strayfield import StrayField
 from .timesolver import TimeSolver
 from .variable import Variable
 from .world import World
+from .elasticband import ElasticBand
 
 __all__ = [
     "_cpp",
