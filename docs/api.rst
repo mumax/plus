@@ -10,5 +10,4 @@ API Reference
     Grid
     Ferromagnet
     TimeSolver
-    Table
     Variable
