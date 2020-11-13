@@ -30,4 +30,4 @@ class FieldQuantity:
         for i in range(ntimes):
             self._impl.exec()
         stop = time.time()
-        return stop-start
+        return (stop-start)/ntimes
