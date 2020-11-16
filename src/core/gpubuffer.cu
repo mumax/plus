@@ -9,7 +9,7 @@ GpuBufferPool::~GpuBufferPool() {
       checkCudaError(cudaFree(ptr));
 }
 
-void* GpuBufferPool::allocate(int size) {
+void* GpuBufferPool::allocate(size_t size) {
   void* ptr;
   if (pool_[size].size() == 0) {
     checkCudaError(cudaMalloc((void**)&ptr, size));

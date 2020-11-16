@@ -13,13 +13,13 @@ class GpuBufferPool {
 
   ~GpuBufferPool();
 
-  void* allocate(int size);
+  void* allocate(size_t size);
   void free(void**);
   void recycle(void**);
 
  private:
-  std::map<int, std::vector<void*>> pool_;
-  std::map<void*, int> inUse_;
+  std::map<size_t, std::vector<void*>> pool_;
+  std::map<void*, size_t> inUse_;
 };
 
 extern GpuBufferPool bufferPool;
@@ -77,7 +77,7 @@ class GpuBuffer {
     size_ = 0;
   }
 
-  int size() { return size_; }
+  size_t size() { return size_; }
   T* get() const { return ptr_; }
 
  private:
