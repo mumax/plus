@@ -33,13 +33,18 @@ class GpuBuffer {
 
   GpuBuffer(const std::vector<T>& other) {
     allocate(other.size());
-    checkCudaError(cudaMemcpyAsync(ptr_, &other[0], size_ * sizeof(T),
-                                   cudaMemcpyHostToDevice, getCudaStream()));
+    if (size_ > 0) {
+      checkCudaError(cudaMemcpyAsync(ptr_, &other[0], size_ * sizeof(T),
+                                     cudaMemcpyHostToDevice, getCudaStream()));
+    }
   }
 
   // Copy constructor
   GpuBuffer(const GpuBuffer& other) {
     allocate(other.size());
+    if (size_ == 0)
+      return;
+
     checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
                                    cudaMemcpyDeviceToDevice, getCudaStream()));
   }
@@ -55,8 +60,11 @@ class GpuBuffer {
   // Copy assignment
   GpuBuffer<T>& operator=(const GpuBuffer<T>& other) {
     allocate(other.size());
-    checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
-                                   cudaMemcpyDeviceToDevice, getCudaStream()));
+    if (size_ > 0) {
+      checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
+                                     cudaMemcpyDeviceToDevice,
+                                     getCudaStream()));
+    }
     return *this;
   }
 
@@ -70,12 +78,17 @@ class GpuBuffer {
   }
 
   void allocate(size_t size) {
+    if (size_ == size)
+      return;
+
     recycle();
-    if (size != 0) {
+
+    if (size > 0) {
       ptr_ = (T*)bufferPool.allocate(size * sizeof(T));
     } else {
       ptr_ = nullptr;
     }
+
     size_ = size;
   }
 
