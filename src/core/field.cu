@@ -23,13 +23,8 @@ Field::Field(Grid grid, int nComponents, real value)
 }
 
 Field::Field(const Field& other) : grid_(other.grid_), ncomp_(other.ncomp_) {
-  allocate();
-
-  for (int c = 0; c < ncomp_; c++) {
-    checkCudaError(cudaMemcpyAsync(buffers_[c].get(), other.buffers_[c].get(),
-                                   grid_.ncells() * sizeof(real),
-                                   cudaMemcpyDeviceToDevice, getCudaStream()));
-  }
+  buffers_ = other.buffers_;
+  updateDevicePointersBuffer();
 }
 
 Field::Field(Field&& other) : grid_(other.grid_), ncomp_(other.ncomp_) {
@@ -63,27 +58,23 @@ void Field::clear() {
   free();
 }
 
+void Field::updateDevicePointersBuffer() {
+  std::vector<real*> bufferPtrsOnHost(ncomp_);
+  std::transform(buffers_.begin(), buffers_.end(), bufferPtrsOnHost.begin(),
+                 [](auto& buf) { return buf.get(); });
+  bufferPtrs_ = GpuBuffer<real*>(bufferPtrsOnHost);
+}
+
 void Field::allocate() {
   free();
 
   if (empty())
     return;
 
-  // get a gpu buffer for each component
-  buffers_.resize(ncomp_);
-  for (auto& p : buffers_)
-    p.allocate(grid_.ncells());
+  buffers_ =
+      std::vector<GpuBuffer<real>>(ncomp_, GpuBuffer<real>(grid_.ncells()));
 
-  // get the ptrs to the buffers in bufferPtrsOnHost
-  std::vector<real*> bufferPtrsOnHost(ncomp_);
-  std::transform(buffers_.begin(), buffers_.end(), bufferPtrsOnHost.begin(),
-                 [](auto& buf) { return buf.get(); });
-
-  // put the ptrs to the buffers in a gpu buffer
-  bufferPtrs_.allocate(ncomp_);
-  checkCudaError(cudaMemcpyAsync(bufferPtrs_.get(), &bufferPtrsOnHost[0],
-                                 ncomp_ * sizeof(real*), cudaMemcpyHostToDevice,
-                                 getCudaStream()));
+  updateDevicePointersBuffer();
 }
 
 void Field::free() {

@@ -52,6 +52,7 @@ class Field : public FieldQuantity {
   void makeZero();
 
  private:
+  void updateDevicePointersBuffer();
   void allocate();
   void free();
 };
