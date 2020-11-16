@@ -64,17 +64,25 @@ Ferromagnet* World::addFerromagnet(Grid grid, std::string name) {
   if (Ferromagnets.find(name) != Ferromagnets.end())
     throw std::runtime_error("A ferromagnet with the name '" + name +
                              "' already exists");
+  printf("World.cpp line 67.\n");
   Ferromagnet* newMagnet = new Ferromagnet(this, name, grid);
   Ferromagnets[name] = newMagnet;
+  printf("World.cpp line 70.\n");
 
   // Add the magnetic field of the other magnets in this magnet, and vice versa
-  for (auto entry : Ferromagnets) {
+  for (auto& entry : Ferromagnets) {
+    printf("World.cpp line 74.\n");
     Ferromagnet* magnet = entry.second;
+    printf("World.cpp line 76.\n");
     magnet->addMagnetField(newMagnet, MAGNETFIELDMETHOD_AUTO);
+    printf("World.cpp line 78.\n");
     if (magnet != newMagnet) {  // Avoid adding the field on itself twice
+      printf("World.cpp line 80.\n");
       newMagnet->addMagnetField(magnet, MAGNETFIELDMETHOD_AUTO);
+      printf("World.cpp line 82.\n");
     }
   }
+  printf("World.cpp line 80.");
 
   return newMagnet;
 };

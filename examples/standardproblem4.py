@@ -11,6 +11,8 @@ import numpy as np
 length, width, thickness = 500e-9, 125e-9, 3e-9
 nx, ny, nz = 128, 32, 1
 
+print(f'Cell size {(length/nx, width/ny, thickness/nz)}')
+
 world = World(cellsize=(length/nx, width/ny, thickness/nz))
 
 magnet = Ferromagnet(world, Grid((nx, ny, nz)))

@@ -121,6 +121,7 @@ __global__ void k_setComponent(CuField f, real value, int comp) {
 }
 
 void Field::setUniformComponent(int comp, real value) {
+  printf("I am launching from Field.cu");
   cudaLaunch(grid_.ncells(), k_setComponent, cu(), value, comp);
 }
 

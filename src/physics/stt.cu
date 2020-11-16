@@ -92,6 +92,7 @@ Field evalSpinTransferTorque(const Ferromagnet* magnet) {
   auto alpha = magnet->alpha.cu();
   auto jcur = magnet->jcur.cu();
   auto cellsize = magnet->world()->cellsize();
+  printf("I am launching from stt.cu");
   cudaLaunch(ncells, k_spinTransferTorque, torque.cu(), m, msat, pol, xi, alpha,
              jcur, cellsize);
   return torque;

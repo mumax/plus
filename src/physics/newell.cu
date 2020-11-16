@@ -62,17 +62,19 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
       for (int dz = -1; dz <= 1; dz++) {
         // TODO: outer loop can be optimized for dz = 0 because
         //       newell_xx yiels the same for z+dz and z-dz
-
+        // printf("We are in the loop!\n");
         // weight factor:
         //    8 for the center
         //   -4 for side faces
         //    2 for edges
         //   -1 for corners
         int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
+        // printf("Pow works just fine!");
 
         // TODO: the computation of the kernel can maybe be further optimized
         //       by caching (or pre-computation of) the Nxx_indefinite results
         result += weight * Nxx_indefinite(idx + int3{dx, dy, dz}, cellsize);
+        printf("We calculated our result.");
       }
     }
   }
