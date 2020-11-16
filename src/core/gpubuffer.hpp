@@ -28,7 +28,7 @@ template <typename T>
 class GpuBuffer {
  public:
   GpuBuffer(size_t N) { allocate(N); }
-  GpuBuffer() : ptr_(nullptr) {}
+  GpuBuffer() {}
   ~GpuBuffer() { recycle(); }
 
   GpuBuffer(const std::vector<T>& other) {
@@ -90,6 +90,6 @@ class GpuBuffer {
   T* get() const { return ptr_; }
 
  private:
-  T* ptr_;
-  size_t size_;
+  T* ptr_ = nullptr;
+  size_t size_ = 0;
 };
