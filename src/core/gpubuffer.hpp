@@ -31,13 +31,17 @@ class GpuBuffer {
   GpuBuffer() : ptr_(nullptr) {}
   ~GpuBuffer() { recycle(); }
 
-  // disable copy constructor
-  GpuBuffer(const GpuBuffer&) = delete;
-
   GpuBuffer(const std::vector<T>& other) {
     allocate(other.size());
     checkCudaError(cudaMemcpyAsync(ptr_, &other[0], size_ * sizeof(T),
                                    cudaMemcpyHostToDevice, getCudaStream()));
+  }
+
+  // Copy constructor
+  GpuBuffer(const GpuBuffer& other) {
+    allocate(other.size());
+    checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
+                                   cudaMemcpyDeviceToDevice, getCudaStream()));
   }
 
   // Move constructor
@@ -48,6 +52,14 @@ class GpuBuffer {
     other.size_ = 0;
   }
 
+  // Copy assignment
+  GpuBuffer<T>& operator=(const GpuBuffer<T>& other) {
+    allocate(other.size());
+    checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
+                                   cudaMemcpyDeviceToDevice, getCudaStream()));
+    return *this;
+  }
+
   // Move assignment
   GpuBuffer<T>& operator=(GpuBuffer<T>&& other) {
     ptr_ = other.ptr_;
@@ -56,9 +68,6 @@ class GpuBuffer {
     other.size_ = 0;
     return *this;
   }
-
-  // disable assignment operator
-  GpuBuffer<T>& operator=(const GpuBuffer<T>&) = delete;
 
   void allocate(size_t size) {
     recycle();
@@ -77,7 +86,7 @@ class GpuBuffer {
     size_ = 0;
   }
 
-  size_t size() { return size_; }
+  size_t size() const { return size_; }
   T* get() const { return ptr_; }
 
  private:
