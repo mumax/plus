@@ -13,13 +13,13 @@ class GpuBufferPool {
 
   ~GpuBufferPool();
 
-  void* allocate(int size);
+  void* allocate(size_t size);
   void free(void**);
   void recycle(void**);
 
  private:
-  std::map<int, std::vector<void*>> pool_;
-  std::map<void*, int> inUse_;
+  std::map<size_t, std::vector<void*>> pool_;
+  std::map<void*, size_t> inUse_;
 };
 
 extern GpuBufferPool bufferPool;
@@ -28,16 +28,25 @@ template <typename T>
 class GpuBuffer {
  public:
   GpuBuffer(size_t N) { allocate(N); }
-  GpuBuffer() : ptr_(nullptr) {}
+  GpuBuffer() {}
   ~GpuBuffer() { recycle(); }
-
-  // disable copy constructor
-  GpuBuffer(const GpuBuffer&) = delete;
 
   GpuBuffer(const std::vector<T>& other) {
     allocate(other.size());
-    checkCudaError(cudaMemcpyAsync(ptr_, &other[0], size_ * sizeof(T),
-                                   cudaMemcpyHostToDevice, getCudaStream()));
+    if (size_ > 0) {
+      checkCudaError(cudaMemcpyAsync(ptr_, &other[0], size_ * sizeof(T),
+                                     cudaMemcpyHostToDevice, getCudaStream()));
+    }
+  }
+
+  // Copy constructor
+  GpuBuffer(const GpuBuffer& other) {
+    allocate(other.size());
+    if (size_ == 0)
+      return;
+
+    checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
+                                   cudaMemcpyDeviceToDevice, getCudaStream()));
   }
 
   // Move constructor
@@ -46,6 +55,17 @@ class GpuBuffer {
     size_ = other.size_;
     other.ptr_ = nullptr;
     other.size_ = 0;
+  }
+
+  // Copy assignment
+  GpuBuffer<T>& operator=(const GpuBuffer<T>& other) {
+    allocate(other.size());
+    if (size_ > 0) {
+      checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
+                                     cudaMemcpyDeviceToDevice,
+                                     getCudaStream()));
+    }
+    return *this;
   }
 
   // Move assignment
@@ -57,16 +77,18 @@ class GpuBuffer {
     return *this;
   }
 
-  // disable assignment operator
-  GpuBuffer<T>& operator=(const GpuBuffer<T>&) = delete;
-
   void allocate(size_t size) {
+    if (size_ == size)
+      return;
+
     recycle();
-    if (size != 0) {
+
+    if (size > 0) {
       ptr_ = (T*)bufferPool.allocate(size * sizeof(T));
     } else {
       ptr_ = nullptr;
     }
+
     size_ = size;
   }
 
@@ -77,10 +99,10 @@ class GpuBuffer {
     size_ = 0;
   }
 
-  int size() { return size_; }
+  size_t size() const { return size_; }
   T* get() const { return ptr_; }
 
  private:
-  T* ptr_;
-  size_t size_;
+  T* ptr_ = nullptr;
+  size_t size_ = 0;
 };
