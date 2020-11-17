@@ -30,16 +30,16 @@ __global__ void k_magnetFieldKernel(CuField kernel, real3 cellsize) {
 
   // printf("Line 30, thread %d\n", idx);
   int3 coo = kernel.grid.index2coord(idx);
-  printf("Line 33, thread %d\n", idx);
+  // printf("Line 33, thread %d\n", idx);
   kernel.setValueInCell(idx, 0, calcNewellNxx(coo, cellsize));
-  printf("Line 35, thread %d\n", idx);
+  // printf("Line 35, thread %d\n", idx);
   kernel.setValueInCell(idx, 1, calcNewellNyy(coo, cellsize));
   kernel.setValueInCell(idx, 2, calcNewellNzz(coo, cellsize));
   kernel.setValueInCell(idx, 3, calcNewellNxy(coo, cellsize));
-  if (!threadIdx.x) printf("Line 36");
+  // if (!threadIdx.x) printf("Line 36\n");
   kernel.setValueInCell(idx, 4, calcNewellNxz(coo, cellsize));
   kernel.setValueInCell(idx, 5, calcNewellNyz(coo, cellsize));
-  if (!threadIdx.x) printf("Success!!!");
+  // if (!threadIdx.x) printf("k_magnetFieldKernel success!!!\n");
 }
 
 void MagnetFieldKernel::compute() {
@@ -50,7 +50,7 @@ void MagnetFieldKernel::compute() {
   cell_test.y = 3.90625E-09F;
   cell_test.z = 3E-09F;
   cudaLaunch(grid_.ncells(), k_magnetFieldKernel, kernel_->cu(), cell_test);
-  printf("Launch was successful.");
+  printf("k_magnetFieldKernel launch was successful.\n");
 }
 
 Grid MagnetFieldKernel::grid() const {
