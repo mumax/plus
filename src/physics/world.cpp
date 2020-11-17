@@ -46,43 +46,44 @@ bool World::inMastergrid(Grid grid) const {
 }
 
 Ferromagnet* World::addFerromagnet(Grid grid, std::string name) {
+  printf("Ferromagne::addFerromagnet start debugging.\n");
   for (const auto& fm : Ferromagnets)
     if (grid.overlaps(fm.second->grid()))
       throw std::out_of_range(
           "Can not add ferromagnet because it overlaps with another "
           "ferromagnet.");
-
+  printf("Ferromagne::addFerromagnet Line 55\n");
   if (!inMastergrid(grid))
     throw std::out_of_range(
         "Can not add ferromagnet because the grid does not fit in the "
         "mastergrid ");
-
+  printf("Ferromagne::addFerromagnet Line 60\n");
   static int idxUnnamed = 1;
   if (name.length() == 0)
     name = "magnet_" + std::to_string(idxUnnamed++);
-
+  printf("Ferromagne::addFerromagnet Line 64\n");
   if (Ferromagnets.find(name) != Ferromagnets.end())
     throw std::runtime_error("A ferromagnet with the name '" + name +
                              "' already exists");
-  printf("World.cpp line 67.\n");
+  printf("Ferromagne::addFerromagnet line 67.\n");
   Ferromagnet* newMagnet = new Ferromagnet(this, name, grid);
   Ferromagnets[name] = newMagnet;
-  printf("World.cpp line 70.\n");
+  printf("Ferromagne::addFerromagnet line 70.\n");
 
   // Add the magnetic field of the other magnets in this magnet, and vice versa
   for (auto& entry : Ferromagnets) {
-    printf("World.cpp line 74.\n");
+    printf("Ferromagne::addFerromagnet line 74.\n");
     Ferromagnet* magnet = entry.second;
-    printf("World.cpp line 76.\n");
+    printf("Ferromagne::addFerromagnet line 76.\n");
     magnet->addMagnetField(newMagnet, MAGNETFIELDMETHOD_AUTO);
-    printf("World.cpp line 78.\n");
+    printf("Ferromagne::addFerromagnet line 78.\n");
     if (magnet != newMagnet) {  // Avoid adding the field on itself twice
-      printf("World.cpp line 80.\n");
+      printf("Ferromagne::addFerromagnet line 80.\n");
       newMagnet->addMagnetField(magnet, MAGNETFIELDMETHOD_AUTO);
-      printf("World.cpp line 82.\n");
+      printf("Ferromagne::addFerromagnet line 82.\n");
     }
   }
-  printf("World.cpp line 80.");
+  printf("Ferromagne::addFerromagnet line 80.");
 
   return newMagnet;
 };

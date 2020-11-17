@@ -8,9 +8,9 @@ template <typename... Arguments>
 void cudaLaunch(int N,
                 void (*kernelfunction)(Arguments...),
                 Arguments... args) {
-  cudaError_t out = cudaSetDevice(0);
-  checkCudaError(out);
-  printf("I am launching this kernel!!!\n");
+  // cudaError_t out = cudaSetDevice(0);
+  // checkCudaError(out);
+  printf("I am launching this kernel without default device!!!\n");
   dim3 blockDims(512);
   dim3 gridDims((N + blockDims.x - 1) / blockDims.x);
   printf("Input N = %d\n", N);
@@ -19,5 +19,5 @@ void cudaLaunch(int N,
   kernelfunction<<<gridDims, blockDims, 0, s0>>>(args...);
   checkCudaError(cudaPeekAtLastError());
   checkCudaError(cudaDeviceSynchronize());
-  printf("CUDA Launch was successful!!!");
+  printf("CUDA Launch was successful!!!\n");
 }

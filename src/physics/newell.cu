@@ -74,7 +74,7 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
         // TODO: the computation of the kernel can maybe be further optimized
         //       by caching (or pre-computation of) the Nxx_indefinite results
         result += weight * Nxx_indefinite(idx + int3{dx, dy, dz}, cellsize);
-        printf("We calculated our result.");
+        // printf("We calculated our result.");
       }
     }
   }
