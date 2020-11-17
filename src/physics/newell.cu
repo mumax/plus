@@ -1,6 +1,5 @@
-#include <cmath>
-
 #include "newell.hpp"
+
 
 // Eq. 27 in paper of Newell (doi.org/10.1029/93JB00694)
 __host__ __device__ static inline double Nxx_indefinite(int3 idx,
@@ -68,6 +67,7 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
         //   -4 for side faces
         //    2 for edges
         //   -1 for corners
+        printf("Power %d, %E\n", dx * dx + dy * dy + dz * dz, dx * dx + dy * dy + dz * dz);
         int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
         // printf("Pow works just fine!");
 
