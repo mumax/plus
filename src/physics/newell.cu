@@ -68,7 +68,7 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
         //   -1 for corners
         int n_power = dx * dx + dy * dy + dz * dz;
         int sign = (n_power % 2 == 0) ? 1 : -1;
-        int weight = sign * 8 / pow(2.0, 1.0 * n_power);
+        int weight = static_cast<int>(sign * 8 / pow(2.0, 1.0 * n_power));
         // TODO: the computation of the kernel can maybe be further optimized
         //       by caching (or pre-computation of) the Nxx_indefinite results
         result += weight * Nxx_indefinite(idx + int3{dx, dy, dz}, cellsize);
@@ -98,7 +98,7 @@ __host__ __device__ real calcNewellNxy(int3 idx, real3 cellsize) {
         //   -1 for corners
         int n_power = dx * dx + dy * dy + dz * dz;
         int sign = (n_power % 2 == 0) ? 1 : -1;
-        int weight = sign * 8 / pow(2.0, 1.0 * n_power);
+        int weight = static_cast<int>(sign * 8 / pow(2.0, 1.0 * n_power));
 
         result += weight * Nxy_indefinite(idx + int3{dx, dy, dz}, cellsize);
       }
