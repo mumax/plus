@@ -67,8 +67,10 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
         //   -4 for side faces
         //    2 for edges
         //   -1 for corners
-        printf("Power %d, %E\n", dx * dx + dy * dy + dz * dz, dx * dx + dy * dy + dz * dz);
-        int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
+        int n_power = dx * dx + dy * dy + dz * dz;
+        int sign = (n_power % 2 == 0) ? 1 : -1;
+        // printf("Power %d, Sign %d\n", n_power, sign);
+        int weight = sign * 8 / pow(2.0, 1.0 * n_power);
         // printf("Pow works just fine!");
 
         // TODO: the computation of the kernel can maybe be further optimized
@@ -99,7 +101,10 @@ __host__ __device__ real calcNewellNxy(int3 idx, real3 cellsize) {
         //   -4 for side faces
         //    2 for edges
         //   -1 for corners
-        int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
+        int n_power = dx * dx + dy * dy + dz * dz;
+        int sign = (n_power % 2 == 0) ? 1 : -1;
+        // printf("Power %d, Sign %d\n", n_power, sign);
+        int weight = sign * 8 / pow(2.0, 1.0 * n_power);
 
         result += weight * Nxy_indefinite(idx + int3{dx, dy, dz}, cellsize);
       }
