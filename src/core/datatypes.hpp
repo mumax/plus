@@ -2,7 +2,6 @@
 
 #include <cuComplex.h>
 #include <cuda_runtime_api.h>
-#include <math.h>
 
 #include <iostream>
 

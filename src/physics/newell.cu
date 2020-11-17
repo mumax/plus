@@ -1,6 +1,5 @@
-#include <cmath>
-
 #include "newell.hpp"
+
 
 // Eq. 27 in paper of Newell (doi.org/10.1029/93JB00694)
 __host__ __device__ static inline double Nxx_indefinite(int3 idx,
@@ -62,14 +61,14 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
       for (int dz = -1; dz <= 1; dz++) {
         // TODO: outer loop can be optimized for dz = 0 because
         //       newell_xx yiels the same for z+dz and z-dz
-
         // weight factor:
         //    8 for the center
         //   -4 for side faces
         //    2 for edges
         //   -1 for corners
-        int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
-
+        int n_power = dx * dx + dy * dy + dz * dz;
+        int sign = (n_power % 2 == 0) ? 1 : -1;
+        int weight = sign * 8 / pow(2.0, 1.0 * n_power);
         // TODO: the computation of the kernel can maybe be further optimized
         //       by caching (or pre-computation of) the Nxx_indefinite results
         result += weight * Nxx_indefinite(idx + int3{dx, dy, dz}, cellsize);
@@ -97,7 +96,9 @@ __host__ __device__ real calcNewellNxy(int3 idx, real3 cellsize) {
         //   -4 for side faces
         //    2 for edges
         //   -1 for corners
-        int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
+        int n_power = dx * dx + dy * dy + dz * dz;
+        int sign = (n_power % 2 == 0) ? 1 : -1;
+        int weight = sign * 8 / pow(2.0, 1.0 * n_power);
 
         result += weight * Nxy_indefinite(idx + int3{dx, dy, dz}, cellsize);
       }
