@@ -1,6 +1,9 @@
 #include "newell.hpp"
 
-// Eq. 27 in paper of Newell (doi.org/10.1029/93JB00694)
+/** Indefinite integral needed to compute the demagkernel component Nxx.
+ *  This function implements Eq. 27 in the paper of Newell.
+ *  @see https://doi.org/10.1029/93JB00694
+ */
 __host__ __device__ static inline double Nxx_indefinite(int3 idx,
                                                         real3 cellsize) {
   double x = idx.x * cellsize.x;
@@ -24,11 +27,14 @@ __host__ __device__ static inline double Nxx_indefinite(int3 idx,
   return result;
 }
 
-// Eq. 32 in paper of Newell
+/** Indefinite integral needed to compute the demagkernel component Nxy.
+ *  This function implements Eq. 32 in the paper of Newell.
+ *  @see https://doi.org/10.1029/93JB00694
+ */
 __host__ __device__ static inline double Nxy_indefinite(int3 idx,
                                                         real3 cellsize) {
-  if (idx.y == 0 ||
-      idx.x == 0)  // Nxy=0 if x=0 and y=0, return early and avoid DBZ
+  // Nxy=0 if x=0 and y=0, return early and avoid DBZ
+  if (idx.y == 0 || idx.x == 0)
     return 0.0;
 
   double x = idx.x * cellsize.x;
@@ -51,8 +57,10 @@ __host__ __device__ static inline double Nxy_indefinite(int3 idx,
   return result;
 }
 
-// The kernel components Nxx, Nxy, ... are a weighted sum of the indefinite
-// integrals. This helper function returns the correct weights
+/** Returns the weight of an indefinite integral term.
+ *  The kernel components Nxx, Nxy, ... are a weighted sum of the indefinite
+ *  integrals. This helper function returns the correct weight.
+ */
 __host__ __device__ static inline int newellWeight(int3 dr) {
   switch (dr.x * dr.x + dr.y * dr.y + dr.z * dr.z) {
     case 0:  // center
@@ -68,7 +76,6 @@ __host__ __device__ static inline int newellWeight(int3 dr) {
   }
 }
 
-// Eq. 19 in paper of Newell
 __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
   // TODO: the computation of the kernel can maybe be further optimized
   //       by caching (or pre-computation of) the Nxx_indefinite results
@@ -88,7 +95,6 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
   return result;
 }
 
-// Eq. 28 in paper of Newell
 __host__ __device__ real calcNewellNxy(int3 idx, real3 cellsize) {
   if (idx.x == 0 || idx.y == 0)
     return 0;
@@ -108,7 +114,8 @@ __host__ __device__ real calcNewellNxy(int3 idx, real3 cellsize) {
   return result;
 }
 
-// reuse Nxx and Nxy by permutating the arguments
+// reuse Nxx and Nxy by permutating the arguments to implement the other kernel
+// components
 real calcNewellNyy(int3 idx, real3 cs) {
   return calcNewellNxx({idx.y, idx.z, idx.x}, {cs.y, cs.z, cs.x});
 }
