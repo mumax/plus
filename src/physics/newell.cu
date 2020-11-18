@@ -53,26 +53,34 @@ __host__ __device__ static inline double Nxy_indefinite(int3 idx,
   return result;
 }
 
+// The kernel components Nxx, Nxy, ... are a weighted sum of the indefinite
+// integrals. This helper function returns the correct weights
+__host__ __device__ static inline int newellWeight(int3 dr) {
+  switch (dr.x * dr.x + dr.y * dr.y + dr.z * dr.z) {
+    case 0:  // center
+      return 8;
+    case 1:  // side face
+      return -4;
+    case 2:  // edge
+      return 2;
+    case 3:  // corner
+      return -1;
+    default:
+      return 0;
+  }
+}
+
 // Eq. 19 in paper of Newell
 __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
+  // TODO: the computation of the kernel can maybe be further optimized
+  //       by caching (or pre-computation of) the Nxx_indefinite results
   double result = 0;
 
   for (int dx = -1; dx <= 1; dx++) {
     for (int dy = -1; dy <= 1; dy++) {
       for (int dz = -1; dz <= 1; dz++) {
-        // TODO: outer loop can be optimized for dz = 0 because
-        //       newell_xx yiels the same for z+dz and z-dz
-
-        // weight factor:
-        //    8 for the center
-        //   -4 for side faces
-        //    2 for edges
-        //   -1 for corners
-        int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
-
-        // TODO: the computation of the kernel can maybe be further optimized
-        //       by caching (or pre-computation of) the Nxx_indefinite results
-        result += weight * Nxx_indefinite(idx + int3{dx, dy, dz}, cellsize);
+        int3 dr{dx, dy, dz};
+        result += newellWeight(dr) * Nxx_indefinite(idx + dr, cellsize);
       }
     }
   }
@@ -92,14 +100,8 @@ __host__ __device__ real calcNewellNxy(int3 idx, real3 cellsize) {
   for (int dx = -1; dx <= 1; dx++) {
     for (int dy = -1; dy <= 1; dy++) {
       for (int dz = -1; dz <= 1; dz++) {
-        // weight factor:
-        //    8 for the center
-        //   -4 for side faces
-        //    2 for edges
-        //   -1 for corners
-        int weight = 8 / pow(-2, dx * dx + dy * dy + dz * dz);
-
-        result += weight * Nxy_indefinite(idx + int3{dx, dy, dz}, cellsize);
+        int3 dr{dx, dy, dz};
+        result += newellWeight(dr) * Nxy_indefinite(idx + dr, cellsize);
       }
     }
   }
