@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include "newell.hpp"
 
 // Eq. 27 in paper of Newell (doi.org/10.1029/93JB00694)
