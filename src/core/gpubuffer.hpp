@@ -17,6 +17,11 @@ class GpuBufferPool {
   void free(void**);
   void recycle(void**);
 
+  /** Prints the number of used and available gpu buffers.
+   *  This function is usefull to detect memory leaks.
+   */
+  void printInfo() const;
+
  private:
   std::map<size_t, std::vector<void*>> pool_;
   std::map<void*, size_t> inUse_;
