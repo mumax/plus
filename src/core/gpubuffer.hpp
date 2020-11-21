@@ -56,6 +56,7 @@ class GpuBuffer {
 
   // Move constructor
   GpuBuffer(GpuBuffer&& other) {
+    recycle();
     ptr_ = other.ptr_;
     size_ = other.size_;
     other.ptr_ = nullptr;
@@ -75,6 +76,7 @@ class GpuBuffer {
 
   // Move assignment
   GpuBuffer<T>& operator=(GpuBuffer<T>&& other) {
+    recycle();
     ptr_ = other.ptr_;
     size_ = other.size_;
     other.ptr_ = nullptr;
