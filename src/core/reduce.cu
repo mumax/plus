@@ -38,14 +38,13 @@ __global__ void k_maxAbsValue(real* result, CuField f) {
 }
 
 real maxAbsValue(const Field& f) {
-  real* d_result = (real*)bufferPool.allocate(sizeof(real));
-  cudaLaunchReductionKernel(k_maxAbsValue, d_result, f.cu());
+  GpuBuffer<real> d_result(1);
+  cudaLaunchReductionKernel(k_maxAbsValue, d_result.get(), f.cu());
 
   // copy the result to the host and return
   real result;
-  checkCudaError(cudaMemcpyAsync(&result, d_result, 1 * sizeof(real),
+  checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(real),
                                  cudaMemcpyDeviceToHost, getCudaStream()));
-  bufferPool.recycle((void**)&d_result);
   return result;
 }
 
@@ -85,14 +84,13 @@ real maxVecNorm(const Field& f) {
         "the input field of maxVecNorm should have 3 components");
   }
 
-  real* d_result = (real*)bufferPool.allocate(sizeof(real));
-  cudaLaunchReductionKernel(k_maxVecNorm, d_result, f.cu());
+  GpuBuffer<real> d_result(1);
+  cudaLaunchReductionKernel(k_maxVecNorm, d_result.get(), f.cu());
 
   // copy the result to the host and return
   real result;
-  checkCudaError(cudaMemcpyAsync(&result, d_result, 1 * sizeof(real),
+  checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(real),
                                  cudaMemcpyDeviceToHost, getCudaStream()));
-  bufferPool.recycle((void**)&d_result);
   return result;
 }
 
@@ -130,11 +128,10 @@ real fieldComponentAverage(const Field& f, int comp) {
   }
 
   real result;
-  real* d_result = (real*)bufferPool.allocate(sizeof(real));
-  cudaLaunchReductionKernel(k_average, d_result, f.cu(), comp);
-  checkCudaError(cudaMemcpyAsync(&result, d_result, sizeof(real),
+  GpuBuffer<real> d_result(1);
+  cudaLaunchReductionKernel(k_average, d_result.get(), f.cu(), comp);
+  checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(real),
                                  cudaMemcpyDeviceToHost, getCudaStream()));
-  bufferPool.recycle((void**)&d_result);
   return result;
 }
 
@@ -171,12 +168,11 @@ __global__ void k_dotSum(real* result, CuField f, CuField g) {
 }
 
 real dotSum(const Field& f, const Field& g) {
-  real* d_result = (real*)bufferPool.allocate(sizeof(real));
-  cudaLaunchReductionKernel(k_dotSum, d_result, f.cu(), g.cu());
+  GpuBuffer<real> d_result(1);
+  cudaLaunchReductionKernel(k_dotSum, d_result.get(), f.cu(), g.cu());
   // copy the result to the host and return
   real result;
-  checkCudaError(cudaMemcpyAsync(&result, d_result, sizeof(real),
+  checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(real),
                                  cudaMemcpyDeviceToHost, getCudaStream()));
-  bufferPool.recycle((void**)&d_result);
   return result;
 }

@@ -12,17 +12,17 @@
  * Using a memory pool avoids the need the allocate new memory on the gpu over
  * and over again by recycling the memory blocks.
  *
- * The GpuBufferPool user is responsible for recycling or freeing the allocated
+ * The GpuMemoryPool user is responsible for recycling or freeing the allocated
  * memory after use. If you need a gpu buffer, consider to use a GpuBuffer
  * object which does this kind of memory management for you.
  */
-class GpuBufferPool {
+class GpuMemoryPool {
  public:
-  GpuBufferPool() = default;
-  GpuBufferPool(GpuBufferPool const&) = delete;
-  void operator=(GpuBufferPool const&) = delete;
+  GpuMemoryPool() = default;
+  GpuMemoryPool(GpuMemoryPool const&) = delete;
+  void operator=(GpuMemoryPool const&) = delete;
 
-  ~GpuBufferPool();
+  ~GpuMemoryPool();
 
   /**
    * Returns a pointer to allocated gpu memory block with the specified size
@@ -35,24 +35,24 @@ class GpuBufferPool {
    * memory will be allocated.
    *
    * The caller is responsible to release the memory after use. This should be
-   * done by calling the 'free' or 'recycle' method on the GpuBufferPool which
+   * done by calling the 'free' or 'recycle' method on the GpuMemoryPool which
    * is used to allocate the gpu memory.
    */
   void* allocate(size_t size);
 
   /**
-   * Free gpu memory allocated by this buffer pool.
+   * Free gpu memory allocated by this memory pool.
    */
   void free(void**);
 
   /**
-   * Recycle gpu memory allocated by this buffer pool.
-   * The allocated memory will become available again in the buffer pool.
+   * Recycle gpu memory allocated by this memory pool.
+   * The allocated memory will become available again in the memory pool.
    */
   void recycle(void**);
 
   /**
-   * Prints the number of used and available allocate memory by this buffer
+   * Prints the number of used and available allocate memory by this memory
    * pool. This function is useful to detect memory leaks.
    */
   void printInfo() const;
@@ -63,9 +63,9 @@ class GpuBufferPool {
 };
 
 /**
- * The global GpuBufferPool instance
+ * The global GpuMemoryPool instance
  */
-extern GpuBufferPool bufferPool;
+extern GpuMemoryPool memoryPool;
 
 template <typename T>
 class GpuBuffer {
@@ -81,7 +81,7 @@ class GpuBuffer {
   GpuBuffer() {}
 
   /**
-   * The GpuBuffer destructor releases the memory back to the bufferPool.
+   * The GpuBuffer destructor releases the memory back to the memoryPool.
    */
   ~GpuBuffer() { recycle(); }
 
@@ -158,7 +158,7 @@ class GpuBuffer {
     recycle();
 
     if (size > 0) {
-      ptr_ = (T*)bufferPool.allocate(size * sizeof(T));
+      ptr_ = (T*)memoryPool.allocate(size * sizeof(T));
     } else {
       ptr_ = nullptr;
     }
@@ -171,7 +171,7 @@ class GpuBuffer {
    */
   void recycle() {
     if (ptr_)
-      bufferPool.recycle((void**)&ptr_);
+      memoryPool.recycle((void**)&ptr_);
     ptr_ = nullptr;
     size_ = 0;
   }
