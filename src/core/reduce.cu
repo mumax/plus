@@ -1,23 +1,12 @@
 #include <stdexcept>
 
 #include "cudaerror.hpp"
+#include "cudalaunch.hpp"
 #include "cudastream.hpp"
 #include "datatypes.hpp"
 #include "field.hpp"
 #include "gpubuffer.hpp"
 #include "reduce.hpp"
-
-#define BLOCKDIM 512
-
-template <typename... Arguments>
-void cudaLaunchReductionKernel(void (*kernelfunction)(Arguments...),
-                               Arguments... args) {
-  dim3 blockDims(BLOCKDIM);
-  dim3 gridDims(1);
-  kernelfunction<<<gridDims, blockDims, 0, getCudaStream()>>>(args...);
-  checkCudaError(cudaPeekAtLastError());
-  checkCudaError(cudaDeviceSynchronize());
-}
 
 __global__ void k_maxAbsValue(real* result, CuField f) {
   // Reduce to a block
@@ -28,7 +17,7 @@ __global__ void k_maxAbsValue(real* result, CuField f) {
   for (int i = tid; i < ncells; i += BLOCKDIM) {
     for (int c = 0; c < f.ncomp; c++) {
       real value = abs(f.valueAt(i, c));
-      threadValue = value > threadValue? value : threadValue;
+      threadValue = value > threadValue ? value : threadValue;
     }
   }
   sdata[tid] = threadValue;
