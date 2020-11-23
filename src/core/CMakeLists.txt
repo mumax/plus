@@ -31,12 +31,16 @@ add_library(core STATIC
     scalarquantity.hpp 
     stepper.cpp
     stepper.hpp
+    system.cpp
+    system.hpp
     timesolver.cpp
     timesolver.hpp
     timer.cpp
     timer.hpp
     variable.hpp
     variable.cpp
+    world.cpp
+    world.hpp
 )
 
 target_include_directories(core PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})

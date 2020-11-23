@@ -35,11 +35,6 @@ class Ferromagnet:
         return Grid._from_impl(self._impl.grid)
 
     @property
-    def world(self):
-        """World in which the ferromagnet lives."""
-        return self._impl.world
-
-    @property
     def cellsize(self):
         """Dimensions of the cell."""
         return self._impl.cellsize

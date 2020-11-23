@@ -16,11 +16,11 @@
 #include "variable.hpp"
 
 class FieldQuantity;
-class World;
+class MumaxWorld;
 
 class Ferromagnet : public System {
  public:
-  Ferromagnet(World* world, std::string name, Grid grid);
+  Ferromagnet(std::string name, Grid grid);
   ~Ferromagnet();
   Ferromagnet(Ferromagnet&&) = default;  // TODO: check if default is ok
 

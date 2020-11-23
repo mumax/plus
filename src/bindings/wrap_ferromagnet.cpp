@@ -10,6 +10,7 @@
 #include "fieldquantity.hpp"
 #include "interfacialdmi.hpp"
 #include "magnetfieldkernel.hpp"
+#include "mumaxworld.hpp"
 #include "parameter.hpp"
 #include "stt.hpp"
 #include "thermalnoise.hpp"
@@ -29,8 +30,11 @@ void wrap_ferromagnet(py::module& m) {
   py::class_<Ferromagnet>(m, "Ferromagnet")
       .def_property_readonly("name", &Ferromagnet::name)
       .def_property_readonly("grid", &Ferromagnet::grid)
-      .def_property_readonly("world", &Ferromagnet::world)
       .def_property_readonly("cellsize", &Ferromagnet::cellsize)
+
+      // TODO: implement the world property which returns the MumaxWorld to
+      // which the ferromagnet belongs
+      //.def_property_readonly("world",...)
 
       .def_property_readonly("magnetization", &Ferromagnet::magnetization)
 

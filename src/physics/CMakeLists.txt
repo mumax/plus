@@ -29,18 +29,16 @@ add_library(physics STATIC
     magnetfieldfft.hpp
     magnetfieldkernel.cu
     magnetfieldkernel.hpp
+    mumaxworld.cpp
+    mumaxworld.hpp
     newell.cu
     newell.hpp
     stt.cu
     stt.hpp
-    system.cpp 
-    system.hpp 
     thermalnoise.cu
     thermalnoise.hpp
     torque.cu 
     torque.hpp 
-    world.cpp 
-    world.hpp
     zeeman.cu
     zeeman.hpp
 )

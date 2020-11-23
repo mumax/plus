@@ -1,11 +1,11 @@
 #include "cudalaunch.hpp"
 #include "datatypes.hpp"
+#include "energy.hpp"
 #include "ferromagnet.hpp"
 #include "ferromagnetquantity.hpp"
 #include "field.hpp"
-#include "world.hpp"
+#include "mumaxworld.hpp"
 #include "zeeman.hpp"
-#include "energy.hpp"
 
 bool externalFieldAssuredZero(const Ferromagnet* magnet) {
   auto magnetFields = magnet->getMagnetFields();
@@ -15,7 +15,8 @@ bool externalFieldAssuredZero(const Ferromagnet* magnet) {
     }
   }
 
-  real3 b_ext = magnet->world()->biasMagneticField;
+  MumaxWorld* world = static_cast<MumaxWorld*>(magnet->world());
+  real3 b_ext = world->biasMagneticField;
   return b_ext == real3{0.0, 0.0, 0.0};
 }
 
@@ -26,7 +27,8 @@ Field evalExternalField(const Ferromagnet* magnet) {
     return h;
   }
 
-  real3 b_ext = magnet->world()->biasMagneticField;
+  MumaxWorld* world = static_cast<MumaxWorld*>(magnet->world());
+  real3 b_ext = world->biasMagneticField;
   h.setUniformComponent(0, b_ext.x);
   h.setUniformComponent(1, b_ext.y);
   h.setUniformComponent(2, b_ext.z);
@@ -42,13 +44,13 @@ Field evalExternalField(const Ferromagnet* magnet) {
   return h;
 }
 
-Field evalZeemanEnergyDensity(const Ferromagnet* magnet){
+Field evalZeemanEnergyDensity(const Ferromagnet* magnet) {
   if (externalFieldAssuredZero(magnet))
-    return Field(magnet->grid(),1, 0.0);
+    return Field(magnet->grid(), 1, 0.0);
   return evalEnergyDensity(magnet, evalExternalField(magnet), 1.0);
 }
 
-real zeemanEnergy(const Ferromagnet* magnet){
+real zeemanEnergy(const Ferromagnet* magnet) {
   if (externalFieldAssuredZero(magnet))
     return 0.0;
   real edens = zeemanEnergyDensityQuantity(magnet).average()[0];
@@ -57,15 +59,15 @@ real zeemanEnergy(const Ferromagnet* magnet){
   return ncells * edens * cellVolume;
 }
 
-FM_FieldQuantity externalFieldQuantity(const Ferromagnet * magnet) {
+FM_FieldQuantity externalFieldQuantity(const Ferromagnet* magnet) {
   return FM_FieldQuantity(magnet, evalExternalField, 3, "external_field", "T");
 }
 
-FM_FieldQuantity zeemanEnergyDensityQuantity(const Ferromagnet * magnet) {
+FM_FieldQuantity zeemanEnergyDensityQuantity(const Ferromagnet* magnet) {
   return FM_FieldQuantity(magnet, evalZeemanEnergyDensity, 1,
-                             "zeeman_energy_density", "J/m3");
+                          "zeeman_energy_density", "J/m3");
 }
 
-FM_ScalarQuantity zeemanEnergyQuantity(const Ferromagnet * magnet) {
+FM_ScalarQuantity zeemanEnergyQuantity(const Ferromagnet* magnet) {
   return FM_ScalarQuantity(magnet, zeemanEnergy, "zeeman_energy", "J");
 }
