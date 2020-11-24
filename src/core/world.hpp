@@ -2,6 +2,7 @@
 
 #include <map>
 #include <memory>
+#include <string>
 
 #include "datatypes.hpp"
 #include "grid.hpp"
@@ -11,7 +12,7 @@ class World {
  public:
   /** Create a world with a given cell size and master grid
    *  If the mastergrid has a zero size, then the mastergrid is considered to be
-   *  infenitely large.
+   *  infinitely large.
    */
   World(real3 cellsize, Grid mastergrid = Grid(int3{0, 0, 0}));
 
@@ -33,16 +34,17 @@ class World {
   /** Returns true if the grid is completely inside the mastergrid. */
   bool inMastergrid(Grid) const;
 
-  /** Add a system to this world.
-   *  The world will take over ownership of the system.
+  /** Register a system to this world.
+   *  The world becomes aware of this system, and will hold a shared pointer to
+   *  the system.
    */
-  void addSystem(std::unique_ptr<System>);
+  void registerSystem(std::shared_ptr<System>, std::string name);
 
   /** Get a pointer to a system in this world by its name. */
-  System* getSystem(std::string name);
+  std::shared_ptr<System> getSystem(std::string name);
 
  protected:
-  std::map<std::string, std::unique_ptr<System>> systems_;
+  std::map<std::string, std::shared_ptr<System>> systems_;
   real3 cellsize_;
   Grid mastergrid_;
 };

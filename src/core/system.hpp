@@ -9,15 +9,13 @@ class World;
 
 class System {
  public:
-  /** Construct a system with a given name and grid. */
-  System(std::string name, Grid grid);
+  /** Construct a system with a given grid which lives in a given world. */
+  System(World* world, Grid grid);
 
   /** Destroy the system. */
   virtual ~System() {}
 
-  /** Return the world to which the system belongs.
-   *  An std::runtime_error is thrown if the system does not belong to a world.
-   */
+  /** Return the world to which the system belongs. */
   World* world() const;
 
   /** Return the name of the system. */
@@ -26,17 +24,15 @@ class System {
   /** Return the grid of the system. */
   Grid grid() const;
 
-  /** Return the cellsize of the world to which the system belongs.
-   *  An std::runtime_error is thrown if the system does not belong to a world.
-   */
+  /** Return the cellsize of the world to which the system belongs. */
   real3 cellsize() const;
 
-  // If a system is handed to the World, the World has to update world_.
+  // If a system is handed to the World, the World will update name_.
   // TODO: look for a better way to do achieve this.
   friend class World;
 
  private:
-  World* world_ = nullptr;
-  std::string name_;
+  World* world_;
+  std::string name_ = "";
   Grid grid_;
 };

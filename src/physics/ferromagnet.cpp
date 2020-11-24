@@ -10,9 +10,12 @@
 #include "mumaxworld.hpp"
 #include "ref.hpp"
 
-Ferromagnet::Ferromagnet(std::string name, Grid grid)
-    : System(name, grid),
-      magnetization_(name + ":magnetization", "", 3, grid),
+Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid)
+    : System(world, grid),
+      magnetization_("magnetization",
+                     "",
+                     3,
+                     grid),  // TODO: add system name to variable name
       aex(grid, 0.0),
       msat(grid, 1.0),
       ku1(grid, 0.0),

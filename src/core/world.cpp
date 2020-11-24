@@ -40,20 +40,35 @@ bool World::inMastergrid(Grid grid) const {
   return true;
 }
 
-void World::addSystem(std::unique_ptr<System> newSystem) {
-  std::string name = newSystem->name();
+void World::registerSystem(std::shared_ptr<System> newSystem,
+                           std::string name) {
+  if (name.empty()) {
+    throw std::runtime_error("A name is needed to register a system");
+  }
+
+  if (newSystem->world() != this) {
+    throw std::runtime_error(
+        "Can not register the system because the system lives in another "
+        "world.");
+  }
+
+  if (!newSystem->name().empty()) {
+    throw std::runtime_error("The system is already registered");
+  }
+
   if (systems_.find(name) != systems_.end()) {
     throw std::runtime_error(
-        "A system with the name '" + name +
-        "' already exists in this world, and hence can not be added.");
+        "Another system with the name '" + name +
+        "' is already registered in this world, and hence can not be added.");
   }
-  newSystem->world_ = this;
-  systems_[name] = std::move(newSystem);
+
+  newSystem->name_ = name;
+  systems_[name] = newSystem;
 }
 
-System* World::getSystem(std::string name) {
+std::shared_ptr<System> World::getSystem(std::string name) {
   auto namedSystem = systems_.find(name);
   if (namedSystem == systems_.end())
     return nullptr;
-  return namedSystem->second.get();
+  return namedSystem->second;
 }

@@ -14,13 +14,14 @@
 #include "ref.hpp"
 #include "system.hpp"
 #include "variable.hpp"
+#include "world.hpp"
 
 class FieldQuantity;
 class MumaxWorld;
 
 class Ferromagnet : public System {
  public:
-  Ferromagnet(std::string name, Grid grid);
+  Ferromagnet(MumaxWorld* world, Grid grid);
   ~Ferromagnet();
   Ferromagnet(Ferromagnet&&) = default;  // TODO: check if default is ok
 

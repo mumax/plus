@@ -6,12 +6,9 @@
 #include "grid.hpp"
 #include "world.hpp"
 
-System::System(std::string name, Grid grid) : grid_(grid), name_(name) {}
+System::System(World* world, Grid grid) : grid_(grid), world_(world) {}
 
 World* System::world() const {
-  if (world_ == nullptr) {
-    throw std::runtime_error("The system is not owned by a world.");
-  }
   return world_;
 }
 
