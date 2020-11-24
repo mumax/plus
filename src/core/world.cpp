@@ -62,13 +62,17 @@ void World::registerSystem(std::shared_ptr<System> newSystem,
         "' is already registered in this world, and hence can not be added.");
   }
 
-  newSystem->name_ = name;
   systems_[name] = newSystem;
 }
 
-std::shared_ptr<System> World::getSystem(std::string name) {
+std::shared_ptr<System> World::registeredSystem(std::string name) const {
   auto namedSystem = systems_.find(name);
   if (namedSystem == systems_.end())
     return nullptr;
   return namedSystem->second;
+}
+
+const std::map<std::string, std::shared_ptr<System>>& World::registeredSystems()
+    const {
+  return systems_;
 }

@@ -13,7 +13,21 @@ World* System::world() const {
 }
 
 std::string System::name() const {
-  return name_;
+  for (auto it : world()->registeredSystems()) {
+    if (it.second.get() == this) {
+      return it.first;
+    }
+  }
+  return "";
+}
+
+bool System::registered() const {
+  for (auto it : world()->registeredSystems()) {
+    if (it.second.get() == this) {
+      return true;
+    }
+  }
+  return false;
 }
 
 Grid System::grid() const {

@@ -41,7 +41,11 @@ class World {
   void registerSystem(std::shared_ptr<System>, std::string name);
 
   /** Get a pointer to a system in this world by its name. */
-  std::shared_ptr<System> getSystem(std::string name);
+  std::shared_ptr<System> registeredSystem(std::string name) const;
+
+  /** Get map of all registered systems in this world. */
+  const std::map<std::string, std::shared_ptr<System>>& registeredSystems()
+      const;
 
  protected:
   std::map<std::string, std::shared_ptr<System>> systems_;
