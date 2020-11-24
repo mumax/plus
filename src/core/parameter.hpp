@@ -6,10 +6,11 @@
 
 class Field;
 class CuParameter;
+class System;
 
 class Parameter : public FieldQuantity {
  public:
-  Parameter(Grid grid, real value = 0.0);
+  Parameter(System*, real value = 0.0);
   ~Parameter();
 
   void set(real value);
@@ -18,13 +19,14 @@ class Parameter : public FieldQuantity {
   bool isUniform() const;
   bool assuredZero() const;
   int ncomp() const;
+  System* system() const;
   Grid grid() const;
   Field eval() const;
 
   CuParameter cu() const;
 
  private:
-  const Grid grid_;
+  System* system_;
   real uniformValue_;
   Field* field_;
 };
@@ -66,7 +68,7 @@ class CuVectorParameter;
 
 class VectorParameter : public FieldQuantity {
  public:
-  VectorParameter(Grid grid, real3 value = {0.0, 0.0, 0.0});
+  VectorParameter(System* system, real3 value = {0.0, 0.0, 0.0});
   ~VectorParameter();
 
   void set(real3 value);
@@ -75,13 +77,14 @@ class VectorParameter : public FieldQuantity {
   bool isUniform() const;
   bool assuredZero() const;
   int ncomp() const;
+  System* system() const;
   Grid grid() const;
   Field eval() const;
 
   CuVectorParameter cu() const;
 
  private:
-  const Grid grid_;
+  System* system_;
   real3 uniformValue_;
   Field* field_;
 };
@@ -113,9 +116,9 @@ inline CuVectorParameter::CuVectorParameter(Grid grid, real3 uniformValue)
       zValuesPtr(nullptr) {}
 
 inline CuVectorParameter::CuVectorParameter(Grid grid,
-                                     real* xPtr,
-                                     real* yPtr,
-                                     real* zPtr)
+                                            real* xPtr,
+                                            real* yPtr,
+                                            real* zPtr)
     : grid(grid),
       uniformValue({0, 0, 0}),
       xValuesPtr(xPtr),

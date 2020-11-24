@@ -1,9 +1,12 @@
+#include <memory>
+
 #include "datatypes.hpp"
 #include "field.hpp"
 #include "parameter.hpp"
+#include "system.hpp"
 
-Parameter::Parameter(Grid grid, real value)
-    : grid_(grid), field_(nullptr), uniformValue_(value) {}
+Parameter::Parameter(System* system, real value)
+    : system_(system), field_(nullptr), uniformValue_(value) {}
 
 Parameter::~Parameter() {
   if (field_)
@@ -34,12 +37,16 @@ int Parameter::ncomp() const {
   return 1;
 }
 
+System* Parameter::system() const {
+  return system_;
+}
+
 Grid Parameter::grid() const {
-  return grid_;
+  return system_->grid();
 }
 
 Field Parameter::eval() const {
-  Field p(grid(), ncomp());
+  Field p(system_, ncomp());
   if (field_) {
     p = *field_;
   } else {
@@ -50,12 +57,12 @@ Field Parameter::eval() const {
 
 CuParameter Parameter::cu() const {
   if (isUniform())
-    return CuParameter(grid_, uniformValue_);
-  return CuParameter(grid_, field_->devptr(0));
+    return CuParameter(grid(), uniformValue_);
+  return CuParameter(grid(), field_->devptr(0));
 }
 
-VectorParameter::VectorParameter(Grid grid, real3 value)
-    : grid_(grid), field_(nullptr), uniformValue_(value) {}
+VectorParameter::VectorParameter(System* system, real3 value)
+    : system_(system), field_(nullptr), uniformValue_(value) {}
 
 VectorParameter::~VectorParameter() {
   if (field_)
@@ -84,8 +91,12 @@ int VectorParameter::ncomp() const {
   return 3;
 }
 
+System* VectorParameter::system() const {
+  return system_;
+}
+
 Grid VectorParameter::grid() const {
-  return grid_;
+  return system()->grid();
 }
 
 Field VectorParameter::eval() const {
@@ -102,7 +113,7 @@ Field VectorParameter::eval() const {
 
 CuVectorParameter VectorParameter::cu() const {
   if (isUniform())
-    return CuVectorParameter(grid_, uniformValue_);
-  return CuVectorParameter{grid_, field_->devptr(0), field_->devptr(1),
+    return CuVectorParameter(grid(), uniformValue_);
+  return CuVectorParameter{grid(), field_->devptr(0), field_->devptr(1),
                            field_->devptr(2)};
 }

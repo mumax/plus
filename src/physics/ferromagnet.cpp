@@ -16,17 +16,17 @@ Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid)
                      "",
                      3,
                      grid),  // TODO: add system name to variable name
-      aex(grid, 0.0),
-      msat(grid, 1.0),
-      ku1(grid, 0.0),
-      ku2(grid, 0.0),
-      alpha(grid, 0.0),
-      temperature(grid, 0.0),
-      idmi(grid, 0.0),
-      xi(grid, 0.0),
-      pol(grid, 0.0),
-      anisU(grid, {0, 0, 0}),
-      jcur(grid, {0, 0, 0}),
+      aex(this, 0.0),
+      msat(this, 1.0),
+      ku1(this, 0.0),
+      ku2(this, 0.0),
+      alpha(this, 0.0),
+      temperature(this, 0.0),
+      idmi(this, 0.0),
+      xi(this, 0.0),
+      pol(this, 0.0),
+      anisU(this, {0, 0, 0}),
+      jcur(this, {0, 0, 0}),
       enableDemag(true) {
   {
     // TODO: this can be done much more efficient somewhere else
