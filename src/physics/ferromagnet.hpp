@@ -21,10 +21,11 @@ class MumaxWorld;
 
 class Ferromagnet : public System {
  public:
-  Ferromagnet(MumaxWorld* world, Grid grid);
+  Ferromagnet(MumaxWorld* world, Grid grid, std::string name);
   ~Ferromagnet();
   Ferromagnet(Ferromagnet&&) = default;  // TODO: check if default is ok
 
+  std::string name() const;
   const Variable* magnetization() const;
 
   bool enableDemag;
@@ -57,6 +58,7 @@ class Ferromagnet : public System {
  private:
   NormalizedVariable magnetization_;
   std::map<const Ferromagnet*, MagnetField*> magnetFields_;
+  std::string name_;
 
  public:
   curandGenerator_t randomGenerator;

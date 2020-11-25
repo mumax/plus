@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "datatypes.hpp"
 #include "grid.hpp"
 
@@ -17,12 +15,6 @@ class System {
 
   /** Return the world to which the system belongs. */
   World* world() const;
-
-  /** Return the name of the system. */
-  std::string name() const;
-
-  /** Return true if the system is registered in the world in which it lives. */
-  bool registered() const;
 
   /** Return the grid of the system. */
   Grid grid() const;

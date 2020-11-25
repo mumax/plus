@@ -10,9 +10,9 @@
 #include "mumaxworld.hpp"
 #include "ref.hpp"
 
-Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid)
+Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid, std::string name)
     : System(world, grid),
-      magnetization_("magnetization", "", this, 3),
+      magnetization_(name + ":magnetization", "", this, 3),
       aex(this, 0.0),
       msat(this, 1.0),
       ku1(this, 0.0),
@@ -49,6 +49,10 @@ Ferromagnet::~Ferromagnet() {
     delete entry.second;
   }
   curandDestroyGenerator(randomGenerator);
+}
+
+std::string Ferromagnet::name() const {
+  return name_;
 }
 
 const Variable* Ferromagnet::magnetization() const {

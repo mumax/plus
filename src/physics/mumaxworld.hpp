@@ -31,4 +31,11 @@ class MumaxWorld : public World {
    *  Return a nullptr if there is no magnet with specified name.
    */
   Ferromagnet* getFerromagnet(std::string name) const;
+
+  /** Get map of all Ferromagnets in this world. */
+  const std::map<std::string, std::shared_ptr<Ferromagnet>>& ferromagnets()
+      const;
+
+ private:
+  std::map<std::string, std::unique_ptr<Ferromagnet>> ferromagnets_;
 };

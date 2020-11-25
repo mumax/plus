@@ -20,10 +20,9 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid, std::string name) {
         "mastergrid ");
   }
 
-  for (const auto& namedSystem : systems_) {
-    System* system = namedSystem.second.get();
-    Ferromagnet* fm = dynamic_cast<Ferromagnet*>(system);
-    if (fm != nullptr && grid.overlaps(fm->grid())) {
+  for (const auto& namedMagnet : ferromagnets_) {
+    Ferromagnet* fm = namedMagnet.second.get();
+    if (grid.overlaps(fm->grid())) {
       throw std::out_of_range(
           "Can not add ferromagnet because it overlaps with another "
           "ferromagnet.");
@@ -35,37 +34,33 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid, std::string name) {
     name = "magnet_" + std::to_string(idxUnnamed++);
   }
 
-  if (systems_.find(name) != systems_.end()) {
-    throw std::runtime_error("A system with the name '" + name +
+  if (ferromagnets_.find(name) != ferromagnets_.end()) {
+    throw std::runtime_error("A ferromagnet with the name '" + name +
                              "' already exists");
   }
 
   // Create the magnet and add it to this world
-  auto newMagnet = std::shared_ptr<Ferromagnet>(new Ferromagnet(this, grid));
-  registerSystem(newMagnet, name);
+  ferromagnets_[name] = std::make_unique<Ferromagnet>(this, grid, name);
+  Ferromagnet* newMagnet = ferromagnets_[name].get();
 
   // Add the magnetic field of the other magnets in this magnet, and vice versa
-  for (const auto& namedSystem : systems_) {
-    System* system = namedSystem.second.get();
-    Ferromagnet* otherMagnet = dynamic_cast<Ferromagnet*>(system);
+  for (const auto& namedMagnet : ferromagnets_) {
+    Ferromagnet* otherMagnet = namedMagnet.second.get();
     if (otherMagnet != nullptr) {
-      otherMagnet->addMagnetField(newMagnet.get(), MAGNETFIELDMETHOD_AUTO);
+      otherMagnet->addMagnetField(newMagnet, MAGNETFIELDMETHOD_AUTO);
       // Avoid adding the field on itself twice
-      if (otherMagnet != newMagnet.get()) {
+      if (otherMagnet != newMagnet) {
         newMagnet->addMagnetField(otherMagnet, MAGNETFIELDMETHOD_AUTO);
       }
     }
   }
 
-  return newMagnet.get();
+  return newMagnet;
 };
 
 Ferromagnet* MumaxWorld::getFerromagnet(std::string name) const {
-  auto namedSystem = systems_.find(name);
-  if (namedSystem == systems_.end())
+  auto namedMagnet = ferromagnets_.find(name);
+  if (namedMagnet == ferromagnets_.end())
     return nullptr;
-  std::shared_ptr<System> system = namedSystem->second;
-  std::shared_ptr<Ferromagnet> magnet =
-      std::dynamic_pointer_cast<Ferromagnet>(system);
-  return magnet.get();
+  return namedMagnet->second.get();
 }

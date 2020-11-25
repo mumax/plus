@@ -1,11 +1,9 @@
 #include "world.hpp"
 
-#include <memory>
 #include <stdexcept>
-#include <string>
 
 #include "datatypes.hpp"
-#include "system.hpp"
+#include "grid.hpp"
 
 World::World(real3 cellsize, Grid mastergrid)
     : cellsize_(cellsize), mastergrid_(mastergrid) {
@@ -38,41 +36,4 @@ bool World::inMastergrid(Grid grid) const {
   if (mastergrid_.size().z > 0 && (d1.z < 0 || d2.z > 0))
     return false;
   return true;
-}
-
-void World::registerSystem(std::shared_ptr<System> newSystem,
-                           std::string name) {
-  if (name.empty()) {
-    throw std::runtime_error("A name is needed to register a system");
-  }
-
-  if (newSystem->world() != this) {
-    throw std::runtime_error(
-        "Can not register the system because the system lives in another "
-        "world.");
-  }
-
-  if (!newSystem->name().empty()) {
-    throw std::runtime_error("The system is already registered");
-  }
-
-  if (systems_.find(name) != systems_.end()) {
-    throw std::runtime_error(
-        "Another system with the name '" + name +
-        "' is already registered in this world, and hence can not be added.");
-  }
-
-  systems_[name] = newSystem;
-}
-
-std::shared_ptr<System> World::registeredSystem(std::string name) const {
-  auto namedSystem = systems_.find(name);
-  if (namedSystem == systems_.end())
-    return nullptr;
-  return namedSystem->second;
-}
-
-const std::map<std::string, std::shared_ptr<System>>& World::registeredSystems()
-    const {
-  return systems_;
 }

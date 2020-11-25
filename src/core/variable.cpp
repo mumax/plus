@@ -28,7 +28,7 @@ const System* Variable::system() const {
 }
 
 std::string Variable::name() const {
-  return system()->name() + ":" + name_;
+  return name_;
 }
 
 std::string Variable::unit() const {
