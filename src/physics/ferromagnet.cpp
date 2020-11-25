@@ -97,7 +97,7 @@ std::vector<const StrayField*> Ferromagnet::getStrayFields() const {
 }
 
 void Ferromagnet::addStrayField(const Ferromagnet* magnet,
-                                StrayFieldComputationMethod method) {
+                                StrayFieldExecutor::Method method) {
   if (world() != magnet->world()) {
     throw std::runtime_error(
         "Can not define the field of the magnet on this magnet because it is "

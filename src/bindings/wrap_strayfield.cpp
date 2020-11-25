@@ -15,9 +15,9 @@ void wrap_strayfield(py::module& m) {
            py::arg("ferromagnet"), py::arg("grid"))
       .def("set_method", [](StrayField* strayField, std::string method) {
         if (method == "fft") {
-          strayField->setMethod(STRAYFIELDMETHOD_FFT);
+          strayField->setMethod(StrayFieldExecutor::METHOD_FFT);
         } else if (method == "brute") {
-          strayField->setMethod(STRAYFIELDMETHOD_BRUTE);
+          strayField->setMethod(StrayFieldExecutor::METHOD_BRUTE);
         } else {
           throw std::invalid_argument("Method should be \"fft\" or \"brute\"");
         }

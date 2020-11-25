@@ -47,10 +47,10 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid, std::string name) {
   for (const auto& namedMagnet : ferromagnets_) {
     Ferromagnet* otherMagnet = namedMagnet.second.get();
     if (otherMagnet != nullptr) {
-      otherMagnet->addStrayField(newMagnet, STRAYFIELDMETHOD_AUTO);
+      otherMagnet->addStrayField(newMagnet);
       // Avoid adding the field on itself twice
       if (otherMagnet != newMagnet) {
-        newMagnet->addStrayField(otherMagnet, STRAYFIELDMETHOD_AUTO);
+        newMagnet->addStrayField(otherMagnet);
       }
     }
   }

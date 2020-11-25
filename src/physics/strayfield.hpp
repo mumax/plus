@@ -5,18 +5,15 @@
 #include "fieldquantity.hpp"
 #include "grid.hpp"
 
-enum StrayFieldComputationMethod {
-  STRAYFIELDMETHOD_BRUTE,
-  STRAYFIELDMETHOD_FFT,
-  STRAYFIELDMETHOD_AUTO
-};
-
 class Parameter;
 class Ferromagnet;
 class Field;
 class System;
 
 class StrayFieldExecutor {
+ public:
+  enum Method { METHOD_BRUTE, METHOD_FFT, METHOD_AUTO };
+
  public:
   virtual ~StrayFieldExecutor() {}
   virtual void exec(Field* h, const Field* m, const Parameter* msat) const = 0;
@@ -30,15 +27,15 @@ class StrayField : public FieldQuantity {
  public:
   StrayField(const Ferromagnet* magnet,
              std::shared_ptr<const System> system,
-             StrayFieldComputationMethod method = STRAYFIELDMETHOD_AUTO);
+             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
 
   StrayField(const Ferromagnet* magnet,
              Grid grid,
-             StrayFieldComputationMethod method = STRAYFIELDMETHOD_AUTO);
+             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
 
   ~StrayField();
 
-  void setMethod(StrayFieldComputationMethod);
+  void setMethod(StrayFieldExecutor::Method);
 
   const Ferromagnet* source() const;
 
