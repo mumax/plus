@@ -52,5 +52,5 @@ class StrayField : public FieldQuantity {
  private:
   std::shared_ptr<const System> system_;
   const Ferromagnet* magnet_;
-  StrayFieldExecutor* executor_;
+  std::unique_ptr<StrayFieldExecutor> executor_;
 };

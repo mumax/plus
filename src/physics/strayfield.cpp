@@ -24,31 +24,25 @@ StrayField::StrayField(const Ferromagnet* magnet,
   setMethod(method);
 }
 
-StrayField::~StrayField() {
-  if (executor_)
-    delete executor_;
-}
+StrayField::~StrayField() {}
 
 void StrayField::setMethod(StrayFieldComputationMethod method) {
   // TODO: check if method has been changed. If not, do nothing
-  if (executor_)
-    delete executor_;
-
   switch (method) {
     case STRAYFIELDMETHOD_AUTO:
       // TODO: make smart choice (dependent on the
       // grid sizes) when choosing between fft or
       // brute method. For now, we choose fft method
-      executor_ = new StrayFieldFFTExecutor(grid(), magnet_->grid(),
-                                            magnet_->world()->cellsize());
+      executor_ = std::make_unique<StrayFieldFFTExecutor>(
+          grid(), magnet_->grid(), magnet_->world()->cellsize());
       break;
     case STRAYFIELDMETHOD_FFT:
-      executor_ = new StrayFieldFFTExecutor(grid(), magnet_->grid(),
-                                            magnet_->world()->cellsize());
+      executor_ = std::make_unique<StrayFieldFFTExecutor>(
+          grid(), magnet_->grid(), magnet_->world()->cellsize());
       break;
     case STRAYFIELDMETHOD_BRUTE:
-      executor_ = new StrayFieldBruteExecutor(grid(), magnet_->grid(),
-                                              magnet_->world()->cellsize());
+      executor_ = std::make_unique<StrayFieldBruteExecutor>(
+          grid(), magnet_->grid(), magnet_->world()->cellsize());
       break;
   }
 }
