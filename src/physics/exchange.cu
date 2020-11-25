@@ -112,7 +112,7 @@ __global__ void k_exchangeField(CuField hField,
 }
 
 Field evalExchangeField(const Ferromagnet* magnet) {
-  Field hField(magnet, 3);
+  Field hField(magnet->system(), 3);
   if (exchangeAssuredZero(magnet)) {
     hField.makeZero();
     return hField;
@@ -128,7 +128,7 @@ Field evalExchangeField(const Ferromagnet* magnet) {
 
 Field evalExchangeEnergyDensity(const Ferromagnet* magnet) {
   if (exchangeAssuredZero(magnet))
-    return Field(magnet, 1, 0.0);
+    return Field(magnet->system(), 1, 0.0);
   return evalEnergyDensity(magnet, evalExchangeField(magnet), 0.5);
 }
 
@@ -196,7 +196,7 @@ __global__ void k_maxangle(CuField maxAngleField,
 }
 
 real evalMaxAngle(const Ferromagnet* magnet) {
-  Field maxAngleField(magnet, 1);
+  Field maxAngleField(magnet->system(), 1);
   cudaLaunch(maxAngleField.grid().ncells(), k_maxangle, maxAngleField.cu(),
              magnet->magnetization()->field().cu(), magnet->aex.cu(),
              magnet->msat.cu());

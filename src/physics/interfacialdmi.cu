@@ -70,7 +70,7 @@ __global__ void k_interfacialDmiField(CuField hField,
 }
 
 Field evalInterfacialDmiField(const Ferromagnet* magnet) {
-  Field hField(magnet, 3);
+  Field hField(magnet->system(), 3);
   if (interfacialDmiAssuredZero(magnet)) {
     hField.makeZero();
     return hField;
@@ -84,7 +84,7 @@ Field evalInterfacialDmiField(const Ferromagnet* magnet) {
 
 Field evalInterfacialDmiEnergyDensity(const Ferromagnet* magnet) {
   if (interfacialDmiAssuredZero(magnet))
-    return Field(magnet, 1, 0.0);
+    return Field(magnet->system(), 1, 0.0);
   return evalEnergyDensity(magnet, evalInterfacialDmiField(magnet), 0.5);
 }
 

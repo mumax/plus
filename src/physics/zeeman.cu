@@ -21,7 +21,7 @@ bool externalFieldAssuredZero(const Ferromagnet* magnet) {
 }
 
 Field evalExternalField(const Ferromagnet* magnet) {
-  Field h(magnet, 3);
+  Field h(magnet->system(), 3);
   if (externalFieldAssuredZero(magnet)) {
     h.makeZero();
     return h;
@@ -46,7 +46,7 @@ Field evalExternalField(const Ferromagnet* magnet) {
 
 Field evalZeemanEnergyDensity(const Ferromagnet* magnet) {
   if (externalFieldAssuredZero(magnet))
-    return Field(magnet, 1, 0.0);
+    return Field(magnet->system(), 1, 0.0);
   return evalEnergyDensity(magnet, evalExternalField(magnet), 1.0);
 }
 

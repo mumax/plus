@@ -39,7 +39,7 @@ __global__ void k_thermalNoise(CuField noiseField,
 }
 
 Field evalThermalNoise(const Ferromagnet* magnet) {
-  Field noise(magnet, 3);
+  Field noise(magnet->system(), 3);
   if (thermalNoiseAssuredZero(magnet)) {
     noise.makeZero();
     return noise;

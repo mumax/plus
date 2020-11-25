@@ -40,7 +40,7 @@ __global__ void k_anisotropyField(CuField hField,
 }
 
 Field evalAnisotropyField(const Ferromagnet* magnet) {
-  Field result(magnet, 3);
+  Field result(magnet->system(), 3);
   if (anisotropyAssuredZero(magnet)) {
     result.makeZero();
     return result;
@@ -86,7 +86,7 @@ __global__ void k_anisotropyEnergyDensity(CuField edens,
 }
 
 Field evalAnisotropyEnergyDensity(const Ferromagnet* magnet) {
-  Field edens(magnet, 1);
+  Field edens(magnet->system(), 1);
   if (anisotropyAssuredZero(magnet)) {
     edens.makeZero();
     return edens;

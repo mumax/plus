@@ -32,7 +32,7 @@ class FM_FieldQuantity : public FieldQuantity {
   }
 
   int ncomp() const { return ncomp_; }
-  const System* system() const { return ferromagnet_; }
+  const System* system() const { return ferromagnet_->system(); }
   std::string name() const { return name_; }
   std::string unit() const { return unit_; }
 

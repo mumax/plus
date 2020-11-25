@@ -12,35 +12,25 @@
 #include "magnetfield.hpp"
 #include "parameter.hpp"
 #include "ref.hpp"
-#include "system.hpp"
 #include "variable.hpp"
 #include "world.hpp"
 
 class FieldQuantity;
 class MumaxWorld;
+class System;
 
-class Ferromagnet : public System {
+class Ferromagnet {
  public:
   Ferromagnet(MumaxWorld* world, Grid grid, std::string name);
   ~Ferromagnet();
   Ferromagnet(Ferromagnet&&) = default;  // TODO: check if default is ok
 
   std::string name() const;
+  System* system() const;
+  World* world() const;
+  Grid grid() const;
+  real3 cellsize() const;
   const Variable* magnetization() const;
-
-  bool enableDemag;
-
-  VectorParameter anisU;
-  VectorParameter jcur;
-  Parameter msat;
-  Parameter aex;
-  Parameter ku1;
-  Parameter ku2;
-  Parameter alpha;
-  Parameter temperature;
-  Parameter idmi;
-  Parameter xi;
-  Parameter pol;
 
   const MagnetField* getMagnetField(const Ferromagnet*) const;
   std::vector<const MagnetField*> getMagnetFields() const;
@@ -56,10 +46,25 @@ class Ferromagnet : public System {
   Ferromagnet& operator=(const Ferromagnet&);
 
  private:
+  std::unique_ptr<System>
+      system_;  // the system_ has to be initialized first,
+                // hence its listed as the first datamember here
   NormalizedVariable magnetization_;
   std::map<const Ferromagnet*, MagnetField*> magnetFields_;
   std::string name_;
 
  public:
+  bool enableDemag;
+  VectorParameter anisU;
+  VectorParameter jcur;
+  Parameter msat;
+  Parameter aex;
+  Parameter ku1;
+  Parameter ku2;
+  Parameter alpha;
+  Parameter temperature;
+  Parameter idmi;
+  Parameter xi;
+  Parameter pol;
   curandGenerator_t randomGenerator;
 };

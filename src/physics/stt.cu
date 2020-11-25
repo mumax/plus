@@ -78,7 +78,7 @@ __global__ void k_spinTransferTorque(CuField torque,
 }
 
 Field evalSpinTransferTorque(const Ferromagnet* magnet) {
-  Field torque(magnet, 3);
+  Field torque(magnet->system(), 3);
   if (spinTransferTorqueAssuredZero(magnet)) {
     torque.makeZero();
     return torque;

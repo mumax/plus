@@ -3,6 +3,7 @@
 #include "ferromagnet.hpp"
 #include "grid.hpp"
 #include "mumaxworld.hpp"
+#include "system.hpp"
 #include "wrappers.hpp"
 
 void wrap_world(py::module& m) {

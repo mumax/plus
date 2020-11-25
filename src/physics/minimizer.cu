@@ -67,7 +67,7 @@ void Minimizer::step() {
   else
     t0 = t1;
 
-  m1 = Field(magnet_, 3);
+  m1 = Field(magnet_->system(), 3);
   int N = m1.grid().ncells();
   cudaLaunch(N, k_step, m1.cu(), m0.cu(), t0.cu(), stepsize_);
 

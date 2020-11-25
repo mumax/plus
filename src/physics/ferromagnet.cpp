@@ -8,22 +8,22 @@
 #include "magnetfield.hpp"
 #include "minimizer.hpp"
 #include "mumaxworld.hpp"
-#include "ref.hpp"
+#include "system.hpp"
 
 Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid, std::string name)
-    : System(world, grid),
-      magnetization_(name + ":magnetization", "", this, 3),
-      aex(this, 0.0),
-      msat(this, 1.0),
-      ku1(this, 0.0),
-      ku2(this, 0.0),
-      alpha(this, 0.0),
-      temperature(this, 0.0),
-      idmi(this, 0.0),
-      xi(this, 0.0),
-      pol(this, 0.0),
-      anisU(this, {0, 0, 0}),
-      jcur(this, {0, 0, 0}),
+    : system_(new System(world, grid)),
+      magnetization_(name + ":magnetization", "", system_.get(), 3),
+      aex(system_.get(), 0.0),
+      msat(system_.get(), 1.0),
+      ku1(system_.get(), 0.0),
+      ku2(system_.get(), 0.0),
+      alpha(system_.get(), 0.0),
+      temperature(system_.get(), 0.0),
+      idmi(system_.get(), 0.0),
+      xi(system_.get(), 0.0),
+      pol(system_.get(), 0.0),
+      anisU(system_.get(), {0, 0, 0}),
+      jcur(system_.get(), {0, 0, 0}),
       enableDemag(true) {
   {
     // TODO: this can be done much more efficient somewhere else
@@ -35,7 +35,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid, std::string name)
     for (auto& v : randomValues) {
       v = unif(randomEngine);
     }
-    Field randomField(this, ncomp);
+    Field randomField(system(), ncomp);
     randomField.setData(&randomValues[0]);
     magnetization_.set(randomField);
   }
@@ -53,6 +53,22 @@ Ferromagnet::~Ferromagnet() {
 
 std::string Ferromagnet::name() const {
   return name_;
+}
+
+System* Ferromagnet::system() const {
+  return system_.get();
+}
+
+World* Ferromagnet::world() const {
+  return system()->world();
+}
+
+Grid Ferromagnet::grid() const {
+  return system()->grid();
+}
+
+real3 Ferromagnet::cellsize() const {
+  return world()->cellsize();
 }
 
 const Variable* Ferromagnet::magnetization() const {
@@ -97,7 +113,7 @@ void Ferromagnet::addMagnetField(const Ferromagnet* magnet,
   }
 
   // Stray field of magnet (parameter) on this magnet (the object)
-  magnetFields_[magnet] = new MagnetField(magnet, this, method);
+  magnetFields_[magnet] = new MagnetField(magnet, system(), method);
 }
 
 void Ferromagnet::removeMagnetField(const Ferromagnet* magnet) {

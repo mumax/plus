@@ -33,7 +33,7 @@ __global__ void k_llgtorque(CuField torque,
 }
 
 Field evalLlgTorque(const Ferromagnet* magnet) {
-  Field torque(magnet, 3);
+  Field torque(magnet->system(), 3);
   Field h = evalEffectiveField(magnet);
   const Field& m = magnet->magnetization()->field();
   const Parameter& alpha = magnet->alpha;
@@ -55,7 +55,7 @@ __global__ void k_dampingtorque(CuField torque,
 }
 
 Field evalRelaxTorque(const Ferromagnet* magnet) {
-  Field torque(magnet, 3);
+  Field torque(magnet->system(), 3);
   Field h = evalEffectiveField(magnet);
   const Field& m = magnet->magnetization()->field();
   int ncells = torque.grid().ncells();
