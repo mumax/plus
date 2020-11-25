@@ -3,29 +3,29 @@
 #include "cudalaunch.hpp"
 #include "field.hpp"
 #include "grid.hpp"
-#include "magnetfieldkernel.hpp"
 #include "newell.hpp"
+#include "strayfieldkernel.hpp"
 #include "system.hpp"
 
-MagnetFieldKernel::MagnetFieldKernel(Grid grid, real3 cellsize)
+StrayFieldKernel::StrayFieldKernel(Grid grid, real3 cellsize)
     : cellsize_(cellsize) {
   kernelSystem_ = std::make_shared<System>(nullptr, grid);
   kernel_ = new Field(kernelSystem_, 6);
   compute();
 }
 
-MagnetFieldKernel::MagnetFieldKernel(Grid dst, Grid src, real3 cellsize)
-    : MagnetFieldKernel(kernelGrid(dst, src), cellsize) {}
+StrayFieldKernel::StrayFieldKernel(Grid dst, Grid src, real3 cellsize)
+    : StrayFieldKernel(kernelGrid(dst, src), cellsize) {}
 
-MagnetFieldKernel::~MagnetFieldKernel() {
+StrayFieldKernel::~StrayFieldKernel() {
   delete kernel_;
 }
 
-std::shared_ptr<const System> MagnetFieldKernel::kernelSystem() const {
+std::shared_ptr<const System> StrayFieldKernel::kernelSystem() const {
   return kernelSystem_;
 }
 
-__global__ void k_magnetFieldKernel(CuField kernel, real3 cellsize) {
+__global__ void k_strayFieldKernel(CuField kernel, real3 cellsize) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!kernel.cellInGrid(idx))
     return;
@@ -38,22 +38,22 @@ __global__ void k_magnetFieldKernel(CuField kernel, real3 cellsize) {
   kernel.setValueInCell(idx, 5, calcNewellNyz(coo, cellsize));
 }
 
-void MagnetFieldKernel::compute() {
-  cudaLaunch(grid().ncells(), k_magnetFieldKernel, kernel_->cu(), cellsize_);
+void StrayFieldKernel::compute() {
+  cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(), cellsize_);
 }
 
-Grid MagnetFieldKernel::grid() const {
+Grid StrayFieldKernel::grid() const {
   return kernelSystem_->grid();
 }
-real3 MagnetFieldKernel::cellsize() const {
+real3 StrayFieldKernel::cellsize() const {
   return cellsize_;
 }
 
-const Field& MagnetFieldKernel::field() const {
+const Field& StrayFieldKernel::field() const {
   return *kernel_;
 }
 
-Grid MagnetFieldKernel::kernelGrid(Grid dst, Grid src) {
+Grid StrayFieldKernel::kernelGrid(Grid dst, Grid src) {
   int3 size = src.size() + dst.size() - int3{1, 1, 1};
   int3 origin = dst.origin() - (src.origin() + src.size() - int3{1, 1, 1});
 

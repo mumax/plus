@@ -6,9 +6,9 @@
 #include "constants.hpp"
 #include "cudalaunch.hpp"
 #include "field.hpp"
-#include "magnetfieldfft.hpp"
-#include "magnetfieldkernel.hpp"
 #include "parameter.hpp"
+#include "strayfieldfft.hpp"
+#include "strayfieldkernel.hpp"
 #include "system.hpp"
 
 #if FP_PRECISION == SINGLE
@@ -126,9 +126,9 @@ __global__ void k_apply_kernel_2d(complex* hx,
   hz[i] = preFactor * (kzz[i] * mz[i]);
 }
 
-MagnetFieldFFTExecutor::MagnetFieldFFTExecutor(Grid gridOut,
-                                               Grid gridIn,
-                                               real3 cellsize)
+StrayFieldFFTExecutor::StrayFieldFFTExecutor(Grid gridOut,
+                                             Grid gridIn,
+                                             real3 cellsize)
     : kernel_(gridOut, gridIn, cellsize), kfft(6), hfft(3), mfft(3) {
   int3 size = kernel_.grid().size();
   fftSize = {size.x / 2 + 1, size.y, size.z};
@@ -152,7 +152,7 @@ MagnetFieldFFTExecutor::MagnetFieldFFTExecutor(Grid gridOut,
         fftExec(forwardPlan, kernel_.field().devptr(comp), kfft.at(comp)));
 }
 
-MagnetFieldFFTExecutor::~MagnetFieldFFTExecutor() {
+StrayFieldFFTExecutor::~StrayFieldFFTExecutor() {
   for (auto p : mfft)
     cudaFree(p);
   for (auto p : kfft)
@@ -164,9 +164,9 @@ MagnetFieldFFTExecutor::~MagnetFieldFFTExecutor() {
   checkCufftResult(cufftDestroy(backwardPlan));
 }
 
-void MagnetFieldFFTExecutor::exec(Field* h,
-                                  const Field* m,
-                                  const Parameter* msat) const {
+void StrayFieldFFTExecutor::exec(Field* h,
+                                 const Field* m,
+                                 const Parameter* msat) const {
   // pad m, and multiply with msat
   std::shared_ptr<System> kernelSystem =
       std::make_shared<System>(h->system()->world(), kernel_.grid());

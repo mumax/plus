@@ -9,9 +9,9 @@
 #include "ferromagnet.hpp"
 #include "fieldquantity.hpp"
 #include "interfacialdmi.hpp"
-#include "magnetfieldkernel.hpp"
 #include "mumaxworld.hpp"
 #include "parameter.hpp"
+#include "strayfieldkernel.hpp"
 #include "stt.hpp"
 #include "thermalnoise.hpp"
 #include "torque.hpp"
@@ -59,11 +59,11 @@ void wrap_ferromagnet(py::module& m) {
       .def(
           "magnetic_field_from_magnet",
           [](const Ferromagnet* fm, Ferromagnet* magnet) {
-            const MagnetField* magnetField = fm->getMagnetField(magnet);
-            if (!magnetField)
+            const StrayField* strayField = fm->getStrayField(magnet);
+            if (!strayField)
               throw std::runtime_error(
                   "Can not compute the magnetic field of the magnet");
-            return magnetField;
+            return strayField;
           },
           py::return_value_policy::reference)
 
@@ -102,7 +102,7 @@ void wrap_ferromagnet(py::module& m) {
   m.def("_demag_kernel", [](const Ferromagnet* fm) {
     Grid grid = fm->grid();
     real3 cellsize = fm->world()->cellsize();
-    MagnetFieldKernel demagKernel(grid, grid, cellsize);
+    StrayFieldKernel demagKernel(grid, grid, cellsize);
     return fieldToArray(demagKernel.field());
   });
 }

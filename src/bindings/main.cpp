@@ -13,5 +13,5 @@ PYBIND11_MODULE(_mumax5cpp, m) {
   wrap_timesolver(m);
   wrap_variable(m);
   wrap_world(m);
-  wrap_magnetfield(m);
+  wrap_strayfield(m);
 }

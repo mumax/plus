@@ -4,20 +4,20 @@
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "fieldquantity.hpp"
-#include "magnetfield.hpp"
+#include "strayfield.hpp"
 #include "wrappers.hpp"
 
-void wrap_magnetfield(py::module& m) {
-  py::class_<MagnetField, FieldQuantity>(m, "MagnetField")
+void wrap_strayfield(py::module& m) {
+  py::class_<StrayField, FieldQuantity>(m, "StrayField")
       .def(py::init([](Ferromagnet* magnet, Grid grid) {
-             return std::unique_ptr<MagnetField>(new MagnetField(magnet, grid));
+             return std::unique_ptr<StrayField>(new StrayField(magnet, grid));
            }),
            py::arg("ferromagnet"), py::arg("grid"))
-      .def("set_method", [](MagnetField* magnetField, std::string method) {
+      .def("set_method", [](StrayField* strayField, std::string method) {
         if (method == "fft") {
-          magnetField->setMethod(MAGNETFIELDMETHOD_FFT);
+          strayField->setMethod(STRAYFIELDMETHOD_FFT);
         } else if (method == "brute") {
-          magnetField->setMethod(MAGNETFIELDMETHOD_BRUTE);
+          strayField->setMethod(STRAYFIELDMETHOD_BRUTE);
         } else {
           throw std::invalid_argument("Method should be \"fft\" or \"brute\"");
         }

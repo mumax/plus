@@ -8,9 +8,9 @@
 #include "zeeman.hpp"
 
 bool externalFieldAssuredZero(const Ferromagnet* magnet) {
-  auto magnetFields = magnet->getMagnetFields();
-  for (auto magnetField : magnetFields) {
-    if (!magnetField->assuredZero()) {
+  auto strayFields = magnet->getStrayFields();
+  for (auto strayField : strayFields) {
+    if (!strayField->assuredZero()) {
       return false;
     }
   }
@@ -33,13 +33,13 @@ Field evalExternalField(const Ferromagnet* magnet) {
   h.setUniformComponent(1, b_ext.y);
   h.setUniformComponent(2, b_ext.z);
 
-  auto magnetFields = magnet->getMagnetFields();
-  for (auto magnetField : magnetFields) {
+  auto strayFields = magnet->getStrayFields();
+  for (auto strayField : strayFields) {
     // Avoid the demag field, we only want external fields
-    if (magnetField->source() == magnet)
+    if (strayField->source() == magnet)
       continue;
 
-    magnetField->addToField(h);
+    strayField->addToField(h);
   }
   return h;
 }

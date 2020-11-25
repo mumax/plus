@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from mumax5 import Ferromagnet, Grid, MagnetField, World
+from mumax5 import Ferromagnet, Grid, StrayField, World
 
 
 def max_relative_error(result, wanted):
@@ -54,7 +54,7 @@ TESTCASES = [
 ]
 
 
-class TestMagnetFields:
+class TestStrayFields:
     @pytest.mark.parametrize("test_case", TESTCASES)
     def test_fft_against_brute(self, test_case):
         """Computes the H-field in hgrid of a magnet on mgrid using both the
@@ -69,7 +69,7 @@ class TestMagnetFields:
         magnet.msat = 800e3
         magnet.magnetization = (1, 0, 0)
 
-        mf = MagnetField(magnet, hgrid)
+        mf = StrayField(magnet, hgrid)
         mf.set_method("fft")
         result = mf.eval()
         mf.set_method("brute")
@@ -97,7 +97,7 @@ class TestMagnetFields:
 
         # Compute the hfield in hgrid of the magnet in mgrid.
         # This is the field which which need to be checked.
-        hfield = MagnetField(magnet, hgrid).eval()
+        hfield = StrayField(magnet, hgrid).eval()
 
         # Construct an equivalent system against we will check the result.
         world2 = World(world.cellsize)

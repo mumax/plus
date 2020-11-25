@@ -6,20 +6,20 @@
 
 #include "datatypes.hpp"
 #include "grid.hpp"
-#include "magnetfield.hpp"
-#include "magnetfieldkernel.hpp"
+#include "strayfield.hpp"
+#include "strayfieldkernel.hpp"
 
 class Parameter;
 class Field;
 
-class MagnetFieldFFTExecutor : public MagnetFieldExecutor {
+class StrayFieldFFTExecutor : public StrayFieldExecutor {
  public:
-  MagnetFieldFFTExecutor(Grid gridOut, Grid gridIn, real3 cellsize);
-  ~MagnetFieldFFTExecutor();
+  StrayFieldFFTExecutor(Grid gridOut, Grid gridIn, real3 cellsize);
+  ~StrayFieldFFTExecutor();
   void exec(Field* h, const Field* m, const Parameter* msat) const;
 
  private:
-  MagnetFieldKernel kernel_;
+  StrayFieldKernel kernel_;
   int3 fftSize;
   std::vector<complex*> kfft, mfft, hfft;
   cufftHandle forwardPlan;

@@ -9,9 +9,9 @@
 #include "field.hpp"
 #include "grid.hpp"
 #include "handler.hpp"
-#include "magnetfield.hpp"
 #include "parameter.hpp"
 #include "ref.hpp"
+#include "strayfield.hpp"
 #include "variable.hpp"
 #include "world.hpp"
 
@@ -32,12 +32,12 @@ class Ferromagnet {
   real3 cellsize() const;
   const Variable* magnetization() const;
 
-  const MagnetField* getMagnetField(const Ferromagnet*) const;
-  std::vector<const MagnetField*> getMagnetFields() const;
-  void addMagnetField(
+  const StrayField* getStrayField(const Ferromagnet*) const;
+  std::vector<const StrayField*> getStrayFields() const;
+  void addStrayField(
       const Ferromagnet*,
-      MagnetFieldComputationMethod method = MAGNETFIELDMETHOD_BRUTE);
-  void removeMagnetField(const Ferromagnet*);
+      StrayFieldComputationMethod method = STRAYFIELDMETHOD_BRUTE);
+  void removeStrayField(const Ferromagnet*);
 
   void minimize(real tol = 1e-6, int nSamples = 10);
 
@@ -50,7 +50,7 @@ class Ferromagnet {
       system_;  // the system_ has to be initialized first,
                 // hence its listed as the first datamember here
   NormalizedVariable magnetization_;
-  std::map<const Ferromagnet*, MagnetField*> magnetFields_;
+  std::map<const Ferromagnet*, StrayField*> strayFields_;
   std::string name_;
 
  public:

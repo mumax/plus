@@ -5,9 +5,9 @@
 #include <random>
 
 #include "fieldquantity.hpp"
-#include "magnetfield.hpp"
 #include "minimizer.hpp"
 #include "mumaxworld.hpp"
+#include "strayfield.hpp"
 #include "system.hpp"
 
 Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid, std::string name)
@@ -45,7 +45,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid, std::string name)
 }
 
 Ferromagnet::~Ferromagnet() {
-  for (auto& entry : magnetFields_) {
+  for (auto& entry : strayFields_) {
     delete entry.second;
   }
   curandDestroyGenerator(randomGenerator);
@@ -80,46 +80,45 @@ void Ferromagnet::minimize(real tol, int nSamples) {
   minimizer.exec();
 }
 
-const MagnetField* Ferromagnet::getMagnetField(
-    const Ferromagnet* magnet) const {
-  auto it = magnetFields_.find(magnet);
-  if (it == magnetFields_.end())
+const StrayField* Ferromagnet::getStrayField(const Ferromagnet* magnet) const {
+  auto it = strayFields_.find(magnet);
+  if (it == strayFields_.end())
     return nullptr;
   return it->second;
 }
 
-std::vector<const MagnetField*> Ferromagnet::getMagnetFields() const {
-  std::vector<const MagnetField*> magnetFields;
-  magnetFields.reserve(magnetFields_.size());
-  for (const auto& entry : magnetFields_) {
-    magnetFields.push_back(entry.second);
+std::vector<const StrayField*> Ferromagnet::getStrayFields() const {
+  std::vector<const StrayField*> strayFields;
+  strayFields.reserve(strayFields_.size());
+  for (const auto& entry : strayFields_) {
+    strayFields.push_back(entry.second);
   }
-  return magnetFields;
+  return strayFields;
 }
 
-void Ferromagnet::addMagnetField(const Ferromagnet* magnet,
-                                 MagnetFieldComputationMethod method) {
+void Ferromagnet::addStrayField(const Ferromagnet* magnet,
+                                StrayFieldComputationMethod method) {
   if (world() != magnet->world()) {
     throw std::runtime_error(
         "Can not define the field of the magnet on this magnet because it is "
         "not in the same world.");
   }
 
-  auto it = magnetFields_.find(magnet);
-  if (it != magnetFields_.end()) {
-    // MagnetField is already registered, just need to update the method
+  auto it = strayFields_.find(magnet);
+  if (it != strayFields_.end()) {
+    // StrayField is already registered, just need to update the method
     it->second->setMethod(method);
     return;
   }
 
   // Stray field of magnet (parameter) on this magnet (the object)
-  magnetFields_[magnet] = new MagnetField(magnet, system(), method);
+  strayFields_[magnet] = new StrayField(magnet, system(), method);
 }
 
-void Ferromagnet::removeMagnetField(const Ferromagnet* magnet) {
-  auto it = magnetFields_.find(magnet);
-  if (it != magnetFields_.end()) {
+void Ferromagnet::removeStrayField(const Ferromagnet* magnet) {
+  auto it = strayFields_.find(magnet);
+  if (it != strayFields_.end()) {
     delete it->second;
-    magnetFields_.erase(it);
+    strayFields_.erase(it);
   }
 }

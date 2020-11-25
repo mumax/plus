@@ -20,14 +20,14 @@ add_library(physics STATIC
     interfacialdmi.hpp
     minimizer.cu
     minimizer.hpp
-    magnetfield.cpp
-    magnetfield.hpp
-    magnetfieldbrute.cu
-    magnetfieldbrute.hpp
-    magnetfieldfft.cu
-    magnetfieldfft.hpp
-    magnetfieldkernel.cu
-    magnetfieldkernel.hpp
+    strayfield.cpp
+    strayfield.hpp
+    strayfieldbrute.cu
+    strayfieldbrute.hpp
+    strayfieldfft.cu
+    strayfieldfft.hpp
+    strayfieldkernel.cu
+    strayfieldkernel.hpp
     mumaxworld.cpp
     mumaxworld.hpp
     newell.cu

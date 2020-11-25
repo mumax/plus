@@ -8,11 +8,11 @@
 class Field;
 class System;
 
-class MagnetFieldKernel {
+class StrayFieldKernel {
  public:
-  MagnetFieldKernel(Grid grid, real3 cellsize);
-  MagnetFieldKernel(Grid dst, Grid src, real3 cellsize);
-  ~MagnetFieldKernel();
+  StrayFieldKernel(Grid grid, real3 cellsize);
+  StrayFieldKernel(Grid dst, Grid src, real3 cellsize);
+  ~StrayFieldKernel();
 
   Grid grid() const;
   std::shared_ptr<const System> kernelSystem() const;

@@ -1,11 +1,11 @@
-"""MagnetField implementation."""
+"""StrayField implementation."""
 
 import _mumax5cpp as _cpp
 
 from .fieldquantity import FieldQuantity
 
 
-class MagnetField(FieldQuantity):
+class StrayField(FieldQuantity):
     """Represent a stray field of a magnet in a specific grid.
 
     Parameters
@@ -17,7 +17,7 @@ class MagnetField(FieldQuantity):
     """
 
     def __init__(self, magnet, grid):
-        super().__init__(_cpp.MagnetField(magnet._impl, grid._impl))
+        super().__init__(_cpp.StrayField(magnet._impl, grid._impl))
 
     def set_method(self, method):
         """Set the computation method for the stray field.

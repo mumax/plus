@@ -1,9 +1,8 @@
 #include "constants.hpp"
 #include "cudalaunch.hpp"
 #include "field.hpp"
-#include "magnetfieldbrute.hpp"
 #include "parameter.hpp"
-
+#include "strayfieldbrute.hpp"
 
 __global__ void k_demagfield(CuField hField,
                              const CuField mField,
@@ -37,15 +36,16 @@ __global__ void k_demagfield(CuField hField,
   hField.setVectorInCell(idx, MU0 * h);
 }
 
-MagnetFieldBruteExecutor::MagnetFieldBruteExecutor(Grid gridOut,
-                                                   Grid gridIn,
-                                                   real3 cellsize)
+StrayFieldBruteExecutor::StrayFieldBruteExecutor(Grid gridOut,
+                                                 Grid gridIn,
+                                                 real3 cellsize)
     : kernel_(gridOut, gridIn, cellsize) {}
 
-void MagnetFieldBruteExecutor::exec(Field* h,
-                                    const Field* m,
-                                    const Parameter* msat) const {
+void StrayFieldBruteExecutor::exec(Field* h,
+                                   const Field* m,
+                                   const Parameter* msat) const {
   // TODO: check dimensions of fields
   int ncells = h->grid().ncells();
-  cudaLaunch(ncells, k_demagfield, h->cu(), m->cu(), kernel_.field().cu(), msat->cu());
+  cudaLaunch(ncells, k_demagfield, h->cu(), m->cu(), kernel_.field().cu(),
+             msat->cu());
 }
