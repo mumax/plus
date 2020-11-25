@@ -1,9 +1,12 @@
 #pragma once
 
+#include <vector>
+
 #include "datatypes.hpp"
 #include "grid.hpp"
 
 class Field;
+class System;
 
 class MagnetFieldKernel {
  public:
@@ -12,13 +15,14 @@ class MagnetFieldKernel {
   ~MagnetFieldKernel();
 
   Grid grid() const;
+  System* kernelSystem();
   real3 cellsize() const;
   const Field& field() const;
 
   void compute();
 
  private:
-  Grid grid_;
+  std::unique_ptr<System> kernelSystem_;
   real3 cellsize_;
   Field* kernel_;
 

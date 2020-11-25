@@ -1,8 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include "fieldquantity.hpp"
 #include "grid.hpp"
-#include "handler.hpp"
 
 enum MagnetFieldComputationMethod {
   MAGNETFIELDMETHOD_BRUTE,
@@ -13,37 +14,46 @@ enum MagnetFieldComputationMethod {
 class Parameter;
 class Ferromagnet;
 class Field;
+class System;
 
 class MagnetFieldExecutor {
  public:
-  virtual ~MagnetFieldExecutor(){}
+  virtual ~MagnetFieldExecutor() {}
   virtual void exec(Field* h, const Field* m, const Parameter* msat) const = 0;
 };
 
 /// MagnetField is a field quantity which evaluates the magnetic field of a
-/// ferromagnet on a specified grid.
+/// ferromagnet on a specified system.
 /// Note: if the specified grid matches the grid of the ferromagnet, then this
 /// magnetic field is the demagnetization field of the magnet
 class MagnetField : public FieldQuantity {
  public:
-  MagnetField(const Ferromagnet * magnet,
+  MagnetField(const Ferromagnet* magnet,
+              System* system,
+              MagnetFieldComputationMethod method = MAGNETFIELDMETHOD_AUTO);
+
+  MagnetField(const Ferromagnet* magnet,
               Grid grid,
               MagnetFieldComputationMethod method = MAGNETFIELDMETHOD_AUTO);
+
   ~MagnetField();
 
   void setMethod(MagnetFieldComputationMethod);
 
-  const Ferromagnet * source() const;
+  const Ferromagnet* source() const;
 
   int ncomp() const;
-  Grid grid() const;
+  const System* system() const;
   std::string unit() const;
   Field eval() const;
 
   bool assuredZero() const;
 
  private:
+  /// If MagnetField is construct using a grid instead of a system, then an
+  /// anonymous system with this system is created
+  std::unique_ptr<System> anonymousSystem_;
+  const System* system_;
   const Ferromagnet* magnet_;
-  Grid grid_;
   MagnetFieldExecutor* executor_;
 };

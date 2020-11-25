@@ -1,23 +1,28 @@
+#include <memory>
+
 #include "cudalaunch.hpp"
 #include "field.hpp"
 #include "grid.hpp"
 #include "magnetfieldkernel.hpp"
 #include "newell.hpp"
+#include "system.hpp"
 
 MagnetFieldKernel::MagnetFieldKernel(Grid grid, real3 cellsize)
-    : cellsize_(cellsize), grid_(grid) {
-  kernel_ = new Field(grid_, 6);
+    : cellsize_(cellsize) {
+  kernelSystem_ = std::make_unique<System>(nullptr, grid);
+  kernel_ = new Field(kernelSystem_.get(), 6);
   compute();
 }
 
 MagnetFieldKernel::MagnetFieldKernel(Grid dst, Grid src, real3 cellsize)
-    : cellsize_(cellsize), grid_(kernelGrid(dst, src)) {
-  kernel_ = new Field(grid_, 6);
-  compute();
-}
+    : MagnetFieldKernel(kernelGrid(dst, src), cellsize) {}
 
 MagnetFieldKernel::~MagnetFieldKernel() {
   delete kernel_;
+}
+
+System* MagnetFieldKernel::kernelSystem() {
+  return kernelSystem_.get();
 }
 
 __global__ void k_magnetFieldKernel(CuField kernel, real3 cellsize) {
@@ -34,11 +39,11 @@ __global__ void k_magnetFieldKernel(CuField kernel, real3 cellsize) {
 }
 
 void MagnetFieldKernel::compute() {
-  cudaLaunch(grid_.ncells(), k_magnetFieldKernel, kernel_->cu(), cellsize_);
+  cudaLaunch(grid().ncells(), k_magnetFieldKernel, kernel_->cu(), cellsize_);
 }
 
 Grid MagnetFieldKernel::grid() const {
-  return grid_;
+  return kernelSystem_->grid();
 }
 real3 MagnetFieldKernel::cellsize() const {
   return cellsize_;

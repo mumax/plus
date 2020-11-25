@@ -1,8 +1,8 @@
 #include "rungekutta.hpp"
 
 #include <cmath>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "butchertableau.hpp"
 #include "datatypes.hpp"
@@ -150,7 +150,7 @@ void RungeKuttaStageExecutor::resetX() {
 }
 
 real RungeKuttaStageExecutor::getError() const {
-  Field err(x.grid(), x.ncomp());
+  Field err(x.system(), x.ncomp());
   err.makeZero();
   for (int i = 0; i < butcher.nStages; i++)
     addTo(err, dt * (butcher.weights1[i] - butcher.weights2[i]), k[i]);

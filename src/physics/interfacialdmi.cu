@@ -70,20 +70,21 @@ __global__ void k_interfacialDmiField(CuField hField,
 }
 
 Field evalInterfacialDmiField(const Ferromagnet* magnet) {
-  Field hField(magnet->grid(), 3);
+  Field hField(magnet, 3);
   if (interfacialDmiAssuredZero(magnet)) {
     hField.makeZero();
     return hField;
   }
   cudaLaunch(hField.grid().ncells(), k_interfacialDmiField, hField.cu(),
              magnet->magnetization()->field().cu(), magnet->idmi.cu(),
-             magnet->msat.cu(), interfaceNormal, magnet->world()->cellsize(), magnet->world()->mastergrid());
+             magnet->msat.cu(), interfaceNormal, magnet->world()->cellsize(),
+             magnet->world()->mastergrid());
   return hField;
 }
 
 Field evalInterfacialDmiEnergyDensity(const Ferromagnet* magnet) {
   if (interfacialDmiAssuredZero(magnet))
-    return Field(magnet->grid(), 1, 0.0);
+    return Field(magnet, 1, 0.0);
   return evalEnergyDensity(magnet, evalInterfacialDmiField(magnet), 0.5);
 }
 

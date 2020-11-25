@@ -29,7 +29,7 @@ __global__ void k_energyDensity(CuField edens,
 Field evalEnergyDensity(const Ferromagnet* magnet,
                         const Field& h,
                         real prefactor) {
-  Field edens(magnet->grid(), 1);
+  Field edens(magnet, 1);
   if (magnet->msat.assuredZero()) {
     edens.makeZero();
     return edens;

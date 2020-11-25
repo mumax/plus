@@ -14,7 +14,7 @@ const auto& generateRandNormal = curandGenerateNormal;
 const auto& generateRandNormal = curandGenerateNormalDouble;
 #endif
 
-bool thermalNoiseAssuredZero(const Ferromagnet *magnet) {
+bool thermalNoiseAssuredZero(const Ferromagnet* magnet) {
   return magnet->temperature.assuredZero();
 }
 
@@ -38,8 +38,8 @@ __global__ void k_thermalNoise(CuField noiseField,
   noiseField.setVectorInCell(idx, noise);
 }
 
-Field evalThermalNoise(const Ferromagnet * magnet) {
-  Field noise(magnet->grid(),3);
+Field evalThermalNoise(const Ferromagnet* magnet) {
+  Field noise(magnet, 3);
   if (thermalNoiseAssuredZero(magnet)) {
     noise.makeZero();
     return noise;
@@ -49,7 +49,8 @@ Field evalThermalNoise(const Ferromagnet * magnet) {
   real mean = 0.0;
   real stddev = 1.0;
   for (int c = 0; c < 3; c++) {
-    generateRandNormal(magnet->randomGenerator, noise.devptr(c), N, mean, stddev);
+    generateRandNormal(magnet->randomGenerator, noise.devptr(c), N, mean,
+                       stddev);
   }
 
   auto msat = magnet->msat.cu();
@@ -62,6 +63,6 @@ Field evalThermalNoise(const Ferromagnet * magnet) {
   return noise;
 }
 
-FM_FieldQuantity thermalNoiseQuantity(const Ferromagnet * magnet) {
+FM_FieldQuantity thermalNoiseQuantity(const Ferromagnet* magnet) {
   return FM_FieldQuantity(magnet, evalThermalNoise, 3, "thermalNoise", "");
 }

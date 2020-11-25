@@ -5,10 +5,14 @@
 
 #include "field.hpp"
 #include "fieldops.hpp"
+#include "system.hpp"
 
-Variable::Variable(std::string name, std::string unit, int ncomp, Grid grid)
+Variable::Variable(std::string name,
+                   std::string unit,
+                   const System* system,
+                   int ncomp)
     : name_(name), unit_(unit) {
-  field_ = new Field(grid, ncomp);
+  field_ = new Field(system, ncomp);
 }
 
 Variable::~Variable() {
@@ -19,12 +23,12 @@ int Variable::ncomp() const {
   return field_->ncomp();
 }
 
-Grid Variable::grid() const {
-  return field_->grid();
+const System* Variable::system() const {
+  return field_->system();
 }
 
 std::string Variable::name() const {
-  return name_;
+  return system()->name() + ":" + name_;
 }
 
 std::string Variable::unit() const {
@@ -40,6 +44,11 @@ const Field& Variable::field() const {
 }
 
 void Variable::set(const Field& src) const {
+  if (src.system() != field_->system()) {
+    throw std::runtime_error(
+        "Can not set the variable because the given field variable is defined "
+        "on another system.");
+  }
   *field_ = src;
 }
 
@@ -61,9 +70,9 @@ void Variable::set(real3 value) const {
 
 NormalizedVariable::NormalizedVariable(std::string name,
                                        std::string unit,
-                                       int ncomp,
-                                       Grid grid)
-    : Variable(name, unit, ncomp, grid) {}
+                                       const System* system,
+                                       int ncomp)
+    : Variable(name, unit, system, ncomp) {}
 
 void NormalizedVariable::set(const Field& src) const {
   // TODO: check if this is possible without the extra copy

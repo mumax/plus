@@ -41,10 +41,6 @@ System* Parameter::system() const {
   return system_;
 }
 
-Grid Parameter::grid() const {
-  return system_->grid();
-}
-
 Field Parameter::eval() const {
   Field p(system_, ncomp());
   if (field_) {
@@ -95,12 +91,8 @@ System* VectorParameter::system() const {
   return system_;
 }
 
-Grid VectorParameter::grid() const {
-  return system()->grid();
-}
-
 Field VectorParameter::eval() const {
-  Field p(grid(), ncomp());
+  Field p(system(), ncomp());
   if (field_) {
     p = *field_;
   } else {

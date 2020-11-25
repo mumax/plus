@@ -8,7 +8,6 @@
 
 void wrap_field(py::module& m) {
   py::class_<Field>(m, "Field")
-      .def(py::init<Grid, int>())
       .def_property_readonly("grid", &Field::grid)
       .def_property_readonly("ncomp", &Field::ncomp)
       .def("get", [](const Field* f) { return fieldToArray(*f); })
@@ -17,7 +16,7 @@ void wrap_field(py::module& m) {
 }
 
 py::array_t<real> fieldToArray(const Field& f) {
-  real* data = new real[f.grid().ncells()*f.ncomp()];
+  real* data = new real[f.grid().ncells() * f.ncomp()];
   f.getData(data);
 
   // Create a Python object that will free the allocated

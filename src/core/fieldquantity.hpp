@@ -8,6 +8,7 @@
 #include "grid.hpp"
 
 class Field;
+class System;
 
 /// FieldQuantity interface
 class FieldQuantity {
@@ -21,8 +22,8 @@ class FieldQuantity {
   /// would be either 1 (scalar field) or 3 (vector fields)
   virtual int ncomp() const = 0;
 
-  /// Returns the grid on which the quantity lives
-  virtual Grid grid() const = 0;
+  /// Returns the system of the field quantity
+  virtual const System* system() const = 0;
 
   /// Evaluates the quantity, the returned Field is moved instead of copied
   virtual Field eval() const = 0;
@@ -46,6 +47,11 @@ class FieldQuantity {
   /// classes for optimization. In this case, it is also recommended to check in
   /// eval() if the quantity is zero, for an early exit.
   virtual bool assuredZero() const { return false; }
+
+  /***** NON VIRTUAL FUNCTIONS *****/
+
+  /// Returns the grid of the underlying system
+  Grid grid() const;
 };
 
 inline bool sameFieldDimensions(const FieldQuantity& q1,

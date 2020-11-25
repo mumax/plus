@@ -12,10 +12,7 @@
 
 Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid)
     : System(world, grid),
-      magnetization_("magnetization",
-                     "",
-                     3,
-                     grid),  // TODO: add system name to variable name
+      magnetization_("magnetization", "", this, 3),
       aex(this, 0.0),
       msat(this, 1.0),
       ku1(this, 0.0),
@@ -38,7 +35,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid)
     for (auto& v : randomValues) {
       v = unif(randomEngine);
     }
-    Field randomField(this->grid(), ncomp);
+    Field randomField(this, ncomp);
     randomField.setData(&randomValues[0]);
     magnetization_.set(randomField);
   }
@@ -95,7 +92,8 @@ void Ferromagnet::addMagnetField(const Ferromagnet* magnet,
     return;
   }
 
-  magnetFields_[magnet] = new MagnetField(magnet, grid(), method);
+  // Stray field of magnet (parameter) on this magnet (the object)
+  magnetFields_[magnet] = new MagnetField(magnet, this, method);
 }
 
 void Ferromagnet::removeMagnetField(const Ferromagnet* magnet) {

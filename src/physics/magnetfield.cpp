@@ -1,15 +1,30 @@
 #include "magnetfield.hpp"
 
+#include <memory>
+
 #include "ferromagnet.hpp"
 #include "magnetfieldbrute.hpp"
 #include "magnetfieldfft.hpp"
 #include "parameter.hpp"
+#include "system.hpp"
 #include "world.hpp"
 
-MagnetField::MagnetField(const Ferromagnet * magnet,
+MagnetField::MagnetField(const Ferromagnet* magnet,
+                         System* system,
+                         MagnetFieldComputationMethod method)
+    : magnet_(magnet),
+      system_(system),
+      anonymousSystem_(nullptr),
+      executor_(nullptr) {
+  setMethod(method);
+}
+
+MagnetField::MagnetField(const Ferromagnet* magnet,
                          Grid grid,
                          MagnetFieldComputationMethod method)
-    : magnet_(magnet), grid_(grid), executor_(nullptr) {
+    : magnet_(magnet), executor_(nullptr) {
+  anonymousSystem_ = std::make_unique<System>(magnet->world(), grid);
+  system_ = anonymousSystem_.get();
   setMethod(method);
 }
 
@@ -28,21 +43,21 @@ void MagnetField::setMethod(MagnetFieldComputationMethod method) {
       // TODO: make smart choice (dependent on the
       // grid sizes) when choosing between fft or
       // brute method. For now, we choose fft method
-      executor_ = new MagnetFieldFFTExecutor(grid_, magnet_->grid(),
+      executor_ = new MagnetFieldFFTExecutor(grid(), magnet_->grid(),
                                              magnet_->world()->cellsize());
       break;
     case MAGNETFIELDMETHOD_FFT:
-      executor_ = new MagnetFieldFFTExecutor(grid_, magnet_->grid(),
+      executor_ = new MagnetFieldFFTExecutor(grid(), magnet_->grid(),
                                              magnet_->world()->cellsize());
       break;
     case MAGNETFIELDMETHOD_BRUTE:
-      executor_ = new MagnetFieldBruteExecutor(grid_, magnet_->grid(),
+      executor_ = new MagnetFieldBruteExecutor(grid(), magnet_->grid(),
                                                magnet_->world()->cellsize());
       break;
   }
 }
 
-const Ferromagnet * MagnetField::source() const {
+const Ferromagnet* MagnetField::source() const {
   return magnet_;
 }
 
@@ -50,12 +65,12 @@ int MagnetField::ncomp() const {
   return 3;
 }
 
-Grid MagnetField::grid() const {
-  return grid_;
+const System* MagnetField::system() const {
+  return system_;
 }
 
 Field MagnetField::eval() const {
-  Field h(grid(), ncomp());
+  Field h(system(), ncomp());
   if (assuredZero()) {
     h.makeZero();
     return h;

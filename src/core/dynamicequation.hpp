@@ -5,6 +5,7 @@
 class Variable;
 class FieldQuantity;
 class Grid;
+class System;
 
 class DynamicEquation {
  public:
@@ -18,4 +19,5 @@ class DynamicEquation {
 
   int ncomp() const;
   Grid grid() const;
+  const System* system() const;
 };

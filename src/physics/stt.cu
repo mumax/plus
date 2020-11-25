@@ -6,7 +6,6 @@
 #include "stt.hpp"
 #include "world.hpp"
 
-
 bool spinTransferTorqueAssuredZero(const Ferromagnet* magnet) {
   return magnet->msat.assuredZero() || magnet->jcur.assuredZero() ||
          magnet->pol.assuredZero();
@@ -79,7 +78,7 @@ __global__ void k_spinTransferTorque(CuField torque,
 }
 
 Field evalSpinTransferTorque(const Ferromagnet* magnet) {
-  Field torque(magnet->grid(), 3);
+  Field torque(magnet, 3);
   if (spinTransferTorqueAssuredZero(magnet)) {
     torque.makeZero();
     return torque;
@@ -98,5 +97,6 @@ Field evalSpinTransferTorque(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity spinTransferTorqueQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalSpinTransferTorque, 3, "spintransfer_torque", "1/s");
+  return FM_FieldQuantity(magnet, evalSpinTransferTorque, 3,
+                          "spintransfer_torque", "1/s");
 }

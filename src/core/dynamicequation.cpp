@@ -3,16 +3,17 @@
 #include <exception>
 
 #include "fieldquantity.hpp"
+#include "system.hpp"
 #include "variable.hpp"
 
 DynamicEquation::DynamicEquation(const Variable* x,
                                  std::shared_ptr<FieldQuantity> rhs,
                                  const FieldQuantity* noiseTerm)
     : x(x), rhs(rhs), noiseTerm(noiseTerm) {
-  if (x->grid() != rhs->grid()) {
+  if (x->system() != rhs->system()) {
     throw std::runtime_error(
         "The variable and the r.h.s. of a dynamic equation should have the "
-        "same grid");
+        "same underlying system");
   }
   if (x->ncomp() != rhs->ncomp()) {
     throw std::runtime_error(
@@ -21,10 +22,10 @@ DynamicEquation::DynamicEquation(const Variable* x,
   }
 
   if (noiseTerm) {
-    if (x->grid() != noiseTerm->grid()) {
+    if (x->system() != noiseTerm->system()) {
       throw std::runtime_error(
           "The variable and the noise term of a dynamic equation should have "
-          "the same grid");
+          "the same underlying system");
     }
     if (x->ncomp() != noiseTerm->ncomp()) {
       throw std::runtime_error(
@@ -40,6 +41,9 @@ int DynamicEquation::ncomp() const {
 }
 
 Grid DynamicEquation::grid() const {
-  return x->grid();
-  ;
+  return system()->grid();
+}
+
+const System* DynamicEquation::system() const {
+  return x->system();
 }

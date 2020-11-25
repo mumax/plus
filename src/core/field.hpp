@@ -10,17 +10,18 @@
 #include "grid.hpp"
 
 class CuField;
+class System;
 
 class Field : public FieldQuantity {
   int ncomp_;
-  Grid grid_;
+  const System* system_ = nullptr;
   std::vector<GpuBuffer<real>> buffers_;
   GpuBuffer<real*> bufferPtrs_;
 
  public:
   Field();
-  Field(Grid grid, int nComponents);
-  Field(Grid grid, int nComponents, real value);
+  Field(const System* system, int nComponents);
+  Field(const System* system, int nComponents, real value);
   Field(const Field&);   // copies gpu field data
   Field(Field&& other);  // moves gpu field data
 
@@ -39,8 +40,8 @@ class Field : public FieldQuantity {
 
   void clear();
 
-  bool empty() const { return grid_.ncells() == 0 || ncomp_ == 0; }
-  Grid grid() const { return grid_; }
+  bool empty() const { return grid().ncells() == 0 || ncomp_ == 0; }
+  const System* system() const;
   int ncomp() const { return ncomp_; }
   real* devptr(int comp) const { return buffers_[comp].get(); };
 
