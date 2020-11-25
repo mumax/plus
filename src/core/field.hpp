@@ -14,14 +14,14 @@ class System;
 
 class Field : public FieldQuantity {
   int ncomp_;
-  const System* system_ = nullptr;
+  std::shared_ptr<const System> system_;
   std::vector<GpuBuffer<real>> buffers_;
   GpuBuffer<real*> bufferPtrs_;
 
  public:
   Field();
-  Field(const System* system, int nComponents);
-  Field(const System* system, int nComponents, real value);
+  Field(std::shared_ptr<const System> system, int nComponents);
+  Field(std::shared_ptr<const System> system, int nComponents, real value);
   Field(const Field&);   // copies gpu field data
   Field(Field&& other);  // moves gpu field data
 
@@ -41,7 +41,7 @@ class Field : public FieldQuantity {
   void clear();
 
   bool empty() const { return grid().ncells() == 0 || ncomp_ == 0; }
-  const System* system() const;
+  std::shared_ptr<const System> system() const;
   int ncomp() const { return ncomp_; }
   real* devptr(int comp) const { return buffers_[comp].get(); };
 

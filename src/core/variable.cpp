@@ -1,5 +1,6 @@
 #include "variable.hpp"
 
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -9,7 +10,7 @@
 
 Variable::Variable(std::string name,
                    std::string unit,
-                   const System* system,
+                   std::shared_ptr<const System> system,
                    int ncomp)
     : name_(name), unit_(unit) {
   field_ = new Field(system, ncomp);
@@ -23,7 +24,7 @@ int Variable::ncomp() const {
   return field_->ncomp();
 }
 
-const System* Variable::system() const {
+std::shared_ptr<const System> Variable::system() const {
   return field_->system();
 }
 
@@ -70,7 +71,7 @@ void Variable::set(real3 value) const {
 
 NormalizedVariable::NormalizedVariable(std::string name,
                                        std::string unit,
-                                       const System* system,
+                                       std::shared_ptr<const System> system,
                                        int ncomp)
     : Variable(name, unit, system, ncomp) {}
 

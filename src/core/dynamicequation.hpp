@@ -19,5 +19,5 @@ class DynamicEquation {
 
   int ncomp() const;
   Grid grid() const;
-  const System* system() const;
+  std::shared_ptr<const System> system() const;
 };

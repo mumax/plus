@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "fieldquantity.hpp"
@@ -10,11 +11,14 @@ class System;
 
 class Variable : public FieldQuantity {
  public:
-  Variable(std::string name, std::string unit, const System* system, int ncomp);
+  Variable(std::string name,
+           std::string unit,
+           std::shared_ptr<const System> system,
+           int ncomp);
   ~Variable();
 
   int ncomp() const;
-  const System* system() const;
+  std::shared_ptr<const System> system() const;
   std::string name() const;
   std::string unit() const;
 
@@ -45,7 +49,7 @@ class NormalizedVariable : public Variable {
  public:
   NormalizedVariable(std::string name,
                      std::string unit,
-                     const System* system,
+                     std::shared_ptr<const System> system,
                      int ncomp);
   void set(const Field&) const;
   void set(real) const;

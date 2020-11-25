@@ -29,7 +29,7 @@ class MagnetFieldExecutor {
 class MagnetField : public FieldQuantity {
  public:
   MagnetField(const Ferromagnet* magnet,
-              System* system,
+              std::shared_ptr<const System> system,
               MagnetFieldComputationMethod method = MAGNETFIELDMETHOD_AUTO);
 
   MagnetField(const Ferromagnet* magnet,
@@ -43,17 +43,14 @@ class MagnetField : public FieldQuantity {
   const Ferromagnet* source() const;
 
   int ncomp() const;
-  const System* system() const;
+  std::shared_ptr<const System> system() const;
   std::string unit() const;
   Field eval() const;
 
   bool assuredZero() const;
 
  private:
-  /// If MagnetField is construct using a grid instead of a system, then an
-  /// anonymous system with this system is created
-  std::unique_ptr<System> anonymousSystem_;
-  const System* system_;
+  std::shared_ptr<const System> system_;
   const Ferromagnet* magnet_;
   MagnetFieldExecutor* executor_;
 };

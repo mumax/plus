@@ -1,6 +1,7 @@
 #include "dynamicequation.hpp"
 
 #include <exception>
+#include <memory>
 
 #include "fieldquantity.hpp"
 #include "system.hpp"
@@ -44,6 +45,6 @@ Grid DynamicEquation::grid() const {
   return system()->grid();
 }
 
-const System* DynamicEquation::system() const {
+std::shared_ptr<const System> DynamicEquation::system() const {
   return x->system();
 }

@@ -23,7 +23,7 @@ class FieldQuantity {
   virtual int ncomp() const = 0;
 
   /// Returns the system of the field quantity
-  virtual const System* system() const = 0;
+  virtual std::shared_ptr<const System> system() const = 0;
 
   /// Evaluates the quantity, the returned Field is moved instead of copied
   virtual Field eval() const = 0;

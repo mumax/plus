@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "datatypes.hpp"
 #include "fieldquantity.hpp"
 #include "grid.hpp"
@@ -10,7 +12,7 @@ class System;
 
 class Parameter : public FieldQuantity {
  public:
-  Parameter(System*, real value = 0.0);
+  Parameter(std::shared_ptr<const System> system, real value = 0.0);
   ~Parameter();
 
   void set(real value);
@@ -19,13 +21,13 @@ class Parameter : public FieldQuantity {
   bool isUniform() const;
   bool assuredZero() const;
   int ncomp() const;
-  System* system() const;
+  std::shared_ptr<const System> system() const;
   Field eval() const;
 
   CuParameter cu() const;
 
  private:
-  System* system_;
+  std::shared_ptr<const System> system_;
   real uniformValue_;
   Field* field_;
 };
@@ -67,7 +69,8 @@ class CuVectorParameter;
 
 class VectorParameter : public FieldQuantity {
  public:
-  VectorParameter(System* system, real3 value = {0.0, 0.0, 0.0});
+  VectorParameter(std::shared_ptr<const System> system,
+                  real3 value = {0.0, 0.0, 0.0});
   ~VectorParameter();
 
   void set(real3 value);
@@ -76,13 +79,13 @@ class VectorParameter : public FieldQuantity {
   bool isUniform() const;
   bool assuredZero() const;
   int ncomp() const;
-  System* system() const;
+  std::shared_ptr<const System> system() const;
   Field eval() const;
 
   CuVectorParameter cu() const;
 
  private:
-  System* system_;
+  std::shared_ptr<const System> system_;
   real3 uniformValue_;
   Field* field_;
 };

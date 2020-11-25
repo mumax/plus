@@ -10,12 +10,9 @@
 #include "world.hpp"
 
 MagnetField::MagnetField(const Ferromagnet* magnet,
-                         System* system,
+                         std::shared_ptr<const System> system,
                          MagnetFieldComputationMethod method)
-    : magnet_(magnet),
-      system_(system),
-      anonymousSystem_(nullptr),
-      executor_(nullptr) {
+    : magnet_(magnet), system_(system), executor_(nullptr) {
   setMethod(method);
 }
 
@@ -23,8 +20,7 @@ MagnetField::MagnetField(const Ferromagnet* magnet,
                          Grid grid,
                          MagnetFieldComputationMethod method)
     : magnet_(magnet), executor_(nullptr) {
-  anonymousSystem_ = std::make_unique<System>(magnet->world(), grid);
-  system_ = anonymousSystem_.get();
+  system_ = std::make_shared<System>(magnet->world(), grid);
   setMethod(method);
 }
 
@@ -65,7 +61,7 @@ int MagnetField::ncomp() const {
   return 3;
 }
 
-const System* MagnetField::system() const {
+std::shared_ptr<const System> MagnetField::system() const {
   return system_;
 }
 

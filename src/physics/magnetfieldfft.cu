@@ -168,8 +168,9 @@ void MagnetFieldFFTExecutor::exec(Field* h,
                                   const Field* m,
                                   const Parameter* msat) const {
   // pad m, and multiply with msat
-  System kernelSystem(h->system()->world(), kernel_.grid());
-  std::unique_ptr<Field> mpad(new Field(&kernelSystem, 3));
+  std::shared_ptr<System> kernelSystem =
+      std::make_shared<System>(h->system()->world(), kernel_.grid());
+  std::unique_ptr<Field> mpad(new Field(kernelSystem, 3));
   cudaLaunch(mpad->grid().ncells(), k_pad, mpad->cu(), m->cu(), msat->cu());
 
   // Forward fourier transforms

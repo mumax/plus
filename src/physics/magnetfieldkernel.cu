@@ -9,8 +9,8 @@
 
 MagnetFieldKernel::MagnetFieldKernel(Grid grid, real3 cellsize)
     : cellsize_(cellsize) {
-  kernelSystem_ = std::make_unique<System>(nullptr, grid);
-  kernel_ = new Field(kernelSystem_.get(), 6);
+  kernelSystem_ = std::make_shared<System>(nullptr, grid);
+  kernel_ = new Field(kernelSystem_, 6);
   compute();
 }
 
@@ -21,8 +21,8 @@ MagnetFieldKernel::~MagnetFieldKernel() {
   delete kernel_;
 }
 
-System* MagnetFieldKernel::kernelSystem() {
-  return kernelSystem_.get();
+std::shared_ptr<const System> MagnetFieldKernel::kernelSystem() const {
+  return kernelSystem_;
 }
 
 __global__ void k_magnetFieldKernel(CuField kernel, real3 cellsize) {

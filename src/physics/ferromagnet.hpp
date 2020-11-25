@@ -26,7 +26,7 @@ class Ferromagnet {
   Ferromagnet(Ferromagnet&&) = default;  // TODO: check if default is ok
 
   std::string name() const;
-  System* system() const;
+  std::shared_ptr<System> system() const;
   World* world() const;
   Grid grid() const;
   real3 cellsize() const;
@@ -46,7 +46,7 @@ class Ferromagnet {
   Ferromagnet& operator=(const Ferromagnet&);
 
  private:
-  std::unique_ptr<System>
+  std::shared_ptr<System>
       system_;  // the system_ has to be initialized first,
                 // hence its listed as the first datamember here
   NormalizedVariable magnetization_;

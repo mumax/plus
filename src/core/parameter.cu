@@ -5,7 +5,7 @@
 #include "parameter.hpp"
 #include "system.hpp"
 
-Parameter::Parameter(System* system, real value)
+Parameter::Parameter(std::shared_ptr<const System> system, real value)
     : system_(system), field_(nullptr), uniformValue_(value) {}
 
 Parameter::~Parameter() {
@@ -37,7 +37,7 @@ int Parameter::ncomp() const {
   return 1;
 }
 
-System* Parameter::system() const {
+std::shared_ptr<const System> Parameter::system() const {
   return system_;
 }
 
@@ -57,7 +57,8 @@ CuParameter Parameter::cu() const {
   return CuParameter(grid(), field_->devptr(0));
 }
 
-VectorParameter::VectorParameter(System* system, real3 value)
+VectorParameter::VectorParameter(std::shared_ptr<const System> system,
+                                 real3 value)
     : system_(system), field_(nullptr), uniformValue_(value) {}
 
 VectorParameter::~VectorParameter() {
@@ -87,7 +88,7 @@ int VectorParameter::ncomp() const {
   return 3;
 }
 
-System* VectorParameter::system() const {
+std::shared_ptr<const System> VectorParameter::system() const {
   return system_;
 }
 

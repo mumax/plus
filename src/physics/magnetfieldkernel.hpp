@@ -15,14 +15,14 @@ class MagnetFieldKernel {
   ~MagnetFieldKernel();
 
   Grid grid() const;
-  System* kernelSystem();
+  std::shared_ptr<const System> kernelSystem() const;
   real3 cellsize() const;
   const Field& field() const;
 
   void compute();
 
  private:
-  std::unique_ptr<System> kernelSystem_;
+  std::shared_ptr<System> kernelSystem_;
   real3 cellsize_;
   Field* kernel_;
 

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 
 #include "cudaerror.hpp"
@@ -13,12 +14,12 @@
 
 Field::Field() : system_(nullptr), ncomp_(0) {}
 
-Field::Field(const System* system, int nComponents)
+Field::Field(std::shared_ptr<const System> system, int nComponents)
     : system_(system), ncomp_(nComponents) {
   allocate();
 }
 
-Field::Field(const System* system, int nComponents, real value)
+Field::Field(std::shared_ptr<const System> system, int nComponents, real value)
     : Field(system, nComponents) {
   for (int comp = 0; comp < nComponents; comp++)
     setUniformComponent(comp, value);
@@ -61,7 +62,7 @@ void Field::clear() {
   free();
 }
 
-const System* Field::system() const {
+std::shared_ptr<const System> Field::system() const {
   return system_;
 }
 

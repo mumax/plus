@@ -12,18 +12,18 @@
 
 Ferromagnet::Ferromagnet(MumaxWorld* world, Grid grid, std::string name)
     : system_(new System(world, grid)),
-      magnetization_(name + ":magnetization", "", system_.get(), 3),
-      aex(system_.get(), 0.0),
-      msat(system_.get(), 1.0),
-      ku1(system_.get(), 0.0),
-      ku2(system_.get(), 0.0),
-      alpha(system_.get(), 0.0),
-      temperature(system_.get(), 0.0),
-      idmi(system_.get(), 0.0),
-      xi(system_.get(), 0.0),
-      pol(system_.get(), 0.0),
-      anisU(system_.get(), {0, 0, 0}),
-      jcur(system_.get(), {0, 0, 0}),
+      magnetization_(name + ":magnetization", "", system_, 3),
+      aex(system_, 0.0),
+      msat(system_, 1.0),
+      ku1(system_, 0.0),
+      ku2(system_, 0.0),
+      alpha(system_, 0.0),
+      temperature(system_, 0.0),
+      idmi(system_, 0.0),
+      xi(system_, 0.0),
+      pol(system_, 0.0),
+      anisU(system_, {0, 0, 0}),
+      jcur(system_, {0, 0, 0}),
       enableDemag(true) {
   {
     // TODO: this can be done much more efficient somewhere else
@@ -55,8 +55,8 @@ std::string Ferromagnet::name() const {
   return name_;
 }
 
-System* Ferromagnet::system() const {
-  return system_.get();
+std::shared_ptr<System> Ferromagnet::system() const {
+  return system_;
 }
 
 World* Ferromagnet::world() const {
