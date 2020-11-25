@@ -1,8 +1,4 @@
 add_library(core STATIC 
-    cudastream.cu
-    cudastream.hpp
-    cudalaunch.hpp
-    cudaerror.hpp 
     datatypes.hpp 
     field.cu 
     field.hpp 
@@ -12,8 +8,6 @@ add_library(core STATIC
     fieldquantity.hpp 
     grid.cu 
     grid.hpp 
-    gpubuffer.cu
-    gpubuffer.hpp
     parameter.cu
     parameter.hpp
     reduce.cu
@@ -32,3 +26,5 @@ add_library(core STATIC
 
 target_include_directories(core PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 target_include_directories(core PUBLIC .)
+
+target_link_libraries(core PUBLIC cudautil)

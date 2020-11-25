@@ -25,6 +25,7 @@ endif()
 add_definitions(-DFP_PRECISION=SINGLE) # FP_PRECISION should be SINGLE or DOUBLE
 add_definitions(-D_USE_MATH_DEFINES) # Needed for cmath constants on Windows
 
+add_subdirectory(src/cudautil)
 add_subdirectory(src/core)
 add_subdirectory(src/timesolver)
 add_subdirectory(src/physics)
