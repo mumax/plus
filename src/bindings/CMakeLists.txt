@@ -1,3 +1,5 @@
+project(mumax5)
+
 add_subdirectory(pybind11)
 
 pybind11_add_module(_mumax5cpp
@@ -18,4 +20,4 @@ pybind11_add_module(_mumax5cpp
 )
 
 target_include_directories(_mumax5cpp PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-target_link_libraries(_mumax5cpp PRIVATE physics)
+target_link_libraries(_mumax5cpp PRIVATE core timesolver physics)

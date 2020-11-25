@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.18) 
-project(mumax5physics)
+#project(mumax5)
 
 add_library(physics STATIC 
     anisotropy.cu 
@@ -44,11 +43,9 @@ add_library(physics STATIC
 )
 
 target_include_directories(physics PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-target_include_directories(physics PUBLIC ${PROJECT_SOURCE_DIR})
-target_link_libraries(physics PUBLIC core)
+target_include_directories(physics PUBLIC .)
+
+target_link_libraries(physics PUBLIC core timesolver)
 
 link_directories(${CUDA_LIBRARY_DIR})
 target_link_libraries(physics PRIVATE cufft curand)
-
-set_target_properties(physics PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-set_target_properties(physics PROPERTIES POSITION_INDEPENDENT_CODE ON)
