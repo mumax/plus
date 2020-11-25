@@ -14,9 +14,16 @@ class StrayFieldExecutor {
  public:
   enum Method { METHOD_BRUTE, METHOD_FFT, METHOD_AUTO };
 
+  /** Factory method for StrayFieldExecutor */
+  static std::unique_ptr<StrayFieldExecutor> create(Method,
+                                                    Grid gridOut,
+                                                    Grid gridIn,
+                                                    real3 cellsize);
+
  public:
   virtual ~StrayFieldExecutor() {}
   virtual void exec(Field* h, const Field* m, const Parameter* msat) const = 0;
+  virtual Method method() const = 0;
 };
 
 /// StrayField is a field quantity which evaluates the stray field of a

@@ -9,6 +9,27 @@
 #include "system.hpp"
 #include "world.hpp"
 
+std::unique_ptr<StrayFieldExecutor> StrayFieldExecutor::create(Method method,
+                                                               Grid gridOut,
+                                                               Grid gridIn,
+                                                               real3 cellsize) {
+  switch (method) {
+    case StrayFieldExecutor::METHOD_AUTO:
+      // TODO: make smart choice (dependent on the
+      // grid sizes) when choosing between fft or
+      // brute method. For now, we choose fft method
+      return std::make_unique<StrayFieldFFTExecutor>(gridOut, gridIn, cellsize);
+      break;
+    case StrayFieldExecutor::METHOD_FFT:
+      return std::make_unique<StrayFieldFFTExecutor>(gridOut, gridIn, cellsize);
+      break;
+    case StrayFieldExecutor::METHOD_BRUTE:
+      return std::make_unique<StrayFieldBruteExecutor>(gridOut, gridIn,
+                                                       cellsize);
+      break;
+  }
+}
+
 StrayField::StrayField(const Ferromagnet* magnet,
                        std::shared_ptr<const System> system,
                        StrayFieldExecutor::Method method)
@@ -27,23 +48,9 @@ StrayField::StrayField(const Ferromagnet* magnet,
 StrayField::~StrayField() {}
 
 void StrayField::setMethod(StrayFieldExecutor::Method method) {
-  // TODO: check if method has been changed. If not, do nothing
-  switch (method) {
-    case StrayFieldExecutor::METHOD_AUTO:
-      // TODO: make smart choice (dependent on the
-      // grid sizes) when choosing between fft or
-      // brute method. For now, we choose fft method
-      executor_ = std::make_unique<StrayFieldFFTExecutor>(
-          grid(), magnet_->grid(), magnet_->world()->cellsize());
-      break;
-    case StrayFieldExecutor::METHOD_FFT:
-      executor_ = std::make_unique<StrayFieldFFTExecutor>(
-          grid(), magnet_->grid(), magnet_->world()->cellsize());
-      break;
-    case StrayFieldExecutor::METHOD_BRUTE:
-      executor_ = std::make_unique<StrayFieldBruteExecutor>(
-          grid(), magnet_->grid(), magnet_->world()->cellsize());
-      break;
+  if (!executor_ || executor_->method() != method) {
+    executor_ = StrayFieldExecutor::create(method, grid(), magnet_->grid(),
+                                           magnet_->world()->cellsize());
   }
 }
 

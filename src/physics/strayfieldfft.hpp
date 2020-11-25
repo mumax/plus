@@ -17,6 +17,7 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
   StrayFieldFFTExecutor(Grid gridOut, Grid gridIn, real3 cellsize);
   ~StrayFieldFFTExecutor();
   void exec(Field* h, const Field* m, const Parameter* msat) const;
+  Method method() const { return StrayFieldExecutor::METHOD_FFT; }
 
  private:
   StrayFieldKernel kernel_;
