@@ -1,5 +1,7 @@
 """FieldQuantity implementation."""
 
+from .grid import Grid
+
 
 class FieldQuantity:
     """A functor representing a physical field quantity.
@@ -38,6 +40,17 @@ class FieldQuantity:
             The number of components of the quantity.
         """
         return self._impl.ncomp
+
+    @property
+    def grid(self):
+        """Return grid on which the quantity will be evaluated.
+
+        Returns
+        -------
+        grid : Grid
+            The grid on which the quantity will be evaluated
+        """
+        return Grid._from_impl(self._impl.grid)
 
     def eval(self):
         """Evaluate the quantity."""
