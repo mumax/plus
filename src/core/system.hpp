@@ -22,6 +22,9 @@ class System {
   /** Return the cellsize of the world to which the system belongs. */
   real3 cellsize() const;
 
+  /** Return the position of a cell of this system in the world. */
+  real3 cellPosition(int3) const;
+
  private:
   World* world_;
   Grid grid_;

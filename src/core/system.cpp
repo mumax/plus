@@ -17,3 +17,9 @@ Grid System::grid() const {
 real3 System::cellsize() const {
   return world()->cellsize();
 }
+
+real3 System::cellPosition(int3 idx) const {
+  int3 p = grid().origin() + idx;
+  real3 c = cellsize();
+  return real3{p.x * c.x, p.y * c.y, p.z * c.z};
+}
