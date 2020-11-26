@@ -2,19 +2,21 @@
 
 #include <cufft.h>
 
+#include <memory>
 #include <vector>
 
 #include "datatypes.hpp"
-#include "grid.hpp"
 #include "strayfield.hpp"
 #include "strayfieldkernel.hpp"
 
 class Parameter;
 class Field;
+class System;
 
 class StrayFieldFFTExecutor : public StrayFieldExecutor {
  public:
-  StrayFieldFFTExecutor(Grid gridOut, Grid gridIn, real3 cellsize);
+  StrayFieldFFTExecutor(std::shared_ptr<const System> systemIn,
+                        std::shared_ptr<const System> systemOut);
   ~StrayFieldFFTExecutor();
   void exec(Field* h, const Field* m, const Parameter* msat) const;
   Method method() const { return StrayFieldExecutor::METHOD_FFT; }

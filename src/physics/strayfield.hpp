@@ -3,25 +3,25 @@
 #include <memory>
 
 #include "fieldquantity.hpp"
-#include "grid.hpp"
 
 class Parameter;
 class Ferromagnet;
 class Field;
 class System;
+class Grid;
 
 class StrayFieldExecutor {
  public:
   enum Method { METHOD_BRUTE, METHOD_FFT, METHOD_AUTO };
 
   /** Factory method for StrayFieldExecutor */
-  static std::unique_ptr<StrayFieldExecutor> create(Method,
-                                                    Grid gridOut,
-                                                    Grid gridIn,
-                                                    real3 cellsize);
+  static std::unique_ptr<StrayFieldExecutor> create(
+      std::shared_ptr<const System> inSystem,
+      std::shared_ptr<const System> outSystem,
+      Method method);
 
  public:
-  virtual ~StrayFieldExecutor() {}
+   virtual ~StrayFieldExecutor() {}
   virtual void exec(Field* h, const Field* m, const Parameter* msat) const = 0;
   virtual Method method() const = 0;
 };

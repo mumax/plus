@@ -1,8 +1,12 @@
+#include <memory>
+
 #include "constants.hpp"
 #include "cudalaunch.hpp"
 #include "field.hpp"
+#include "grid.hpp"
 #include "parameter.hpp"
 #include "strayfieldbrute.hpp"
+#include "system.hpp"
 
 __global__ void k_demagfield(CuField hField,
                              const CuField mField,
@@ -36,10 +40,10 @@ __global__ void k_demagfield(CuField hField,
   hField.setVectorInCell(idx, MU0 * h);
 }
 
-StrayFieldBruteExecutor::StrayFieldBruteExecutor(Grid gridOut,
-                                                 Grid gridIn,
-                                                 real3 cellsize)
-    : kernel_(gridOut, gridIn, cellsize) {}
+StrayFieldBruteExecutor::StrayFieldBruteExecutor(
+    std::shared_ptr<const System> inSystem,
+    std::shared_ptr<const System> outSystem)
+    : kernel_(outSystem->grid(), inSystem->grid(), inSystem->cellsize()) {}
 
 void StrayFieldBruteExecutor::exec(Field* h,
                                    const Field* m,

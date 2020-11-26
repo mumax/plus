@@ -6,6 +6,7 @@
 #include "constants.hpp"
 #include "cudalaunch.hpp"
 #include "field.hpp"
+#include "grid.hpp"
 #include "parameter.hpp"
 #include "strayfieldfft.hpp"
 #include "strayfieldkernel.hpp"
@@ -126,10 +127,13 @@ __global__ void k_apply_kernel_2d(complex* hx,
   hz[i] = preFactor * (kzz[i] * mz[i]);
 }
 
-StrayFieldFFTExecutor::StrayFieldFFTExecutor(Grid gridOut,
-                                             Grid gridIn,
-                                             real3 cellsize)
-    : kernel_(gridOut, gridIn, cellsize), kfft(6), hfft(3), mfft(3) {
+StrayFieldFFTExecutor::StrayFieldFFTExecutor(
+    std::shared_ptr<const System> systemIn,
+    std::shared_ptr<const System> systemOut)
+    : kernel_(systemOut->grid(), systemIn->grid(), systemIn->cellsize()),
+      kfft(6),
+      hfft(3),
+      mfft(3) {
   int3 size = kernel_.grid().size();
   fftSize = {size.x / 2 + 1, size.y, size.z};
   int ncells = fftSize.x * fftSize.y * fftSize.z;
