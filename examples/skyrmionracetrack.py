@@ -1,5 +1,5 @@
 from mumax5 import Ferromagnet, Grid, TimeSolver, World
-from mumax5.util import neelskyrmion, set_magnetization, show_field
+from mumax5.util import neelskyrmion, show_field
 
 # create the world
 cellsize = (1e-9, 1e-9, 0.4e-9)
@@ -16,8 +16,9 @@ magnet.anisU = (0, 0, 1)
 magnet.alpha = 0.2
 
 # set and relax the initial magnetization
-skyrmion = neelskyrmion(center=(64e-9, 32e-9, 0), radius=10e-9, charge=-1, pol=1)
-set_magnetization(magnet, cellsize, skyrmion)
+magnet.magnetization = neelskyrmion(
+    center=(64e-9, 32e-9, 0), radius=10e-9, charge=-1, pol=1
+)
 magnet.minimize()
 
 # add a current
