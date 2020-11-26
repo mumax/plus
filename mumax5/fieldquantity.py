@@ -1,5 +1,7 @@
 """FieldQuantity implementation."""
 
+import numpy as _np
+
 from .grid import Grid
 
 
@@ -75,6 +77,22 @@ class FieldQuantity:
         """Evaluate the quantity and return the average of each component."""
         # TODO add return type.
         return self._impl.average()
+
+    @property
+    def meshgrid(self):
+        """Return a numpy meshgrid with the x, y, and z coordinate of each cell."""
+        # TODO: it might make more sense to put this somewhere else
+        nx, ny, nz = self.grid.size
+        cellsize = self._impl.system.cellsize
+        origin = self._impl.system.cell_position((0, 0, 0))
+
+        mgrid_idx = _np.flip(_np.mgrid[0:nz, 0:ny, 0:nx], axis=0)
+
+        mgrid = _np.zeros(mgrid_idx.shape, dtype=_np.float32)
+        for c in [0, 1, 2]:
+            mgrid[c] = origin[c] + mgrid_idx[c] * cellsize[c]
+
+        return mgrid
 
     def _bench(self, ntimes=100):
         import time
