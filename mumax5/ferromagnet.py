@@ -46,7 +46,7 @@ class Ferromagnet:
 
     @magnetization.setter
     def magnetization(self, value):
-        self._impl.magnetization.set(value)
+        self.magnetization.set(value)
 
     @property
     def enable_demag(self):
