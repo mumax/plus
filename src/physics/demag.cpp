@@ -31,7 +31,7 @@ real evalDemagEnergy(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity demagFieldQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalDemagField, 3, "exchange_field", "T");
+  return FM_FieldQuantity(magnet, evalDemagField, 3, "demag_field", "T");
 }
 
 FM_FieldQuantity demagEnergyDensityQuantity(const Ferromagnet* magnet) {
