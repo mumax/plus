@@ -48,9 +48,20 @@ class FieldQuantity:
         Returns
         -------
         grid : Grid
-            The grid on which the quantity will be evaluated
+            The grid on which the quantity will be evaluated.
         """
         return Grid._from_impl(self._impl.grid)
+
+    @property
+    def shape(self):
+        """Return the shape of the output numpy array of this quantity.
+
+        Returns
+        -------
+        shape : tuple of ints
+            The shape of the output numpy array of this quantity.
+        """
+        return (self.ncomp, *self.grid.shape)
 
     def eval(self):
         """Evaluate the quantity."""
