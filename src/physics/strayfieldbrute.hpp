@@ -8,12 +8,13 @@
 class System;
 class Field;
 class Parameter;
+class Ferromagnet;
 
 class StrayFieldBruteExecutor : public StrayFieldExecutor {
  public:
-  StrayFieldBruteExecutor(std::shared_ptr<const System> inSystem,
-                          std::shared_ptr<const System> outSystem);
-  void exec(Field* h, const Field* m, const Parameter* msat) const;
+  StrayFieldBruteExecutor(const Ferromagnet* magnet,
+                          std::shared_ptr<const System> system);
+  Field exec() const;
   Method method() const { return StrayFieldExecutor::METHOD_BRUTE; }
 
  private:

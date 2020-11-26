@@ -5,6 +5,8 @@
 
 #include "constants.hpp"
 #include "cudalaunch.hpp"
+#include "ferromagnet.hpp"
+#include "ferromagnetquantity.hpp"
 #include "field.hpp"
 #include "grid.hpp"
 #include "parameter.hpp"
@@ -128,9 +130,10 @@ __global__ void k_apply_kernel_2d(complex* hx,
 }
 
 StrayFieldFFTExecutor::StrayFieldFFTExecutor(
-    std::shared_ptr<const System> systemIn,
-    std::shared_ptr<const System> systemOut)
-    : kernel_(systemOut->grid(), systemIn->grid(), systemIn->cellsize()),
+    const Ferromagnet* magnet,
+    std::shared_ptr<const System> system)
+    : StrayFieldExecutor(magnet, system),
+      kernel_(system->grid(), magnet_->grid(), system_->cellsize()),
       kfft(6),
       hfft(3),
       mfft(3) {
@@ -168,14 +171,15 @@ StrayFieldFFTExecutor::~StrayFieldFFTExecutor() {
   checkCufftResult(cufftDestroy(backwardPlan));
 }
 
-void StrayFieldFFTExecutor::exec(Field* h,
-                                 const Field* m,
-                                 const Parameter* msat) const {
+Field StrayFieldFFTExecutor::exec() const {
+  const Field& m = magnet_->magnetization()->field();
+
   // pad m, and multiply with msat
   std::shared_ptr<System> kernelSystem =
-      std::make_shared<System>(h->system()->world(), kernel_.grid());
+      std::make_shared<System>(m.system()->world(), kernel_.grid());
   std::unique_ptr<Field> mpad(new Field(kernelSystem, 3));
-  cudaLaunch(mpad->grid().ncells(), k_pad, mpad->cu(), m->cu(), msat->cu());
+  cudaLaunch(mpad->grid().ncells(), k_pad, mpad->cu(), m.cu(),
+             magnet_->msat.cu());
 
   // Forward fourier transforms
   for (int comp = 0; comp < 3; comp++)
@@ -203,5 +207,7 @@ void StrayFieldFFTExecutor::exec(Field* h,
     checkCufftResult(ifftExec(backwardPlan, hfft.at(comp), mpad->devptr(comp)));
 
   // unpad
-  cudaLaunch(h->grid().ncells(), k_unpad, h->cu(), mpad->cu());
+  Field h(system_, 3);
+  cudaLaunch(h.grid().ncells(), k_unpad, h.cu(), mpad->cu());
+  return h;
 }

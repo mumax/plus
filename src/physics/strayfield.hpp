@@ -16,14 +16,22 @@ class StrayFieldExecutor {
 
   /** Factory method for StrayFieldExecutor */
   static std::unique_ptr<StrayFieldExecutor> create(
-      std::shared_ptr<const System> inSystem,
-      std::shared_ptr<const System> outSystem,
+      const Ferromagnet* magnet,
+      std::shared_ptr<const System> system,
       Method method);
 
+ protected:
+  StrayFieldExecutor(const Ferromagnet* magnet,
+                     std::shared_ptr<const System> system);
+
  public:
-   virtual ~StrayFieldExecutor() {}
-  virtual void exec(Field* h, const Field* m, const Parameter* msat) const = 0;
+  virtual ~StrayFieldExecutor() {}
+  virtual Field exec() const = 0;
   virtual Method method() const = 0;
+
+ protected:
+  const Ferromagnet* magnet_;
+  const std::shared_ptr<const System> system_;
 };
 
 /// StrayField is a field quantity which evaluates the stray field of a

@@ -12,13 +12,14 @@
 class Parameter;
 class Field;
 class System;
+class Ferromagnet;
 
 class StrayFieldFFTExecutor : public StrayFieldExecutor {
  public:
-  StrayFieldFFTExecutor(std::shared_ptr<const System> systemIn,
-                        std::shared_ptr<const System> systemOut);
+  StrayFieldFFTExecutor(const Ferromagnet* magnet,
+                        std::shared_ptr<const System> system);
   ~StrayFieldFFTExecutor();
-  void exec(Field* h, const Field* m, const Parameter* msat) const;
+  Field exec() const;
   Method method() const { return StrayFieldExecutor::METHOD_FFT; }
 
  private:

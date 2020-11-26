@@ -2,6 +2,7 @@
 
 #include "constants.hpp"
 #include "cudalaunch.hpp"
+#include "ferromagnet.hpp"
 #include "field.hpp"
 #include "grid.hpp"
 #include "parameter.hpp"
@@ -41,15 +42,16 @@ __global__ void k_demagfield(CuField hField,
 }
 
 StrayFieldBruteExecutor::StrayFieldBruteExecutor(
-    std::shared_ptr<const System> inSystem,
-    std::shared_ptr<const System> outSystem)
-    : kernel_(outSystem->grid(), inSystem->grid(), inSystem->cellsize()) {}
+    const Ferromagnet* magnet,
+    std::shared_ptr<const System> system)
+    : StrayFieldExecutor(magnet, system),
+      kernel_(system->grid(), magnet_->grid(), magnet_->cellsize()) {}
 
-void StrayFieldBruteExecutor::exec(Field* h,
-                                   const Field* m,
-                                   const Parameter* msat) const {
-  // TODO: check dimensions of fields
-  int ncells = h->grid().ncells();
-  cudaLaunch(ncells, k_demagfield, h->cu(), m->cu(), kernel_.field().cu(),
-             msat->cu());
+Field StrayFieldBruteExecutor::exec() const {
+  Field h(system_, 3);
+  int ncells = h.grid().ncells();
+  cudaLaunch(ncells, k_demagfield, h.cu(),
+             magnet_->magnetization()->field().cu(), kernel_.field().cu(),
+             magnet_->msat.cu());
+  return h;
 }

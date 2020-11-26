@@ -10,24 +10,28 @@
 #include "world.hpp"
 
 std::unique_ptr<StrayFieldExecutor> StrayFieldExecutor::create(
-    std::shared_ptr<const System> inSystem,
-    std::shared_ptr<const System> outSystem,
+    const Ferromagnet* magnet,
+    std::shared_ptr<const System> system,
     Method method) {
   switch (method) {
     case StrayFieldExecutor::METHOD_AUTO:
       // TODO: make smart choice (dependent on the
       // grid sizes) when choosing between fft or
       // brute method. For now, we choose fft method
-      return std::make_unique<StrayFieldFFTExecutor>(inSystem, outSystem);
+      return std::make_unique<StrayFieldFFTExecutor>(magnet, system);
       break;
     case StrayFieldExecutor::METHOD_FFT:
-      return std::make_unique<StrayFieldFFTExecutor>(inSystem, outSystem);
+      return std::make_unique<StrayFieldFFTExecutor>(magnet, system);
       break;
     case StrayFieldExecutor::METHOD_BRUTE:
-      return std::make_unique<StrayFieldBruteExecutor>(inSystem, outSystem);
+      return std::make_unique<StrayFieldBruteExecutor>(magnet, system);
       break;
   }
 }
+
+StrayFieldExecutor::StrayFieldExecutor(const Ferromagnet* magnet,
+                                       std::shared_ptr<const System> system)
+    : magnet_(magnet), system_(system) {}
 
 StrayField::StrayField(const Ferromagnet* magnet,
                        std::shared_ptr<const System> system,
@@ -48,7 +52,7 @@ StrayField::~StrayField() {}
 
 void StrayField::setMethod(StrayFieldExecutor::Method method) {
   if (!executor_ || executor_->method() != method) {
-    executor_ = StrayFieldExecutor::create(magnet_->system(), system_, method);
+    executor_ = StrayFieldExecutor::create(magnet_, system_, method);
   }
 }
 
@@ -65,15 +69,10 @@ std::shared_ptr<const System> StrayField::system() const {
 }
 
 Field StrayField::eval() const {
-  Field h(system(), ncomp());
   if (assuredZero()) {
-    h.makeZero();
-    return h;
+    return Field(system(), ncomp(), 0.0);
   }
-  const Parameter* msat = &magnet_->msat;
-  const Field& m = magnet_->magnetization()->field();
-  executor_->exec(&h, &m, msat);
-  return h;
+  return executor_->exec();
 }
 
 std::string StrayField::unit() const {
