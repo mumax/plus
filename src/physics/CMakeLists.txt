@@ -20,6 +20,10 @@ add_library(physics STATIC
     interfacialdmi.hpp
     minimizer.cu
     minimizer.hpp
+    mumaxworld.cpp
+    mumaxworld.hpp
+    newell.cu
+    newell.hpp
     strayfield.cpp
     strayfield.hpp
     strayfieldbrute.cu
@@ -28,10 +32,6 @@ add_library(physics STATIC
     strayfieldfft.hpp
     strayfieldkernel.cu
     strayfieldkernel.hpp
-    mumaxworld.cpp
-    mumaxworld.hpp
-    newell.cu
-    newell.hpp
     stt.cu
     stt.hpp
     thermalnoise.cu
