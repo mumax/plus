@@ -4,6 +4,7 @@
 #include "grid.hpp"
 #include "mumaxworld.hpp"
 #include "system.hpp"
+#include "timesolver.hpp"
 #include "wrappers.hpp"
 
 void wrap_world(py::module& m) {
@@ -27,5 +28,7 @@ void wrap_world(py::module& m) {
            py::return_value_policy::reference)
       .def("get_ferromagnet", &MumaxWorld::getFerromagnet, py::arg("name"),
            "get a reference to a magnet by name",
-           py::return_value_policy::reference);
+           py::return_value_policy::reference)
+      .def_property_readonly("timesolver", &MumaxWorld::timesolver,
+                             py::return_value_policy::reference);
 }

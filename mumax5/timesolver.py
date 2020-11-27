@@ -43,6 +43,12 @@ class TimeSolver:
     def __init__(self, variable, rhs):
         self._impl = _cpp.TimeSolver(variable._impl, rhs._impl)
 
+    @classmethod
+    def _from_impl(cls, impl):
+        solver = cls.__new__(cls)
+        solver._impl = impl
+        return solver
+
     def step(self):
         """Make one step of the time solver."""
         self._impl.step()
