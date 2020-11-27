@@ -9,13 +9,10 @@
 #include "strayfieldbrute.hpp"
 #include "system.hpp"
 
-__global__ void k_demagfield(CuField hField,
-                             const CuField mField,
-                             const CuField kernel,
-                             const CuParameter msat) {
+__global__ void k_demagfield(CuField hField, const CuField mField,
+                             const CuField kernel, const CuParameter msat) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (!hField.cellInGrid(idx))
-    return;
+  if (!hField.cellInGrid(idx)) return;
 
   real3 h{0, 0, 0};
 
@@ -42,8 +39,7 @@ __global__ void k_demagfield(CuField hField,
 }
 
 StrayFieldBruteExecutor::StrayFieldBruteExecutor(
-    const Ferromagnet* magnet,
-    std::shared_ptr<const System> system)
+    const Ferromagnet* magnet, std::shared_ptr<const System> system)
     : StrayFieldExecutor(magnet, system),
       kernel_(system->grid(), magnet_->grid(), magnet_->cellsize()) {}
 

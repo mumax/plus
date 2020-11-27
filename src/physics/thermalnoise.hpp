@@ -6,6 +6,6 @@
 class Ferromagnet;
 class Field;
 
-Field evalThermalNoise(const Ferromagnet*);
+Field evalThermalNoise(const Ferromagnet *);
 
 FM_FieldQuantity thermalNoiseQuantity(const Ferromagnet *);

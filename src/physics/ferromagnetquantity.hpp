@@ -16,11 +16,8 @@ typedef std::function<real(const Ferromagnet*)> FM_ScalarFunc;
 
 class FM_FieldQuantity : public FieldQuantity {
  public:
-  FM_FieldQuantity(const Ferromagnet* ferromagnet,
-                   FM_FieldFunc evalfunc,
-                   int ncomp,
-                   std::string name,
-                   std::string unit)
+  FM_FieldQuantity(const Ferromagnet* ferromagnet, FM_FieldFunc evalfunc,
+                   int ncomp, std::string name, std::string unit)
       : ferromagnet_(ferromagnet),
         evalfunc_(evalfunc),
         ncomp_(ncomp),
@@ -51,10 +48,8 @@ class FM_FieldQuantity : public FieldQuantity {
 
 class FM_ScalarQuantity : public ScalarQuantity {
  public:
-  FM_ScalarQuantity(const Ferromagnet* ferromagnet,
-                    FM_ScalarFunc evalfunc,
-                    std::string name,
-                    std::string unit)
+  FM_ScalarQuantity(const Ferromagnet* ferromagnet, FM_ScalarFunc evalfunc,
+                    std::string name, std::string unit)
       : ferromagnet_(ferromagnet),
         evalfunc_(evalfunc),
         name_(name),

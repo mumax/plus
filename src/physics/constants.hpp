@@ -2,7 +2,6 @@
 
 #include "datatypes.hpp"
 
-
 // Gyromagnetic ratio in rad/Ts
 #define GAMMALL 1.7595E11
 // Vacuum permeability in H/m

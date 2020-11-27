@@ -25,8 +25,7 @@ class Ref {
   }
 
   T* get() const {
-    if (link_)
-      return link_->get();
+    if (link_) return link_->get();
     return nullptr;
   }
 
@@ -48,7 +47,6 @@ class RefHandler {
   std::shared_ptr<RefLink<T>> link_;
   std::shared_ptr<RefLink<const T>> clink_;
 };
-
 
 //
 //  RefHandler<Ferromagnet> refHandler{this};

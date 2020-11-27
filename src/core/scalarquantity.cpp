@@ -1,11 +1,7 @@
-#include"scalarquantity.hpp"
+#include "scalarquantity.hpp"
 
 ScalarQuantity::~ScalarQuantity() {}
 
-std::string ScalarQuantity::unit() const {
-  return "";
-}
+std::string ScalarQuantity::unit() const { return ""; }
 
-std::string ScalarQuantity::name() const {
-  return "";
-}
+std::string ScalarQuantity::name() const { return ""; }

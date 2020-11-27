@@ -10,8 +10,7 @@
 #include "world.hpp"
 
 std::unique_ptr<StrayFieldExecutor> StrayFieldExecutor::create(
-    const Ferromagnet* magnet,
-    std::shared_ptr<const System> system,
+    const Ferromagnet* magnet, std::shared_ptr<const System> system,
     Method method) {
   switch (method) {
     case StrayFieldExecutor::METHOD_AUTO:
@@ -40,8 +39,7 @@ StrayField::StrayField(const Ferromagnet* magnet,
   setMethod(method);
 }
 
-StrayField::StrayField(const Ferromagnet* magnet,
-                       Grid grid,
+StrayField::StrayField(const Ferromagnet* magnet, Grid grid,
                        StrayFieldExecutor::Method method)
     : magnet_(magnet), executor_(nullptr) {
   system_ = std::make_shared<System>(magnet->world(), grid);
@@ -56,17 +54,11 @@ void StrayField::setMethod(StrayFieldExecutor::Method method) {
   }
 }
 
-const Ferromagnet* StrayField::source() const {
-  return magnet_;
-}
+const Ferromagnet* StrayField::source() const { return magnet_; }
 
-int StrayField::ncomp() const {
-  return 3;
-}
+int StrayField::ncomp() const { return 3; }
 
-std::shared_ptr<const System> StrayField::system() const {
-  return system_;
-}
+std::shared_ptr<const System> StrayField::system() const { return system_; }
 
 Field StrayField::eval() const {
   if (assuredZero()) {
@@ -75,10 +67,6 @@ Field StrayField::eval() const {
   return executor_->exec();
 }
 
-std::string StrayField::unit() const {
-  return "T";
-}
+std::string StrayField::unit() const { return "T"; }
 
-bool StrayField::assuredZero() const {
-  return magnet_->msat.assuredZero();
-}
+bool StrayField::assuredZero() const { return magnet_->msat.assuredZero(); }

@@ -10,8 +10,7 @@ GpuMemoryPool memoryPool;
 
 GpuMemoryPool::~GpuMemoryPool() {
   for (const auto& poolEntry : pool_)
-    for (auto& ptr : poolEntry.second)
-      checkCudaError(cudaFree(ptr));
+    for (auto& ptr : poolEntry.second) checkCudaError(cudaFree(ptr));
 }
 
 void* GpuMemoryPool::allocate(size_t size) {
@@ -48,12 +47,10 @@ void GpuMemoryPool::printInfo() const {
   std::map<size_t, std::pair<int, int>> memoryUse;
 
   // count number of used memory blocks (for each memory block size seperately)
-  for (auto u : inUse_)
-    memoryUse[u.second].first++;
+  for (auto u : inUse_) memoryUse[u.second].first++;
 
   // get number of memory blocks in the pool for each memory block size
-  for (const auto& p : pool_)
-    memoryUse[p.first].second = p.second.size();
+  for (const auto& p : pool_) memoryUse[p.first].second = p.second.size();
 
   int totalMemUsed = 0;
   for (auto b : memoryUse) {

@@ -60,7 +60,6 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid, std::string name) {
 
 Ferromagnet* MumaxWorld::getFerromagnet(std::string name) const {
   auto namedMagnet = ferromagnets_.find(name);
-  if (namedMagnet == ferromagnets_.end())
-    return nullptr;
+  if (namedMagnet == ferromagnets_.end()) return nullptr;
   return namedMagnet->second.get();
 }

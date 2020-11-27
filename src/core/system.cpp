@@ -6,14 +6,8 @@
 
 System::System(World* world, Grid grid) : grid_(grid), world_(world) {}
 
-World* System::world() const {
-  return world_;
-}
+World* System::world() const { return world_; }
 
-Grid System::grid() const {
-  return grid_;
-}
+Grid System::grid() const { return grid_; }
 
-real3 System::cellsize() const {
-  return world()->cellsize();
-}
+real3 System::cellsize() const { return world()->cellsize(); }

@@ -78,13 +78,9 @@ class Handle {
     return *this;
   }
 
-  bool operator==(const Handle<T>& other) const {
-    return get() == other.get();
-  }
+  bool operator==(const Handle<T>& other) const { return get() == other.get(); }
 
-  bool operator!=(const Handle<T>& other) const {
-    return get() != other.get();
-  }
+  bool operator!=(const Handle<T>& other) const { return get() != other.get(); }
 
   // We might want to use map with a Handle as the key
   // TODO: find a less hacky approach
@@ -95,8 +91,7 @@ class Handle {
   // Returns a pointer to the handled object. This might be a nullptr if the
   // object is being deleted by the handler
   T* get() const {
-    if (link_)
-      return link_->handler->operator->();
+    if (link_) return link_->handler->operator->();
     return nullptr;
   }
 

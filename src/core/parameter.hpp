@@ -51,13 +51,10 @@ class CuParameter {
   __device__ real valueAt(int3 coo) const;
 };
 
-__device__ inline bool CuParameter::isUniform() const {
-  return !valuesPtr;
-}
+__device__ inline bool CuParameter::isUniform() const { return !valuesPtr; }
 
 __device__ inline real CuParameter::valueAt(int idx) const {
-  if (isUniform())
-    return uniformValue;
+  if (isUniform()) return uniformValue;
   return valuesPtr[idx];
 }
 
@@ -116,9 +113,7 @@ inline CuVectorParameter::CuVectorParameter(Grid grid, real3 uniformValue)
       yValuesPtr(nullptr),
       zValuesPtr(nullptr) {}
 
-inline CuVectorParameter::CuVectorParameter(Grid grid,
-                                            real* xPtr,
-                                            real* yPtr,
+inline CuVectorParameter::CuVectorParameter(Grid grid, real* xPtr, real* yPtr,
                                             real* zPtr)
     : grid(grid),
       uniformValue({0, 0, 0}),
@@ -131,8 +126,7 @@ __device__ inline bool CuVectorParameter::isUniform() const {
 }
 
 __device__ inline real3 CuVectorParameter::vectorAt(int idx) const {
-  if (isUniform())
-    return uniformValue;
+  if (isUniform()) return uniformValue;
   return {xValuesPtr[idx], yValuesPtr[idx], zValuesPtr[idx]};
 }
 

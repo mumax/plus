@@ -9,8 +9,7 @@ Parameter::Parameter(std::shared_ptr<const System> system, real value)
     : system_(system), field_(nullptr), uniformValue_(value) {}
 
 Parameter::~Parameter() {
-  if (field_)
-    delete field_;
+  if (field_) delete field_;
 }
 
 void Parameter::set(real value) {
@@ -21,25 +20,17 @@ void Parameter::set(real value) {
   }
 }
 
-void Parameter::set(const Field& values) {
-  field_ = new Field(values);
-}
+void Parameter::set(const Field& values) { field_ = new Field(values); }
 
-bool Parameter::isUniform() const {
-  return !field_;
-}
+bool Parameter::isUniform() const { return !field_; }
 
 bool Parameter::assuredZero() const {
   return isUniform() && uniformValue_ == 0.0;
 }
 
-int Parameter::ncomp() const {
-  return 1;
-}
+int Parameter::ncomp() const { return 1; }
 
-std::shared_ptr<const System> Parameter::system() const {
-  return system_;
-}
+std::shared_ptr<const System> Parameter::system() const { return system_; }
 
 Field Parameter::eval() const {
   Field p(system_, ncomp());
@@ -52,8 +43,7 @@ Field Parameter::eval() const {
 }
 
 CuParameter Parameter::cu() const {
-  if (isUniform())
-    return CuParameter(grid(), uniformValue_);
+  if (isUniform()) return CuParameter(grid(), uniformValue_);
   return CuParameter(grid(), field_->devptr(0));
 }
 
@@ -62,31 +52,23 @@ VectorParameter::VectorParameter(std::shared_ptr<const System> system,
     : system_(system), field_(nullptr), uniformValue_(value) {}
 
 VectorParameter::~VectorParameter() {
-  if (field_)
-    delete field_;
+  if (field_) delete field_;
 }
 
 void VectorParameter::set(real3 value) {
   uniformValue_ = value;
-  if (field_)
-    delete field_;
+  if (field_) delete field_;
 }
 
-void VectorParameter::set(const Field& values) {
-  field_ = new Field(values);
-}
+void VectorParameter::set(const Field& values) { field_ = new Field(values); }
 
-bool VectorParameter::isUniform() const {
-  return !field_;
-}
+bool VectorParameter::isUniform() const { return !field_; }
 
 bool VectorParameter::assuredZero() const {
   return isUniform() && uniformValue_ == real3{0.0, 0.0, 0.0};
 }
 
-int VectorParameter::ncomp() const {
-  return 3;
-}
+int VectorParameter::ncomp() const { return 3; }
 
 std::shared_ptr<const System> VectorParameter::system() const {
   return system_;
@@ -105,8 +87,7 @@ Field VectorParameter::eval() const {
 }
 
 CuVectorParameter VectorParameter::cu() const {
-  if (isUniform())
-    return CuVectorParameter(grid(), uniformValue_);
+  if (isUniform()) return CuVectorParameter(grid(), uniformValue_);
   return CuVectorParameter{grid(), field_->devptr(0), field_->devptr(1),
                            field_->devptr(2)};
 }

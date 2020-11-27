@@ -37,13 +37,9 @@ class Grid {
 // -----------------------------------------------------------------------
 // Implementation of inline member functions
 
-__device__ __host__ inline int3 Grid::size() const {
-  return size_;
-}
+__device__ __host__ inline int3 Grid::size() const { return size_; }
 
-__device__ __host__ inline int3 Grid::origin() const {
-  return origin_;
-}
+__device__ __host__ inline int3 Grid::origin() const { return origin_; }
 
 __device__ __host__ inline int Grid::ncells() const {
   return size_.x * size_.y * size_.z;
@@ -70,12 +66,9 @@ __device__ __host__ inline int modulo(int i, int d) {
 }
 
 __device__ __host__ inline int3 Grid::wrap(int3 idx) const {
-  if (size_.x > 0)
-    idx.x = origin_.x + modulo(idx.x - origin_.x, size_.x);
-  if (size_.y > 0)
-    idx.y = origin_.y + modulo(idx.y - origin_.y, size_.y);
-  if (size_.z > 0)
-    idx.z = origin_.z + modulo(idx.z - origin_.z, size_.z);
+  if (size_.x > 0) idx.x = origin_.x + modulo(idx.x - origin_.x, size_.x);
+  if (size_.y > 0) idx.y = origin_.y + modulo(idx.y - origin_.y, size_.y);
+  if (size_.z > 0) idx.z = origin_.z + modulo(idx.z - origin_.z, size_.z);
   return idx;
 }
 
@@ -95,6 +88,7 @@ __device__ __host__ inline bool Grid::overlaps(Grid other) const {
   int z1 = max(origin_.z, other.origin_.z);
   int x2 = min(origin_.x + size_.x, other.origin_.x + other.size_.x);
   int y2 = min(origin_.y + size_.y, other.origin_.y + other.size_.y);
-  int z2 = min(origin_.z + size_.z, other.origin_.z + other.size_.z); // NOLINT [build/c++11]
+  int z2 = min(origin_.z + size_.z,  // NOLINT [build/c++11]
+               other.origin_.z + other.size_.z);
   return (x2 - x1) > 0 && (y2 - y1) > 0 && (z2 - z1) > 0;
 }

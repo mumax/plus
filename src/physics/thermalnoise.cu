@@ -18,15 +18,12 @@ bool thermalNoiseAssuredZero(const Ferromagnet* magnet) {
   return magnet->temperature.assuredZero();
 }
 
-__global__ void k_thermalNoise(CuField noiseField,
-                               const CuParameter msat,
+__global__ void k_thermalNoise(CuField noiseField, const CuParameter msat,
                                const CuParameter alpha,
-                               const CuParameter temperature,
-                               real preFactor) {
+                               const CuParameter temperature, real preFactor) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!noiseField.cellInGrid(idx))
-    return;
+  if (!noiseField.cellInGrid(idx)) return;
 
   real Ms = msat.valueAt(idx);
   real T = temperature.valueAt(idx);

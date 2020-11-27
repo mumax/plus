@@ -46,8 +46,7 @@ __CUDAOP__ complex operator*(complex a, complex b) {
 
 __global__ void k_pad(CuField out, CuField in, CuParameter msat) {
   int outIdx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (outIdx >= out.grid.ncells())
-    return;
+  if (outIdx >= out.grid.ncells()) return;
 
   int3 outCoo = out.grid.index2coord(outIdx);
   int3 inCoo = outCoo - out.grid.origin() + in.grid.origin();
@@ -58,16 +57,14 @@ __global__ void k_pad(CuField out, CuField in, CuParameter msat) {
     for (int c = 0; c < out.ncomp; c++)
       out.setValueInCell(outIdx, c, Ms * in.valueAt(inIdx, c));
   } else {
-    for (int c = 0; c < out.ncomp; c++)
-      out.setValueInCell(outIdx, c, 0.0);
+    for (int c = 0; c < out.ncomp; c++) out.setValueInCell(outIdx, c, 0.0);
   }
 }
 
 __global__ void k_unpad(CuField out, CuField in) {
   int outIdx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (outIdx >= out.grid.ncells())
-    return;
+  if (outIdx >= out.grid.ncells()) return;
 
   // Output coordinate relative to the origin of the output grid
   int3 outRelCoo = out.grid.index2coord(outIdx) - out.grid.origin();
@@ -87,51 +84,31 @@ static void checkCufftResult(cufftResult result) {
     throw std::runtime_error("cufft error in demag convolution");
 }
 
-__global__ void k_apply_kernel_3d(complex* hx,
-                                  complex* hy,
-                                  complex* hz,
-                                  complex* mx,
-                                  complex* my,
-                                  complex* mz,
-                                  complex* kxx,
-                                  complex* kyy,
-                                  complex* kzz,
-                                  complex* kxy,
-                                  complex* kxz,
-                                  complex* kyz,
-                                  complex preFactor,
-                                  int n) {
+__global__ void k_apply_kernel_3d(complex* hx, complex* hy, complex* hz,
+                                  complex* mx, complex* my, complex* mz,
+                                  complex* kxx, complex* kyy, complex* kzz,
+                                  complex* kxy, complex* kxz, complex* kyz,
+                                  complex preFactor, int n) {
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
-  if (i >= n)
-    return;
+  if (i >= n) return;
   hx[i] = preFactor * (kxx[i] * mx[i] + kxy[i] * my[i] + kxz[i] * mz[i]);
   hy[i] = preFactor * (kxy[i] * mx[i] + kyy[i] * my[i] + kyz[i] * mz[i]);
   hz[i] = preFactor * (kxz[i] * mx[i] + kyz[i] * my[i] + kzz[i] * mz[i]);
 }
 
-__global__ void k_apply_kernel_2d(complex* hx,
-                                  complex* hy,
-                                  complex* hz,
-                                  complex* mx,
-                                  complex* my,
-                                  complex* mz,
-                                  complex* kxx,
-                                  complex* kyy,
-                                  complex* kzz,
-                                  complex* kxy,
-                                  complex preFactor,
-                                  int n) {
+__global__ void k_apply_kernel_2d(complex* hx, complex* hy, complex* hz,
+                                  complex* mx, complex* my, complex* mz,
+                                  complex* kxx, complex* kyy, complex* kzz,
+                                  complex* kxy, complex preFactor, int n) {
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
-  if (i >= n)
-    return;
+  if (i >= n) return;
   hx[i] = preFactor * (kxx[i] * mx[i] + kxy[i] * my[i]);
   hy[i] = preFactor * (kxy[i] * mx[i] + kyy[i] * my[i]);
   hz[i] = preFactor * (kzz[i] * mz[i]);
 }
 
 StrayFieldFFTExecutor::StrayFieldFFTExecutor(
-    const Ferromagnet* magnet,
-    std::shared_ptr<const System> system)
+    const Ferromagnet* magnet, std::shared_ptr<const System> system)
     : StrayFieldExecutor(magnet, system),
       kernel_(system->grid(), magnet_->grid(), system_->cellsize()),
       kfft(6),
@@ -160,12 +137,9 @@ StrayFieldFFTExecutor::StrayFieldFFTExecutor(
 }
 
 StrayFieldFFTExecutor::~StrayFieldFFTExecutor() {
-  for (auto p : mfft)
-    cudaFree(p);
-  for (auto p : kfft)
-    cudaFree(p);
-  for (auto p : hfft)
-    cudaFree(p);
+  for (auto p : mfft) cudaFree(p);
+  for (auto p : kfft) cudaFree(p);
+  for (auto p : hfft) cudaFree(p);
 
   checkCufftResult(cufftDestroy(forwardPlan));
   checkCufftResult(cufftDestroy(backwardPlan));

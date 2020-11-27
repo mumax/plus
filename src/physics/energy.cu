@@ -9,15 +9,12 @@
 #include "world.hpp"
 #include "zeeman.hpp"
 
-__global__ void k_energyDensity(CuField edens,
-                                const CuField mag,
-                                const CuField hfield,
-                                const CuParameter msat,
+__global__ void k_energyDensity(CuField edens, const CuField mag,
+                                const CuField hfield, const CuParameter msat,
                                 const real prefactor) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!edens.cellInGrid(idx))
-    return;
+  if (!edens.cellInGrid(idx)) return;
 
   real Ms = msat.valueAt(idx);
   real3 h = hfield.vectorAt(idx);
@@ -26,8 +23,7 @@ __global__ void k_energyDensity(CuField edens,
   edens.setValueInCell(idx, 0, -prefactor * Ms * dot(m, h));
 }
 
-Field evalEnergyDensity(const Ferromagnet* magnet,
-                        const Field& h,
+Field evalEnergyDensity(const Ferromagnet* magnet, const Field& h,
                         real prefactor) {
   Field edens(magnet->system(), 1);
   if (magnet->msat.assuredZero()) {

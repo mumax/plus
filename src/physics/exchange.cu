@@ -12,23 +12,18 @@ bool exchangeAssuredZero(const Ferromagnet* magnet) {
 }
 
 __device__ static inline real harmonicMean(real a, real b) {
-  if (a + b == 0.0)
-    return 0.0;
-  if (a == b)
-    return a;
+  if (a + b == 0.0) return 0.0;
+  if (a == b) return a;
   return 2 * a * b / (a + b);
 }
 
-__global__ void k_exchangeField(CuField hField,
-                                const CuField mField,
-                                const CuParameter aex,
-                                const CuParameter msat,
+__global__ void k_exchangeField(CuField hField, const CuField mField,
+                                const CuParameter aex, const CuParameter msat,
                                 const real3 w,  // w = 1/cellsize^2
                                 Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!mField.grid.cellInGrid(idx))
-    return;
+  if (!mField.grid.cellInGrid(idx)) return;
 
   if (msat.valueAt(idx) == 0) {
     hField.setVectorInCell(idx, {0, 0, 0});
@@ -46,8 +41,7 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
   for (int sgn : {-1, 1}) {
     const int3 coo_ = mastergrid.wrap(coo + int3{sgn, 0, 0});
-    if (!mField.grid.cellInGrid(coo_))
-      continue;
+    if (!mField.grid.cellInGrid(coo_)) continue;
     const int idx_ = mField.grid.coord2index(coo_);
     if (msat.valueAt(idx_) != 0) {
       const real3 m_ = mField.vectorAt(idx_);
@@ -60,8 +54,7 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
   for (int sgn : {-1, 1}) {
     const int3 coo_ = mastergrid.wrap(coo + int3{0, sgn, 0});
-    if (!mField.grid.cellInGrid(coo_))
-      continue;
+    if (!mField.grid.cellInGrid(coo_)) continue;
     const int idx_ = mField.grid.coord2index(coo_);
     if (msat.valueAt(idx_) != 0) {
       const real3 m_ = mField.vectorAt(idx_);
@@ -75,8 +68,7 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
     for (int sgn : {-1, 1}) {
       const int3 coo_ = mastergrid.wrap(coo + int3{0, 0, sgn});
-      if (!mField.grid.cellInGrid(coo_))
-        continue;
+      if (!mField.grid.cellInGrid(coo_)) continue;
       const int idx_ = mField.grid.coord2index(coo_);
       if (msat.valueAt(idx_) != 0) {
         const real3 m_ = mField.vectorAt(idx_);
@@ -127,14 +119,12 @@ Field evalExchangeField(const Ferromagnet* magnet) {
 }
 
 Field evalExchangeEnergyDensity(const Ferromagnet* magnet) {
-  if (exchangeAssuredZero(magnet))
-    return Field(magnet->system(), 1, 0.0);
+  if (exchangeAssuredZero(magnet)) return Field(magnet->system(), 1, 0.0);
   return evalEnergyDensity(magnet, evalExchangeField(magnet), 0.5);
 }
 
 real evalExchangeEnergy(const Ferromagnet* magnet) {
-  if (exchangeAssuredZero(magnet))
-    return 0;
+  if (exchangeAssuredZero(magnet)) return 0;
   real edens = exchangeEnergyDensityQuantity(magnet).average()[0];
   int ncells = magnet->grid().ncells();
   real cellVolume = magnet->world()->cellVolume();
@@ -154,14 +144,11 @@ FM_ScalarQuantity exchangeEnergyQuantity(const Ferromagnet* magnet) {
   return FM_ScalarQuantity(magnet, evalExchangeEnergy, "exchange_energy", "J");
 }
 
-__global__ void k_maxangle(CuField maxAngleField,
-                           const CuField mField,
-                           const CuParameter aex,
-                           const CuParameter msat) {
+__global__ void k_maxangle(CuField maxAngleField, const CuField mField,
+                           const CuParameter aex, const CuParameter msat) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!maxAngleField.grid.cellInGrid(idx))
-    return;
+  if (!maxAngleField.grid.cellInGrid(idx)) return;
 
   if (msat.valueAt(idx) == 0) {
     maxAngleField.setValueInCell(idx, 0, 0);

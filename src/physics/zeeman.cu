@@ -36,8 +36,7 @@ Field evalExternalField(const Ferromagnet* magnet) {
   auto strayFields = magnet->getStrayFields();
   for (auto strayField : strayFields) {
     // Avoid the demag field, we only want external fields
-    if (strayField->source() == magnet)
-      continue;
+    if (strayField->source() == magnet) continue;
 
     strayField->addToField(h);
   }
@@ -45,14 +44,12 @@ Field evalExternalField(const Ferromagnet* magnet) {
 }
 
 Field evalZeemanEnergyDensity(const Ferromagnet* magnet) {
-  if (externalFieldAssuredZero(magnet))
-    return Field(magnet->system(), 1, 0.0);
+  if (externalFieldAssuredZero(magnet)) return Field(magnet->system(), 1, 0.0);
   return evalEnergyDensity(magnet, evalExternalField(magnet), 1.0);
 }
 
 real zeemanEnergy(const Ferromagnet* magnet) {
-  if (externalFieldAssuredZero(magnet))
-    return 0.0;
+  if (externalFieldAssuredZero(magnet)) return 0.0;
   real edens = zeemanEnergyDensityQuantity(magnet).average()[0];
   int ncells = magnet->grid().ncells();
   real cellVolume = magnet->world()->cellVolume();

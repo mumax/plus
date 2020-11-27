@@ -11,10 +11,8 @@ class ButcherTableau {
  public:
   ButcherTableau(std::vector<real> nodes,
                  std::vector<std::vector<real>> rkMatrix,
-                 std::vector<real> weights1,
-                 std::vector<real> weights2,
-                 int order1,
-                 int order2);
+                 std::vector<real> weights1, std::vector<real> weights2,
+                 int order1, int order2);
 
   explicit ButcherTableau(RKmethod method);
 

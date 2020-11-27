@@ -42,9 +42,7 @@ __CUDAOP__ int3 operator+(const int3& a, const int3& b) {
   return int3{a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
-__CUDAOP__ int3 operator-(const int3& a) {
-  return int3{-a.x, -a.y, -a.z};
-}
+__CUDAOP__ int3 operator-(const int3& a) { return int3{-a.x, -a.y, -a.z}; }
 
 __CUDAOP__ int3 operator-(const int3& a, const int3& b) {
   return int3{a.x - b.x, a.y - b.y, a.z - b.z};
@@ -119,9 +117,7 @@ __CUDAOP__ real3 operator+(const real3& a, const real& b) {
   return real3{a.x + b, a.y + b, a.z + b};
 }
 
-__CUDAOP__ real3 operator-(const real3& a) {
-  return real3{-a.x, -a.y, -a.z};
-}
+__CUDAOP__ real3 operator-(const real3& a) { return real3{-a.x, -a.y, -a.z}; }
 
 __CUDAOP__ real3 operator-(const real3& a, const real3& b) {
   return real3{a.x - b.x, a.y - b.y, a.z - b.z};
@@ -164,9 +160,7 @@ __CUDAOP__ real3 cross(const real3& a, const real3& b) {
                a.x * b.y - a.y * b.x};
 }
 
-__CUDAOP__ real norm(const real3& a) {
-  return sqrt(dot(a, a));
-}
+__CUDAOP__ real norm(const real3& a) { return sqrt(dot(a, a)); }
 
 // Returns the normalized vector.
 // If the norm is zero, it returns a zero vector

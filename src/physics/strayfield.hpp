@@ -35,8 +35,7 @@ class StrayFieldExecutor {
    *               METHOD_FFT at the moment
    */
   static std::unique_ptr<StrayFieldExecutor> create(
-      const Ferromagnet* magnet,
-      std::shared_ptr<const System> system,
+      const Ferromagnet* magnet, std::shared_ptr<const System> system,
       Method method);
 
  protected:
@@ -79,8 +78,7 @@ class StrayField : public FieldQuantity {
    * @param system the system in which we compute the stray field
    * @param method the used method for the computation
    */
-  StrayField(const Ferromagnet* magnet,
-             std::shared_ptr<const System> system,
+  StrayField(const Ferromagnet* magnet, std::shared_ptr<const System> system,
              StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
 
   /**
@@ -92,8 +90,7 @@ class StrayField : public FieldQuantity {
    * @param grid   used to create a system in which the stray field is computed
    * @param method the used method for the computation
    */
-  StrayField(const Ferromagnet* magnet,
-             Grid grid,
+  StrayField(const Ferromagnet* magnet, Grid grid,
              StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
 
   /** Destructor. */

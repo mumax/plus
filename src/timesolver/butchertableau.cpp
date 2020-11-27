@@ -1,12 +1,13 @@
 #include "butchertableau.hpp"
+
 #include <math.h>
+
 #include <exception>
 
 ButcherTableau::ButcherTableau(std::vector<real> nodes,
                                std::vector<std::vector<real>> rkMatrix,
                                std::vector<real> weights1,
-                               std::vector<real> weights2,
-                               int order1,
+                               std::vector<real> weights2, int order1,
                                int order2)
     : nodes(nodes),
       rkMatrix(rkMatrix),
@@ -26,12 +27,10 @@ bool ButcherTableau::isConsistent() const {
     return false;
 
   for (int i = 0; i < N; i++) {
-    if (rkMatrix[i].size() != i)
-      return false;
+    if (rkMatrix[i].size() != i) return false;
 
     real rowSum = 0.;
-    for (int j = 0; j < i; j++)
-      rowSum += rkMatrix[i][j];
+    for (int j = 0; j < i; j++) rowSum += rkMatrix[i][j];
     if (fabs(rowSum - nodes[i]) > 1e-5)  // TODO: do this better
       return false;
   }

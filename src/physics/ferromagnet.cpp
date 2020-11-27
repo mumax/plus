@@ -1,6 +1,7 @@
 #include "ferromagnet.hpp"
 
 #include <curand.h>
+
 #include <memory>
 #include <random>
 
@@ -51,29 +52,17 @@ Ferromagnet::~Ferromagnet() {
   curandDestroyGenerator(randomGenerator);
 }
 
-std::string Ferromagnet::name() const {
-  return name_;
-}
+std::string Ferromagnet::name() const { return name_; }
 
-std::shared_ptr<System> Ferromagnet::system() const {
-  return system_;
-}
+std::shared_ptr<System> Ferromagnet::system() const { return system_; }
 
-World* Ferromagnet::world() const {
-  return system()->world();
-}
+World* Ferromagnet::world() const { return system()->world(); }
 
-Grid Ferromagnet::grid() const {
-  return system()->grid();
-}
+Grid Ferromagnet::grid() const { return system()->grid(); }
 
-real3 Ferromagnet::cellsize() const {
-  return world()->cellsize();
-}
+real3 Ferromagnet::cellsize() const { return world()->cellsize(); }
 
-const Variable* Ferromagnet::magnetization() const {
-  return &magnetization_;
-}
+const Variable* Ferromagnet::magnetization() const { return &magnetization_; }
 
 void Ferromagnet::minimize(real tol, int nSamples) {
   Minimizer minimizer(this, tol, nSamples);
@@ -82,8 +71,7 @@ void Ferromagnet::minimize(real tol, int nSamples) {
 
 const StrayField* Ferromagnet::getStrayField(const Ferromagnet* magnet) const {
   auto it = strayFields_.find(magnet);
-  if (it == strayFields_.end())
-    return nullptr;
+  if (it == strayFields_.end()) return nullptr;
   return it->second;
 }
 

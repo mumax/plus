@@ -103,8 +103,7 @@ class GpuBuffer {
    */
   GpuBuffer(const GpuBuffer& other) {
     allocate(other.size());
-    if (size_ == 0)
-      return;
+    if (size_ == 0) return;
     checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
                                    cudaMemcpyDeviceToDevice, getCudaStream()));
   }
@@ -152,8 +151,7 @@ class GpuBuffer {
    * size.
    */
   void allocate(size_t size) {
-    if (size_ == size)
-      return;
+    if (size_ == size) return;
 
     recycle();
 
@@ -170,8 +168,7 @@ class GpuBuffer {
    * Empties the buffer and releases memory back into the pool.
    */
   void recycle() {
-    if (ptr_)
-      memoryPool.recycle(reinterpret_cast<void**>(&ptr_));
+    if (ptr_) memoryPool.recycle(reinterpret_cast<void**>(&ptr_));
     ptr_ = nullptr;
     size_ = 0;
   }

@@ -16,7 +16,8 @@ void wrap_timesolver(py::module& m) {
                  x, std::unique_ptr<FieldQuantity>(rhs.clone()))));
            }),
            py::arg("variable"), py::arg("rhs"))
-      // .def(py::init([](Variable* x, FieldQuantity* rhs, FieldQuantity * noise)
+      // .def(py::init([](Variable* x, FieldQuantity* rhs, FieldQuantity *
+      // noise)
       //{
       //       return std::unique_ptr<TimeSolver>(
       //           new TimeSolver(DynamicEquation(x, rhs, noise)));

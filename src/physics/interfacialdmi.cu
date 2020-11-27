@@ -14,22 +14,18 @@ bool interfacialDmiAssuredZero(const Ferromagnet* magnet) {
 }
 
 __device__ static inline real harmonicMean(real a, real b) {
-  if (a + b == 0.0)
-    return 0.0;
+  if (a + b == 0.0) return 0.0;
   return 2 * a * b / (a + b);
 }
 
-__global__ void k_interfacialDmiField(CuField hField,
-                                      const CuField mField,
+__global__ void k_interfacialDmiField(CuField hField, const CuField mField,
                                       const CuParameter idmi,
                                       const CuParameter msat,
                                       const real3 interfaceNormal,
-                                      const real3 cellsize,
-                                      Grid mastergrid) {
+                                      const real3 cellsize, Grid mastergrid) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!hField.cellInGrid(idx))
-    return;
+  if (!hField.cellInGrid(idx)) return;
 
   if (msat.valueAt(idx) == 0) {
     hField.setVectorInCell(idx, {0, 0, 0});
@@ -83,14 +79,12 @@ Field evalInterfacialDmiField(const Ferromagnet* magnet) {
 }
 
 Field evalInterfacialDmiEnergyDensity(const Ferromagnet* magnet) {
-  if (interfacialDmiAssuredZero(magnet))
-    return Field(magnet->system(), 1, 0.0);
+  if (interfacialDmiAssuredZero(magnet)) return Field(magnet->system(), 1, 0.0);
   return evalEnergyDensity(magnet, evalInterfacialDmiField(magnet), 0.5);
 }
 
 real evalInterfacialDmiEnergy(const Ferromagnet* magnet) {
-  if (interfacialDmiAssuredZero(magnet))
-    return 0;
+  if (interfacialDmiAssuredZero(magnet)) return 0;
   real edens = interfacialDmiEnergyDensityQuantity(magnet).average()[0];
   int ncells = magnet->grid().ncells();
   real cellVolume = magnet->world()->cellVolume();

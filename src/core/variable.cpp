@@ -8,41 +8,27 @@
 #include "fieldops.hpp"
 #include "system.hpp"
 
-Variable::Variable(std::string name,
-                   std::string unit,
-                   std::shared_ptr<const System> system,
-                   int ncomp)
+Variable::Variable(std::string name, std::string unit,
+                   std::shared_ptr<const System> system, int ncomp)
     : name_(name), unit_(unit) {
   field_ = new Field(system, ncomp);
 }
 
-Variable::~Variable() {
-  delete field_;
-}
+Variable::~Variable() { delete field_; }
 
-int Variable::ncomp() const {
-  return field_->ncomp();
-}
+int Variable::ncomp() const { return field_->ncomp(); }
 
 std::shared_ptr<const System> Variable::system() const {
   return field_->system();
 }
 
-std::string Variable::name() const {
-  return name_;
-}
+std::string Variable::name() const { return name_; }
 
-std::string Variable::unit() const {
-  return unit_;
-}
+std::string Variable::unit() const { return unit_; }
 
-Field Variable::eval() const {
-  return field_->eval();
-}
+Field Variable::eval() const { return field_->eval(); }
 
-const Field& Variable::field() const {
-  return *field_;
-}
+const Field& Variable::field() const { return *field_; }
 
 void Variable::set(const Field& src) const {
   if (src.system() != field_->system()) {
@@ -69,8 +55,7 @@ void Variable::set(real3 value) const {
   field_->setUniformComponent(2, value.z);
 }
 
-NormalizedVariable::NormalizedVariable(std::string name,
-                                       std::string unit,
+NormalizedVariable::NormalizedVariable(std::string name, std::string unit,
                                        std::shared_ptr<const System> system,
                                        int ncomp)
     : Variable(name, unit, system, ncomp) {}
@@ -80,9 +65,7 @@ void NormalizedVariable::set(const Field& src) const {
   Variable::set(normalized(src));
 }
 
-void NormalizedVariable::set(real value) const {
-  Variable::set(1);
-}
+void NormalizedVariable::set(real value) const { Variable::set(1); }
 
 void NormalizedVariable::set(real3 value) const {
   Variable::set(normalized(value));

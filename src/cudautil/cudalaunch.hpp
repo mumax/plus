@@ -7,8 +7,7 @@ const int BLOCKDIM = 512;
 
 // Source: https://devblogs.nvidia.com/cplusplus-11-in-cuda-variadic-templates/
 template <typename... Arguments>
-void cudaLaunch(int N,
-                void (*kernelfunction)(Arguments...),
+void cudaLaunch(int N, void (*kernelfunction)(Arguments...),
                 Arguments... args) {
   dim3 blockDims(BLOCKDIM);
   dim3 gridDims((N + blockDims.x - 1) / blockDims.x);

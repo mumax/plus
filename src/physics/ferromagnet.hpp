@@ -35,9 +35,8 @@ class Ferromagnet {
 
   const StrayField* getStrayField(const Ferromagnet*) const;
   std::vector<const StrayField*> getStrayFields() const;
-  void addStrayField(
-      const Ferromagnet*,
-      StrayFieldExecutor::Method method = StrayFieldExecutor::METHOD_AUTO);
+  void addStrayField(const Ferromagnet*, StrayFieldExecutor::Method method =
+                                             StrayFieldExecutor::METHOD_AUTO);
   void removeStrayField(const Ferromagnet*);
 
   void minimize(real tol = 1e-6, int nSamples = 10);

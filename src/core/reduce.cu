@@ -26,15 +26,13 @@ __global__ void k_maxAbsValue(real* result, CuField f) {
   // Reduce the block
   for (unsigned int s = BLOCKDIM / 2; s > 0; s >>= 1) {
     if (tid < s)
-      if (sdata[tid + s] > sdata[tid])
-        sdata[tid] = sdata[tid + s];
+      if (sdata[tid + s] > sdata[tid]) sdata[tid] = sdata[tid + s];
     __syncthreads();
   }
   // TODO: check if loop unrolling makes sense here
 
   // Set the result
-  if (tid == 0)
-    *result = sdata[0];
+  if (tid == 0) *result = sdata[0];
 }
 
 real maxAbsValue(const Field& f) {
@@ -67,15 +65,13 @@ __global__ void k_maxVecNorm(real* result, CuField f) {
   // Reduce the block
   for (unsigned int s = BLOCKDIM / 2; s > 0; s >>= 1) {
     if (tid < s)
-      if (sdata[tid + s] > sdata[tid])
-        sdata[tid] = sdata[tid + s];
+      if (sdata[tid + s] > sdata[tid]) sdata[tid] = sdata[tid + s];
     __syncthreads();
   }
   // TODO: check if loop unrolling makes sense here
 
   // Set the result
-  if (tid == 0)
-    *result = sdata[0];
+  if (tid == 0) *result = sdata[0];
 }
 
 real maxVecNorm(const Field& f) {
@@ -108,15 +104,13 @@ __global__ void k_average(real* result, CuField f, int comp) {
 
   // Reduce the block
   for (unsigned int s = BLOCKDIM / 2; s > 0; s >>= 1) {
-    if (tid < s)
-      sdata[tid] += sdata[tid + s];
+    if (tid < s) sdata[tid] += sdata[tid + s];
     __syncthreads();
   }
   // TODO: check if loop unrolling makes sense here
 
   // Set the result
-  if (tid == 0)
-    *result = sdata[0] / ncells;
+  if (tid == 0) *result = sdata[0] / ncells;
 }
 
 real fieldComponentAverage(const Field& f, int comp) {
@@ -156,15 +150,13 @@ __global__ void k_dotSum(real* result, CuField f, CuField g) {
 
   // Reduce the block
   for (unsigned int s = BLOCKDIM / 2; s > 0; s >>= 1) {
-    if (tid < s)
-      sdata[tid] += sdata[tid + s];
+    if (tid < s) sdata[tid] += sdata[tid + s];
     __syncthreads();
   }
   // TODO: check if loop unrolling makes sense here
 
   // Set the result
-  if (tid == 0)
-    *result = sdata[0];
+  if (tid == 0) *result = sdata[0];
 }
 
 real dotSum(const Field& f, const Field& g) {

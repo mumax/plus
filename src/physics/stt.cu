@@ -11,8 +11,7 @@ bool spinTransferTorqueAssuredZero(const Ferromagnet* magnet) {
          magnet->pol.assuredZero();
 }
 
-__global__ void k_spinTransferTorque(CuField torque,
-                                     const CuField mField,
+__global__ void k_spinTransferTorque(CuField torque, const CuField mField,
                                      const CuParameter msatParam,
                                      const CuParameter polParam,
                                      const CuParameter xiParam,
@@ -23,8 +22,7 @@ __global__ void k_spinTransferTorque(CuField torque,
 
   const Grid grid = torque.grid;
 
-  if (!grid.cellInGrid(idx))
-    return;
+  if (!grid.cellInGrid(idx)) return;
 
   const real3 m = mField.vectorAt(idx);
   const real3 j = jcurParam.vectorAt(idx);

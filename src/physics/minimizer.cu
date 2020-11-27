@@ -6,8 +6,7 @@
 #include "reduce.hpp"
 #include "torque.hpp"
 
-Minimizer::Minimizer(const Ferromagnet* magnet,
-                     real stopMaxMagDiff,
+Minimizer::Minimizer(const Ferromagnet* magnet, real stopMaxMagDiff,
                      int nMagDiffSamples)
     : magnet_(magnet),
       torque_(relaxTorqueQuantity(magnet)),
@@ -22,18 +21,14 @@ void Minimizer::exec() {
   nsteps_ = 0;
   lastMagDiffs_.clear();
 
-  while (!converged())
-    step();
+  while (!converged()) step();
 }
 
-__global__ void k_step(CuField mField,
-                       const CuField m0Field,
-                       const CuField torqueField,
-                       real dt) {
+__global__ void k_step(CuField mField, const CuField m0Field,
+                       const CuField torqueField, real dt) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!mField.cellInGrid(idx))
-    return;
+  if (!mField.cellInGrid(idx)) return;
 
   real3 m0 = m0Field.vectorAt(idx);
   real3 t = torqueField.vectorAt(idx);
@@ -53,8 +48,7 @@ static inline real BarzilianBorweinStepSize(Field& dm, Field& dtorque, int n) {
     nom = dotSum(dm, dtorque);
     div = dotSum(dtorque, dtorque);
   }
-  if (div == 0.0)
-    return 1e-14;  // TODO: figure out safe stepsize
+  if (div == 0.0) return 1e-14;  // TODO: figure out safe stepsize
 
   return nom / div;
 }
@@ -86,18 +80,15 @@ void Minimizer::step() {
 }
 
 bool Minimizer::converged() const {
-  if (lastMagDiffs_.size() < nMagDiffSamples_)
-    return false;
+  if (lastMagDiffs_.size() < nMagDiffSamples_) return false;
 
   for (auto dm : lastMagDiffs_)
-    if (dm > stopMaxMagDiff_)
-      return false;
+    if (dm > stopMaxMagDiff_) return false;
 
   return true;
 }
 
 void Minimizer::addMagDiff(real dm) {
   lastMagDiffs_.push_back(dm);
-  if (lastMagDiffs_.size() > nMagDiffSamples_)
-    lastMagDiffs_.pop_front();
+  if (lastMagDiffs_.size() > nMagDiffSamples_) lastMagDiffs_.pop_front();
 }

@@ -39,8 +39,7 @@ Field::Field(Field&& other) : system_(other.system_), ncomp_(other.ncomp_) {
 }
 
 Field& Field::operator=(const Field& other) {
-  if (this == &other)
-    return *this;
+  if (this == &other) return *this;
   return *this = std::move(Field(other));  // moves a copy of other to this
 }
 
@@ -63,9 +62,7 @@ void Field::clear() {
   free();
 }
 
-std::shared_ptr<const System> Field::system() const {
-  return system_;
-}
+std::shared_ptr<const System> Field::system() const { return system_; }
 
 void Field::updateDevicePointersBuffer() {
   std::vector<real*> bufferPtrsOnHost(ncomp_);
@@ -77,8 +74,7 @@ void Field::updateDevicePointersBuffer() {
 void Field::allocate() {
   free();
 
-  if (empty())
-    return;
+  if (empty()) return;
 
   buffers_ =
       std::vector<GpuBuffer<real>>(ncomp_, GpuBuffer<real>(grid().ncells()));
@@ -91,9 +87,7 @@ void Field::free() {
   bufferPtrs_.recycle();
 }
 
-CuField Field::cu() const {
-  return CuField(grid(), ncomp_, bufferPtrs_.get());
-}
+CuField Field::cu() const { return CuField(grid(), ncomp_, bufferPtrs_.get()); }
 
 void Field::getData(real* buffer) const {
   for (int c = 0; c < ncomp_; c++) {
@@ -115,8 +109,7 @@ void Field::setData(real* buffer) {
 
 __global__ void k_setComponent(CuField f, real value, int comp) {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
-  if (!f.cellInGrid(idx))
-    return;
+  if (!f.cellInGrid(idx)) return;
   f.setValueInCell(idx, comp, value);
 }
 
@@ -125,8 +118,7 @@ void Field::setUniformComponent(int comp, real value) {
 }
 
 void Field::makeZero() {
-  for (int comp = 0; comp < ncomp_; comp++)
-    setUniformComponent(comp, 0.0);
+  for (int comp = 0; comp < ncomp_; comp++) setUniformComponent(comp, 0.0);
 }
 
 Field& Field::operator+=(const Field& other) {

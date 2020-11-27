@@ -33,42 +33,27 @@ TimeSolver::TimeSolver(std::vector<DynamicEquation> eqs)
 }
 
 TimeSolver::~TimeSolver() {
-  if (stepper_)
-    delete stepper_;
+  if (stepper_) delete stepper_;
 }
 
-const real& TimeSolver::time() const {
-  return time_;
-}
+const real& TimeSolver::time() const { return time_; }
 
-DynamicEquation TimeSolver::equation(int idx) const {
-  return eqs_.at(idx);
-}
+DynamicEquation TimeSolver::equation(int idx) const { return eqs_.at(idx); }
 
-int TimeSolver::nEquations() const {
-  return eqs_.size();
-}
+int TimeSolver::nEquations() const { return eqs_.size(); }
 
-const real& TimeSolver::timestep() const {
-  return timestep_;
-}
+const real& TimeSolver::timestep() const { return timestep_; }
 
-real TimeSolver::maxerror() const {
-  return maxerror_;
-}
+real TimeSolver::maxerror() const { return maxerror_; }
 
-void TimeSolver::setTime(real time) {
-  time_ = time;
-}
+void TimeSolver::setTime(real time) { time_ = time; }
 
 void TimeSolver::adaptTimeStep(real correctionFactor) {
-  if (fixedTimeStep_)
-    return;
+  if (fixedTimeStep_) return;
 
   real headroom = 0.8;
 
-  if (std::isnan(correctionFactor))
-    correctionFactor = 1.;
+  if (std::isnan(correctionFactor)) correctionFactor = 1.;
 
   correctionFactor *= headroom;
   correctionFactor = correctionFactor > 2.0 ? 2.0 : correctionFactor;
@@ -78,30 +63,20 @@ void TimeSolver::adaptTimeStep(real correctionFactor) {
 }
 
 void TimeSolver::setTimeStep(real dt) {
-  if (dt <= 0.0)
-    std::invalid_argument("Time step has to be larger than zero");
+  if (dt <= 0.0) std::invalid_argument("Time step has to be larger than zero");
   timestep_ = dt;
 }
 
-void TimeSolver::enableAdaptiveTimeStep() {
-  fixedTimeStep_ = false;
-}
+void TimeSolver::enableAdaptiveTimeStep() { fixedTimeStep_ = false; }
 
-void TimeSolver::disableAdaptiveTimeStep() {
-  fixedTimeStep_ = true;
-}
+void TimeSolver::disableAdaptiveTimeStep() { fixedTimeStep_ = true; }
 
-bool TimeSolver::adaptiveTimeStep() const {
-  return !fixedTimeStep_;
-}
+bool TimeSolver::adaptiveTimeStep() const { return !fixedTimeStep_; }
 
-void TimeSolver::step() {
-  stepper_->step();
-}
+void TimeSolver::step() { stepper_->step(); }
 
 void TimeSolver::steps(unsigned int nSteps) {
-  for (int i = 0; i < nSteps; i++)
-    step();
+  for (int i = 0; i < nSteps; i++) step();
 }
 
 void TimeSolver::runwhile(std::function<bool(void)> runcondition) {
@@ -111,8 +86,7 @@ void TimeSolver::runwhile(std::function<bool(void)> runcondition) {
 }
 
 void TimeSolver::run(real duration) {
-  if (duration <= 0)
-    return;
+  if (duration <= 0) return;
 
   real stoptime = time_ + duration;
   auto runcondition = [this, stoptime]() {

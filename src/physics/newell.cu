@@ -34,8 +34,7 @@ __host__ __device__ static inline double Nxx_indefinite(int3 idx,
 __host__ __device__ static inline double Nxy_indefinite(int3 idx,
                                                         real3 cellsize) {
   // Nxy=0 if x=0 and y=0, return early and avoid DBZ
-  if (idx.y == 0 || idx.x == 0)
-    return 0.0;
+  if (idx.y == 0 || idx.x == 0) return 0.0;
 
   double x = idx.x * cellsize.x;
   double y = idx.y * cellsize.y;
@@ -96,8 +95,7 @@ __host__ __device__ real calcNewellNxx(int3 idx, real3 cellsize) {
 }
 
 __host__ __device__ real calcNewellNxy(int3 idx, real3 cellsize) {
-  if (idx.x == 0 || idx.y == 0)
-    return 0;
+  if (idx.x == 0 || idx.y == 0) return 0;
 
   double result = 0;
 

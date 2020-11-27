@@ -1,6 +1,6 @@
 #pragma once
 
-#include <chrono> // NOLINT [build/c++11]
+#include <chrono>  // NOLINT [build/c++11]
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -10,8 +10,7 @@ class Timer {
  public:
   Timer() = default;
   void start(std::string clockName) {
-    if (clocks.find(clockName) == clocks.end())
-      clocks[clockName] = Clock();
+    if (clocks.find(clockName) == clocks.end()) clocks[clockName] = Clock();
     clocks[clockName].start();
   }
 

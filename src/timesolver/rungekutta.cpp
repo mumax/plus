@@ -39,9 +39,7 @@ RungeKuttaStepper::RungeKuttaStepper(TimeSolver* solver, RKmethod method)
   setParentTimeSolver(solver);
 }
 
-int RungeKuttaStepper::nStages() const {
-  return butcher_.nStages;
-}
+int RungeKuttaStepper::nStages() const { return butcher_.nStages; }
 
 void RungeKuttaStepper::step() {
   // construct a Runge Kutta stage executor for every equation
@@ -58,26 +56,23 @@ void RungeKuttaStepper::step() {
     // apply the stages
     for (int stage = 0; stage < nStages(); stage++) {
       solver_->setTime(t0 + dt * butcher_.nodes[stage]);
-      for (auto& eq : equations)
-        eq.setStageX(stage);
-      for (auto& eq : equations)
-        eq.setStageK(stage);
+      for (auto& eq : equations) eq.setStageX(stage);
+      for (auto& eq : equations) eq.setStageK(stage);
     }
 
     // make the actual step
     solver_->setTime(t0 + dt);
-    for (auto& eq : equations)
-      eq.setFinalX();
+    for (auto& eq : equations) eq.setFinalX();
 
     // nothing more to do if time step is fixed
-    if (!solver_->adaptiveTimeStep())
-      break;
+    if (!solver_->adaptiveTimeStep()) break;
 
     // loop over equations and get the largest error
     real error = 0.0;
-    for (auto& eq : equations)
-      if (real e = eq.getError(); e > error)
-        error = e;
+    for (auto& eq : equations) {
+      real e = eq.getError();
+      if (e > error) error = e;
+    }
 
     success = error < solver_->maxerror();
 
@@ -92,8 +87,7 @@ void RungeKuttaStepper::step() {
 
     // undo step if not successful
     if (!success) {
-      for (auto& eq : equations)
-        eq.resetX();
+      for (auto& eq : equations) eq.resetX();
       solver_->setTime(t0);
     }
   }
@@ -116,13 +110,11 @@ void RungeKuttaStageExecutor::setStageK(int stage) {
   k[stage] = eq_.rhs->eval();
 
   // k += noise/sqrt(dt)
-  if (noise)
-    addTo(k[stage], 1 / sqrt(dt), noise.value());
+  if (noise) addTo(k[stage], 1 / sqrt(dt), noise.value());
 }
 
 void RungeKuttaStageExecutor::setStageX(int stage) {
-  if (stage == 0)
-    return;
+  if (stage == 0) return;
 
   Field xstage = x0;
   for (int i = 0; i < stage; i++)
@@ -145,9 +137,7 @@ void RungeKuttaStageExecutor::setFinalX() {
   x = xstage;
 }
 
-void RungeKuttaStageExecutor::resetX() {
-  x = x0;
-}
+void RungeKuttaStageExecutor::resetX() { x = x0; }
 
 real RungeKuttaStageExecutor::getError() const {
   Field err(x.system(), x.ncomp());

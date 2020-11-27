@@ -36,13 +36,9 @@ DynamicEquation::DynamicEquation(const Variable* x,
   }
 }
 
-int DynamicEquation::ncomp() const {
-  return x->ncomp();
-}
+int DynamicEquation::ncomp() const { return x->ncomp(); }
 
-Grid DynamicEquation::grid() const {
-  return system()->grid();
-}
+Grid DynamicEquation::grid() const { return system()->grid(); }
 
 std::shared_ptr<const System> DynamicEquation::system() const {
   return x->system();

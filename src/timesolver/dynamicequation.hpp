@@ -9,8 +9,7 @@ class System;
 
 class DynamicEquation {
  public:
-  DynamicEquation(const Variable* x,
-                  std::shared_ptr<FieldQuantity> rhs,
+  DynamicEquation(const Variable* x, std::shared_ptr<FieldQuantity> rhs,
                   const FieldQuantity* noiseTerm = nullptr);
 
   const Variable* x;
