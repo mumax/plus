@@ -26,9 +26,10 @@ def vectorfield_to_rgb(field):
                     C = 2 * (1 - L) * S
 
                 X = C * (1 - np.abs(np.mod(Hp, 2.0) - 1.0))
+
                 m = L - C / 2.0
                 rgbcell = np.array([m, m, m])
-                if Hp > 0 and Hp < 1:
+                if Hp >= 0 and Hp < 1:
                     rgbcell += np.array([C, X, 0])
                 elif Hp < 2:
                     rgbcell += np.array([X, C, 0])
