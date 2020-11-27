@@ -1,6 +1,6 @@
 import numpy as np
 
-from mumax5 import Ferromagnet, Grid, TimeSolver, World
+from mumax5 import Ferromagnet, Grid, World
 from mumax5.util import show_field
 
 
@@ -32,10 +32,7 @@ for i in range(n_magnets):
     magnet.magnetization = (1, 0.1, 0)
     magnets.append(magnet)
 
-LLGequations = [(magnet.magnetization, magnet.torque) for magnet in magnets]
-
-solver = TimeSolver(LLGequations)
-solver.run(1e-10)
+world.timesolver.run(1e-10)
 
 for magnet in magnets:
     show_field(magnet.magnetization)

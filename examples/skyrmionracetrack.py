@@ -1,4 +1,4 @@
-from mumax5 import Ferromagnet, Grid, TimeSolver, World
+from mumax5 import Ferromagnet, Grid, World
 from mumax5.util import neelskyrmion, show_field
 
 # create the world
@@ -27,7 +27,6 @@ magnet.xi = 0.3
 magnet.jcur = (1e12, 0, 0)
 magnet.pol = 0.4
 
-solver = TimeSolver(magnet.magnetization, magnet.torque)
-solver.run(2e-10)
+world.timesolver.run(2e-10)
 
 show_field(magnet.magnetization)

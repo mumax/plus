@@ -6,7 +6,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from mumax5 import Ferromagnet, Grid, TimeSolver, World
+from mumax5 import Ferromagnet, Grid, World
 
 length, width, thickness = 500e-9, 125e-9, 3e-9
 nx, ny, nz = 128, 32, 1
@@ -40,8 +40,7 @@ outputquantities = {
 
 # --- RUN THE SOLVER ---
 
-solver = TimeSolver(magnet.magnetization, magnet.torque)
-output = solver.solve(timepoints, outputquantities)
+output = world.timesolver.solve(timepoints, outputquantities)
 
 # --- PLOT THE OUTPUT DATA ---
 

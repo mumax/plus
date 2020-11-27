@@ -1,4 +1,4 @@
-from mumax5 import Ferromagnet, Grid, TimeSolver, World
+from mumax5 import Ferromagnet, Grid, World
 from mumax5.util import show_field
 
 # infinite grid in z direction, periodic in x and y
@@ -16,7 +16,6 @@ magnet.ku1 = 1.0
 magnet.anisU = (0, 0, 1)
 magnet.alpha = 0.5
 
-solver = TimeSolver(magnet.magnetization, magnet.torque)
-solver.steps(500)
+world.timesolver.steps(500)
 
 show_field(magnet.magnetization)

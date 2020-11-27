@@ -2,7 +2,7 @@ import time
 
 import matplotlib.pyplot as plt
 
-from mumax5 import Ferromagnet, Grid, TimeSolver, World
+from mumax5 import Ferromagnet, Grid, World
 
 
 def simple_bench(grid, nsteps=100):
@@ -16,14 +16,13 @@ def simple_bench(grid, nsteps=100):
     magnet.aex = 13e-12
     magnet.alpha = 0.5
 
-    solver = TimeSolver(magnet.magnetization, magnet.torque)
-    solver.timestep = 1e-13
-    solver.adaptive_timestep = False
+    world.timesolver.timestep = 1e-13
+    world.timesolver.adaptive_timestep = False
 
-    solver.steps(10)  # warm up
+    world.timesolver.steps(10)  # warm up
 
     start = time.time()
-    solver.steps(nsteps)
+    world.timesolver.steps(nsteps)
     stop = time.time()
 
     return stop - start
