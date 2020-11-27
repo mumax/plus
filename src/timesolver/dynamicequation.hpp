@@ -11,11 +11,11 @@ class DynamicEquation {
  public:
   DynamicEquation(const Variable* x,
                   std::shared_ptr<FieldQuantity> rhs,
-                  const FieldQuantity* noiseTerm = nullptr);
+                  std::shared_ptr<FieldQuantity> noiseTerm = nullptr);
 
   const Variable* x;
   std::shared_ptr<FieldQuantity> rhs;
-  const FieldQuantity* noiseTerm;
+  std::shared_ptr<FieldQuantity> noiseTerm;
 
   int ncomp() const;
   Grid grid() const;

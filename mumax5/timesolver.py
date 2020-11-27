@@ -40,8 +40,11 @@ class TimeSolver:
         The right-hand side of a differential equation.
     """
 
-    def __init__(self, variable, rhs):
-        self._impl = _cpp.TimeSolver(variable._impl, rhs._impl)
+    def __init__(self, variable, rhs, noise=None):
+        if noise:
+            self._impl = _cpp.TimeSolver(variable._impl, rhs._impl, noise._impl)
+        else:
+            self._impl = _cpp.TimeSolver(variable._impl, rhs._impl)
 
     @classmethod
     def _from_impl(cls, impl):

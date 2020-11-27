@@ -9,6 +9,7 @@
 #include "ferromagnet.hpp"
 #include "grid.hpp"
 #include "system.hpp"
+#include "thermalnoise.hpp"
 #include "timesolver.hpp"
 #include "torque.hpp"
 
@@ -82,7 +83,8 @@ void MumaxWorld::resetTimeSolverEquations() {
     Ferromagnet* magnet = namedMagnet.second.get();
     DynamicEquation eq(
         magnet->magnetization(),
-        std::shared_ptr<FieldQuantity>(torqueQuantity(magnet).clone()));
+        std::shared_ptr<FieldQuantity>(torqueQuantity(magnet).clone()),
+        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(magnet).clone()));
     equations.push_back(eq);
   }
   timesolver_->setEquations(equations);

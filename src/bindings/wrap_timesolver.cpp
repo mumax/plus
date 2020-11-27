@@ -13,16 +13,16 @@ void wrap_timesolver(py::module& m) {
   py::class_<TimeSolver>(m, "TimeSolver")
       .def(py::init([](Variable* x, FM_FieldQuantity rhs) {
              return std::unique_ptr<TimeSolver>(new TimeSolver(DynamicEquation(
-                 x, std::unique_ptr<FieldQuantity>(rhs.clone()))));
+                 x, std::shared_ptr<FieldQuantity>(rhs.clone()))));
            }),
            py::arg("variable"), py::arg("rhs"))
-      // .def(py::init([](Variable* x, FieldQuantity* rhs, FieldQuantity *
-      // noise)
-      //{
-      //       return std::unique_ptr<TimeSolver>(
-      //           new TimeSolver(DynamicEquation(x, rhs, noise)));
-      //     }),
-      //     py::arg("variable"), py::arg("rhs"), py::arg("noiseterm"))
+      .def(py::init([](Variable* x, FM_FieldQuantity rhs,
+                       FM_FieldQuantity noise) {
+             return std::unique_ptr<TimeSolver>(new TimeSolver(DynamicEquation(
+                 x, std::shared_ptr<FieldQuantity>(rhs.clone()),
+                 std::shared_ptr<FieldQuantity>(noise.clone()))));
+           }),
+           py::arg("variable"), py::arg("rhs"), py::arg("noise"))
       // .def(py::init(
       //         [](std::vector<std::pair<Variable*, FieldQuantity*>> eqPairs) {
       //           std::vector<DynamicEquation> eqs;

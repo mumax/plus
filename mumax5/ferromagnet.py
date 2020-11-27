@@ -275,3 +275,8 @@ class Ferromagnet:
     def total_energy(self):
         """Energy related to the total effective field."""
         return ScalarQuantity(_cpp.total_energy(self._impl))
+
+    @property
+    def thermal_noise(self):
+        """Thermal noise on the magnetization."""
+        return FieldQuantity(_cpp.thermal_noise(self._impl))

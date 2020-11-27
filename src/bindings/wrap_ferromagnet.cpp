@@ -45,10 +45,6 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("jcur", &Ferromagnet::jcur)
       .def_readonly("temperature", &Ferromagnet::temperature)
 
-      .def_property_readonly(
-          "thermal_noise",
-          [](const Ferromagnet* fm) { return thermalNoiseQuantity(fm); })
-
       .def(
           "magnetic_field_from_magnet",
           [](const Ferromagnet* fm, Ferromagnet* magnet) {
@@ -91,6 +87,8 @@ void wrap_ferromagnet(py::module& m) {
   m.def("effective_field", &effectiveFieldQuantity);
   m.def("total_energy_density", &totalEnergyDensityQuantity);
   m.def("total_energy", &totalEnergyQuantity);
+
+  m.def("thermal_noise", &thermalNoiseQuantity);
 
   m.def("_demag_kernel", [](const Ferromagnet* fm) {
     Grid grid = fm->grid();
