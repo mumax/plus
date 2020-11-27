@@ -16,9 +16,10 @@ magnet.anisU = (0, 0, 1)
 magnet.alpha = 0.2
 
 # set and relax the initial magnetization
-magnet.magnetization = neelskyrmion(
-    center=(64e-9, 32e-9, 0), radius=10e-9, charge=-1, pol=1
-)
+magnet.magnetization = neelskyrmion(center=(64e-9, 32e-9, 0),
+                                    radius=10e-9,
+                                    charge=-1,
+                                    polarization=1)
 magnet.minimize()
 
 # add a current
