@@ -44,10 +44,16 @@ int RungeKuttaStepper::nStages() const {
 }
 
 void RungeKuttaStepper::step() {
+  // If there are no equations to solve, advance time and return early
+  if (solver_->equations().empty()) {
+    solver_->setTime(solver_->time() + solver_->timestep());
+    return;
+  }
+
   // construct a Runge Kutta stage executor for every equation
   std::vector<RungeKuttaStageExecutor> equations;
-  for (int i = 0; i < solver_->nEquations(); i++)
-    equations.emplace_back(RungeKuttaStageExecutor(solver_->equation(i), this));
+  for (auto eq : solver_->equations())
+    equations.emplace_back(RungeKuttaStageExecutor(eq, this));
 
   real t0 = solver_->time();
 
@@ -70,7 +76,7 @@ void RungeKuttaStepper::step() {
       eq.setFinalX();
 
     // nothing more to do if time step is fixed
-    if (!solver_->adaptiveTimeStep())
+    if (!solver_->hasAdaptiveTimeStep())
       break;
 
     // loop over equations and get the largest error
