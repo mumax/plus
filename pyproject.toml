@@ -1,6 +1,6 @@
 [tool.black]
 target-version = ['py37', 'py38']
-exclude = '''
+force-exclude = '''
 (
   /(
       \.git
