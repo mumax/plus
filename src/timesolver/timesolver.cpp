@@ -24,22 +24,21 @@ TimeSolver::TimeSolver(std::vector<DynamicEquation> eqs) {
 
 TimeSolver::~TimeSolver() {}
 
-void TimeSolver::initializeTimeStep() {
-  if (fixedTimeStep_ || eqs_.empty())
-    return;
+real TimeSolver::sensibleTimeStep() const {
+  if (eqs_.empty())
+    return 0.0;  // Timestep is irrelevant if there are no equations to solve
 
   real globalMaxNorm = 0;
   for (auto eq : eqs_)
     if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > globalMaxNorm)
       globalMaxNorm = maxNorm;
 
-  // initial guess for the timestep
-  timestep_ = 0.01 / globalMaxNorm;
+  return 0.01 / globalMaxNorm;
 }
 
 void TimeSolver::setEquations(std::vector<DynamicEquation> eqs) {
   eqs_ = eqs;
-  initializeTimeStep();
+  timestep_ = sensibleTimeStep();
 }
 
 void TimeSolver::adaptTimeStep(real correctionFactor) {

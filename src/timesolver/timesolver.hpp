@@ -44,7 +44,7 @@ class TimeSolver {
 
   //------------- HELPER FUNCTIONS FOR ADAPTIVE TIMESTEPPING -------------------
 
-  void initializeTimeStep(); /** Make smart guess for initial timestep */
+  real sensibleTimeStep() const; /** Computes a sensible timestep */
   void adaptTimeStep(real corr);
 
  private:

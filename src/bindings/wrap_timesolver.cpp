@@ -31,6 +31,7 @@ void wrap_timesolver(py::module& m) {
       //           return std::unique_ptr<TimeSolver>(new TimeSolver(eqs));
       //         }))
       .def_property_readonly("time", &TimeSolver::time)
+      .def_property_readonly("sensible_timestep", &TimeSolver::sensibleTimeStep)
       .def("step", &TimeSolver::step)
       .def("steps", &TimeSolver::steps)
       .def_property("timestep", &TimeSolver::timestep, &TimeSolver::setTimeStep)

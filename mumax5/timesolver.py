@@ -49,14 +49,22 @@ class TimeSolver:
         solver._impl = impl
         return solver
 
-    def step(self):
-        """Make one step of the time solver."""
-        self._impl.step()
+    def _assure_sensible_timestep(self):
+        """Assure a sensible timestep.
+
+        If things in the world have been changed, than it could be that the current
+        timestep of the solver is way to big. Calling this method makes sure that
+        the timestep is sensibly small.
+        """
+        if self.adaptive_timestep:
+            if self.timestep == 0.0 or self.timestep > self._impl.sensible_timestep:
+                self.timestep = self._impl.sensible_timestep
 
     def steps(self, nsteps):
-        """Make n steps of the time solver."""
-        for i in range(nsteps):
-            self.step()
+        """Make n steps with the time solver."""
+        # Make sure we start stepping with a sensible timestep
+        self._assure_sensible_timestep()
+        self._impl.steps(nsteps)
 
     def run(self, duration):
         """Run the solver for a given duration.
@@ -66,6 +74,7 @@ class TimeSolver:
         duration : float
             Duration in seconds.
         """
+        self._assure_sensible_timestep()
         self._impl.run(duration)
 
     def solve(self, timepoints, quantity_dict):
@@ -81,11 +90,16 @@ class TimeSolver:
         quantity_dict : dict
             Specified quantities to collect.
         """
-        # check if time points are OK
+        # TODO:check if time points are OK
+        self._assure_sensible_timestep()
         output = TimeSolverOutput(quantity_dict)
+
         for tp in timepoints:
+            # we only need to assure a sensible timestep at the beginning,
+            # hence we use here self._impl.run instead of self.run
             duration = tp - self.time
-            self.run(duration)
+            self._impl.run(duration)
+
             output.write_line(tp)
         return output
 
