@@ -16,8 +16,6 @@ add_library(core STATIC
     scalarquantity.hpp 
     system.cpp
     system.hpp
-    timer.cpp
-    timer.hpp
     variable.hpp
     variable.cpp
     world.cpp

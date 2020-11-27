@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ferromagnetquantity.hpp"
-#include "handler.hpp"
 
 class Ferromagnet;
 class Field;
