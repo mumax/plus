@@ -19,13 +19,6 @@
 #include "wrappers.hpp"
 #include "zeeman.hpp"
 
-#define GETPARAM(NAME) [](const Ferromagnet* fm) { return &fm->NAME; }
-
-#define SETPARAM(NAME)                     \
-  [](Ferromagnet* fm, py::object data) {   \
-    py::cast(&fm->NAME).attr("set")(data); \
-  }
-
 void wrap_ferromagnet(py::module& m) {
   py::class_<Ferromagnet>(m, "Ferromagnet")
       .def_property_readonly("name", &Ferromagnet::name)
