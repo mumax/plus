@@ -4,6 +4,7 @@ import _mumax5cpp as _cpp
 
 from .fieldquantity import FieldQuantity
 from .grid import Grid
+from .parameter import Parameter
 from .scalarquantity import ScalarQuantity
 from .variable import Variable
 
@@ -66,101 +67,101 @@ class Ferromagnet:
     @property
     def msat(self):
         """Saturation magnetization."""
-        return self._impl.msat
+        return Parameter(self._impl.msat)
 
     @msat.setter
     def msat(self, value):
-        self._impl.msat.set(value)
+        self.msat.set(value)
 
     @property
     def alpha(self):
         """LLG damping parameter."""
-        return self._impl.alpha
+        return Parameter(self._impl.alpha)
 
     @alpha.setter
     def alpha(self, value):
-        self._impl.alpha.set(value)
+        self.alpha.set(value)
 
     @property
     def aex(self):
         """Exchange constant."""
-        return self._impl.aex
+        return Parameter(self._impl.aex)
 
     @aex.setter
     def aex(self, value):
-        self._impl.aex.set(value)
+        self.aex.set(value)
 
     @property
     def ku1(self):
         """Uniaxial anisotropy parameter Ku1."""
-        return self._impl.ku1
+        return Parameter(self._impl.ku1)
 
     @ku1.setter
     def ku1(self, value):
-        self._impl.ku1.set(value)
+        self.ku1.set(value)
 
     @property
     def ku2(self):
         """Uniaxial anisotropy parameter Ku2."""
-        return self._impl.ku2
+        return Parameter(self._impl.ku2)
 
     @ku2.setter
     def ku2(self, value):
-        self._impl.ku2.set(value)
+        self.ku2.set(value)
 
     @property
     def anisU(self):
         """Uniaxial anisotropy direction (the easy axis)."""
-        return self._impl.anisU
+        return Parameter(self._impl.anisU)
 
     @anisU.setter
     def anisU(self, value):
-        self._impl.anisU.set(value)
+        self.anisU.set(value)
 
     @property
     def idmi(self):
         """Interfacial DMI strength."""
-        return self._impl.idmi
+        return Parameter(self._impl.idmi)
 
     @idmi.setter
     def idmi(self, value):
-        self._impl.idmi.set(value)
+        self.idmi.set(value)
 
     @property
     def xi(self):
         """Non-adiabaticity of the spin-transfer torque."""
-        return self._impl.xi
+        return Parameter(self._impl.xi)
 
     @xi.setter
     def xi(self, value):
-        self._impl.xi.set(value)
+        self.xi.set(value)
 
     @property
     def pol(self):
         """Electrical current polarization."""
-        return self._impl.pol
+        return Parameter(self._impl.pol)
 
     @pol.setter
     def pol(self, value):
-        self._impl.pol.set(value)
+        self.pol.set(value)
 
     @property
     def jcur(self):
         """Electrical current density."""
-        return self._impl.jcur
+        return Parameter(self._impl.jcur)
 
     @jcur.setter
     def jcur(self, value):
-        self._impl.jcur.set(value)
+        self.jcur.set(value)
 
     @property
     def temperature(self):
         """Temperature."""
-        return self._impl.temperature
+        return Parameter(self._impl.temperature)
 
     @temperature.setter
     def temperature(self, value):
-        self._impl.temperature.set(value)
+        self.temperature.set(value)
 
     # ----- QUANTITIES ----------------------
 

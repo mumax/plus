@@ -11,3 +11,4 @@ API Reference
     Ferromagnet
     TimeSolver
     Variable
+    Parameter
