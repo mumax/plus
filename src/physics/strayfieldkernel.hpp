@@ -8,11 +8,12 @@
 
 class Field;
 class System;
+class World;
 
 class StrayFieldKernel {
  public:
-  StrayFieldKernel(Grid grid, real3 cellsize);
-  StrayFieldKernel(Grid dst, Grid src, real3 cellsize);
+  StrayFieldKernel(Grid grid, const World* world);
+  StrayFieldKernel(Grid dst, Grid src, const World* world);
   ~StrayFieldKernel();
 
   Grid grid() const;
@@ -23,9 +24,7 @@ class StrayFieldKernel {
   void compute();
 
  private:
-  std::shared_ptr<System> kernelSystem_;
-  real3 cellsize_;
-  Field* kernel_;
+  std::unique_ptr<Field> kernel_;
 
  public:
   // Helper function which determines the kernel grid

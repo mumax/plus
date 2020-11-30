@@ -93,7 +93,7 @@ void wrap_ferromagnet(py::module& m) {
   m.def("_demag_kernel", [](const Ferromagnet* fm) {
     Grid grid = fm->grid();
     real3 cellsize = fm->world()->cellsize();
-    StrayFieldKernel demagKernel(grid, grid, cellsize);
+    StrayFieldKernel demagKernel(grid, grid, fm->world());
     return fieldToArray(demagKernel.field());
   });
 }

@@ -45,7 +45,7 @@ StrayFieldBruteExecutor::StrayFieldBruteExecutor(
     const Ferromagnet* magnet,
     std::shared_ptr<const System> system)
     : StrayFieldExecutor(magnet, system),
-      kernel_(system->grid(), magnet_->grid(), magnet_->cellsize()) {}
+      kernel_(system->grid(), magnet_->grid(), magnet_->world()) {}
 
 Field StrayFieldBruteExecutor::exec() const {
   Field h(system_, 3);

@@ -133,7 +133,7 @@ StrayFieldFFTExecutor::StrayFieldFFTExecutor(
     const Ferromagnet* magnet,
     std::shared_ptr<const System> system)
     : StrayFieldExecutor(magnet, system),
-      kernel_(system->grid(), magnet_->grid(), system_->cellsize()),
+      kernel_(system->grid(), magnet_->grid(), magnet->world()),
       kfft(6),
       hfft(3),
       mfft(3) {
