@@ -10,6 +10,12 @@ class System {
   /** Construct a system with a given grid which lives in a given world. */
   System(const World* world, Grid grid);
 
+  // Systems should not be copied or moved
+  System(const System&) = delete;
+  System& operator=(const System&) = delete;
+  System(System&&) = delete;
+  System& operator=(System&&) = delete;
+
   /** Destroy the system. */
   virtual ~System() {}
 
