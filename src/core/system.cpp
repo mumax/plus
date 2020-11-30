@@ -4,9 +4,9 @@
 #include "grid.hpp"
 #include "world.hpp"
 
-System::System(World* world, Grid grid) : grid_(grid), world_(world) {}
+System::System(const World* world, Grid grid) : grid_(grid), world_(world) {}
 
-World* System::world() const {
+const World* System::world() const {
   return world_;
 }
 

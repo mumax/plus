@@ -15,7 +15,7 @@ bool externalFieldAssuredZero(const Ferromagnet* magnet) {
     }
   }
 
-  MumaxWorld* world = static_cast<MumaxWorld*>(magnet->world());
+  const MumaxWorld* world = static_cast<const MumaxWorld*>(magnet->world());
   real3 b_ext = world->biasMagneticField;
   return b_ext == real3{0.0, 0.0, 0.0};
 }
@@ -27,7 +27,7 @@ Field evalExternalField(const Ferromagnet* magnet) {
     return h;
   }
 
-  MumaxWorld* world = static_cast<MumaxWorld*>(magnet->world());
+  const MumaxWorld* world = static_cast<const MumaxWorld*>(magnet->world());
   real3 b_ext = world->biasMagneticField;
   h.setUniformComponent(0, b_ext.x);
   h.setUniformComponent(1, b_ext.y);

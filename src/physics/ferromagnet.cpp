@@ -1,6 +1,7 @@
 #include "ferromagnet.hpp"
 
 #include <curand.h>
+
 #include <memory>
 #include <random>
 
@@ -59,7 +60,7 @@ std::shared_ptr<System> Ferromagnet::system() const {
   return system_;
 }
 
-World* Ferromagnet::world() const {
+const World* Ferromagnet::world() const {
   return system()->world();
 }
 

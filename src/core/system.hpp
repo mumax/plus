@@ -8,13 +8,13 @@ class World;
 class System {
  public:
   /** Construct a system with a given grid which lives in a given world. */
-  System(World* world, Grid grid);
+  System(const World* world, Grid grid);
 
   /** Destroy the system. */
   virtual ~System() {}
 
   /** Return the world to which the system belongs. */
-  World* world() const;
+  const World* world() const;
 
   /** Return the grid of the system. */
   Grid grid() const;
@@ -26,6 +26,6 @@ class System {
   real3 cellPosition(int3) const;
 
  private:
-  World* world_;
+  const World* world_;
   Grid grid_;
 };

@@ -26,7 +26,7 @@ class Ferromagnet {
 
   std::string name() const;
   std::shared_ptr<System> system() const;
-  World* world() const;
+  const World* world() const;
   Grid grid() const;
   real3 cellsize() const;
   const Variable* magnetization() const;
