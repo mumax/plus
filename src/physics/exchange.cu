@@ -27,7 +27,9 @@ __global__ void k_exchangeField(CuField hField,
                                 Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!mField.grid.cellInGrid(idx))
+  const Grid grid = mField.system.grid;
+
+  if (!grid.cellInGrid(idx))
     return;
 
   if (msat.valueAt(idx) == 0) {
@@ -35,7 +37,7 @@ __global__ void k_exchangeField(CuField hField,
     return;
   }
 
-  const int3 coo = hField.grid.index2coord(idx);
+  const int3 coo = grid.index2coord(idx);
   const real3 m = mField.vectorAt(idx);
   const real a = aex.valueAt(idx);
 
@@ -46,9 +48,9 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
   for (int sgn : {-1, 1}) {
     const int3 coo_ = mastergrid.wrap(coo + int3{sgn, 0, 0});
-    if (!mField.grid.cellInGrid(coo_))
+    if (!grid.cellInGrid(coo_))
       continue;
-    const int idx_ = mField.grid.coord2index(coo_);
+    const int idx_ = grid.coord2index(coo_);
     if (msat.valueAt(idx_) != 0) {
       const real3 m_ = mField.vectorAt(idx_);
       const real a_ = aex.valueAt(idx_);
@@ -60,9 +62,9 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
   for (int sgn : {-1, 1}) {
     const int3 coo_ = mastergrid.wrap(coo + int3{0, sgn, 0});
-    if (!mField.grid.cellInGrid(coo_))
+    if (!grid.cellInGrid(coo_))
       continue;
-    const int idx_ = mField.grid.coord2index(coo_);
+    const int idx_ = grid.coord2index(coo_);
     if (msat.valueAt(idx_) != 0) {
       const real3 m_ = mField.vectorAt(idx_);
       const real a_ = aex.valueAt(idx_);
@@ -71,13 +73,13 @@ __global__ void k_exchangeField(CuField hField,
   }
 
   // Z direction
-  if (mField.grid.size().z > 1) {
+  if (grid.size().z > 1) {
 #pragma unroll
     for (int sgn : {-1, 1}) {
       const int3 coo_ = mastergrid.wrap(coo + int3{0, 0, sgn});
-      if (!mField.grid.cellInGrid(coo_))
+      if (!grid.cellInGrid(coo_))
         continue;
-      const int idx_ = mField.grid.coord2index(coo_);
+      const int idx_ = grid.coord2index(coo_);
       if (msat.valueAt(idx_) != 0) {
         const real3 m_ = mField.vectorAt(idx_);
         const real a_ = aex.valueAt(idx_);
@@ -160,7 +162,9 @@ __global__ void k_maxangle(CuField maxAngleField,
                            const CuParameter msat) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!maxAngleField.grid.cellInGrid(idx))
+  const Grid grid = maxAngleField.system.grid;
+
+  if (!grid.cellInGrid(idx))
     return;
 
   if (msat.valueAt(idx) == 0) {
@@ -168,7 +172,7 @@ __global__ void k_maxangle(CuField maxAngleField,
     return;
   }
 
-  const int3 coo = maxAngleField.grid.index2coord(idx);
+  const int3 coo = grid.index2coord(idx);
   const real3 m = mField.vectorAt(idx);
   const real a = aex.valueAt(idx);
 
@@ -181,8 +185,8 @@ __global__ void k_maxangle(CuField maxAngleField,
 #pragma unroll
   for (int3 relcoo : neighborRelativeCoordinates) {
     const int3 coo_ = coo + relcoo;
-    const int idx_ = maxAngleField.grid.coord2index(coo_);
-    if (maxAngleField.cellInGrid(coo_) && msat.valueAt(idx_) != 0) {
+    const int idx_ = grid.coord2index(coo_);
+    if (grid.cellInGrid(coo_) && msat.valueAt(idx_) != 0) {
       real3 m_ = mField.vectorAt(idx_);
       real a_ = aex.valueAt(idx_);
       real angle = m == m_ ? 0 : acos(dot(m, m_));

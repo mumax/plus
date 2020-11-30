@@ -19,10 +19,10 @@ __global__ void k_demagfield(CuField hField,
 
   real3 h{0, 0, 0};
 
-  int3 dstcoo = hField.grid.index2coord(idx);
+  int3 dstcoo = hField.system.grid.index2coord(idx);
 
-  for (int i = 0; i < mField.grid.ncells(); i++) {
-    int3 srccoo = mField.grid.index2coord(i);
+  for (int i = 0; i < mField.system.grid.ncells(); i++) {
+    int3 srccoo = mField.system.grid.index2coord(i);
     int3 r = dstcoo - srccoo;
     real nxx = kernel.valueAt(r, 0);
     real nyy = kernel.valueAt(r, 1);

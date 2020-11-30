@@ -23,3 +23,10 @@ real3 System::cellPosition(int3 idx) const {
   real3 c = cellsize();
   return real3{p.x * c.x, p.y * c.y, p.z * c.z};
 }
+
+CuSystem System::cu() const {
+  return CuSystem(this);
+}
+
+CuSystem::CuSystem(const System* system)
+    : grid(system->grid()), cellsize(system->cellsize()) {}

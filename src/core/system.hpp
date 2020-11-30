@@ -4,6 +4,7 @@
 #include "grid.hpp"
 
 class World;
+class CuSystem;
 
 class System {
  public:
@@ -31,7 +32,18 @@ class System {
   /** Return the position of a cell of this system in the world. */
   real3 cellPosition(int3) const;
 
+  /** Return a CuSystem which can be copied to the gpu and be used in cuda
+   * kernels. */
+  CuSystem cu() const;
+
  private:
   const World* world_;
   Grid grid_;
+};
+
+struct CuSystem {
+  explicit CuSystem(const System*);
+
+  const Grid grid;
+  const real3 cellsize;
 };

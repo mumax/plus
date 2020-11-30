@@ -8,9 +8,9 @@
 #include "fieldquantity.hpp"
 #include "gpubuffer.hpp"
 #include "grid.hpp"
+#include "system.hpp"
 
 class CuField;
-class System;
 
 class Field : public FieldQuantity {
   int ncomp_;
@@ -56,21 +56,23 @@ class Field : public FieldQuantity {
   void updateDevicePointersBuffer();
   void allocate();
   void free();
+
+  friend CuField;
 };
 
 struct CuField {
-  friend Field;
-
  public:
-  const Grid grid;
+  const CuSystem system;
   const int ncomp;
 
  private:
   real** ptrs;
 
  public:
-  CuField(Grid grid, int ncomp, real** ptrs)
-      : grid(grid), ncomp(ncomp), ptrs(ptrs) {}
+  explicit CuField(const Field* f)
+      : system(f->system()->cu()),
+        ncomp(f->ncomp()),
+        ptrs(f->bufferPtrs_.get()) {}
 
   __device__ bool cellInGrid(int) const;
   __device__ bool cellInGrid(int3) const;
@@ -86,11 +88,11 @@ struct CuField {
 };
 
 __device__ inline bool CuField::cellInGrid(int idx) const {
-  return grid.cellInGrid(idx);
+  return system.grid.cellInGrid(idx);
 }
 
 __device__ inline bool CuField::cellInGrid(int3 coo) const {
-  return grid.cellInGrid(coo);
+  return system.grid.cellInGrid(coo);
 }
 
 __device__ inline real CuField::valueAt(int idx, int comp) const {
@@ -98,7 +100,7 @@ __device__ inline real CuField::valueAt(int idx, int comp) const {
 }
 
 __device__ inline real CuField::valueAt(int3 coo, int comp) const {
-  return valueAt(grid.coord2index(coo), comp);
+  return valueAt(system.grid.coord2index(coo), comp);
 }
 
 __device__ inline real3 CuField::vectorAt(int idx) const {
@@ -106,7 +108,7 @@ __device__ inline real3 CuField::vectorAt(int idx) const {
 }
 
 __device__ inline real3 CuField::vectorAt(int3 coo) const {
-  return vectorAt(grid.coord2index(coo));
+  return vectorAt(system.grid.coord2index(coo));
 }
 
 __device__ inline void CuField::setValueInCell(int idx, int comp, real value) {

@@ -22,11 +22,12 @@ std::shared_ptr<const System> StrayFieldKernel::kernelSystem() const {
   return kernel_->system();
 }
 
-__global__ void k_strayFieldKernel(CuField kernel, real3 cellsize) {
+__global__ void k_strayFieldKernel(CuField kernel) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!kernel.cellInGrid(idx))
     return;
-  int3 coo = kernel.grid.index2coord(idx);
+  const real3 cellsize = kernel.system.cellsize;
+  int3 coo = kernel.system.grid.index2coord(idx);
   kernel.setValueInCell(idx, 0, calcNewellNxx(coo, cellsize));
   kernel.setValueInCell(idx, 1, calcNewellNyy(coo, cellsize));
   kernel.setValueInCell(idx, 2, calcNewellNzz(coo, cellsize));
@@ -36,7 +37,7 @@ __global__ void k_strayFieldKernel(CuField kernel, real3 cellsize) {
 }
 
 void StrayFieldKernel::compute() {
-  cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(), cellsize());
+  cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu());
 }
 
 Grid StrayFieldKernel::grid() const {

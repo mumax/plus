@@ -11,7 +11,7 @@
 __global__ void k_maxAbsValue(real* result, CuField f) {
   // Reduce to a block
   __shared__ real sdata[BLOCKDIM];
-  int ncells = f.grid.ncells();
+  int ncells = f.system.grid.ncells();
   int tid = threadIdx.x;
   real threadValue = 0.0;
   for (int i = tid; i < ncells; i += BLOCKDIM) {
@@ -51,7 +51,7 @@ real maxAbsValue(const Field& f) {
 __global__ void k_maxVecNorm(real* result, CuField f) {
   // Reduce to a block
   __shared__ real sdata[BLOCKDIM];
-  int ncells = f.grid.ncells();
+  int ncells = f.system.grid.ncells();
   int tid = threadIdx.x;
   real threadValue = 0.0;
   for (int i = tid; i < ncells; i += BLOCKDIM) {
@@ -97,7 +97,7 @@ real maxVecNorm(const Field& f) {
 __global__ void k_average(real* result, CuField f, int comp) {
   __shared__ real sdata[BLOCKDIM];
   int tid = threadIdx.x;
-  int ncells = f.grid.ncells();
+  int ncells = f.system.grid.ncells();
 
   // Reduce to a block
   real threadValue = 0.0;
@@ -144,7 +144,7 @@ std::vector<real> fieldAverage(const Field& f) {
 
 __global__ void k_dotSum(real* result, CuField f, CuField g) {
   __shared__ real sdata[BLOCKDIM];
-  int ncells = f.grid.ncells();
+  int ncells = f.system.grid.ncells();
   int tid = threadIdx.x;
 
   real threadValue = 0.0;

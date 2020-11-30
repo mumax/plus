@@ -24,11 +24,13 @@ __global__ void k_interfacialDmiField(CuField hField,
                                       const CuParameter idmi,
                                       const CuParameter msat,
                                       const real3 interfaceNormal,
-                                      const real3 cellsize,
                                       Grid mastergrid) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!hField.cellInGrid(idx))
+  const Grid grid = hField.system.grid;
+  const real3 cellsize = hField.system.cellsize;
+
+  if (!grid.cellInGrid(idx))
     return;
 
   if (msat.valueAt(idx) == 0) {
@@ -36,7 +38,7 @@ __global__ void k_interfacialDmiField(CuField hField,
     return;
   }
 
-  const int3 coo = hField.grid.index2coord(idx);
+  const int3 coo = grid.index2coord(idx);
   const real d = idmi.valueAt(idx);
 
   real3 h{0, 0, 0};  // accumulate exchange field of cell at idx. Devide by msat
@@ -48,9 +50,9 @@ __global__ void k_interfacialDmiField(CuField hField,
 
   for (int3 relcoo : neighborRelativeCoordinates) {
     const int3 coo_ = mastergrid.wrap(coo + relcoo);
-    const int idx_ = hField.grid.coord2index(coo_);
+    const int idx_ = grid.coord2index(coo_);
 
-    if (hField.cellInGrid(coo_) && msat.valueAt(idx_) != 0) {
+    if (grid.cellInGrid(coo_) && msat.valueAt(idx_) != 0) {
       // unit vector from cell to neighbor
       real3 dr{(real)relcoo.x, (real)relcoo.y, (real)relcoo.z};
 
@@ -77,8 +79,7 @@ Field evalInterfacialDmiField(const Ferromagnet* magnet) {
   }
   cudaLaunch(hField.grid().ncells(), k_interfacialDmiField, hField.cu(),
              magnet->magnetization()->field().cu(), magnet->idmi.cu(),
-             magnet->msat.cu(), interfaceNormal, magnet->world()->cellsize(),
-             magnet->world()->mastergrid());
+             magnet->msat.cu(), interfaceNormal, magnet->world()->mastergrid());
   return hField;
 }
 

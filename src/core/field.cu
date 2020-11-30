@@ -92,7 +92,7 @@ void Field::free() {
 }
 
 CuField Field::cu() const {
-  return CuField(grid(), ncomp_, bufferPtrs_.get());
+  return CuField(this);
 }
 
 void Field::getData(real* buffer) const {
