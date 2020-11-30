@@ -95,6 +95,7 @@ __device__ __host__ inline bool Grid::overlaps(Grid other) const {
   int z1 = max(origin_.z, other.origin_.z);
   int x2 = min(origin_.x + size_.x, other.origin_.x + other.size_.x);
   int y2 = min(origin_.y + size_.y, other.origin_.y + other.size_.y);
-  int z2 = min(origin_.z + size_.z, other.origin_.z + other.size_.z); // NOLINT [build/c++11]
+  int z2 = min(origin_.z + size_.z,  // NOLINT [build/c++11]
+               other.origin_.z + other.size_.z);
   return (x2 - x1) > 0 && (y2 - y1) > 0 && (z2 - z1) > 0;
 }

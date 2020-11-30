@@ -1,9 +1,9 @@
 #pragma once
 
-#include<pybind11/pybind11.h>
-#include<pybind11/stl.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
-#include"datatypes.hpp"
+#include "datatypes.hpp"
 
 namespace pybind11 {
 namespace detail {
@@ -33,8 +33,6 @@ struct type_caster<int3> {
  private:
   type_caster<i3> i3_caster;
 };
-
-
 
 template <>
 struct type_caster<real3> {

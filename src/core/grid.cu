@@ -10,7 +10,8 @@ Grid::Grid(int3 size, int3 origin) {
 
 void Grid::setSize(int3 size) {
   if (size.x < 0 || size.y < 0 || size.z < 0) {
-    throw std::invalid_argument("The grid size should be larger than or equal to 0");
+    throw std::invalid_argument(
+        "The grid size should be larger than or equal to 0");
   }
   size_ = size;
 }

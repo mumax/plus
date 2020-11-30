@@ -1,6 +1,7 @@
 #include "ferromagnet.hpp"
 
 #include <curand.h>
+
 #include <memory>
 #include <random>
 
