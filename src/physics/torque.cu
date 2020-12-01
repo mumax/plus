@@ -21,8 +21,14 @@ __global__ void k_llgtorque(CuField torque,
                             const CuField hField,
                             const CuParameter alpha) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (!torque.cellInGrid(idx))
+
+  // When outside the geometry, set to zero and return early
+  if (!torque.cellInGeometry(idx)) {
+    if (torque.cellInGrid(idx))
+      torque.setVectorInCell(idx, {0, 0, 0});
     return;
+  }
+
   real3 m = mField.vectorAt(idx);
   real3 h = hField.vectorAt(idx);
   real a = alpha.valueAt(idx);
@@ -46,8 +52,14 @@ __global__ void k_dampingtorque(CuField torque,
                                 const CuField mField,
                                 const CuField hField) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (!torque.cellInGrid(idx))
+
+  // When outside the geometry, set to zero and return early
+  if (!torque.cellInGeometry(idx)) {
+    if (torque.cellInGrid(idx))
+      torque.setVectorInCell(idx, {0, 0, 0});
     return;
+  }
+
   real3 m = mField.vectorAt(idx);
   real3 h = hField.vectorAt(idx);
   real3 t = -GAMMALL * cross(m, cross(m, h));
