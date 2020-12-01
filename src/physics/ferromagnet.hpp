@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "field.hpp"
+#include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "parameter.hpp"
 #include "strayfield.hpp"
@@ -20,16 +21,20 @@ class System;
 
 class Ferromagnet {
  public:
-  Ferromagnet(MumaxWorld* world, Grid grid, std::string name);
+  Ferromagnet(MumaxWorld* world,
+              Grid grid,
+              std::string name,
+              GpuBuffer<bool> geometry = GpuBuffer<bool>());
   ~Ferromagnet();
   Ferromagnet(Ferromagnet&&) = default;  // TODO: check if default is ok
 
   std::string name() const;
-  std::shared_ptr<System> system() const;
+  std::shared_ptr<const System> system() const;
   const World* world() const;
   Grid grid() const;
   real3 cellsize() const;
   const Variable* magnetization() const;
+  const GpuBuffer<bool>& getGeometry() const;
 
   const StrayField* getStrayField(const Ferromagnet*) const;
   std::vector<const StrayField*> getStrayFields() const;

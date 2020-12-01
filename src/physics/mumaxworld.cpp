@@ -7,6 +7,7 @@
 #include "datatypes.hpp"
 #include "dynamicequation.hpp"
 #include "ferromagnet.hpp"
+#include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "system.hpp"
 #include "thermalnoise.hpp"
@@ -21,6 +22,12 @@ MumaxWorld::MumaxWorld(real3 cellsize, Grid mastergrid)
 MumaxWorld::~MumaxWorld() {}
 
 Ferromagnet* MumaxWorld::addFerromagnet(Grid grid, std::string name) {
+  return addFerromagnet(grid, GpuBuffer<bool>(), name);
+}
+
+Ferromagnet* MumaxWorld::addFerromagnet(Grid grid,
+                                        GpuBuffer<bool> geometry,
+                                        std::string name) {
   if (!inMastergrid(grid)) {
     throw std::out_of_range(
         "Can not add ferromagnet because the grid does not fit in the "
@@ -47,7 +54,8 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid, std::string name) {
   }
 
   // Create the magnet and add it to this world
-  ferromagnets_[name] = std::make_unique<Ferromagnet>(this, grid, name);
+  ferromagnets_[name] =
+      std::make_unique<Ferromagnet>(this, grid, name, geometry);
   Ferromagnet* newMagnet = ferromagnets_[name].get();
 
   // Add the magnetic field of the other magnets in this magnet, and vice versa

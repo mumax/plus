@@ -22,8 +22,17 @@ class Ferromagnet:
         The ferromagnet's identifier.
     """
 
-    def __init__(self, world, grid, name=""):
-        self._impl = world._impl.add_ferromagnet(grid._impl, name)
+    def __init__(self, world, grid, name="", geometry=None):
+        if geometry is None:
+            self._impl = world._impl.add_ferromagnet(grid._impl, name)
+        else:
+            geometry = geometry.astype(bool)
+            if geometry.shape != grid.shape:
+                raise ValueError(
+                    "The dimensions of the geometry do not match the dimensions "
+                    + "of the grid."
+                )
+            self._impl = world._impl.add_ferromagnet(grid._impl, geometry, name)
 
     @property
     def name(self):
@@ -39,6 +48,11 @@ class Ferromagnet:
     def cellsize(self):
         """Dimensions of the cell."""
         return self._impl.cellsize
+
+    @property
+    def geometry(self):
+        """Geometry of the ferromagnet."""
+        return self._impl.geometry
 
     @property
     def magnetization(self):

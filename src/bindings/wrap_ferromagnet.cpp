@@ -24,6 +24,35 @@ void wrap_ferromagnet(py::module& m) {
       .def_property_readonly("name", &Ferromagnet::name)
       .def_property_readonly("grid", &Ferromagnet::grid)
       .def_property_readonly("cellsize", &Ferromagnet::cellsize)
+      .def_property_readonly(
+          "geometry",
+          [](const Ferromagnet* magnet) {
+            bool* geometry;
+            if (magnet->getGeometry().size() == 0) {
+              int ncells = magnet->grid().ncells();
+              geometry = new bool[ncells];
+              for (int i = 0; i < ncells; i++) {
+                geometry[i] = true;
+              }
+            } else {
+              geometry = magnet->getGeometry().getHostCopy();
+            }
+
+            // Create python capsule which will free geometry
+            py::capsule free_when_done(geometry, [](void* p) {
+              bool* geometry = reinterpret_cast<bool*>(p);
+              delete[] geometry;
+            });
+
+            int3 size = magnet->grid().size();
+            int shape[3] = {size.z, size.y, size.x};
+            int strides[3];
+            strides[0] = sizeof(bool) * size.x * size.y;
+            strides[1] = sizeof(bool) * size.x;
+            strides[2] = sizeof(bool);
+
+            return py::array_t<bool>(shape, strides, geometry, free_when_done);
+          })
 
       // TODO: implement the world property which returns the MumaxWorld to
       // which the ferromagnet belongs

@@ -6,6 +6,7 @@
 #include <string>
 
 #include "datatypes.hpp"
+#include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "world.hpp"
 
@@ -28,6 +29,11 @@ class MumaxWorld : public World {
 
   /** Add a ferromagnet to the world. */
   Ferromagnet* addFerromagnet(Grid grid, std::string name = "");
+
+  /** Add a ferromagnet to the world with a non-trivial geometry. */
+  Ferromagnet* addFerromagnet(Grid grid,
+                              GpuBuffer<bool> geometry,
+                              std::string name = "");
 
   /** Get a ferromagnet by its name.
    *  Return a nullptr if there is no magnet with specified name.
