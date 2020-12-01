@@ -1,5 +1,7 @@
 """Ferromagnet implementation."""
 
+import numpy as _np
+
 import _mumax5cpp as _cpp
 
 from .fieldquantity import FieldQuantity
@@ -18,21 +20,44 @@ class Ferromagnet:
         World in which the ferromagnet lives.
     grid : mumax5.Grid
         The number of cells in x, y, z the ferromagnet should be divided into.
-    name : str, default=""
-        The ferromagnet's identifier.
+    geometry : None, ndarray, or callable (default=None)
+        The geometry of the ferromagnet can be set in three ways.
+        1. If the geometry contains all cells in the grid, then use None (the default)
+        2. Use an ndarray which specifies for each cell wheter or not it is in the
+           geometry.
+        3. Use a function which takes x, y, and z coordinates as arguments and returns
+           true if this position is inside the geometry and false otherwise.
+    name : str (default="")
+        The ferromagnet's identifier. If the name is empty (the default), a name for the
+        ferromagnet will be created.
     """
 
     def __init__(self, world, grid, name="", geometry=None):
         if geometry is None:
             self._impl = world._impl.add_ferromagnet(grid._impl, name)
+            return
+
+        if callable(geometry):
+            # construct meshgrid of x, y, and z coordinates for the grid
+            nx, ny, nz = grid.size
+            cs = world.cellsize
+            idxs = _np.flip(_np.mgrid[0:nz, 0:ny, 0:nx], axis=0)  # meshgrid of indices
+            x, y, z = [(grid.origin[i] + idxs[i]) * cs[i] for i in [0, 1, 2]]
+
+            # evaluate the geometry function for each position in this meshgrid
+            geometry_array = _np.vectorize(geometry, otypes=[bool])(x, y, z)
+
         else:
-            geometry = geometry.astype(bool)
-            if geometry.shape != grid.shape:
+            # When here, the geometry is not None, not callable, so it should be an
+            # ndarray or at least should be convertable to ndarray
+            geometry_array = _np.array(geometry, dtype=bool)
+            if geometry_array.shape != grid.shape:
                 raise ValueError(
                     "The dimensions of the geometry do not match the dimensions "
                     + "of the grid."
                 )
-            self._impl = world._impl.add_ferromagnet(grid._impl, geometry, name)
+
+        self._impl = world._impl.add_ferromagnet(grid._impl, geometry_array, name)
 
     @property
     def name(self):
