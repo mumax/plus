@@ -23,8 +23,12 @@ __global__ void k_spinTransferTorque(CuField torque,
   const Grid grid = torque.system.grid;
   const real3 cellsize = torque.system.cellsize;
 
-  if (!grid.cellInGrid(idx))
+  // When outside the geometry, set to zero and return early
+  if (!torque.cellInGeometry(idx)) {
+    if (torque.cellInGrid(idx))
+      torque.setVectorInCell(idx, {0, 0, 0});
     return;
+  }
 
   const real3 m = mField.vectorAt(idx);
   const real3 j = jcurParam.vectorAt(idx);
