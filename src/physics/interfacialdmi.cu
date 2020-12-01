@@ -27,11 +27,15 @@ __global__ void k_interfacialDmiField(CuField hField,
                                       Grid mastergrid) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+  // When outside the geometry, set to zero and return early
+  if (!hField.cellInGeometry(idx)) {
+    if (hField.cellInGrid(idx))
+      hField.setVectorInCell(idx, {0, 0, 0});
+    return;
+  }
+
   const Grid grid = hField.system.grid;
   const real3 cellsize = hField.system.cellsize;
-
-  if (!grid.cellInGrid(idx))
-    return;
 
   if (msat.valueAt(idx) == 0) {
     hField.setVectorInCell(idx, {0, 0, 0});
@@ -52,7 +56,7 @@ __global__ void k_interfacialDmiField(CuField hField,
     const int3 coo_ = mastergrid.wrap(coo + relcoo);
     const int idx_ = grid.coord2index(coo_);
 
-    if (grid.cellInGrid(coo_) && msat.valueAt(idx_) != 0) {
+    if (hField.cellInGeometry(coo_) && msat.valueAt(idx_) != 0) {
       // unit vector from cell to neighbor
       real3 dr{(real)relcoo.x, (real)relcoo.y, (real)relcoo.z};
 
