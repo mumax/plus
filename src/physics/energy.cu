@@ -16,8 +16,12 @@ __global__ void k_energyDensity(CuField edens,
                                 const real prefactor) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!edens.cellInGrid(idx))
+  // When outside the geometry, set to zero and return early
+  if (!edens.cellInGeometry(idx)) {
+    if (edens.cellInGrid(idx))
+      edens.setValueInCell(idx, 0, 0.0);
     return;
+  }
 
   real Ms = msat.valueAt(idx);
   real3 h = hfield.vectorAt(idx);
