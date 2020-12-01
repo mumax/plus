@@ -25,6 +25,13 @@ __global__ void k_thermalNoise(CuField noiseField,
                                real preFactor) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+  // When outside the geometry, set to zero and return early
+  if (!noiseField.cellInGeometry(idx)) {
+    if (noiseField.cellInGrid(idx))
+      noiseField.setVectorInCell(idx, {0, 0, 0});
+    return;
+  }
+
   if (!noiseField.cellInGrid(idx))
     return;
 
