@@ -15,6 +15,8 @@ __global__ void k_maxAbsValue(real* result, CuField f) {
   int tid = threadIdx.x;
   real threadValue = 0.0;
   for (int i = tid; i < ncells; i += BLOCKDIM) {
+    if (!f.cellInGeometry(i))
+      continue;
     for (int c = 0; c < f.ncomp; c++) {
       real value = abs(f.valueAt(i, c));
       threadValue = value > threadValue ? value : threadValue;
@@ -55,6 +57,8 @@ __global__ void k_maxVecNorm(real* result, CuField f) {
   int tid = threadIdx.x;
   real threadValue = 0.0;
   for (int i = tid; i < ncells; i += BLOCKDIM) {
+    if (!f.cellInGeometry(i))
+      continue;
     real3 cellVec = f.vectorAt(i);
     real cellNorm = norm(cellVec);
     if (cellNorm > threadValue) {
@@ -101,8 +105,11 @@ __global__ void k_average(real* result, CuField f, int comp) {
 
   // Reduce to a block
   real threadValue = 0.0;
-  for (int i = tid; i < ncells; i += BLOCKDIM)
+  for (int i = tid; i < ncells; i += BLOCKDIM) {
+    if (!f.cellInGeometry(i))
+      continue;
     threadValue += f.valueAt(i, comp);
+  }
   sdata[tid] = threadValue;
   __syncthreads();
 
@@ -149,6 +156,9 @@ __global__ void k_dotSum(real* result, CuField f, CuField g) {
 
   real threadValue = 0.0;
   for (int i = tid; i < ncells; i += BLOCKDIM) {
+    if (!f.cellInGeometry(i))
+      continue;
+
     threadValue += dot(f.vectorAt(i), g.vectorAt(i));
   }
   sdata[tid] = threadValue;
@@ -168,8 +178,14 @@ __global__ void k_dotSum(real* result, CuField f, CuField g) {
 }
 
 real dotSum(const Field& f, const Field& g) {
+  if (f.system() != g.system())
+    throw std::invalid_argument(
+        "Can not take the dot sum of the two fields because they are not "
+        "defined on the same system.");
+
   GpuBuffer<real> d_result(1);
   cudaLaunchReductionKernel(k_dotSum, d_result.get(), f.cu(), g.cu());
+
   // copy the result to the host and return
   real result;
   checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(real),

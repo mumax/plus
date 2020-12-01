@@ -18,6 +18,7 @@ Field::Field() : system_(nullptr), ncomp_(0) {}
 Field::Field(std::shared_ptr<const System> system, int nComponents)
     : system_(system), ncomp_(nComponents) {
   allocate();
+  setZeroOutsideGeometry();
 }
 
 Field::Field(std::shared_ptr<const System> system, int nComponents, real value)
@@ -111,13 +112,19 @@ void Field::setData(real* buffer) {
                                    grid().ncells() * sizeof(real),
                                    cudaMemcpyHostToDevice, getCudaStream()));
   }
+  setZeroOutsideGeometry();
 }
 
 __global__ void k_setComponent(CuField f, real value, int comp) {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
   if (!f.cellInGrid(idx))
     return;
-  f.setValueInCell(idx, comp, value);
+
+  if (f.cellInGeometry(idx)) {
+    f.setValueInCell(idx, comp, value);
+  } else {
+    f.setValueInCell(idx, comp, 0.0);
+  }
 }
 
 void Field::setUniformComponent(int comp, real value) {
@@ -127,6 +134,19 @@ void Field::setUniformComponent(int comp, real value) {
 void Field::makeZero() {
   for (int comp = 0; comp < ncomp_; comp++)
     setUniformComponent(comp, 0.0);
+}
+
+__global__ void k_setZeroOutsideGeometry(CuField f) {
+  int idx = blockDim.x * blockIdx.x + threadIdx.x;
+  if (f.cellInGrid(idx) && !f.cellInGeometry(idx)) {
+    for (int comp = 0; comp < f.ncomp; comp++)
+      f.setValueInCell(idx, comp, 0.0);
+  }
+}
+
+void Field::setZeroOutsideGeometry() {
+  if (system_->geometry().size() > 0)
+    cudaLaunch(grid().ncells(), k_setZeroOutsideGeometry, cu());
 }
 
 Field& Field::operator+=(const Field& other) {

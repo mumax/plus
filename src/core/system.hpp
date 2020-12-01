@@ -58,11 +58,13 @@ struct CuSystem {
   bool const* geometry = nullptr;
 
   __device__ bool inGeometry(int3 coo) const;
+  __device__ bool inGeometry(int idx) const;
 };
 
 __device__ inline bool CuSystem::inGeometry(int3 coo) const {
-  if (grid.cellInGrid(coo))
-    if (!geometry || geometry[grid.coord2index(coo)])
-      return true;
-  return false;
+  return grid.cellInGrid(coo) && (!geometry || geometry[grid.coord2index(coo)]);
+}
+
+__device__ inline bool CuSystem::inGeometry(int idx) const {
+  return grid.cellInGrid(idx) && (!geometry || geometry[idx]);
 }

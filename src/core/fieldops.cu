@@ -11,7 +11,7 @@ __global__ void k_addFields(CuField y,
                             real a2,
                             const CuField x2) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (!y.cellInGrid(idx))
+  if (!y.cellInGeometry(idx))
     return;
   for (int c = -0; c < y.ncomp; c++) {
     real term1 = a1 * x1.valueAt(idx, c);
@@ -74,14 +74,14 @@ __global__ void k_addConstant(CuField y,
                               real value,
                               int comp) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (!y.cellInGrid(idx))
+  if (!y.cellInGeometry(idx))
     return;
   y.setValueInCell(idx, comp, x.valueAt(idx, comp) + value);
 }
 
 __global__ void k_normalize(CuField dst, const CuField src) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (!dst.cellInGrid(idx))
+  if (!dst.cellInGeometry(idx))
     return;
   real norm2 = 0.0;
   for (int c = 0; c < src.ncomp; c++) {
