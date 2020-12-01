@@ -4,7 +4,7 @@
 #include <utility>
 
 #include "cudaerror.hpp"
-#include "gpubuffer.hpp"
+#include "gpumemorypool.hpp"
 
 GpuMemoryPool memoryPool;
 

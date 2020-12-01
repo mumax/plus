@@ -1,188 +1,189 @@
 #pragma once
-#include <map>
+
 #include <vector>
 
 #include "cudaerror.hpp"
 #include "cudastream.hpp"
-
-/**
- * Gpu memory pool.
- *
- * The allocation of large memory blocks on the gpu is an heavy operation.
- * Using a memory pool avoids the need the allocate new memory on the gpu over
- * and over again by recycling the memory blocks.
- *
- * The GpuMemoryPool user is responsible for recycling or freeing the allocated
- * memory after use. If you need a gpu buffer, consider to use a GpuBuffer
- * object which does this kind of memory management for you.
- */
-class GpuMemoryPool {
- public:
-  GpuMemoryPool() = default;
-  GpuMemoryPool(GpuMemoryPool const&) = delete;
-  void operator=(GpuMemoryPool const&) = delete;
-
-  ~GpuMemoryPool();
-
-  /**
-   * Returns a pointer to allocated gpu memory block with the specified size
-   * (in bytes).
-   *
-   * If there is an allocate memoery blcok available in the pool which has the
-   * correct size, then a pointer to this memory be returned and removed from
-   * the pool which avoids the allocation of new memory on the gpu. If there is
-   * no memoery block with the correct size available in the pool, then new gpu
-   * memory will be allocated.
-   *
-   * The caller is responsible to release the memory after use. This should be
-   * done by calling the 'free' or 'recycle' method on the GpuMemoryPool which
-   * is used to allocate the gpu memory.
-   */
-  void* allocate(size_t size);
-
-  /**
-   * Free gpu memory allocated by this memory pool.
-   */
-  void free(void**);
-
-  /**
-   * Recycle gpu memory allocated by this memory pool.
-   * The allocated memory will become available again in the memory pool.
-   */
-  void recycle(void**);
-
-  /**
-   * Prints the number of used and available allocate memory by this memory
-   * pool. This function is useful to detect memory leaks.
-   */
-  void printInfo() const;
-
- private:
-  std::map<size_t, std::vector<void*>> pool_;
-  std::map<void*, size_t> inUse_;
-};
-
-/**
- * The global GpuMemoryPool instance
- */
-extern GpuMemoryPool memoryPool;
+#include "gpumemorypool.hpp"
 
 template <typename T>
 class GpuBuffer {
  public:
-  /**
-   * Constructs a gpu buffer for N objects of type T;
-   */
-  explicit GpuBuffer(size_t N) { allocate(N); }
+  // _______________________________________________________________CONSTRUCTORS
 
-  /**
-   * Constructs an empty gpu buffer.
-   */
-  GpuBuffer() {}
-
-  /**
-   * The GpuBuffer destructor releases the memory back to the memoryPool.
-   */
-  ~GpuBuffer() { recycle(); }
+  GpuBuffer() {}                     /** Empty gpu buffer. */
+  explicit GpuBuffer(size_t N);      /** Gpu buffer for N objects */
+  GpuBuffer(const GpuBuffer& other); /** Copy constructor */
+  GpuBuffer(GpuBuffer&& other);      /** Move constructor */
 
   /**
    * Construct a gpu buffer from a std::vector.
    * The size of the gpu buffer matches the size of the vector.
    * The values are copied from the vector on the host to the gpu.
    */
-  explicit GpuBuffer(const std::vector<T>& other) {
-    allocate(other.size());
-    if (size_ > 0) {
-      checkCudaError(cudaMemcpyAsync(ptr_, &other[0], size_ * sizeof(T),
-                                     cudaMemcpyHostToDevice, getCudaStream()));
-    }
-  }
+  explicit GpuBuffer(const std::vector<T>& other);
+
+  /** Gpubuffer with size N, and copy N values from data pointer. */
+  GpuBuffer(int N, T* data);
+
+  // ________________________________________________________________DESTRUCTION
+
+  /** Destroy and release allocated memory back to the memory pool. */
+  ~GpuBuffer() { recycle(); }
+
+  // ____________________________________________________________________GETTERS
+
+  size_t size() const { return size_; } /** Number of elements in buffer. */
+  T* get() const { return ptr_; }       /** Device ptr of the buffer. */
+  std::vector<T> getData() const;       /** Get copy of data on the host. */
 
   /**
-   * Copy constructor
+   * Copy the data from the gpubuffer to a newly allocated array on the
+   * host. WARNING: This function returns a raw pointer, the user is
+   * responsible to free the memory when done!
    */
-  GpuBuffer(const GpuBuffer& other) {
-    allocate(other.size());
-    if (size_ == 0)
-      return;
-    checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
-                                   cudaMemcpyDeviceToDevice, getCudaStream()));
-  }
+  T* getHostCopy() const;
+
+  // ___________________________________________________________________MODIFIERS
+
+  GpuBuffer<T>& operator=(const GpuBuffer<T>& other); /** Copy assignment */
+  GpuBuffer<T>& operator=(GpuBuffer<T>&& other);      /** Move assignment */
+
+  void recycle(); /** Empty the buffer and releases memory to the pool. */
 
   /**
-   * Move constructor
+   * Resizes the buffer. The buffer content will only be preserved if the new
+   * size matches the old size.
    */
-  GpuBuffer(GpuBuffer&& other) {
-    recycle();
-    ptr_ = other.ptr_;
-    size_ = other.size_;
-    other.ptr_ = nullptr;
-    other.size_ = 0;
-  }
+  void allocate(size_t size);
 
-  /**
-   * Copy assignment
-   */
-  GpuBuffer<T>& operator=(const GpuBuffer<T>& other) {
-    allocate(other.size());
-    if (size_ > 0) {
-      checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
-                                     cudaMemcpyDeviceToDevice,
-                                     getCudaStream()));
-    }
-    return *this;
-  }
-
-  /**
-   * Move assignment
-   */
-  GpuBuffer<T>& operator=(GpuBuffer<T>&& other) {
-    recycle();
-    ptr_ = other.ptr_;
-    size_ = other.size_;
-    other.ptr_ = nullptr;
-    other.size_ = 0;
-    return *this;
-  }
-
-  /**
-   * Resizes the buffer.
-   *
-   * The buffer content will only be preserved if the new size matches the old
-   * size.
-   */
-  void allocate(size_t size) {
-    if (size_ == size)
-      return;
-
-    recycle();
-
-    if (size > 0) {
-      ptr_ = reinterpret_cast<T*>(memoryPool.allocate(size * sizeof(T)));
-    } else {
-      ptr_ = nullptr;
-    }
-
-    size_ = size;
-  }
-
-  /**
-   * Empties the buffer and releases memory back into the pool.
-   */
-  void recycle() {
-    if (ptr_)
-      memoryPool.recycle(reinterpret_cast<void**>(&ptr_));
-    ptr_ = nullptr;
-    size_ = 0;
-  }
-
-  /**
-   * Returns the size (number of elements) of the buffer.
-   */
-  size_t size() const { return size_; }
-  T* get() const { return ptr_; }
-
+  // _________________________________________________________PRIVATE_DATAMEMBERS
  private:
   T* ptr_ = nullptr;
   size_t size_ = 0;
 };
+
+//-------------------------------------------------------------------------------
+// IMPLEMENTATION OF GPUBUFFER METHODS
+//-------------------------------------------------------------------------------
+
+template <class T>
+inline GpuBuffer<T>::GpuBuffer(size_t N) {
+  allocate(N);
+}
+
+template <class T>
+inline GpuBuffer<T>::GpuBuffer(const std::vector<T>& other) {
+  allocate(other.size());
+  if (size_ > 0) {
+    checkCudaError(cudaMemcpyAsync(ptr_, other.data(), size_ * sizeof(T),
+                                   cudaMemcpyHostToDevice, getCudaStream()));
+  }
+}
+
+template <class T>
+inline GpuBuffer<T>::GpuBuffer(int N, T* data) {
+  allocate(N);
+  if (size_ > 0) {
+    checkCudaError(cudaMemcpyAsync(ptr_, data, size_ * sizeof(T),
+                                   cudaMemcpyHostToDevice, getCudaStream()));
+  }
+}
+
+template <class T>
+inline GpuBuffer<T>::GpuBuffer(const GpuBuffer& other) {
+  allocate(other.size());
+  if (size_ == 0)
+    return;
+  checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
+                                 cudaMemcpyDeviceToDevice, getCudaStream()));
+}
+
+template <class T>
+inline GpuBuffer<T>::GpuBuffer(GpuBuffer&& other) {
+  recycle();
+  ptr_ = other.ptr_;
+  size_ = other.size_;
+  other.ptr_ = nullptr;
+  other.size_ = 0;
+}
+
+template <class T>
+inline GpuBuffer<T>& GpuBuffer<T>::operator=(const GpuBuffer<T>& other) {
+  allocate(other.size());
+  if (size_ > 0) {
+    checkCudaError(cudaMemcpyAsync(ptr_, other.ptr_, size_ * sizeof(T),
+                                   cudaMemcpyDeviceToDevice, getCudaStream()));
+  }
+  return *this;
+}
+
+template <class T>
+inline GpuBuffer<T>& GpuBuffer<T>::operator=(GpuBuffer<T>&& other) {
+  recycle();
+  ptr_ = other.ptr_;
+  size_ = other.size_;
+  other.ptr_ = nullptr;
+  other.size_ = 0;
+  return *this;
+}
+
+template <class T>
+inline void GpuBuffer<T>::allocate(size_t size) {
+  if (size_ == size)
+    return;
+
+  recycle();
+
+  if (size > 0) {
+    ptr_ = reinterpret_cast<T*>(memoryPool.allocate(size * sizeof(T)));
+  } else {
+    ptr_ = nullptr;
+  }
+
+  size_ = size;
+}
+
+template <class T>
+inline void GpuBuffer<T>::recycle() {
+  if (ptr_)
+    memoryPool.recycle(reinterpret_cast<void**>(&ptr_));
+  ptr_ = nullptr;
+  size_ = 0;
+}
+
+template <class T>
+inline T* GpuBuffer<T>::getHostCopy() const {
+  T* data = new T[size_];
+  if (size_ > 0) {
+    checkCudaError(cudaMemcpyAsync(data, ptr_, size_ * sizeof(T),
+                                   cudaMemcpyDeviceToHost, getCudaStream()));
+  }
+  return data;
+}
+
+template <class T>
+inline std::vector<T> GpuBuffer<T>::getData() const {
+  std::vector<T> vec(size_);
+  if (size_ > 0) {
+    checkCudaError(cudaMemcpyAsync(vec.data(), ptr_, size_ * sizeof(T),
+                                   cudaMemcpyDeviceToHost, getCudaStream()));
+  }
+  return vec;
+}
+
+// Explicit bool specialization for GpuBuffer<bool>::getData().
+// This specialization is needed because unlike othter element types,
+// std::vector<bool> does not contain a contiguous array of elements. Hence, the
+// boolean array data on the gpu can not directly copied into an
+// std::vector<bool>. We need a temporary bool buffer to copy into.
+template <>
+inline std::vector<bool> GpuBuffer<bool>::getData() const {
+  bool* buf = getHostCopy();
+  std::vector<bool> data(size_);
+  for (int i = 0; i < size_; i++) {
+    data[i] = buf[i];
+  }
+  delete[] buf;
+  return data;
+}
