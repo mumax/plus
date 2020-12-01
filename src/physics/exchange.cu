@@ -27,6 +27,13 @@ __global__ void k_exchangeField(CuField hField,
                                 Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+  // When outside the geometry, set to zero and return early
+  if (!hField.cellInGeometry(idx)) {
+    if (hField.cellInGrid(idx))
+      hField.setVectorInCell(idx, {0, 0, 0});
+    return;
+  }
+
   const Grid grid = mField.system.grid;
 
   if (!grid.cellInGrid(idx))
@@ -48,7 +55,7 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
   for (int sgn : {-1, 1}) {
     const int3 coo_ = mastergrid.wrap(coo + int3{sgn, 0, 0});
-    if (!grid.cellInGrid(coo_))
+    if (!hField.cellInGeometry(coo_))
       continue;
     const int idx_ = grid.coord2index(coo_);
     if (msat.valueAt(idx_) != 0) {
@@ -62,7 +69,7 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
   for (int sgn : {-1, 1}) {
     const int3 coo_ = mastergrid.wrap(coo + int3{0, sgn, 0});
-    if (!grid.cellInGrid(coo_))
+    if (!hField.cellInGeometry(coo_))
       continue;
     const int idx_ = grid.coord2index(coo_);
     if (msat.valueAt(idx_) != 0) {
@@ -77,7 +84,7 @@ __global__ void k_exchangeField(CuField hField,
 #pragma unroll
     for (int sgn : {-1, 1}) {
       const int3 coo_ = mastergrid.wrap(coo + int3{0, 0, sgn});
-      if (!grid.cellInGrid(coo_))
+      if (!hField.cellInGeometry(coo_))
         continue;
       const int idx_ = grid.coord2index(coo_);
       if (msat.valueAt(idx_) != 0) {
@@ -162,10 +169,14 @@ __global__ void k_maxangle(CuField maxAngleField,
                            const CuParameter msat) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  const Grid grid = maxAngleField.system.grid;
-
-  if (!grid.cellInGrid(idx))
+  // When outside the geometry, set to zero and return early
+  if (!maxAngleField.cellInGeometry(idx)) {
+    if (maxAngleField.cellInGrid(idx))
+      maxAngleField.setVectorInCell(idx, {0, 0, 0});
     return;
+  }
+
+  const Grid grid = maxAngleField.system.grid;
 
   if (msat.valueAt(idx) == 0) {
     maxAngleField.setValueInCell(idx, 0, 0);
@@ -186,7 +197,7 @@ __global__ void k_maxangle(CuField maxAngleField,
   for (int3 relcoo : neighborRelativeCoordinates) {
     const int3 coo_ = coo + relcoo;
     const int idx_ = grid.coord2index(coo_);
-    if (grid.cellInGrid(coo_) && msat.valueAt(idx_) != 0) {
+    if (mField.cellInGeometry(coo_) && msat.valueAt(idx_) != 0) {
       real3 m_ = mField.vectorAt(idx_);
       real a_ = aex.valueAt(idx_);
       real angle = m == m_ ? 0 : acos(dot(m, m_));
