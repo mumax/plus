@@ -57,7 +57,7 @@ __global__ void k_pad(CuField out, CuField in, CuParameter msat) {
   int3 inCoo = outCoo - outgrid.origin() + ingrid.origin();
   int inIdx = ingrid.coord2index(inCoo);
 
-  if (ingrid.cellInGrid(inCoo)) {
+  if (in.cellInGeometry(inCoo)) {
     real Ms = msat.valueAt(inIdx);
     for (int c = 0; c < out.ncomp; c++)
       out.setValueInCell(outIdx, c, Ms * in.valueAt(inIdx, c));
@@ -70,11 +70,16 @@ __global__ void k_pad(CuField out, CuField in, CuParameter msat) {
 __global__ void k_unpad(CuField out, CuField in) {
   int outIdx = blockIdx.x * blockDim.x + threadIdx.x;
 
+  // When outside the geometry of destiny field, set to zero and return
+  // early
+  if (!out.cellInGeometry(outIdx)) {
+    if (out.cellInGrid(outIdx))
+      out.setVectorInCell(outIdx, {0, 0, 0});
+    return;
+  }
+
   Grid outgrid = out.system.grid;
   Grid ingrid = in.system.grid;
-
-  if (outIdx >= outgrid.ncells())
-    return;
 
   // Output coordinate relative to the origin of the output grid
   int3 outRelCoo = outgrid.index2coord(outIdx) - outgrid.origin();
