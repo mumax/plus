@@ -18,8 +18,12 @@ __global__ void k_anisotropyField(CuField hField,
                                   const CuParameter msat) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!hField.cellInGrid(idx))
+  // When outside the geometry, set to zero and return early
+  if (!hField.cellInGeometry(idx)) {
+    if (hField.cellInGrid(idx))
+      hField.setVectorInCell(idx, {0, 0, 0});
     return;
+  }
 
   if (msat.valueAt(idx) == 0) {
     hField.setVectorInCell(idx, {0, 0, 0});
@@ -64,8 +68,12 @@ __global__ void k_anisotropyEnergyDensity(CuField edens,
                                           const CuParameter msat) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!edens.cellInGrid(idx))
+  // When outside the geometry, set to zero and return early
+  if (!edens.cellInGeometry(idx)) {
+    if (edens.cellInGrid(idx))
+      edens.setValueInCell(idx, 0, 0.0);
     return;
+  }
 
   if (msat.valueAt(idx) == 0.0) {
     edens.setValueInCell(idx, 0, 0.0);
