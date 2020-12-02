@@ -36,6 +36,10 @@ def hsl_to_rgb(H, S, L):
     else:
         rgb = _np.array([0, 0, 0])
 
+    # clip rgb values to be in [0,1]
+    for i in range(3):
+        rgb[i] = min(max(rgb[i], 0.0), 1.0)
+
     return rgb
 
 
