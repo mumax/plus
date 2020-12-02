@@ -4,10 +4,10 @@ import matplotlib.pyplot as _plt
 import numpy as _np
 
 
-def vectorfield_to_rgb(field):
+def vectorfield_to_rgba(field):
     """Map field modulus values to RGB."""
     field /= _np.max(_np.linalg.norm(field, axis=0))
-    rgb = _np.zeros((*(field[0].shape), 3))
+    rgba = _np.zeros((*(field[0].shape), 4))
     for ix in range(field.shape[3]):
         for iy in range(field.shape[2]):
             for iz in range(field.shape[1]):
@@ -43,15 +43,25 @@ def vectorfield_to_rgb(field):
                     rgbcell += _np.array([C, 0, X])
                 else:
                     rgbcell = _np.array([0, 0, 0])
-                rgb[iz, iy, ix, :] = rgbcell
-    return rgb
+                rgba[iz, iy, ix, :] = [*rgbcell, 1]
+    return rgba
 
 
 def show_field(quantity, layer=0):
     """Plot a mumax5.FieldQuantity with 3 components using the mumax3 colorscheme."""
-    _plt.title(quantity.name)
-    rgb = vectorfield_to_rgb(quantity.eval())
-    _plt.imshow(rgb[layer])
+    fig = _plt.figure()
+
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_title(quantity.name)
+
+    rgb = vectorfield_to_rgba(quantity.eval())
+
+    # make cells outside the geometry transparant by setting the alpha channel to 0
+    rgb[:, :, :, 3] = quantity._impl.system.geometry
+
+    ax.set_facecolor("gray")
+    ax.imshow(rgb[layer])
+
     _plt.show()
 
 
