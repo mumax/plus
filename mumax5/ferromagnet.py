@@ -67,17 +67,17 @@ class Ferromagnet:
     @property
     def grid(self):
         """Return the underlying grid of the ferromagnet."""
-        return Grid._from_impl(self._impl.grid)
+        return Grid._from_impl(self._impl.system.grid)
 
     @property
     def cellsize(self):
         """Dimensions of the cell."""
-        return self._impl.cellsize
+        return self._impl.system.cellsize
 
     @property
     def geometry(self):
         """Geometry of the ferromagnet."""
-        return self._impl.geometry
+        return self._impl.system.geometry
 
     @property
     def magnetization(self):
