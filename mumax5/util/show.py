@@ -98,7 +98,25 @@ def show_field(quantity, layer=0):
 
 def show_layer(quantity, component=0, layer=0):
     """Visualize a single component of a mumax5.FieldQuantity."""
-    f = quantity.eval()
-    _plt.title(quantity.name)
-    _plt.imshow(f[component, layer])
+    if not isinstance(quantity, _m5.FieldQuantity):
+        raise TypeError("The first argument should be a FieldQuantity")
+
+    field = quantity.eval()
+    field = field[component, layer]  # select component and layer
+
+    geometry = quantity._impl.system.geometry[layer]
+    field = _np.ma.array(field, mask=_np.invert(geometry))
+
+    cmap = _plt.get_cmap("viridis")
+    cmap.set_bad(alpha=0.0)  # This will affect cells outside the mask (i.e. geometry)
+
+    fig = _plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_facecolor("gray")
+    ax.set_title(quantity.name + ", component=%d" % component)
+    ax.imshow(
+        field, cmap=cmap, origin="lower", extent=_quantity_img_xy_extent(quantity)
+    )
+    ax.set_xlabel("$x$ (m)")
+    ax.set_ylabel("$y$ (m)")
     _plt.show()
