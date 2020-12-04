@@ -59,6 +59,10 @@ class Ferromagnet:
 
         self._impl = world._impl.add_ferromagnet(grid._impl, geometry_array, name)
 
+    def __repr__(self):
+        """Return Ferromagnet string representation."""
+        return f"Ferromagnet(grid={self.grid}, name='{self.name}')"
+
     @property
     def name(self):
         """Name of the ferromagnet."""
@@ -96,6 +100,18 @@ class Ferromagnet:
     @enable_demag.setter
     def enable_demag(self, value):
         self._impl.enable_demag = value
+
+    @property
+    def bias_magnetic_field(self):
+        """Uniform bias magnetic field which will affect a ferromagnet.
+
+        The value should be specifed in Teslas.
+        """
+        return Parameter(self._impl.bias_magnetic_field)
+
+    @bias_magnetic_field.setter
+    def bias_magnetic_field(self, value):
+        self._impl.bias_magnetic_field.set(value)
 
     def minimize(self):
         """Minimize the total energy."""

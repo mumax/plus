@@ -18,6 +18,10 @@ class World:
     def __init__(self, cellsize):
         self._impl = _cpp.World(cellsize)
 
+    def __repr__(self):
+        """Return World string representation."""
+        return f"World(cellsize={self.cellsize})"
+
     @property
     def timesolver(self):
         """Time solver for this world."""

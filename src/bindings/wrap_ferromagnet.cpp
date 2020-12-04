@@ -31,6 +31,8 @@ void wrap_ferromagnet(py::module& m) {
       .def_property_readonly("magnetization", &Ferromagnet::magnetization)
 
       .def_readwrite("enable_demag", &Ferromagnet::enableDemag)
+      .def_readwrite("bias_magnetic_field", &Ferromagnet::biasMagneticField,
+                     "uniform external magnetic field")
 
       .def_readonly("msat", &Ferromagnet::msat)
       .def_readonly("alpha", &Ferromagnet::alpha)

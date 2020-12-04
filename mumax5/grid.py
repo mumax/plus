@@ -17,6 +17,10 @@ class Grid:
     def __init__(self, size, origin=(0, 0, 0)):
         self._impl = _cpp.Grid(size, origin)
 
+    def __repr__(self):
+        """Return Grid string representation."""
+        return f"Grid(size={self.size}, origin={self.origin})"
+
     @classmethod
     def _from_impl(cls, impl):
         grid = cls.__new__(cls)

@@ -29,6 +29,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world,
       pol(system_, 0.0),
       anisU(system_, {0, 0, 0}),
       jcur(system_, {0, 0, 0}),
+      biasMagneticField(system_, {0, 0, 0}),
       enableDemag(true) {
   {
     // TODO: this can be done much more efficient somewhere else

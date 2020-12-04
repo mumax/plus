@@ -61,6 +61,10 @@ class Ferromagnet {
   bool enableDemag;
   VectorParameter anisU;
   VectorParameter jcur;
+  /** Uniform bias magnetic field which will affect a ferromagnet.
+   * Measured in Teslas.
+  */
+  VectorParameter biasMagneticField;
   Parameter msat;
   Parameter aex;
   Parameter ku1;

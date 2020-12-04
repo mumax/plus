@@ -28,10 +28,14 @@ Field evalExternalField(const Ferromagnet* magnet) {
   }
 
   const MumaxWorld* world = static_cast<const MumaxWorld*>(magnet->world());
-  real3 b_ext = world->biasMagneticField;
-  h.setUniformComponent(0, b_ext.x);
-  h.setUniformComponent(1, b_ext.y);
-  h.setUniformComponent(2, b_ext.z);
+  real3 wB_bias = world->biasMagneticField;
+  auto mB_bias = magnet->biasMagneticField;
+
+  h.setUniformComponent(0, wB_bias.x);
+  h.setUniformComponent(1, wB_bias.y);
+  h.setUniformComponent(2, wB_bias.z);
+
+  mB_bias.addToField(h);
 
   auto strayFields = magnet->getStrayFields();
   for (auto strayField : strayFields) {

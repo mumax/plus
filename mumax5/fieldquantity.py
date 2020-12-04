@@ -14,6 +14,13 @@ class FieldQuantity:
     def __init__(self, impl):
         self._impl = impl
 
+    def __repr__(self):
+        """Return FieldQuantity string representation."""
+        return (
+            f"FieldQuantity(grid={self.grid}, name='{self.name}', "
+            f"ncomp={self.ncomp}, unit={self.unit})"
+        )
+
     @property
     def name(self):
         """Return isntance's name."""
