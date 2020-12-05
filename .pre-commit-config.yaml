@@ -32,3 +32,10 @@ repos:
             "--filter=-legal/copyright",
             "--linelength=88"
             ]
+    -   id: clang-format
+        name: clang-format
+        description: Run `clang-format` against C/C++ header and source files
+        language: python
+        files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
+        entry: clang-format
+        args: ["-i", "-style=Chromium"]

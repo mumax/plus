@@ -16,6 +16,9 @@ dependencies:
   - flake8-docstrings
   - isort # check that imports are in the right order
   - pre-commit
+  - pip
+  - pip:
+      - clang-format
 
   # optional
   - ipython
