@@ -5,7 +5,7 @@
 
 class TimeSolver;
 class Field;
-class RungeKuttaStageExecutor; // declared and defined in rungakutta.cpp
+class RungeKuttaStageExecutor;  // declared and defined in rungakutta.cpp
 class Variable;
 
 class RungeKuttaStepper : public Stepper {

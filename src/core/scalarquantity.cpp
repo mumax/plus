@@ -1,4 +1,4 @@
-#include"scalarquantity.hpp"
+#include "scalarquantity.hpp"
 
 ScalarQuantity::~ScalarQuantity() {}
 

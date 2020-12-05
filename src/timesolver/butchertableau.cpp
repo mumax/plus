@@ -1,5 +1,7 @@
 #include "butchertableau.hpp"
+
 #include <math.h>
+
 #include <exception>
 
 ButcherTableau::ButcherTableau(std::vector<real> nodes,
