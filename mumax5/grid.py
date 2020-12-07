@@ -15,6 +15,12 @@ class Grid:
     """
 
     def __init__(self, size, origin=(0, 0, 0)):
+        if len(size) != 3:
+            raise ValueError("'size' should have three dimensions.")
+
+        if len(origin) != 3:
+            raise ValueError("'origin' should have three dimensions.")
+
         self._impl = _cpp.Grid(size, origin)
 
     def __repr__(self):

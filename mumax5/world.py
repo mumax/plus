@@ -16,6 +16,9 @@ class World:
     """
 
     def __init__(self, cellsize):
+        if len(cellsize) != 3:
+            raise ValueError("'cellsize' should have three dimensions.")
+
         self._impl = _cpp.World(cellsize)
 
     def __repr__(self):
