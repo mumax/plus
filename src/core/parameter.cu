@@ -52,9 +52,7 @@ Field Parameter::eval() const {
 }
 
 CuParameter Parameter::cu() const {
-  if (isUniform())
-    return CuParameter(grid(), uniformValue_);
-  return CuParameter(grid(), field_->devptr(0));
+  return CuParameter(this);
 }
 
 VectorParameter::VectorParameter(std::shared_ptr<const System> system,
@@ -105,8 +103,5 @@ Field VectorParameter::eval() const {
 }
 
 CuVectorParameter VectorParameter::cu() const {
-  if (isUniform())
-    return CuVectorParameter(grid(), uniformValue_);
-  return CuVectorParameter{grid(), field_->devptr(0), field_->devptr(1),
-                           field_->devptr(2)};
+  return CuVectorParameter(this);
 }

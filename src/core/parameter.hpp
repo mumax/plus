@@ -30,26 +30,33 @@ class Parameter : public FieldQuantity {
   std::shared_ptr<const System> system_;
   real uniformValue_;
   Field* field_;
+
+  friend CuParameter;
 };
 
 class CuParameter {
  public:
-  const Grid grid;
+  const CuSystem system;
   const real uniformValue;
 
  private:
   real* valuesPtr;
 
  public:
-  CuParameter(Grid grid, real uniformValue)
-      : grid(grid), uniformValue(uniformValue), valuesPtr(nullptr) {}
-  CuParameter(Grid grid, real* valuesPtr)
-      : grid(grid), uniformValue(0), valuesPtr(valuesPtr) {}
-
+  explicit CuParameter(const Parameter* p);
   __device__ bool isUniform() const;
   __device__ real valueAt(int idx) const;
   __device__ real valueAt(int3 coo) const;
 };
+
+inline CuParameter::CuParameter(const Parameter* p)
+    : system(p->system()->cu()),
+      uniformValue(p->uniformValue_),
+      valuesPtr(nullptr) {
+  if (p->field_) {
+    valuesPtr = p->field_->devptr(0);
+  }
+}
 
 __device__ inline bool CuParameter::isUniform() const {
   return !valuesPtr;
@@ -62,7 +69,7 @@ __device__ inline real CuParameter::valueAt(int idx) const {
 }
 
 __device__ inline real CuParameter::valueAt(int3 coo) const {
-  return valueAt(grid.coord2index(coo));
+  return valueAt(system.grid.coord2index(coo));
 }
 
 class CuVectorParameter;
@@ -88,11 +95,13 @@ class VectorParameter : public FieldQuantity {
   std::shared_ptr<const System> system_;
   real3 uniformValue_;
   Field* field_;
+
+  friend CuVectorParameter;
 };
 
 struct CuVectorParameter {
  public:
-  const Grid grid;
+  const CuSystem system;
   const real3 uniformValue;
 
  private:
@@ -101,30 +110,24 @@ struct CuVectorParameter {
   real* zValuesPtr;
 
  public:
-  CuVectorParameter(Grid grid, real3 uniformValue);
-  CuVectorParameter(Grid grid, real* xPtr, real* yPtr, real* zPtr);
-
+  explicit CuVectorParameter(const VectorParameter*);
   __device__ bool isUniform() const;
   __device__ real3 vectorAt(int idx) const;
   __device__ real3 vectorAt(int3 coo) const;
 };
 
-inline CuVectorParameter::CuVectorParameter(Grid grid, real3 uniformValue)
-    : grid(grid),
-      uniformValue(uniformValue),
+inline CuVectorParameter::CuVectorParameter(const VectorParameter* p)
+    : system(p->system()->cu()),
+      uniformValue(p->uniformValue_),
       xValuesPtr(nullptr),
       yValuesPtr(nullptr),
-      zValuesPtr(nullptr) {}
-
-inline CuVectorParameter::CuVectorParameter(Grid grid,
-                                            real* xPtr,
-                                            real* yPtr,
-                                            real* zPtr)
-    : grid(grid),
-      uniformValue({0, 0, 0}),
-      xValuesPtr(xPtr),
-      yValuesPtr(yPtr),
-      zValuesPtr(zPtr) {}
+      zValuesPtr(nullptr) {
+  if (p->field_) {
+    xValuesPtr = p->field_->devptr(0);
+    yValuesPtr = p->field_->devptr(1);
+    zValuesPtr = p->field_->devptr(2);
+  }
+}
 
 __device__ inline bool CuVectorParameter::isUniform() const {
   return !xValuesPtr;
@@ -137,5 +140,5 @@ __device__ inline real3 CuVectorParameter::vectorAt(int idx) const {
 }
 
 __device__ inline real3 CuVectorParameter::vectorAt(int3 coo) const {
-  return vectorAt(grid.coord2index(coo));
+  return vectorAt(system.grid.coord2index(coo));
 }
