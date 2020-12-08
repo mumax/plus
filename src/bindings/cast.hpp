@@ -3,6 +3,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <tuple>
+
 #include "datatypes.hpp"
 
 namespace pybind11 {
@@ -11,7 +13,7 @@ namespace detail {
 /** Cast int3 to tuple and vice versa. */
 template <>
 struct type_caster<int3> {
-  typedef std::array<int, 3> i3;
+  typedef std::tuple<int, int, int> i3;
 
  public:
   /**
@@ -31,8 +33,9 @@ struct type_caster<int3> {
       return false;
     }
 
-    auto arr = (i3)i3_caster;
-    value = {arr[0], arr[1], arr[2]};
+    auto tuple = static_cast<i3>(i3_caster);
+    auto [x, y, z] = tuple;
+    value = {x, y, z};
 
     return true;
   }
@@ -45,25 +48,9 @@ struct type_caster<int3> {
    * ignored by implicit casters.
    */
   static handle cast(int3 src, return_value_policy policy, handle parent) {
-    size_t size = 3;
-    tuple out(size);
+    auto tuple = std::make_tuple(src.x, src.y, src.z);
 
-    auto out_x = reinterpret_steal<object>(PyLong_FromLong(src.x));
-    auto out_y = reinterpret_steal<object>(PyLong_FromLong(src.y));
-    auto out_z = reinterpret_steal<object>(PyLong_FromLong(src.z));
-
-    if (!out_x || !out_y || !out_z) {
-      return handle();
-    }
-
-    PyTuple_SET_ITEM(out.ptr(), 0,
-                     out_x.release().ptr());  // steals a reference
-    PyTuple_SET_ITEM(out.ptr(), 1,
-                     out_y.release().ptr());  // steals a reference
-    PyTuple_SET_ITEM(out.ptr(), 2,
-                     out_z.release().ptr());  // steals a reference
-
-    return out.release();
+    return type_caster<i3>::cast(tuple, policy, parent);
   }
 
  private:
@@ -73,7 +60,7 @@ struct type_caster<int3> {
 /** Cast real3 to tuple and vice versa. */
 template <>
 struct type_caster<real3> {
-  typedef std::array<real, 3> r3;
+  typedef std::tuple<real, real, real> r3;
 
  public:
   /**
@@ -93,8 +80,9 @@ struct type_caster<real3> {
       return false;
     }
 
-    auto arr = (r3)r3_caster;
-    value = {arr[0], arr[1], arr[2]};
+    auto tuple = static_cast<r3>(r3_caster);
+    auto [x, y, z] = tuple;
+    value = {x, y, z};
 
     return true;
   }
@@ -107,25 +95,9 @@ struct type_caster<real3> {
    * ignored by implicit casters.
    */
   static handle cast(real3 src, return_value_policy policy, handle parent) {
-    size_t size = 3;
-    tuple out(size);
+    auto tuple = std::make_tuple(src.x, src.y, src.z);
 
-    auto out_x = reinterpret_steal<object>(PyFloat_FromDouble(src.x));
-    auto out_y = reinterpret_steal<object>(PyFloat_FromDouble(src.y));
-    auto out_z = reinterpret_steal<object>(PyFloat_FromDouble(src.z));
-
-    if (!out_x || !out_y || !out_z) {
-      return handle();
-    }
-
-    PyTuple_SET_ITEM(out.ptr(), 0,
-                     out_x.release().ptr());  // steals a reference
-    PyTuple_SET_ITEM(out.ptr(), 1,
-                     out_y.release().ptr());  // steals a reference
-    PyTuple_SET_ITEM(out.ptr(), 2,
-                     out_z.release().ptr());  // steals a reference
-
-    return out.release();
+    return type_caster<r3>::cast(tuple, policy, parent);
   }
 
  private:
