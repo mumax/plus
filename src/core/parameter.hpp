@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include "datatypes.hpp"
@@ -12,11 +13,15 @@ class System;
 
 class Parameter : public FieldQuantity {
  public:
+  /** Declare a short name for a time-dependent function */
+  typedef std::function<real(real)> time_function;
+
   explicit Parameter(std::shared_ptr<const System> system, real value = 0.0);
   ~Parameter();
 
   void set(real value);
   void set(const Field& values);
+  void addTimeDependentTerm(const time_function& term);
 
   bool isUniform() const;
   bool assuredZero() const;
@@ -28,6 +33,8 @@ class Parameter : public FieldQuantity {
 
  private:
   std::shared_ptr<const System> system_;
+  /** List of all time dependent terms */
+  std::vector<time_function> time_dep_terms;
   real uniformValue_;
   Field* field_;
 

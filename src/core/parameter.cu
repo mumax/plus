@@ -25,6 +25,10 @@ void Parameter::set(const Field& values) {
   field_ = new Field(values);
 }
 
+void Parameter::addTimeTerm(const time_function& term) {
+  time_dep_terms.push_back(term);
+}
+
 bool Parameter::isUniform() const {
   return !field_;
 }
