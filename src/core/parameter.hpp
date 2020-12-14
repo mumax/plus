@@ -21,14 +21,20 @@ class Parameter : public FieldQuantity {
 
   void set(real value);
   void set(const Field& values);
+  // value + term(t)
   void addTimeDependentTerm(const time_function& term);
+  // value/values + term(t) * values
+  void addTimeDependentTerm(const time_function& term, const Field& values);
+  // add remove all time terms
 
   bool isUniform() const;
   bool assuredZero() const;
   int ncomp() const;
   std::shared_ptr<const System> system() const;
+  /** Evaluate parameter on its field. check parent */
   Field eval() const;
 
+  /** Send parameter data to the device. */
   CuParameter cu() const;
 
  private:
