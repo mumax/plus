@@ -28,7 +28,7 @@ class World:
     @property
     def timesolver(self):
         """Time solver for this world."""
-        return TimeSolver._from_impl(self._impl.timesolver)
+        return TimeSolver(self._impl.timesolver)
 
     def get_ferromagnet(self, name):
         """Get a ferromagnet by its name."""

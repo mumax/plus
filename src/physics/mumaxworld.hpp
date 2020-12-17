@@ -44,12 +44,9 @@ class MumaxWorld : public World {
   const std::map<std::string, std::shared_ptr<Ferromagnet>>& ferromagnets()
       const;
 
-  TimeSolver* timesolver();
-
  private:
   void resetTimeSolverEquations();
 
  private:
   std::map<std::string, std::unique_ptr<Ferromagnet>> ferromagnets_;
-  std::unique_ptr<TimeSolver> timesolver_;
 };

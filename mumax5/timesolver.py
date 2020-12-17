@@ -1,7 +1,5 @@
 """Classes for solving differential equations in the time domain."""
 
-import _mumax5cpp as _cpp
-
 
 class TimeSolverOutput:
     """Collect values of a list of quantities on specified timepoints.
@@ -30,27 +28,16 @@ class TimeSolverOutput:
 
 
 class TimeSolver:
-    """Solve a set of differential equations in the time domain.
+    """Evolve the world in time.
 
-    Parameters
-    ----------
-    variable : mumax5.Variable
-        Independent variable.
-    rhs : mumax5.FieldQuantity
-        The right-hand side of a differential equation.
+    Each world has already its own TimeSolver. This TimeSolver can be accessed through
+    the world.timesolver property.
+
+    TimeSolvers should not be initialized by the end user.
     """
 
-    def __init__(self, variable, rhs, noise=None):
-        if noise:
-            self._impl = _cpp.TimeSolver(variable._impl, rhs._impl, noise._impl)
-        else:
-            self._impl = _cpp.TimeSolver(variable._impl, rhs._impl)
-
-    @classmethod
-    def _from_impl(cls, impl):
-        solver = cls.__new__(cls)
-        solver._impl = impl
-        return solver
+    def __init__(self, impl):
+        self._impl = impl
 
     def _assure_sensible_timestep(self):
         """Assure a sensible timestep.
