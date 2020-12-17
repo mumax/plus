@@ -8,6 +8,7 @@
 #include "fieldops.hpp"
 #include "reduce.hpp"
 #include "system.hpp"
+#include "world.hpp"
 
 Grid FieldQuantity::grid() const {
   return system()->grid();
@@ -25,4 +26,11 @@ void FieldQuantity::addToField(Field& f) const {
 
 std::vector<real> FieldQuantity::average() const {
   return fieldAverage(eval());
+}
+
+const World* FieldQuantity::world() const {
+  const System* sys = system().get();
+  if (sys)
+    return sys->world();
+  return nullptr;
 }
