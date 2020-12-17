@@ -18,6 +18,9 @@ class World {
   /** Destroy the world. */
   ~World();
 
+  /** Return the current time of the World */
+  real time() const;
+
   /** Return the cell size dimensions. */
   real3 cellsize() const;
 

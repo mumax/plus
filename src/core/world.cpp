@@ -17,6 +17,10 @@ World::World(real3 cellsize, Grid mastergrid)
 
 World::~World() {}
 
+real World::time() const {
+  return timesolver_->time();
+}
+
 real3 World::cellsize() const {
   return cellsize_;
 }
