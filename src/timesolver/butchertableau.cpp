@@ -45,15 +45,15 @@ bool ButcherTableau::isConsistent() const {
 
 ButcherTableau constructTableau(RKmethod method) {
   switch (method) {
-    case HEUN:
+    case RKmethod::HEUN:
       return constructHeunTableau();
-    case BOGACKISHAMPINE:
+    case RKmethod::BOGACKI_SHAMPINE:
       return constructBogackiShampineTableau();
-    case CASHKARP:
+    case RKmethod::CASH_KARP:
       return constructCashKarpTableau();
-    case FEHLBERG:
+    case RKmethod::FEHLBERG:
       return constructFehlbergTableau();
-    case DORMANDPRINCE:
+    case RKmethod::DORMAND_PRINCE:
       return constructDormandPrinceTableau();
     default:  // TODO: handle this better
       std::cerr << "Method is not implemented, Dormand Prince method is "

@@ -2,6 +2,7 @@
 
 #include "datatypes.hpp"
 #include "field.hpp"
+#include "fieldops.hpp"
 #include "parameter.hpp"
 #include "system.hpp"
 
@@ -25,8 +26,16 @@ void Parameter::set(const Field& values) {
   field_ = new Field(values);
 }
 
-void Parameter::addTimeTerm(const time_function& term) {
-  time_dep_terms.push_back(term);
+void Parameter::addTimeDependentTerm(const time_function& term) {
+    time_dep_terms.emplace_back(term, nullptr);
+}
+
+void Parameter::addTimeDependentTerm(const time_function& term, const Field& mask) {
+    time_dep_terms.emplace_back(term, std::make_unique<Field>(mask));
+}
+
+void Parameter::removeAllTimeDependentTerms() {
+    time_dep_terms.clear();
 }
 
 bool Parameter::isUniform() const {
@@ -45,13 +54,41 @@ std::shared_ptr<const System> Parameter::system() const {
   return system_;
 }
 
+Field Parameter::evalTimeDependentTerms(real t) {
+    Field p(system_, ncomp());
+    p.setUniformComponent(0, 0);
+
+    if (time_dep_terms.size() != 0) {
+        for (auto& [func, mask] : time_dep_terms) {
+            if (mask) {
+                p += func(t) * (*mask);
+            }
+            else {
+                Field f(system_, ncomp());
+                f.setUniformComponent(0, func(t));
+                p += f;
+            }
+        }
+    }
+
+    return p;
+}
+
 Field Parameter::eval() const {
+    // set time value here
+    auto t = 0;
   Field p(system_, ncomp());
+  Field f = evalTimeDependentTerms(t);
+
   if (field_) {
-    p = *field_;
-  } else {
-    p.setUniformComponent(0, uniformValue_);
+      p = *field_;
   }
+  else {
+      p.setUniformComponent(0, uniformValue_);
+  }
+
+  p += f;
+
   return p;
 }
 

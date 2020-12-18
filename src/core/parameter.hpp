@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 
 #include "datatypes.hpp"
 #include "fieldquantity.hpp"
@@ -21,17 +22,34 @@ class Parameter : public FieldQuantity {
 
   void set(real value);
   void set(const Field& values);
-  // value + term(t)
+  /** Add time-dependent function that is the same for every grid cell.
+  * 
+  * Parameter values will be evaluated as:
+  * a) uniform_value + term(t)
+  * b) cell_value + term(t)
+  * 
+  * @param term time-dependent function.
+  */
   void addTimeDependentTerm(const time_function& term);
-  // value/values + term(t) * values
-  void addTimeDependentTerm(const time_function& term, const Field& values);
-  // add remove all time terms
+  /** Add time-dependent function that is the same for every grid cell.
+  * 
+  * Parameter values will be evaluated as:
+  * a) uniform_value + term(t) * mask
+  * b) cell_value + term(t) * cell_mask_value
+  *
+  * @param term time-dependent function.
+  * @param mask define how the magnitude of the time-dependent function should
+  *             depend on cell coordinates. The input value will be copied.
+  */
+  void addTimeDependentTerm(const time_function& term, const Field& mask);
+   /** Remove all time-dependet terms and their masks. */
+  void removeAllTimeDependentTerms();
 
   bool isUniform() const;
   bool assuredZero() const;
   int ncomp() const;
   std::shared_ptr<const System> system() const;
-  /** Evaluate parameter on its field. check parent */
+  /** Evaluate parameter on its field. */
   Field eval() const;
 
   /** Send parameter data to the device. */
@@ -40,9 +58,11 @@ class Parameter : public FieldQuantity {
  private:
   std::shared_ptr<const System> system_;
   /** List of all time dependent terms */
-  std::vector<time_function> time_dep_terms;
+  std::vector<std::pair<time_function, std::unique_ptr<Field>>> time_dep_terms;
   real uniformValue_;
   Field* field_;
+
+  Field evalTimeDependentTerms(real t) const;
 
   friend CuParameter;
 };

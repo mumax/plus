@@ -19,7 +19,7 @@ TimeSolver::TimeSolver(DynamicEquation eq)
 TimeSolver::TimeSolver(std::vector<DynamicEquation> eqs) {
   setEquations(eqs);  // This call sets the initial timestep
                       // by calling initializeTimeStep
-  stepper_ = std::make_unique<RungeKuttaStepper>(this, FEHLBERG);
+  stepper_ = std::make_unique<RungeKuttaStepper>(this, RKmethod::FEHLBERG);
 }
 
 TimeSolver::~TimeSolver() {}

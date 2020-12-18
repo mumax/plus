@@ -21,8 +21,8 @@ class TimeSolver {
   //------------- GET SOLVER SETTINGS ------------------------------------------
 
   const std::vector<DynamicEquation>& equations() const { return eqs_; }
-  const real& time() const { return time_; }
-  const real& timestep() const { return timestep_; }
+  real time() const { return time_; }
+  real timestep() const { return timestep_; }
   bool hasAdaptiveTimeStep() const { return !fixedTimeStep_; }
   real maxerror() const { return maxerror_; }
 
