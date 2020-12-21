@@ -9,6 +9,7 @@
 #include "world.hpp"
 
 class Stepper;
+enum class RKmethod;
 
 class TimeSolver {
   //------------- CONSTRUCTORS -------------------------------------------------
@@ -35,6 +36,7 @@ class TimeSolver {
 
   //------------- SET SOLVER SETTINGS ------------------------------------------
 
+  void setRungeKuttaMethod(RKmethod);
   void setEquations(std::vector<DynamicEquation> eq);
   void setTime(real time) { time_ = time; }
   void setTimeStep(real dt) { timestep_ = dt; }

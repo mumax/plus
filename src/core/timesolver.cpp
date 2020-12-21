@@ -15,10 +15,15 @@ std::unique_ptr<TimeSolver> TimeSolver::Factory::create() {
 }
 
 TimeSolver::TimeSolver() {
-  stepper_ = std::make_unique<RungeKuttaStepper>(this, RKmethod::FEHLBERG);
+  setRungeKuttaMethod(RKmethod::FEHLBERG);
 }
 
 TimeSolver::~TimeSolver() {}
+
+void TimeSolver::setRungeKuttaMethod(RKmethod method) {
+  stepper_ = std::make_unique<RungeKuttaStepper>(this, method);
+  timestep_ = sensibleTimeStep();
+}
 
 real TimeSolver::sensibleTimeStep() const {
   if (eqs_.empty())

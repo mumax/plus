@@ -2,7 +2,22 @@
 
 #include <math.h>
 
+#include <algorithm>
 #include <exception>
+#include <string>
+
+RKmethod getRungeKuttaMethodFromName(const std::string& name) {
+  auto it =
+      std::find_if(RungeKuttaMethodNames.begin(), RungeKuttaMethodNames.end(),
+                   [name](const auto& kv) { return kv.second == name; });
+
+  if (it == RungeKuttaMethodNames.end())
+    throw std::invalid_argument("'" + name +
+                                "' is not a valid Runge Kutta method name");
+
+  RKmethod method = it->first;
+  return method;
+}
 
 ButcherTableau::ButcherTableau(std::vector<real> nodes,
                                std::vector<std::vector<real>> rkMatrix,

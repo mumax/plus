@@ -50,6 +50,20 @@ class TimeSolver:
             if self.timestep == 0.0 or self.timestep > self._impl.sensible_timestep:
                 self.timestep = self._impl.sensible_timestep
 
+    def set_method(self, method_name):
+        """Set the Runga Kutta method used by the time solver.
+
+        Implemented methods are:
+          'Heun'
+          'BogackiShampine'
+          'CashKarp'
+          'Fehlberg'
+          'DormandPrince'
+
+        The default and recommended Runge Kutta method is 'Fehlberg'.
+        """
+        self._impl.set_method(method_name)
+
     def steps(self, nsteps):
         """Make n steps with the time solver."""
         # Make sure we start stepping with a sensible timestep

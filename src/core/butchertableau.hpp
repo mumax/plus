@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+#include <string>
 #include <vector>
 
 #include "datatypes.hpp"
@@ -11,6 +13,18 @@ enum class RKmethod {
   FEHLBERG,
   DORMAND_PRINCE
 };
+
+const std::map<RKmethod, std::string> RungeKuttaMethodNames{
+    // clang-format off
+    {RKmethod::HEUN, "Heun"},
+    {RKmethod::BOGACKI_SHAMPINE, "BogackiShampine"},
+    {RKmethod::CASH_KARP, "CashKarp"},
+    {RKmethod::FEHLBERG, "Fehlberg"},
+    {RKmethod::DORMAND_PRINCE, "DormandPrince"},
+    // clang-format on
+};
+
+RKmethod getRungeKuttaMethodFromName(const std::string& name);
 
 /// Extended Butcher Tableau for Adaptive Runge-Kutta methods
 class ButcherTableau {
