@@ -195,11 +195,14 @@ real dotSum(const Field& f, const Field& g) {
 
 __global__ void k_geodesicDistance(real* result, CuField f, CuField g) {
   __shared__ real sdata[BLOCKDIM];
-  int ncells = f.grid.ncells();
+  int ncells = f.system.grid.ncells();
   int tid = threadIdx.x;
 
   real threadValue = 0.0;
   for (int i = tid; i < ncells; i += BLOCKDIM) {
+    if (!f.cellInGeometry(i))
+      continue;
+
     real3 fi = f.vectorAt(i);
     real3 gi = g.vectorAt(i);
     // vincenty's formula
@@ -223,12 +226,11 @@ __global__ void k_geodesicDistance(real* result, CuField f, CuField g) {
 }
 
 real geodesicDistance(const Field& f, const Field& g) {
-  real* d_result = (real*)bufferPool.allocate(sizeof(real));
-  cudaLaunchReductionKernel(k_dotSum, d_result, f.cu(), g.cu());
+  GpuBuffer<real> d_result(1);
+  cudaLaunchReductionKernel(k_dotSum, d_result.get(), f.cu(), g.cu());
   // copy the result to the host and return
   real result;
-  checkCudaError(cudaMemcpyAsync(&result, d_result, sizeof(real),
+  checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(real),
                                  cudaMemcpyDeviceToHost, getCudaStream()));
-  bufferPool.recycle((void**)&d_result);
   return result;
 }

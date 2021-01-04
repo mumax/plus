@@ -12,14 +12,13 @@ void wrap_elasticband(py::module& m) {
         int nImages = py_imagelist.size();
         std::vector<Field> images(nImages);
         for (int i = 0; i < nImages; i++) {
-          images[i] = Field(magnet->grid(), 3);
+          images[i] = Field(magnet->system(), 3);
           setArrayInField(images[i], py_imagelist[i].cast<py::array_t<real>>());
         }
         std::unique_ptr<ElasticBand> eband(new ElasticBand(magnet, images));
         return eband;
       }))
       .def("select_image", &ElasticBand::selectImage)
-      //.def("solve", &ElasticBand::solve)
       .def("step", &ElasticBand::step)
       .def("n_images", &ElasticBand::nImages)
       .def("relax_endpoints", &ElasticBand::relaxEndPoints)

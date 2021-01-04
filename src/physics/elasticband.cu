@@ -26,7 +26,7 @@ ElasticBand::ElasticBand(Ferromagnet* magnet, const std::vector<Field>& images)
 
   for (const auto image : images) {
     images_.emplace_back(image);
-    velocities_.emplace_back(Field(magnet_->grid(), 3, 0.0));
+    velocities_.emplace_back(Field(magnet_->system(), 3, 0.0));
   }
 }
 
@@ -118,7 +118,7 @@ std::vector<Field> ElasticBand::perpendicularForces() {
 
   std::vector<Field> forces;
   for (const auto image : images_) {
-    forces.emplace_back(Field(magnet_->grid(), 3));
+    forces.emplace_back(Field(magnet_->system(), 3));
   }
 
   for (int i = 1; i < nImages() - 1; i++) {  // End points need to stay fixed
@@ -167,5 +167,3 @@ void ElasticBand::step(real dt) {
 real ElasticBand::geodesicDistanceImages(int i, int j) {
   return geodesicDistance(images_[i], images_[j]);
 }
-
-// void ElasticBand::solve() {}

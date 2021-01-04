@@ -2,6 +2,7 @@
 
 import _mumax5cpp as _cpp
 
+from .elasticband import ElasticBand
 from .ferromagnet import Ferromagnet
 from .fieldquantity import FieldQuantity
 from .grid import Grid
@@ -10,10 +11,10 @@ from .strayfield import StrayField
 from .timesolver import TimeSolver
 from .variable import Variable
 from .world import World
-from .elasticband import ElasticBand
 
 __all__ = [
     "_cpp",
+    "ElasticBand",
     "Ferromagnet",
     "FieldQuantity",
     "Grid",
