@@ -31,13 +31,6 @@ int main() {
   // choose B1 or B2 here
   mWorld.biasMagneticField = B1;
 
-  // LLG equation
-  std::shared_ptr<FieldQuantity> rhsLLG(torqueQuantity(magnet).clone());
-  DynamicEquation llg(magnet->magnetization(), rhsLLG);
-
-  // solve the LLG equation
-  TimeSolver solver(llg);
-
   // --- SCHEDULE THE OUTPUT ---
   int n_timepoints = 1000;
   real start = 0, stop = 1E-9, delta = (stop - start) / (n_timepoints - 1);
@@ -47,11 +40,10 @@ int main() {
   magn_csv << "t,mx,my,mz," << std::endl;
 
   for (int i = 0; i < n_timepoints; i++) {
-    auto time = start + i * delta;
-    solver.run(delta);
+    mWorld.timesolver()->run(delta);
     auto m = magnet->magnetization()->average();
-    magn_csv << time << "," << m[0] << "," << m[1] << "," << m[2] << ","
-             << std::endl;
+    magn_csv << mWorld.time() << "," << m[0] << "," << m[1] << "," << m[2]
+             << "," << std::endl;
   }
 
   std::cout << "Simulation results were saved into " << out_file_path

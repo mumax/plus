@@ -6,16 +6,24 @@
 
 #include "datatypes.hpp"
 #include "dynamicequation.hpp"
+#include "world.hpp"
 
 class Stepper;
+enum class RKmethod;
 
 class TimeSolver {
- public:
   //------------- CONSTRUCTORS -------------------------------------------------
 
+ public:
+  class Factory {  // Can only be used by the constructor of the world
+    static std::unique_ptr<TimeSolver> create();
+    friend World::World(real3, Grid);
+  };
+
+ private:
   TimeSolver();
-  explicit TimeSolver(DynamicEquation eq);
-  explicit TimeSolver(std::vector<DynamicEquation> eqs);
+
+ public:
   ~TimeSolver();
 
   //------------- GET SOLVER SETTINGS ------------------------------------------
@@ -28,6 +36,7 @@ class TimeSolver {
 
   //------------- SET SOLVER SETTINGS ------------------------------------------
 
+  void setRungeKuttaMethod(RKmethod);
   void setEquations(std::vector<DynamicEquation> eq);
   void setTime(real time) { time_ = time; }
   void setTimeStep(real dt) { timestep_ = dt; }

@@ -4,15 +4,22 @@
 
 #include "datatypes.hpp"
 #include "grid.hpp"
+#include "timesolver.hpp"
 
 World::World(real3 cellsize, Grid mastergrid)
-    : cellsize_(cellsize), mastergrid_(mastergrid) {
+    : cellsize_(cellsize),
+      mastergrid_(mastergrid),
+      timesolver_(TimeSolver::Factory::create()) {
   if (cellsize.x <= 0 || cellsize.y <= 0 || cellsize.z <= 0) {
     throw std::invalid_argument("The cell size should be larger than 0");
   }
 }
 
 World::~World() {}
+
+real World::time() const {
+  return timesolver_->time();
+}
 
 real3 World::cellsize() const {
   return cellsize_;
@@ -36,4 +43,8 @@ bool World::inMastergrid(Grid grid) const {
   if (mastergrid_.size().z > 0 && (d1.z < 0 || d2.z > 0))
     return false;
   return true;
+}
+
+TimeSolver* World::timesolver() const {
+  return timesolver_.get();
 }

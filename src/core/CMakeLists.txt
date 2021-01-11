@@ -1,5 +1,9 @@
 add_library(core STATIC 
+    butchertableau.cpp
+    butchertableau.hpp
     datatypes.hpp 
+    dynamicequation.hpp
+    dynamicequation.cpp
     field.cu 
     field.hpp 
     fieldops.cu 
@@ -12,10 +16,16 @@ add_library(core STATIC
     parameter.hpp
     reduce.cu
     reduce.hpp
+    rungekutta.cpp
+    rungekutta.hpp
     scalarquantity.cpp 
     scalarquantity.hpp 
+    stepper.cpp
+    stepper.hpp
     system.cpp
     system.hpp
+    timesolver.cpp
+    timesolver.hpp
     variable.hpp
     variable.cpp
     world.cpp

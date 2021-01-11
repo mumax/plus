@@ -2,7 +2,22 @@
 
 #include <math.h>
 
+#include <algorithm>
 #include <exception>
+#include <string>
+
+RKmethod getRungeKuttaMethodFromName(const std::string& name) {
+  auto it =
+      std::find_if(RungeKuttaMethodNames.begin(), RungeKuttaMethodNames.end(),
+                   [name](const auto& kv) { return kv.second == name; });
+
+  if (it == RungeKuttaMethodNames.end())
+    throw std::invalid_argument("'" + name +
+                                "' is not a valid Runge Kutta method name");
+
+  RKmethod method = it->first;
+  return method;
+}
 
 ButcherTableau::ButcherTableau(std::vector<real> nodes,
                                std::vector<std::vector<real>> rkMatrix,
@@ -15,11 +30,11 @@ ButcherTableau::ButcherTableau(std::vector<real> nodes,
       weights1(weights1),
       weights2(weights2),
       order1(order1),
-      order2(order2),
-      nStages(nodes.size()) {}
-
-ButcherTableau::ButcherTableau(RKmethod method)
-    : ButcherTableau(constructTableau(method)) {}
+      order2(order2) {
+  if (!isConsistent())
+    throw std::invalid_argument(
+        "Arguments to construct the ButcherTableau are inconsistent");
+}
 
 bool ButcherTableau::isConsistent() const {
   int N = nodes.size();
@@ -43,27 +58,27 @@ bool ButcherTableau::isConsistent() const {
   return true;
 }
 
-ButcherTableau constructTableau(RKmethod method) {
+const ButcherTableau& ButcherTableau::get(RKmethod method) {
   switch (method) {
     case RKmethod::HEUN:
-      return constructHeunTableau();
+      return ButcherTableau::Heun;
     case RKmethod::BOGACKI_SHAMPINE:
-      return constructBogackiShampineTableau();
+      return ButcherTableau::BogackiShampine;
     case RKmethod::CASH_KARP:
-      return constructCashKarpTableau();
+      return ButcherTableau::CashKarp;
     case RKmethod::FEHLBERG:
-      return constructFehlbergTableau();
+      return ButcherTableau::Fehlberg;
     case RKmethod::DORMAND_PRINCE:
-      return constructDormandPrinceTableau();
+      return ButcherTableau::DormandPrince;
     default:  // TODO: handle this better
       std::cerr << "Method is not implemented, Dormand Prince method is "
                    "used instead"
                 << std::endl;
-      return constructDormandPrinceTableau();
+      return ButcherTableau::DormandPrince;
   }
 }
 
-ButcherTableau constructHeunTableau() {
+const ButcherTableau ButcherTableau::Heun = []() {
   int order1 = 2;
   int order2 = 1;
   std::vector<real> nodes = {0., 1.};
@@ -71,9 +86,9 @@ ButcherTableau constructHeunTableau() {
   std::vector<real> weights1 = {1. / 2., 1. / 2.};
   std::vector<real> weights2 = {1., 0.};
   return ButcherTableau(nodes, rkMatrix, weights1, weights2, order1, order2);
-}
+}();
 
-ButcherTableau constructBogackiShampineTableau() {
+const ButcherTableau ButcherTableau::BogackiShampine = []() {
   int N = 4;
   int order1 = 3;
   int order2 = 2;
@@ -86,9 +101,9 @@ ButcherTableau constructBogackiShampineTableau() {
   std::vector<real> weights1 = {2. / 9., 1. / 3., 4. / 9., 0.};
   std::vector<real> weights2 = {7. / 24, 1. / 4., 1. / 3., 1. / 8.};
   return ButcherTableau(nodes, rkMatrix, weights1, weights2, order1, order2);
-}
+}();
 
-ButcherTableau constructFehlbergTableau() {
+const ButcherTableau ButcherTableau::Fehlberg = []() {
   int N = 6;
   int order1 = 5;
   int order2 = 4;
@@ -121,9 +136,9 @@ ButcherTableau constructFehlbergTableau() {
   weights2[4] = -1 / 5.;
   weights2[5] = 0.;
   return ButcherTableau(nodes, rkMatrix, weights1, weights2, order1, order2);
-}
+}();
 
-ButcherTableau constructCashKarpTableau() {
+const ButcherTableau ButcherTableau::CashKarp = []() {
   int N = 6;
   int order1 = 5;
   int order2 = 4;
@@ -157,9 +172,9 @@ ButcherTableau constructCashKarpTableau() {
   weights2[4] = 277. / 14336.;
   weights2[5] = 1. / 4.;
   return ButcherTableau(nodes, rkMatrix, weights1, weights2, order1, order2);
-}
+}();
 
-ButcherTableau constructDormandPrinceTableau() {
+const ButcherTableau ButcherTableau::DormandPrince = []() {
   int N = 7;
   int order1 = 6;
   int order2 = 5;
@@ -198,4 +213,4 @@ ButcherTableau constructDormandPrinceTableau() {
   weights2[5] = 187. / 2100.;
   weights2[6] = 1. / 40.;
   return ButcherTableau(nodes, rkMatrix, weights1, weights2, order1, order2);
-}
+}();

@@ -1,7 +1,6 @@
 #include "rungekutta.hpp"
 
 #include <cmath>
-#include <optional>
 #include <vector>
 
 #include "butchertableau.hpp"
@@ -15,12 +14,12 @@
 #include "variable.hpp"
 
 RungeKuttaStepper::RungeKuttaStepper(TimeSolver* solver, RKmethod method)
-    : butcher_(constructTableau(method)) {
+    : butcher_(ButcherTableau::get(method)) {
   setParentTimeSolver(solver);
 }
 
 int RungeKuttaStepper::nStages() const {
-  return butcher_.nStages;
+  return butcher_.nodes.size();
 }
 
 void RungeKuttaStepper::step() {
@@ -31,9 +30,9 @@ void RungeKuttaStepper::step() {
   }
 
   // construct a Runge Kutta stage executor for every equation
-  std::vector<RungeKuttaStageExecutor> equations;
+  std::vector<RungeKuttaStepper::RungeKuttaStageExecutor> equations;
   for (auto eq : solver_->equations())
-    equations.emplace_back(eq, this);
+    equations.emplace_back(eq, *this);
 
   real t0 = solver_->time();
 
@@ -85,9 +84,9 @@ void RungeKuttaStepper::step() {
   }
 }
 
-// I think eq should be given by reference, since we create a copy here anyway
-RungeKuttaStageExecutor::RungeKuttaStageExecutor(DynamicEquation eq,
-                                                 const RungeKuttaStepper& stepper)
+RungeKuttaStepper::RungeKuttaStageExecutor::RungeKuttaStageExecutor(
+    DynamicEquation eq,
+    const RungeKuttaStepper& stepper)
     : x0(eq.x->eval()),
       butcher(stepper.butcher_),
       stepper(stepper),
@@ -99,18 +98,20 @@ RungeKuttaStageExecutor::RungeKuttaStageExecutor(DynamicEquation eq,
     noise = eq_.noiseTerm->eval();
 }
 
-void RungeKuttaStageExecutor::setStageK(int stage) {
-  auto dt = stepper.solver_->timestep();
+void RungeKuttaStepper::RungeKuttaStageExecutor::setStageK(int stage) {
   k[stage] = eq_.rhs->eval();
 
-  // k += noise/sqrt(dt)
+  auto dt = stepper.solver_->timestep();
+
   if (noise)
     addTo(k[stage], 1 / sqrt(dt), noise.value());
 }
 
-void RungeKuttaStageExecutor::setStageX(int stage) {
+void RungeKuttaStepper::RungeKuttaStageExecutor::setStageX(int stage) {
   if (stage == 0)
     return;
+
+  auto dt = stepper.solver_->timestep();
 
   Field xstage = x0;
   auto dt = stepper.solver_->timestep();
@@ -124,11 +125,11 @@ void RungeKuttaStageExecutor::setStageX(int stage) {
   x = xstage;
 }
 
-void RungeKuttaStageExecutor::setFinalX() {
+void RungeKuttaStepper::RungeKuttaStageExecutor::setFinalX() {
   Field xstage = x0;
   auto dt = stepper.solver_->timestep();
 
-  for (int i = 0; i < butcher.nStages; i++)
+  for (int i = 0; i < stepper.nStages(); i++)
     addTo(xstage, dt * butcher.weights1[i], k[i]);
 
   // If x is a normalized variable, then xstage will be normalized during the
@@ -137,16 +138,20 @@ void RungeKuttaStageExecutor::setFinalX() {
   x = xstage;
 }
 
-void RungeKuttaStageExecutor::resetX() {
+void RungeKuttaStepper::RungeKuttaStageExecutor::resetX() {
   x = x0;
 }
 
-real RungeKuttaStageExecutor::getError() const {
+real RungeKuttaStepper::RungeKuttaStageExecutor::getError() const {
   Field err(x.system(), x.ncomp());
   auto dt = stepper.solver_->timestep();
 
   err.makeZero();
-  for (int i = 0; i < butcher.nStages; i++)
+
+  auto dt = stepper.solver_->timestep();
+
+  for (int i = 0; i < stepper.nStages(); i++)
     addTo(err, dt * (butcher.weights1[i] - butcher.weights2[i]), k[i]);
+
   return maxVecNorm(err);
 }

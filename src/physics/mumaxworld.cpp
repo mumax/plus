@@ -15,9 +15,7 @@
 #include "torque.hpp"
 
 MumaxWorld::MumaxWorld(real3 cellsize, Grid mastergrid)
-    : World(cellsize, mastergrid),
-      biasMagneticField({0, 0, 0}),
-      timesolver_(new TimeSolver()) {}
+    : World(cellsize, mastergrid), biasMagneticField({0, 0, 0}) {}
 
 MumaxWorld::~MumaxWorld() {}
 
@@ -79,10 +77,6 @@ Ferromagnet* MumaxWorld::getFerromagnet(std::string name) const {
   if (namedMagnet == ferromagnets_.end())
     return nullptr;
   return namedMagnet->second.get();
-}
-
-TimeSolver* MumaxWorld::timesolver() {
-  return timesolver_.get();
 }
 
 void MumaxWorld::resetTimeSolverEquations() {

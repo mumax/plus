@@ -1,11 +1,14 @@
 #pragma once
 
+#include <optional>
+#include <vector>
+
 #include "butchertableau.hpp"
+#include "dynamicequation.hpp"
+#include "field.hpp"
 #include "stepper.hpp"
 
 class TimeSolver;
-class Field;
-// class RungeKuttaStageExecutor;  // declared and defined in rungakutta.cpp
 class Variable;
 
 class RungeKuttaStepper : public Stepper {
@@ -16,17 +19,15 @@ class RungeKuttaStepper : public Stepper {
 
  private:
   ButcherTableau butcher_;
-
-  friend class RungeKuttaStageExecutor;
+  class RungeKuttaStageExecutor;
 };
 
-
-class RungeKuttaStageExecutor {
+class RungeKuttaStepper::RungeKuttaStageExecutor {
  public:
-  RungeKuttaStageExecutor(DynamicEquation eq,  const RungeKuttaStepper& stepper);
+  RungeKuttaStageExecutor(DynamicEquation, const RungeKuttaStepper&);
 
-  void setStageK(int stage);
-  void setStageX(int stage);
+  void setStageK(int);
+  void setStageX(int);
   void setFinalX();
   void resetX();
   real getError() const;

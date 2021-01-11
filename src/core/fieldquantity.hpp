@@ -9,6 +9,7 @@
 
 class Field;
 class System;
+class World;
 
 /// FieldQuantity interface
 class FieldQuantity {
@@ -52,6 +53,10 @@ class FieldQuantity {
 
   /// Returns the grid of the underlying system
   Grid grid() const;
+
+  /// Return the world in which the quantity lives.
+  /// Return nullptr if the system is not attached to a World.
+  const World* world() const;
 };
 
 inline bool sameFieldDimensions(const FieldQuantity& q1,
