@@ -9,5 +9,5 @@ class Stepper {
   void setParentTimeSolver(TimeSolver*);
 
  protected:
-  TimeSolver* solver_;
+  TimeSolver* solver_ = nullptr;
 };

@@ -40,7 +40,7 @@ int main() {
   magn_csv << "t,mx,my,mz," << std::endl;
 
   for (int i = 0; i < n_timepoints; i++) {
-    mWorld.timesolver()->run(delta);
+    mWorld.timesolver().run(delta);
     auto m = magnet->magnetization()->average();
     magn_csv << mWorld.time() << "," << m[0] << "," << m[1] << "," << m[2]
              << "," << std::endl;

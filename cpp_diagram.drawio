@@ -1,31 +1,31 @@
-<mxfile host="65bd71144e" modified="2020-12-16T11:54:12.484Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.52.0 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36" etag="yoFpCmrlBEpTE0XHJ6yb" version="13.10.0" type="embed">
+<mxfile host="65bd71144e" modified="2021-01-11T17:06:05.308Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.52.1 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36" etag="tLPZ2ZLg9YIJ4bpeyqcl" version="13.10.0" type="embed">
     <diagram id="3Fg5za8XqQxQwpxaVsY4" name="Mumax C++">
-        <mxGraphModel dx="1136" dy="4062" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4681" pageHeight="3300" math="0" shadow="0">
+        <mxGraphModel dx="1452" dy="4019" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4681" pageHeight="3300" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="2" value="core.World" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;rounded=1;" parent="1" vertex="1">
-                    <mxGeometry x="651" y="-1240" width="160" height="150" as="geometry"/>
+                    <mxGeometry x="651" y="-1240" width="190" height="210" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="+ cellsize_: real3&#10;+ mastergrid_: Grid" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="2" vertex="1">
-                    <mxGeometry y="30" width="160" height="44" as="geometry"/>
+                <mxCell id="3" value="+ cellsize_: real3&#10;+ mastergrid_: Grid&#10;+ timesolver_: &#10;std::unique_ptr&lt;TimeSolver&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="2" vertex="1">
+                    <mxGeometry y="30" width="190" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="4" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;rounded=1;" parent="2" vertex="1">
-                    <mxGeometry y="74" width="160" height="8" as="geometry"/>
+                    <mxGeometry y="100" width="190" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="+ cellsize(): real3&#10;+ cellVolume(): real&#10;+ mastergrid(): Grid&#10;+ inMastergrid(Grid): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="2" vertex="1">
-                    <mxGeometry y="82" width="160" height="68" as="geometry"/>
+                <mxCell id="5" value="+ cellsize(): real3&#10;+ cellVolume(): real&#10;+ mastergrid(): Grid&#10;+ inMastergrid(Grid): bool&#10;+ time(): real&#10;+ timesolver(): TimeSolver&amp;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="2" vertex="1">
+                    <mxGeometry y="108" width="190" height="102" as="geometry"/>
                 </mxCell>
                 <mxCell id="11" value="physics.MumaxWorld" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;rounded=1;" parent="1" vertex="1">
                     <mxGeometry x="531" y="-850" width="400" height="250" as="geometry"/>
                 </mxCell>
-                <mxCell id="12" value="+ biasMagneticField: real3&#10;+ ferromagnets_: std::map&lt;std::string, std::unique_ptr&lt;Ferromagnet*&gt;&gt;&#10;+ timesolver_: *TimeSolver" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="11" vertex="1">
+                <mxCell id="12" value="public:&#10;+ biasMagneticField: real3&#10;private:&#10;+ ferromagnets_: std::map&lt;std::string, std::unique_ptr&lt;Ferromagnet*&gt;&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="11" vertex="1">
                     <mxGeometry y="26" width="400" height="64" as="geometry"/>
                 </mxCell>
                 <mxCell id="13" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;rounded=1;" parent="11" vertex="1">
                     <mxGeometry y="90" width="400" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="14" value="public:&#10;+ addFerromagnet(Grid, std::string: type): Ferromagnet*&#10;+ addFerromagnet(Grid, GpuBuffer&lt;bool&gt;, std::string): Ferromagnet*&#10;+ getFerromagnet(std::string): Ferromagnet*&#10;+ ferromagnets(): std::map&lt;std::string, Ferromagnet*&gt;&#10;+ timesolver(): TimeSolver*&#10;private:&#10;+ resolveTimeSolverEquations(): void&#10;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="11" vertex="1">
+                <mxCell id="14" value="public:&#10;+ addFerromagnet(Grid, std::string: type): Ferromagnet*&#10;+ addFerromagnet(Grid, GpuBuffer&lt;bool&gt;, std::string): Ferromagnet*&#10;+ getFerromagnet(std::string): Ferromagnet*&#10;+ ferromagnets(): std::map&lt;std::string, Ferromagnet*&gt;&#10;private:&#10;+ resolveTimeSolverEquations(): void&#10;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=1;" parent="11" vertex="1">
                     <mxGeometry y="98" width="400" height="152" as="geometry"/>
                 </mxCell>
                 <mxCell id="16" value="timesolver.TimeSolver" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;rounded=1;" parent="1" vertex="1">
@@ -102,7 +102,7 @@
                         <mxPoint x="731" y="-1280" as="sourcePoint"/>
                         <mxPoint x="891" y="-1280" as="targetPoint"/>
                         <Array as="points">
-                            <mxPoint x="731" y="-1280"/>
+                            <mxPoint x="746" y="-1280"/>
                             <mxPoint x="1016" y="-1280"/>
                         </Array>
                         <mxPoint as="offset"/>
@@ -193,13 +193,11 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="64" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;" parent="1" source="11" target="5" edge="1">
+                <mxCell id="64" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;exitX=0.474;exitY=-0.01;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="11" edge="1">
                     <mxGeometry width="160" relative="1" as="geometry">
                         <mxPoint x="731" y="-853" as="sourcePoint"/>
-                        <mxPoint x="841" y="-930" as="targetPoint"/>
-                        <Array as="points">
-                            <mxPoint x="731" y="-1060"/>
-                        </Array>
+                        <mxPoint x="720" y="-1030" as="targetPoint"/>
+                        <Array as="points"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="66" value="Friend" style="endArrow=open;endSize=12;dashed=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.49;entryY=0.999;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="58" target="160" edge="1">
@@ -654,7 +652,7 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="174" value="" style="endArrow=open;endFill=1;endSize=12;html=1;exitX=0.625;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="135" target="144">
+                <mxCell id="174" value="" style="endArrow=open;endFill=1;endSize=12;html=1;exitX=0.625;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" parent="1" source="135" target="144" edge="1">
                     <mxGeometry width="160" relative="1" as="geometry">
                         <mxPoint x="2350" y="50" as="sourcePoint"/>
                         <mxPoint x="2510" y="50" as="targetPoint"/>
@@ -665,7 +663,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="175" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;" edge="1" parent="1" target="31">
+                <mxCell id="175" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;" parent="1" target="31" edge="1">
                     <mxGeometry x="-0.9371" y="10" relative="1" as="geometry">
                         <mxPoint x="2260" y="81" as="sourcePoint"/>
                         <mxPoint x="1660" y="-190" as="targetPoint"/>

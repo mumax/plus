@@ -45,6 +45,6 @@ bool World::inMastergrid(Grid grid) const {
   return true;
 }
 
-TimeSolver* World::timesolver() const {
-  return timesolver_.get();
+TimeSolver& World::timesolver() const {
+  return *timesolver_;
 }

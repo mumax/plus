@@ -3,8 +3,8 @@
 #include "datatypes.hpp"
 #include "gpubuffer.hpp"
 #include "grid.hpp"
+#include "world.hpp"
 
-class World;
 class CuSystem;
 
 class System {

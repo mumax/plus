@@ -7,10 +7,10 @@
 #include "datatypes.hpp"
 #include "fieldquantity.hpp"
 #include "grid.hpp"
+#include "system.hpp"
 
 class Field;
 class CuParameter;
-class System;
 
 class Parameter : public FieldQuantity {
  public:
@@ -58,7 +58,7 @@ class Parameter : public FieldQuantity {
  private:
   std::shared_ptr<const System> system_;
   /** List of all time dependent terms */
-  std::vector<std::pair<time_function, std::unique_ptr<Field>>> time_dep_terms;
+  std::vector<std::pair<time_function, Field*>> time_dep_terms;
   real uniformValue_;
   Field* field_;
 

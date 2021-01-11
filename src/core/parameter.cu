@@ -4,7 +4,6 @@
 #include "field.hpp"
 #include "fieldops.hpp"
 #include "parameter.hpp"
-#include "system.hpp"
 
 Parameter::Parameter(std::shared_ptr<const System> system, real value)
     : system_(system), field_(nullptr), uniformValue_(value) {}
@@ -12,6 +11,8 @@ Parameter::Parameter(std::shared_ptr<const System> system, real value)
 Parameter::~Parameter() {
   if (field_)
     delete field_;
+
+  removeAllTimeDependentTerms();
 }
 
 void Parameter::set(real value) {
@@ -31,10 +32,18 @@ void Parameter::addTimeDependentTerm(const time_function& term) {
 }
 
 void Parameter::addTimeDependentTerm(const time_function& term, const Field& mask) {
-    time_dep_terms.emplace_back(term, std::make_unique<Field>(mask));
+    // time_dep_terms.push_back(std::make_pair(term, std::make_unique<Field>(mask)));
+    // check whether it creates a copy of time_func here via & == &
+    auto mask_ = new Field(mask);
+    time_dep_terms.emplace_back(term, mask_);
 }
 
 void Parameter::removeAllTimeDependentTerms() {
+    for (auto& term : time_dep_terms) {
+        auto mask_ = std::get<Field*>(term);
+        delete mask_;
+    }
+
     time_dep_terms.clear();
 }
 
@@ -54,20 +63,21 @@ std::shared_ptr<const System> Parameter::system() const {
   return system_;
 }
 
-Field Parameter::evalTimeDependentTerms(real t) {
+Field Parameter::evalTimeDependentTerms(real t) const {
     Field p(system_, ncomp());
     p.setUniformComponent(0, 0);
 
-    if (time_dep_terms.size() != 0) {
-        for (auto& [func, mask] : time_dep_terms) {
-            if (mask) {
-                p += func(t) * (*mask);
-            }
-            else {
-                Field f(system_, ncomp());
-                f.setUniformComponent(0, func(t));
-                p += f;
-            }
+    for (auto& term : time_dep_terms) {
+        auto& func = std::get<Parameter::time_function>(term);
+        auto mask = std::get<Field*>(term);
+
+        if (mask) {
+            p += func(t) * (*mask);
+        }
+        else {
+            Field f(system_, ncomp());
+            f.setUniformComponent(0, func(t));
+            p += f;
         }
     }
 
@@ -75,8 +85,7 @@ Field Parameter::evalTimeDependentTerms(real t) {
 }
 
 Field Parameter::eval() const {
-    // set time value here
-    auto t = 0;
+    auto t = system_->world()->time();
   Field p(system_, ncomp());
   Field f = evalTimeDependentTerms(t);
 

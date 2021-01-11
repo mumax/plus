@@ -37,7 +37,7 @@ class World {
   bool inMastergrid(Grid) const;
 
   /** Return a pointer to the world's timesolver. */
-  TimeSolver* timesolver() const;
+  TimeSolver& timesolver() const;
 
  protected:
   real3 cellsize_;

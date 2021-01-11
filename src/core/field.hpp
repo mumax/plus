@@ -25,7 +25,7 @@ class Field : public FieldQuantity {
   Field(const Field&);   // copies gpu field data
   Field(Field&& other);  // moves gpu field data
 
-  ~Field() {}
+  virtual ~Field() {}
 
   Field eval() const { return Field(*this); }
 

@@ -111,8 +111,6 @@ void RungeKuttaStepper::RungeKuttaStageExecutor::setStageX(int stage) {
   if (stage == 0)
     return;
 
-  auto dt = stepper.solver_->timestep();
-
   Field xstage = x0;
   auto dt = stepper.solver_->timestep();
 
@@ -144,7 +142,6 @@ void RungeKuttaStepper::RungeKuttaStageExecutor::resetX() {
 
 real RungeKuttaStepper::RungeKuttaStageExecutor::getError() const {
   Field err(x.system(), x.ncomp());
-  auto dt = stepper.solver_->timestep();
 
   err.makeZero();
 
