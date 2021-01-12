@@ -51,6 +51,7 @@ class TestMumax3:
                 saveas(b_anis,"b_anis.ovf")
                 saveas(b_demag,"b_demag.ovf")
                 saveas(b_eff,"b_eff.ovf")
+                saveas(edens_anis,"edens_anis.ovf")
                 saveas(lltorque,"lltorque.ovf")
             """
         )
@@ -67,6 +68,13 @@ class TestMumax3:
         err = max_relative_error(
             result=self.magnet.anisotropy_field.eval(),
             wanted=self.mumax3sim.get_field("b_anis"),
+        )
+        assert err < 1e-3
+
+    def test_anisotropy_energy_density(self):
+        err = max_relative_error(
+            result=self.magnet.anisotropy_energy_density.eval(),
+            wanted=self.mumax3sim.get_field("edens_anis"),
         )
         assert err < 1e-3
 
