@@ -168,7 +168,7 @@ StrayFieldFFTExecutor::StrayFieldFFTExecutor(
 
   for (int comp = 0; comp < 6; comp++)
     checkCufftResult(
-        fftExec(forwardPlan, kernel_.field().devptr(comp), kfft.at(comp)));
+        fftExec(forwardPlan, kernel_.field().device_ptr(comp), kfft.at(comp)));
 }
 
 StrayFieldFFTExecutor::~StrayFieldFFTExecutor() {
@@ -195,7 +195,7 @@ Field StrayFieldFFTExecutor::exec() const {
 
   // Forward fourier transforms
   for (int comp = 0; comp < 3; comp++)
-    checkCufftResult(fftExec(forwardPlan, mpad->devptr(comp), mfft.at(comp)));
+    checkCufftResult(fftExec(forwardPlan, mpad->device_ptr(comp), mfft.at(comp)));
 
   // apply kernel on m_fft
   int ncells = fftSize.x * fftSize.y * fftSize.z;
@@ -216,7 +216,7 @@ Field StrayFieldFFTExecutor::exec() const {
 
   // backward fourier transfrom
   for (int comp = 0; comp < 3; comp++)
-    checkCufftResult(ifftExec(backwardPlan, hfft.at(comp), mpad->devptr(comp)));
+    checkCufftResult(ifftExec(backwardPlan, hfft.at(comp), mpad->device_ptr(comp)));
 
   // unpad
   Field h(system_, 3);

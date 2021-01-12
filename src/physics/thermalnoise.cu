@@ -56,7 +56,7 @@ Field evalThermalNoise(const Ferromagnet* magnet) {
   real mean = 0.0;
   real stddev = 1.0;
   for (int c = 0; c < 3; c++) {
-    generateRandNormal(magnet->randomGenerator, noise.devptr(c), N, mean,
+    generateRandNormal(magnet->randomGenerator, noise.device_ptr(c), N, mean,
                        stddev);
   }
 

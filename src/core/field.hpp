@@ -43,7 +43,7 @@ class Field : public FieldQuantity {
   bool empty() const { return grid().ncells() == 0 || ncomp_ == 0; }
   std::shared_ptr<const System> system() const;
   int ncomp() const { return ncomp_; }
-  real* devptr(int comp) const { return buffers_[comp].get(); }
+  real* device_ptr(int comp) const { return buffers_[comp].get(); }
 
   CuField cu() const;
 

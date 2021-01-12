@@ -57,12 +57,15 @@ class Parameter : public FieldQuantity {
 
  private:
   std::shared_ptr<const System> system_;
-  /** List of all time dependent terms */
-  std::vector<std::pair<time_function, Field*>> time_dep_terms;
+  /** List of all time dependent terms. */
+  std::vector<std::pair<time_function, Field>> time_dep_terms;
   real uniformValue_;
-  Field* field_;
+  /** Store time-independent term values. */
+  Field* staticField_;
+  /** Store time-dependent term values to be used on device. */
+  mutable Field* dynamicField_;
 
-  Field evalTimeDependentTerms(real t) const;
+  void evalTimeDependentTerms(real, Field&) const;
 
   friend CuParameter;
 };
@@ -74,9 +77,11 @@ class CuParameter {
 
  private:
   real* valuesPtr;
+  real* dynamicValuesPtr;
 
  public:
   explicit CuParameter(const Parameter* p);
+  __device__ bool isDynamic() const;
   __device__ bool isUniform() const;
   __device__ real valueAt(int idx) const;
   __device__ real valueAt(int3 coo) const;
@@ -85,10 +90,20 @@ class CuParameter {
 inline CuParameter::CuParameter(const Parameter* p)
     : system(p->system()->cu()),
       uniformValue(p->uniformValue_),
-      valuesPtr(nullptr) {
-  if (p->field_) {
-    valuesPtr = p->field_->devptr(0);
+      valuesPtr(nullptr),
+      dynamicValuesPtr(nullptr)
+{
+  if (p->staticField_) {
+    valuesPtr = p->staticField_->device_ptr(0);
   }
+
+  if (p->dynamicField_) {
+      dynamicValuesPtr = p->dynamicField_->device_ptr(0);
+  }
+}
+
+__device__ inline bool CuParameter::isDynamic() const {
+    return !dynamicValuesPtr;
 }
 
 __device__ inline bool CuParameter::isUniform() const {
@@ -96,9 +111,20 @@ __device__ inline bool CuParameter::isUniform() const {
 }
 
 __device__ inline real CuParameter::valueAt(int idx) const {
-  if (isUniform())
-    return uniformValue;
-  return valuesPtr[idx];
+    if (isUniform()) {
+        if (isDynamic()) {
+            return uniformValue + dynamicValuesPtr[idx];
+        }
+
+        return uniformValue;
+    }
+    else {
+        if (isDynamic()) {
+            return valuesPtr[idx] + dynamicValuesPtr[idx];
+        }
+
+        return valuesPtr[idx];
+    }
 }
 
 __device__ inline real CuParameter::valueAt(int3 coo) const {
@@ -156,9 +182,9 @@ inline CuVectorParameter::CuVectorParameter(const VectorParameter* p)
       yValuesPtr(nullptr),
       zValuesPtr(nullptr) {
   if (p->field_) {
-    xValuesPtr = p->field_->devptr(0);
-    yValuesPtr = p->field_->devptr(1);
-    zValuesPtr = p->field_->devptr(2);
+    xValuesPtr = p->field_->device_ptr(0);
+    yValuesPtr = p->field_->device_ptr(1);
+    zValuesPtr = p->field_->device_ptr(2);
   }
 }
 
