@@ -104,7 +104,7 @@ Field evalAnisotropyEnergyDensity(const Ferromagnet* magnet) {
   const CuField m = magnet->magnetization()->field().cu();
   auto anisU = magnet->anisU.cu();
   auto ku1 = magnet->ku1.cu();
-  auto ku2 = magnet->ku1.cu();
+  auto ku2 = magnet->ku2.cu();
   auto msat = magnet->msat.cu();
   int ncells = magnet->grid().ncells();
   cudaLaunch(ncells, k_anisotropyEnergyDensity, e, m, anisU, ku1, ku2, msat);
