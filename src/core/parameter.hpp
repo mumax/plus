@@ -34,7 +34,7 @@ class Parameter : public FieldQuantity, public DynamicParameter<real> {
  private:
   std::shared_ptr<const System> system_;
   real uniformValue_;
-  /** Store time-independent term values. */
+  /** Store time-independent values. */
   Field* staticField_;
 
   friend CuParameter;
@@ -51,7 +51,6 @@ class CuParameter {
 
  public:
   explicit CuParameter(const Parameter* p);
-  __device__ bool isDynamic() const;
   __device__ bool isUniform() const;
   __device__ real valueAt(int idx) const;
   __device__ real valueAt(int3 coo) const;
@@ -72,24 +71,20 @@ inline CuParameter::CuParameter(const Parameter* p)
   }
 }
 
-__device__ inline bool CuParameter::isDynamic() const {
-    return !dynamicValuesPtr;
-}
-
 __device__ inline bool CuParameter::isUniform() const {
   return !valuesPtr;
 }
 
 __device__ inline real CuParameter::valueAt(int idx) const {
     if (isUniform()) {
-        if (isDynamic()) {
+        if (dynamicValuesPtr) {
             return uniformValue + dynamicValuesPtr[idx];
         }
 
         return uniformValue;
     }
     else {
-        if (isDynamic()) {
+        if (dynamicValuesPtr) {
             return valuesPtr[idx] + dynamicValuesPtr[idx];
         }
 
@@ -123,7 +118,7 @@ class VectorParameter : public FieldQuantity, public DynamicParameter<real3> {
  private:
   std::shared_ptr<const System> system_;
   real3 uniformValue_;
-  Field* field_;
+  Field* staticField_;
 
   friend CuVectorParameter;
 };
@@ -137,6 +132,9 @@ struct CuVectorParameter {
   real* xValuesPtr;
   real* yValuesPtr;
   real* zValuesPtr;
+  real* xDynamicValuesPtr;
+  real* yDynamicValuesPtr;
+  real* zDynamicValuesPtr;
 
  public:
   explicit CuVectorParameter(const VectorParameter*);
@@ -150,11 +148,20 @@ inline CuVectorParameter::CuVectorParameter(const VectorParameter* p)
       uniformValue(p->uniformValue_),
       xValuesPtr(nullptr),
       yValuesPtr(nullptr),
-      zValuesPtr(nullptr) {
-  if (p->field_) {
-    xValuesPtr = p->field_->device_ptr(0);
-    yValuesPtr = p->field_->device_ptr(1);
-    zValuesPtr = p->field_->device_ptr(2);
+      zValuesPtr(nullptr),
+      xDynamicValuesPtr(nullptr),
+      yDynamicValuesPtr(nullptr),
+      zDynamicValuesPtr(nullptr) {
+  if (p->staticField_) {
+    xValuesPtr = p->staticField_->device_ptr(0);
+    yValuesPtr = p->staticField_->device_ptr(1);
+    zValuesPtr = p->staticField_->device_ptr(2);
+  }
+
+  if (p->dynamicField_) {
+      xDynamicValuesPtr = p->dynamicField_->device_ptr(0);
+      yDynamicValuesPtr = p->dynamicField_->device_ptr(1);
+      zDynamicValuesPtr = p->dynamicField_->device_ptr(2);
   }
 }
 
@@ -163,9 +170,25 @@ __device__ inline bool CuVectorParameter::isUniform() const {
 }
 
 __device__ inline real3 CuVectorParameter::vectorAt(int idx) const {
-  if (isUniform())
-    return uniformValue;
-  return {xValuesPtr[idx], yValuesPtr[idx], zValuesPtr[idx]};
+    if (isUniform()) {
+        if (xDynamicValuesPtr && yDynamicValuesPtr && zDynamicValuesPtr) {
+            real3 dynamic_value{ xValuesPtr[idx], yValuesPtr[idx], zValuesPtr[idx] };
+
+            return uniformValue + dynamic_value;
+        }
+
+        return uniformValue;
+    }
+    else {
+        real3 static_value{ xValuesPtr[idx], yValuesPtr[idx], zValuesPtr[idx] };
+        if (xDynamicValuesPtr && yDynamicValuesPtr && zDynamicValuesPtr) {
+            real3 dynamic_value{ xValuesPtr[idx], yValuesPtr[idx], zValuesPtr[idx] };
+
+            return static_value + dynamic_value;
+        }
+
+        return static_value;
+    }
 }
 
 __device__ inline real3 CuVectorParameter::vectorAt(int3 coo) const {

@@ -46,14 +46,16 @@ Field Parameter::eval() const {
   Field staticField(system_, ncomp());
   Field dynamicField(system_, ncomp());
 
-  dynamicField.setUniformComponent(0, 0);
+  dynamicField.makeZero();
   evalTimeDependentTerms(t, dynamicField);
 
   if (staticField_) {
       staticField = *staticField_;
   }
   else {
-      staticField.setUniformComponent(0, uniformValue_);
+      // can we safely skip n = 0 here???, can we move this function in a parent class???
+      // e.g. Scalar Parameter instead of Parameter, and create Static Parameter or just Parameter???
+      staticField.setUniformComponent(uniformValue_);
   }
 
   staticField += dynamicField;
@@ -63,35 +65,35 @@ Field Parameter::eval() const {
 
 CuParameter Parameter::cu() const {
     auto t = system_->world()->time();
-
     dynamicField_.reset(new Field(system_, ncomp()));
-    dynamicField_->setUniformComponent(0, 0);
+    dynamicField_->makeZero();
 
     evalTimeDependentTerms(t, *dynamicField_);
+
   return CuParameter(this);
 }
 
 VectorParameter::VectorParameter(std::shared_ptr<const System> system,
                                  real3 value)
-    : system_(system), field_(nullptr), uniformValue_(value) {}
+    : system_(system), staticField_(nullptr), uniformValue_(value) {}
 
 VectorParameter::~VectorParameter() {
-  if (field_)
-    delete field_;
+  if (staticField_)
+    delete staticField_;
 }
 
 void VectorParameter::set(real3 value) {
   uniformValue_ = value;
-  if (field_)
-    delete field_;
+  if (staticField_)
+    delete staticField_;
 }
 
 void VectorParameter::set(const Field& values) {
-  field_ = new Field(values);
+  staticField_ = new Field(values);
 }
 
 bool VectorParameter::isUniform() const {
-  return !field_;
+  return !staticField_;
 }
 
 bool VectorParameter::assuredZero() const {
@@ -107,17 +109,31 @@ std::shared_ptr<const System> VectorParameter::system() const {
 }
 
 Field VectorParameter::eval() const {
-  Field p(system(), ncomp());
-  if (field_) {
-    p = *field_;
-  } else {
-    p.setUniformComponent(0, uniformValue_.x);
-    p.setUniformComponent(1, uniformValue_.y);
-    p.setUniformComponent(2, uniformValue_.z);
+  auto t = system_->world()->time();
+  Field staticField(system_, ncomp());
+  Field dynamicField(system_, ncomp());
+
+  dynamicField.makeZero();
+  evalTimeDependentTerms(t, dynamicField);
+
+  if (staticField_) {
+      staticField = *staticField_;
   }
-  return p;
+  else {
+      staticField.setUniformComponent(uniformValue_);
+  }
+
+  staticField += dynamicField;
+
+  return staticField;
 }
 
 CuVectorParameter VectorParameter::cu() const {
+    auto t = system_->world()->time();
+    dynamicField_.reset(new Field(system_, ncomp()));
+    dynamicField_->makeZero();
+
+    evalTimeDependentTerms(t, *dynamicField_);
+
   return CuVectorParameter(this);
 }
