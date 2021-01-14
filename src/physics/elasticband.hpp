@@ -13,8 +13,7 @@ class ElasticBand {
   ElasticBand(Ferromagnet*, const std::vector<Field>& images);
   int nImages() const { return images_.size(); }
   void relaxEndPoints();
-  // void solve();
-  void step(real);
+  void step(real stepsize);
   void selectImage(int);
   real geodesicDistanceImages(int, int);
   std::vector<real> energies();

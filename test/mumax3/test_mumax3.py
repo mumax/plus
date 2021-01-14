@@ -51,6 +51,8 @@ class TestMumax3:
                 saveas(b_anis,"b_anis.ovf")
                 saveas(b_demag,"b_demag.ovf")
                 saveas(b_eff,"b_eff.ovf")
+                saveas(edens_demag,"edens_demag.ovf")
+                saveas(edens_anis,"edens_anisotropy.ovf")
                 saveas(lltorque,"lltorque.ovf")
             """
         )
@@ -83,6 +85,22 @@ class TestMumax3:
         err = max_relative_error(
             result=self.magnet.demag_field.eval(),
             wanted=self.mumax3sim.get_field("b_demag"),
+        )
+        assert err < 1e-3
+
+    def test_demag_energy_density(self):
+        # Here we compare to the demagfield of mumax with an increased tollerance.
+        # Because mumax3 and mumax5 approximate in a different way the demag kernel
+        err = max_relative_error(
+            result=self.magnet.demag_energy_density.eval(),
+            wanted=self.mumax3sim.get_field("edens_demag"),
+        )
+        assert err < 1e-1
+
+    def test_anisotropy_energy_density(self):
+        err = max_relative_error(
+            result=self.magnet.anisotropy_energy_density.eval(),
+            wanted=self.mumax3sim.get_field("edens_anisotropy"),
         )
         assert err < 1e-3
 

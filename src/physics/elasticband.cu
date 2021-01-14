@@ -1,6 +1,7 @@
 #include <stdexcept>
 
 #include "cudalaunch.hpp"
+#include "datatypes.hpp"
 #include "effectivefield.hpp"
 #include "elasticband.hpp"
 #include "energy.hpp"
@@ -9,8 +10,9 @@
 #include "reduce.hpp"
 #include "scalarquantity.hpp"
 
-// https://www.sciencedirect.com/science/article/abs/pii/S0304885302003888
-// 10.1063/1.1323224
+// https://aip.scitation.org/doi/10.1063/1.1323224
+// https://doi.org/10.1016/j.cpc.2015.07.001
+// https://journals.aps.org/prb/abstract/10.1103/PhysRevB.95.214418
 
 ElasticBand::ElasticBand(Ferromagnet* magnet, const std::vector<Field>& images)
     : magnet_(magnet) {
@@ -48,11 +50,44 @@ void ElasticBand::selectImage(int idx) {
   magnet_->magnetization()->set(images_.at(idx));
 }
 
-__device__ inline real emax(real ep, real ec, real en) {
-  return abs(ep - ec) > abs(en - ec) ? abs(ep - ec) : abs(en - ec);
+/** Computes the (normalized) tangent at image mCenter according to Henkelman.
+ *  See https://aip.scitation.org/doi/10.1063/1.1323224
+ */
+__device__ static inline real3 computeTangent(real3 mLeft,
+                                              real3 mCenter,
+                                              real3 mRight,
+                                              real energyLeft,
+                                              real energyCenter,
+                                              real energyRight) {
+  real3 leftTangent = mCenter - mLeft;
+  real3 rightTangent = mRight - mCenter;
+
+  if (energyLeft < energyCenter && energyCenter < energyRight) {
+    return normalized(rightTangent);
+  }
+
+  if (energyLeft > energyCenter && energyCenter > energyRight) {
+    return normalized(leftTangent);
+  }
+
+  real leftEnergyDiff = energyCenter - energyLeft;
+  real rightEnergyDiff = energyRight - energyCenter;
+
+  real dEnergyMax =
+      max(abs(leftEnergyDiff), abs(rightEnergyDiff));  // NOLINT [4]
+
+  real dEnergyMin =
+      min(abs(leftEnergyDiff), abs(rightEnergyDiff));  // NOLINT [4]
+
+  if (energyRight > energyLeft) {
+    return normalized(rightTangent * dEnergyMax + leftTangent * dEnergyMin);
+  } else {
+    return normalized(rightTangent * dEnergyMin + leftTangent * dEnergyMax);
+  }
 }
-__device__ inline real emin(real ep, real ec, real en) {
-  return abs(ep - ec) < abs(en - ec) ? abs(ep - ec) : abs(en - ec);
+
+__device__ real geodesicDistance(real3 v1, real3 v2) {
+  return atan2(norm(cross(v1, v2)), dot(v1, v2));
 }
 
 __global__ static void k_force(CuField force,
@@ -72,29 +107,19 @@ __global__ static void k_force(CuField force,
   real3 next = mnext.vectorAt(idx);
   real3 curr = mcurrent.vectorAt(idx);
 
-  real3 tleft = curr - prev;
-  real3 tright = next - curr;
-  real3 tangent;
-
-  if (energyPrev < energyCurrent && energyCurrent < energyNext) {
-    tangent = tright;
-  } else if (energyPrev > energyCurrent && energyCurrent > energyNext) {
-    tangent = tleft;
-  } else {
-    real emax_ = emax(energyPrev, energyCurrent, energyNext);
-    real emin_ = emin(energyPrev, energyCurrent, energyNext);
-    if (energyNext > energyPrev) {
-      tangent = tright * emax_ + tleft * emin_;
-    } else {
-      tangent = tright * emin_ + tleft * emax_;
-    }
-  }
-
-  tangent = normalized(tangent);
+  real3 tangent =
+      computeTangent(prev, curr, next, energyPrev, energyCurrent, energyNext);
   tangent = tangent - dot(tangent, curr) * curr;
   tangent = normalized(tangent);
 
-  real3 f = -(grad - dot(grad, tangent) * tangent);
+  real springConstant = 1.0;
+  real3 springForce =
+      springConstant *
+      (geodesicDistance(next, curr) - geodesicDistance(curr, prev)) * tangent;
+
+  real3 gradPerpendicular = grad - dot(grad, tangent) * tangent;
+  // real3 f = -gradPerpendicular + springForce;
+  real3 f = springForce;
   f = f - dot(f, curr) * curr;  // project force on tangent space
 
   force.setVectorInCell(idx, f);
@@ -114,13 +139,9 @@ std::vector<real> ElasticBand::energies() {
 std::vector<Field> ElasticBand::perpendicularForces() {
   Field m0 = magnet_->magnetization()->field();
 
-  auto energy = energies();
+  std::vector<real> energy = energies();
 
-  std::vector<Field> forces;
-  for (const auto image : images_) {
-    forces.emplace_back(Field(magnet_->system(), 3));
-  }
-
+  std::vector<Field> forces(images_.size(), Field(magnet_->system(), 3, 0.0));
   for (int i = 1; i < nImages() - 1; i++) {  // End points need to stay fixed
     magnet_->magnetization()->set(images_.at(i));
     Field hField = evalEffectiveField(magnet_);
@@ -149,18 +170,36 @@ __global__ static void k_step(CuField xvalues,
   v = v + dt * f;
 
   // velocity projection
-  real3 e_f = normalized(f);
-  v = dot(v, e_f) > 0 ? dot(v, e_f) * e_f : real3{0., 0., 0.};
+  // real3 e_f = normalized(f);
+  // v = dot(v, e_f) > 0 ? dot(v, e_f) * e_f : real3{0., 0., 0.};
 
   xvalues.setVectorInCell(idx, normalized(x));
   velocity.setVectorInCell(idx, v);
 }
 
-void ElasticBand::step(real dt) {
+// __global__ void k_verlet_step(CuField xValues,
+//                               CuField xPreviousValues,
+//                               CuField force,
+//                               real dt) {
+//   int idx = blockIdx.x * blockDim.x + threadIdx.x;
+//   if (!xValues.cellInGrid(idx))
+//     return;
+//
+//   real3 a = force.vectorAt(idx);
+//   real3 x0 = xValues.vectorAt(idx);
+//   real3 xp = xPreviousValues.vectorAt(idx);
+//
+//   real3 xn = 2 * x0 - xp + a * dt * dt;
+//
+//   xValues.setVectorInCell(idx, xn);
+//   xPreviousValues.setVectorInCell(idx, x0);
+// }
+
+void ElasticBand::step(real stepsize) {
   std::vector<Field> forces = perpendicularForces();
   for (int i = 1; i < nImages() - 1; i++) {  // End points need to stay fixed
     cudaLaunch(magnet_->grid().ncells(), k_step, images_[i].cu(),
-               velocities_[i].cu(), forces[i].cu(), dt);
+               velocities_[i].cu(), forces[i].cu(), stepsize);
   }
 }
 
