@@ -50,6 +50,9 @@ class Field : public FieldQuantity {
   void getData(real* buffer) const;
   void setData(real* buffer);
   void setUniformComponent(int comp, real value);
+  void setUniformComponent(real value);
+  void setUniformComponent(real3 value);
+
   void makeZero();
 
   void setZeroOutsideGeometry();

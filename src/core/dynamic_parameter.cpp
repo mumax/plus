@@ -1,0 +1,48 @@
+#include "dynamic_parameter.hpp"
+#include "fieldops.hpp"
+
+template<typename T>
+DynamicParameter<T>::DynamicParameter(const DynamicParameter<T>& other):
+    dynamicField_(new Field(*other.dynamicField_)),
+    time_dep_terms(other.time_dep_terms) {}
+
+template<typename T>
+DynamicParameter<T>& DynamicParameter<T>::operator=(const DynamicParameter<T>& other) {
+    dynamicField_.reset(new Field(*other.dynamicField_));
+    time_dep_terms = other.time_dep_terms;
+
+    return *this;
+}
+
+template<typename T>
+DynamicParameter<T>::DynamicParameter(const DynamicParameter<T>&& other) noexcept:
+    dynamicField_(std::move(other.dynamicField_)),
+    time_dep_terms(std::move(other.time_dep_terms)) {}
+
+template<typename T>
+DynamicParameter<T>& DynamicParameter<T>::operator=(const DynamicParameter<T>&& other) noexcept {
+    dynamicField_ = std::move(other.dynamicField_);
+    time_dep_terms = std::move(other.time_dep_terms);
+
+    return *this;
+}
+
+template<typename T>
+void DynamicParameter<T>::evalTimeDependentTerms(real t, Field& p) const {
+    for (auto& term : time_dep_terms) {
+        auto& func = std::get<std::function<T(real)>>(term);
+        auto& mask = std::get<Field>(term);
+
+        if (!mask.empty()) {
+            p += func(t) * mask;
+        }
+        else {
+            Field f(p.system(), p.ncomp());
+            f.setUniformComponent(func(t));
+            p += f;
+        }
+    }
+}
+
+template class DynamicParameter<real>;
+template class DynamicParameter<real3>;

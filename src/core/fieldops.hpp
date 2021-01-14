@@ -19,5 +19,7 @@ Field add(std::vector<const Field*> x, std::vector<real> weights);
 
 Field operator*(real a, const Field& x);
 
+Field operator*(real3 a, const Field& x);
+
 Field normalized(const Field& src);
 void normalize(Field&);

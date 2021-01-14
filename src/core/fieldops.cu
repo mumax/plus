@@ -13,11 +13,25 @@ __global__ void k_addFields(CuField y,
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!y.cellInGeometry(idx))
     return;
-  for (int c = -0; c < y.ncomp; c++) {
+  for (int c = 0; c < y.ncomp; c++) {
     real term1 = a1 * x1.valueAt(idx, c);
     real term2 = a2 * x2.valueAt(idx, c);
     y.setValueInCell(idx, c, term1 + term2);
   }
+}
+
+__global__ void k_addFields(CuField y,
+                            real3 a1,
+                            const CuField x1,
+                            real3 a2,
+                            const CuField x2) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (!y.cellInGeometry(idx))
+        return;
+
+    real3 term1 = a1 * x1.vectorAt(idx);
+    real3 term2 = a2 * x2.vectorAt(idx);
+    y.setVectorInCell(idx, term1 + term2);
 }
 
 inline void add(Field& y, real a1, const Field& x1, real a2, const Field& x2) {
@@ -33,6 +47,24 @@ inline void add(Field& y, real a1, const Field& x1, real a2, const Field& x2) {
   }
   int ncells = y.grid().ncells();
   cudaLaunch(ncells, k_addFields, y.cu(), a1, x1.cu(), a2, x2.cu());
+}
+
+inline void add(Field& y, real3 a1, const Field& x1, real3 a2, const Field& x2) {
+    if (x1.system() != y.system() || x2.system() != y.system()) {
+        throw std::invalid_argument(
+            "Fields can not be added together because they belong to different "
+            "systems)");
+    }
+    if (x1.ncomp() != y.ncomp() || x1.ncomp() != y.ncomp()) {
+        throw std::invalid_argument(
+            "Fields can not be added because they do not have the same number of "
+            "components");
+    }
+    if (x1.ncomp() != 3) {
+        throw std::invalid_argument("Fields should have 3 components.");
+    }
+    int ncells = y.grid().ncells();
+    cudaLaunch(ncells, k_addFields, y.cu(), a1, x1.cu(), a2, x2.cu());
 }
 
 Field add(real a1, const Field& x1, real a2, const Field& x2) {
@@ -104,3 +136,11 @@ Field normalized(const Field& src) {
 void normalize(Field& f) {
   cudaLaunch(f.grid().ncells(), k_normalize, f.cu(), f.cu());
 }
+
+Field operator*(real3 a, const Field& x) {
+    Field y(x.system(), x.ncomp());
+    real3 a0 = real3{0, 0, 0};
+    add(y, a0, x, a, x);
+    return y;
+}
+

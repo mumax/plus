@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "datatypes.hpp"
+#include "dynamic_parameter.hpp"
 #include "fieldquantity.hpp"
 #include "grid.hpp"
 #include "system.hpp"
@@ -12,38 +13,13 @@
 class Field;
 class CuParameter;
 
-class Parameter : public FieldQuantity {
+class Parameter : public FieldQuantity, public DynamicParameter<real> {
  public:
-  /** Declare a short name for a time-dependent function */
-  typedef std::function<real(real)> time_function;
-
   explicit Parameter(std::shared_ptr<const System> system, real value = 0.0);
   ~Parameter();
 
   void set(real value);
   void set(const Field& values);
-  /** Add time-dependent function that is the same for every grid cell.
-  * 
-  * Parameter values will be evaluated as:
-  * a) uniform_value + term(t)
-  * b) cell_value + term(t)
-  * 
-  * @param term time-dependent function.
-  */
-  void addTimeDependentTerm(const time_function& term);
-  /** Add time-dependent function that is the same for every grid cell.
-  * 
-  * Parameter values will be evaluated as:
-  * a) uniform_value + term(t) * mask
-  * b) cell_value + term(t) * cell_mask_value
-  *
-  * @param term time-dependent function.
-  * @param mask define how the magnitude of the time-dependent function should
-  *             depend on cell coordinates. The input value will be copied.
-  */
-  void addTimeDependentTerm(const time_function& term, const Field& mask);
-   /** Remove all time-dependet terms and their masks. */
-  void removeAllTimeDependentTerms();
 
   bool isUniform() const;
   bool assuredZero() const;
@@ -57,15 +33,9 @@ class Parameter : public FieldQuantity {
 
  private:
   std::shared_ptr<const System> system_;
-  /** List of all time dependent terms. */
-  std::vector<std::pair<time_function, Field>> time_dep_terms;
   real uniformValue_;
   /** Store time-independent term values. */
   Field* staticField_;
-  /** Store time-dependent term values to be used on device. */
-  mutable Field* dynamicField_;
-
-  void evalTimeDependentTerms(real, Field&) const;
 
   friend CuParameter;
 };
@@ -133,7 +103,7 @@ __device__ inline real CuParameter::valueAt(int3 coo) const {
 
 class CuVectorParameter;
 
-class VectorParameter : public FieldQuantity {
+class VectorParameter : public FieldQuantity, public DynamicParameter<real3> {
  public:
   VectorParameter(std::shared_ptr<const System> system,
                   real3 value = {0.0, 0.0, 0.0});

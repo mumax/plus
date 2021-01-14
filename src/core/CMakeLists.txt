@@ -4,6 +4,8 @@ add_library(core STATIC
     datatypes.hpp 
     dynamicequation.hpp
     dynamicequation.cpp
+    dynamic_parameter.hpp
+    dynamic_parameter.cpp
     field.cu 
     field.hpp 
     fieldops.cu 
