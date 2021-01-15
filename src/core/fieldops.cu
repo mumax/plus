@@ -69,6 +69,10 @@ Field operator*(real a, const Field& x) {
   return add(0, x, a, x);
 }
 
+Field operator-(const Field& x) {
+  return -1 * x;
+}
+
 __global__ void k_addConstant(CuField y,
                               const CuField x,
                               real value,

@@ -175,6 +175,14 @@ __CUDAOP__ real3 normalized(const real3& a) {
   return scalingsFactor * a;
 }
 
+__CUDAOP__ real3 projectOn(real3 x, real3 u) {
+  return u * dot(x, u) / dot(u, u);
+}
+
+__CUDAOP__ real3 projectOrthogonalOn(real3 x, real3 u) {
+  return x - projectOn(x, u);
+}
+
 __CUDAOP__ bool operator==(const real3& a, const real3& b) {
   return (a.x == b.x) && (a.y == b.y) && (a.z == b.z);
 }

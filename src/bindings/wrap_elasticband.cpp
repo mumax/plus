@@ -22,5 +22,7 @@ void wrap_elasticband(py::module& m) {
       .def("step", &ElasticBand::step)
       .def("n_images", &ElasticBand::nImages)
       .def("relax_endpoints", &ElasticBand::relaxEndPoints)
-      .def("geodesic_distance_images", &ElasticBand::geodesicDistanceImages);
+      .def("geodesic_distance_images", &ElasticBand::geodesicDistanceImages)
+      .def_property("spring_constant", &ElasticBand::springConstant,
+                    &ElasticBand::setSpringConstant);
 }
