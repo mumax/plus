@@ -127,9 +127,13 @@ class TimeSolver:
 
     @adaptive_timestep.setter
     def adaptive_timestep(self, adaptive):
-        self._impl.timestep = adaptive
+        self._impl.adaptive_timestep = adaptive
 
     @property
     def time(self):
         """Return the time value."""
         return self._impl.time
+
+    @time.setter
+    def time(self, time):
+        self._impl.time = time

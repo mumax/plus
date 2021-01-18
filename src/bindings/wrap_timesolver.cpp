@@ -13,7 +13,7 @@
 
 void wrap_timesolver(py::module& m) {
   py::class_<TimeSolver>(m, "TimeSolver")
-      .def_property_readonly("time", &TimeSolver::time)
+      .def_property("time", &TimeSolver::time, &TimeSolver::setTime)
       .def_property_readonly("sensible_timestep", &TimeSolver::sensibleTimeStep)
       .def("set_method",
            [](TimeSolver& solver, std::string methodName) {
