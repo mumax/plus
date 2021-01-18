@@ -105,14 +105,24 @@ void Field::getData(real* buffer) const {
   }
 }
 
-void Field::setData(real* buffer) {
+void Field::getData(std::vector<real>& buffer) const {
+    buffer.clear();
+    buffer.reserve(ncomp_ * grid().ncells());
+    getData(buffer.data());
+}
+
+void Field::setData(const real* buffer) {
   for (int c = 0; c < ncomp_; c++) {
-    real* bufferComponent = buffer + c * grid().ncells();
+    auto bufferComponent = buffer + c * grid().ncells();
     checkCudaError(cudaMemcpyAsync(buffers_[c].get(), bufferComponent,
                                    grid().ncells() * sizeof(real),
                                    cudaMemcpyHostToDevice, getCudaStream()));
   }
   setZeroOutsideGeometry();
+}
+
+void Field::setData(const std::vector<real>& buffer) {
+    setData(buffer.data());
 }
 
 __global__ void k_setComponent(CuField f, real value, int comp) {

@@ -3,13 +3,23 @@
 
 template<typename T>
 DynamicParameter<T>::DynamicParameter(const DynamicParameter<T>& other):
-    dynamicField_(new Field(*other.dynamicField_)),
-    time_dep_terms(other.time_dep_terms) {}
+    dynamicField_(nullptr) {
+    if (other.dynamicField_) {
+        dynamicField_.reset(new Field(*other.dynamicField_));
+    }
+    if (!other.time_dep_terms.empty()) {
+        time_dep_terms = other.time_dep_terms;
+    }
+}
 
 template<typename T>
 DynamicParameter<T>& DynamicParameter<T>::operator=(const DynamicParameter<T>& other) {
-    dynamicField_.reset(new Field(*other.dynamicField_));
-    time_dep_terms = other.time_dep_terms;
+    if (other.dynamicField_) {
+        dynamicField_.reset(new Field(*other.dynamicField_));
+    }
+    if (!other.time_dep_terms.empty()) {
+        time_dep_terms = other.time_dep_terms;
+    }
 
     return *this;
 }

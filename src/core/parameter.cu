@@ -30,7 +30,7 @@ bool Parameter::isUniform() const {
 }
 
 bool Parameter::assuredZero() const {
-  return isUniform() && uniformValue_ == 0.0;
+  return !isDynamic() && isUniform() && uniformValue_ == 0.0;
 }
 
 int Parameter::ncomp() const {
@@ -42,12 +42,7 @@ std::shared_ptr<const System> Parameter::system() const {
 }
 
 Field Parameter::eval() const {
-  auto t = system_->world()->time();
   Field staticField(system_, ncomp());
-  Field dynamicField(system_, ncomp());
-
-  dynamicField.makeZero();
-  evalTimeDependentTerms(t, dynamicField);
 
   if (staticField_) {
       staticField = *staticField_;
@@ -58,17 +53,27 @@ Field Parameter::eval() const {
       staticField.setUniformComponent(uniformValue_);
   }
 
-  staticField += dynamicField;
+  if (isDynamic()) {
+      auto t = system_->world()->time();
+      Field dynamicField(system_, ncomp());
+
+      dynamicField.makeZero();
+      evalTimeDependentTerms(t, dynamicField);
+
+      staticField += dynamicField;
+  }
 
   return staticField;
 }
 
 CuParameter Parameter::cu() const {
-    auto t = system_->world()->time();
-    dynamicField_.reset(new Field(system_, ncomp()));
-    dynamicField_->makeZero();
+    if (isDynamic()) {
+        auto t = system_->world()->time();
+        dynamicField_.reset(new Field(system_, ncomp()));
+        dynamicField_->makeZero();
 
-    evalTimeDependentTerms(t, *dynamicField_);
+        evalTimeDependentTerms(t, *dynamicField_);
+    }
 
   return CuParameter(this);
 }
@@ -97,7 +102,7 @@ bool VectorParameter::isUniform() const {
 }
 
 bool VectorParameter::assuredZero() const {
-  return isUniform() && uniformValue_ == real3{0.0, 0.0, 0.0};
+  return !isDynamic() && isUniform() && uniformValue_ == real3{0.0, 0.0, 0.0};
 }
 
 int VectorParameter::ncomp() const {
@@ -109,12 +114,7 @@ std::shared_ptr<const System> VectorParameter::system() const {
 }
 
 Field VectorParameter::eval() const {
-  auto t = system_->world()->time();
   Field staticField(system_, ncomp());
-  Field dynamicField(system_, ncomp());
-
-  dynamicField.makeZero();
-  evalTimeDependentTerms(t, dynamicField);
 
   if (staticField_) {
       staticField = *staticField_;
@@ -123,17 +123,27 @@ Field VectorParameter::eval() const {
       staticField.setUniformComponent(uniformValue_);
   }
 
-  staticField += dynamicField;
+  if (isDynamic()) {
+      auto t = system_->world()->time();
+      Field dynamicField(system_, ncomp());
+
+      dynamicField.makeZero();
+      evalTimeDependentTerms(t, dynamicField);
+
+      staticField += dynamicField;
+  }
 
   return staticField;
 }
 
 CuVectorParameter VectorParameter::cu() const {
-    auto t = system_->world()->time();
-    dynamicField_.reset(new Field(system_, ncomp()));
-    dynamicField_->makeZero();
+    if (isDynamic()) {
+        auto t = system_->world()->time();
+        dynamicField_.reset(new Field(system_, ncomp()));
+        dynamicField_->makeZero();
 
-    evalTimeDependentTerms(t, *dynamicField_);
+        evalTimeDependentTerms(t, *dynamicField_);
+    }
 
   return CuVectorParameter(this);
 }

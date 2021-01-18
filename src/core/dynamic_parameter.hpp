@@ -38,6 +38,8 @@ public:
   void addTimeDependentTerm(const std::function<T(real)>& term, const Field& mask) { time_dep_terms.emplace_back(std::function<T(real)>(term), Field(mask)); }
    /** Remove all time-dependet terms and their masks. */
   void removeAllTimeDependentTerms() { time_dep_terms.clear(); }
+  /** Return true if parameter has non-zero time dependent terms. */
+  bool isDynamic() const noexcept { return !time_dep_terms.empty(); };
 protected:
   /** Store time-dependent field values to be used on device. */
   mutable std::unique_ptr<Field> dynamicField_;
