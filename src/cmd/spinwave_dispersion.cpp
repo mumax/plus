@@ -69,8 +69,8 @@ void spinwave_dispersion() {
             return sin(x) / (x);
     };
 
-    auto Bt = [&sinc, fmax, T, Bz](real t) {
-        return real3{ 0.01F * (float)sinc(2 * M_PI * fmax * (t - T / 2)), 0, 0 };
+    auto Bt = [&sinc, fmax, T](real t) {
+        return real3{ 0.01 * sinc(2 * M_PI * fmax * (t - T / 2)), 0, 0 };
     };
 
     magnet->biasMagneticField.addTimeDependentTerm(Bt, mask);
