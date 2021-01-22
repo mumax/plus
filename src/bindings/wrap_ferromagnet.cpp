@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 #include "anisotropy.hpp"
+#include "bulkdmi.hpp"
 #include "demag.hpp"
 #include "effectivefield.hpp"
 #include "energy.hpp"
@@ -41,6 +42,7 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("aex", &Ferromagnet::aex)
       .def_readonly("anisU", &Ferromagnet::anisU)
       .def_readonly("idmi", &Ferromagnet::idmi)
+      .def_readonly("bdmi", &Ferromagnet::bdmi)
       .def_readonly("xi", &Ferromagnet::xi)
       .def_readonly("pol", &Ferromagnet::pol)
       .def_readonly("jcur", &Ferromagnet::jcur)
@@ -80,6 +82,10 @@ void wrap_ferromagnet(py::module& m) {
   m.def("interfacialdmi_field", &interfacialDmiFieldQuantity);
   m.def("interfacialdmi_energy_density", &interfacialDmiEnergyDensityQuantity);
   m.def("interfacialdmi_energy", &interfacialDmiEnergyQuantity);
+
+  m.def("bulkdmi_field", &bulkDmiFieldQuantity);
+  m.def("bulkdmi_energy_density", &bulkDmiEnergyDensityQuantity);
+  m.def("bulkdmi_energy", &bulkDmiEnergyQuantity);
 
   m.def("external_field", &externalFieldQuantity);
   m.def("zeeman_energy_density", &zeemanEnergyDensityQuantity);

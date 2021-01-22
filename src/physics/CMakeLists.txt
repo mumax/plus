@@ -3,6 +3,8 @@
 add_library(physics STATIC 
     anisotropy.cu 
     anisotropy.hpp 
+    bulkdmi.cu
+    bulkdmi.hpp
     constants.hpp
     demag.cpp
     demag.hpp

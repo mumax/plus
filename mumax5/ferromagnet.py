@@ -183,6 +183,15 @@ class Ferromagnet:
         self.idmi.set(value)
 
     @property
+    def bdmi(self):
+        """Bulk DMI strength."""
+        return Parameter(self._impl.bdmi)
+
+    @bdmi.setter
+    def bdmi(self, value):
+        self.bdmi.set(value)
+
+    @property
     def xi(self):
         """Non-adiabaticity of the spin-transfer torque."""
         return Parameter(self._impl.xi)
@@ -288,7 +297,7 @@ class Ferromagnet:
 
     @property
     def interfacialdmi_field(self):
-        """Effective field of the Dzyaloshinskii-Moriya interaction."""
+        """Effective field of the interfacial Dzyaloshinskii-Moriya interaction."""
         return FieldQuantity(_cpp.interfacialdmi_field(self._impl))
 
     @property
@@ -301,6 +310,21 @@ class Ferromagnet:
     def interfacialdmi_energy(self):
         """Energy related to the interfacial Dzyaloshinskii-Moriya interaction."""
         return ScalarQuantity(_cpp.interfacialdmi_energy(self._impl))
+
+    @property
+    def bulkdmi_field(self):
+        """Effective field of the 'bulk' Dzyaloshinskii-Moriya interaction."""
+        return FieldQuantity(_cpp.bulkdmi_field(self._impl))
+
+    @property
+    def bulkdmi_energy_density(self):
+        """Energy density related to the Dzyaloshinskii-Moriya interaction in bulk."""
+        return FieldQuantity(_cpp.bulkdmi_energy_density(self._impl))
+
+    @property
+    def bulkdmi_energy(self):
+        """Energy related to the 'bulk' Dzyaloshinskii-Moriya interaction."""
+        return ScalarQuantity(_cpp.bulkdmi_energy(self._impl))
 
     @property
     def external_field(self):

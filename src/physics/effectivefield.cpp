@@ -1,6 +1,7 @@
 #include "effectivefield.hpp"
 
 #include "anisotropy.hpp"
+#include "bulkdmi.hpp"
 #include "demag.hpp"
 #include "exchange.hpp"
 #include "ferromagnet.hpp"
@@ -15,6 +16,7 @@ Field evalEffectiveField(const Ferromagnet* magnet) {
   h += evalExchangeField(magnet);
   h += evalExternalField(magnet);
   h += evalInterfacialDmiField(magnet);
+  h += evalBulkDmiField(magnet);
   return h;
 }
 

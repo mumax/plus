@@ -71,7 +71,8 @@ class Ferromagnet {
   Parameter ku2;
   Parameter alpha;
   Parameter temperature;
-  Parameter idmi;
+  Parameter idmi; /* Interfacially ind. DMI strength */
+  Parameter bdmi; /* Bulk DMI strength */
   Parameter xi;
   Parameter pol;
   curandGenerator_t randomGenerator;

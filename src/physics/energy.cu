@@ -1,4 +1,5 @@
 #include "anisotropy.hpp"
+#include "bulkdmi.hpp"
 #include "cudalaunch.hpp"
 #include "demag.hpp"
 #include "energy.hpp"
@@ -51,6 +52,7 @@ Field evalTotalEnergyDensity(const Ferromagnet* magnet) {
   edens += evalExchangeEnergyDensity(magnet);
   edens += evalZeemanEnergyDensity(magnet);
   edens += evalInterfacialDmiEnergyDensity(magnet);
+  edens += evalBulkDmiEnergyDensity(magnet);
   return edens;
 }
 
