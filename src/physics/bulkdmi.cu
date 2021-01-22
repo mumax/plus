@@ -63,9 +63,6 @@ __global__ static void k_bulkDmiField(CuField hField,
       real3 m_ = mField.vectorAt(idx_);
 
       h += harmonicMean(d, d_) * cross(m_, dr) / cs;
-      // real3 dmivec = harmonicMean(d, d_) * cross(interfaceNormal, dr);
-
-      // h += cross(dmivec, m_) / cs;
     }
   }
 
