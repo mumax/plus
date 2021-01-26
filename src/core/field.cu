@@ -1,3 +1,5 @@
+#include "field.hpp"
+
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -7,7 +9,6 @@
 #include "cudaerror.hpp"
 #include "cudalaunch.hpp"
 #include "cudastream.hpp"
-#include "field.hpp"
 #include "fieldops.hpp"
 #include "fieldquantity.hpp"
 #include "gpubuffer.hpp"
@@ -23,8 +24,7 @@ Field::Field(std::shared_ptr<const System> system, int nComponents)
 
 Field::Field(std::shared_ptr<const System> system, int nComponents, real value)
     : Field(system, nComponents) {
-  for (int comp = 0; comp < nComponents; comp++)
-    setUniformComponent(comp, value);
+  setUniformValue(value);
 }
 
 Field::Field(const Field& other)
@@ -105,10 +105,12 @@ void Field::getData(real* buffer) const {
   }
 }
 
-void Field::getData(std::vector<real>& buffer) const {
-    buffer.clear();
-    buffer.reserve(ncomp_ * grid().ncells());
-    getData(buffer.data());
+std::vector<real> Field::getData() const {
+  auto size = ncomp_ * grid().ncells();
+  std::vector<real> buffer(size, 0);
+  getData(buffer.data());
+
+  return buffer;
 }
 
 void Field::setData(const real* buffer) {
@@ -122,7 +124,7 @@ void Field::setData(const real* buffer) {
 }
 
 void Field::setData(const std::vector<real>& buffer) {
-    setData(buffer.data());
+  setData(buffer.data());
 }
 
 __global__ void k_setComponent(CuField f, real value, int comp) {
@@ -138,33 +140,32 @@ __global__ void k_setComponent(CuField f, real value, int comp) {
 }
 
 __global__ void k_setVectorValue(CuField f, real3 value) {
-    int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    if (!f.cellInGrid(idx))
-        return;
+  int idx = blockDim.x * blockIdx.x + threadIdx.x;
+  if (!f.cellInGrid(idx))
+    return;
 
-    if (f.cellInGeometry(idx)) {
-        f.setVectorInCell(idx, value);
-    }
-    else {
-        f.setVectorInCell(idx, real3{ 0, 0, 0 });
-    }
+  if (f.cellInGeometry(idx)) {
+    f.setVectorInCell(idx, value);
+  } else {
+    f.setVectorInCell(idx, real3{0, 0, 0});
+  }
 }
 
 void Field::setUniformComponent(int comp, real value) {
   cudaLaunch(grid().ncells(), k_setComponent, cu(), value, comp);
 }
 
-void Field::setUniformComponent(real value) {
-    for (int comp = 0; comp < ncomp_; comp++)
-        setUniformComponent(comp, value);
+void Field::setUniformValue(real value) {
+  for (int comp = 0; comp < ncomp_; comp++)
+    setUniformComponent(comp, value);
 }
 
-void Field::setUniformComponent(real3 value) {
-    cudaLaunch(grid().ncells(), k_setVectorValue, cu(), value);
+void Field::setUniformValue(real3 value) {
+  cudaLaunch(grid().ncells(), k_setVectorValue, cu(), value);
 }
 
 void Field::makeZero() {
-    setUniformComponent(0);
+  setUniformValue(0);
 }
 
 __global__ void k_setZeroOutsideGeometry(CuField f) {
