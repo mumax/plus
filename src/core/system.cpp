@@ -34,6 +34,13 @@ real3 System::cellPosition(int3 idx) const {
   return real3{p.x * c.x, p.y * c.y, p.z * c.z};
 }
 
+real3 System::center() const {
+  int3 size = grid().size();
+  real3 corner1 = cellPosition({0, 0, 0});
+  real3 corner2 = cellPosition({size.x - 1, size.y - 1, size.z - 1});
+  return (corner2 + corner1) / 2;
+}
+
 const GpuBuffer<bool>& System::geometry() const {
   return geometry_;
 }
