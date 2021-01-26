@@ -48,9 +48,9 @@ Field Parameter::eval() const {
       staticField = *staticField_;
   }
   else {
-      // can we safely skip n = 0 here???, can we move this function in a parent class???
+      // can we move this function in a parent class???
       // e.g. Scalar Parameter instead of Parameter, and create Static Parameter or just Parameter???
-      staticField.setUniformComponent(uniformValue_);
+      staticField.setUniformValue(uniformValue_);
   }
 
   if (isDynamic()) {
@@ -120,7 +120,7 @@ Field VectorParameter::eval() const {
       staticField = *staticField_;
   }
   else {
-      staticField.setUniformComponent(uniformValue_);
+      staticField.setUniformValue(uniformValue_);
   }
 
   if (isDynamic()) {

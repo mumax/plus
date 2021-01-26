@@ -48,7 +48,7 @@ void DynamicParameter<T>::evalTimeDependentTerms(real t, Field& p) const {
         }
         else {
             Field f(p.system(), p.ncomp());
-            f.setUniformComponent(func(t));
+            f.setUniformValue(func(t));
             p += f;
         }
     }
