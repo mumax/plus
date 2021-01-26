@@ -7,6 +7,13 @@
 template<typename T>
 class DynamicParameter {
 public:
+  DynamicParameter(): dynamicField_(nullptr) {};
+  DynamicParameter(const DynamicParameter&);
+  DynamicParameter& operator=(const DynamicParameter&);
+  DynamicParameter(const DynamicParameter&&) noexcept;
+  DynamicParameter& operator=(const DynamicParameter&&) noexcept;
+
+  virtual ~DynamicParameter() = default;
   /** Add time-dependent function that is the same for every grid cell.
   * 
   * Parameter values will be evaluated as:
@@ -15,15 +22,6 @@ public:
   * 
   * @param term time-dependent function.
   */
-
-  DynamicParameter(): dynamicField_(nullptr) {};
-  DynamicParameter(const DynamicParameter&);
-  DynamicParameter& operator=(const DynamicParameter&);
-  DynamicParameter(const DynamicParameter&&) noexcept;
-  DynamicParameter& operator=(const DynamicParameter&&) noexcept;
-
-  virtual ~DynamicParameter() = default;
-
   void addTimeDependentTerm(const std::function<T(real)>& term) { time_dep_terms.emplace_back(term, Field()); }
   /** Add time-dependent function that is the same for every grid cell.
   * 
@@ -36,7 +34,7 @@ public:
   *             depend on cell coordinates. The input value will be copied.
   */
   void addTimeDependentTerm(const std::function<T(real)>& term, const Field& mask) { time_dep_terms.emplace_back(std::function<T(real)>(term), Field(mask)); }
-   /** Remove all time-dependet terms and their masks. */
+  /** Remove all time-dependet terms and their masks. */
   void removeAllTimeDependentTerms() { time_dep_terms.clear(); }
   /** Return true if parameter has non-zero time dependent terms. */
   bool isDynamic() const noexcept { return !time_dep_terms.empty(); };
