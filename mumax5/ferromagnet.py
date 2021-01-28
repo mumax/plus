@@ -84,6 +84,17 @@ class Ferromagnet:
         return self._impl.system.geometry
 
     @property
+    def center(self):
+        """Center of the ferromagnet.
+
+        Returns
+        -------
+        center: tuple[float] of size 3
+            xyz coordinate of the center of the ferromagnet.
+        """
+        return self._impl.system.center
+
+    @property
     def magnetization(self):
         """Direction of the magnetization (normalized)."""
         return Variable(self._impl.magnetization)

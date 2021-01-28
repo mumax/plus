@@ -35,6 +35,9 @@ class System {
   /** Return the position of a cell of this system in the world. */
   real3 cellPosition(int3) const;
 
+  /** Return the position of the center of this system in the world. */
+  real3 center() const;
+
   /** Get the geometry of the system. */
   const GpuBuffer<bool>& geometry() const;
 
