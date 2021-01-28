@@ -62,11 +62,11 @@ class Parameter(FieldQuantity):
         if mask is None:
             self._impl.add_time_terms(term)
         else:
-            if mask.shape != self.ncomp:
-                raise ValueError(
-                    f"mask has unexpected shape. Expected {mask.shape}, provided "
-                    f"{self.ncomp}"
-                )
+            # if mask.shape != self.ncomp: should be a different check function
+            #     raise ValueError(
+            #         f"mask has unexpected shape. Expected {mask.shape}, provided "
+            #         f"{self.ncomp}"
+            #     )
 
             self._impl.add_time_terms(term, mask)
 
@@ -101,6 +101,10 @@ class Parameter(FieldQuantity):
                 self.add_time_terms(value)
             else:
                 self._set_func(value)
+        elif isinstance(value, tuple) and callable(value[0]):
+            # first term is time-function, second term is a mask
+            self.set(0)
+            self.add_time_terms(*value)
         else:
             self._impl.set(value)
 

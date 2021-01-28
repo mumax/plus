@@ -40,7 +40,7 @@ class Field : public FieldQuantity {
 
   void clear();
 
-  bool empty() const { return grid().ncells() == 0 || ncomp_ == 0; }
+  bool empty() const { return !system_ || grid().ncells() == 0 || ncomp_ == 0; }
   std::shared_ptr<const System> system() const;
   int ncomp() const { return ncomp_; }
   real* device_ptr(int comp) const { return buffers_[comp].get(); }

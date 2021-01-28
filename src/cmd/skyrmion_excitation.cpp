@@ -36,6 +36,7 @@ void skyrmion_excitation() {
     magnet->aex.set(15E-12);
     magnet->alpha.set(0.001);
     magnet->anisU.set(real3{0, 0, 1});
+    magnet->idmi.set(3E-3);
 
     auto sinc = [](real x) -> real {
       if (std::abs(x) <= std::numeric_limits<real>::epsilon())
@@ -44,18 +45,13 @@ void skyrmion_excitation() {
         return sin(x) / (x);
     };
 
-    auto Bt = [&sinc, fmax, T, t0](real t) -> real {
+    auto Ku1t = [&sinc, fmax, T, t0](real t) -> real {
       return 1E6 * (1.0 + 0.01 * sinc(2 * M_PI * fmax * (t - t0)));
     };
 
-    magnet->ku1.addTimeDependentTerm(Bt); // do we need a mask??
+    magnet->ku1.addTimeDependentTerm(Ku1t); // do we need a mask??
 
     magnet->minimize();
-
-    // how can we set these values
-    // Dind = 3.0e-3
-    // Ku1 = 1e6 * (1 + 0.01 * sinc(2 * pi * {fmax} * (t - t0)))
-    // AnisU = vector(0, 0, 1)
 
     // how to create a Neel skyrmion here??
     // m = neelskyrmion(-1, 1)
@@ -71,6 +67,6 @@ void skyrmion_excitation() {
       mWorld.timesolver().run(dt);
       auto m = magnet->magnetization()->average();
       magn_csv << mWorld.time() << "," << m[0] << "," << m[1] << "," << m[2]
-               << "," << Bt(i * dt) << "," << std::endl;
+               << "," << Ku1t(i * dt) << "," << std::endl;
     }
 }
