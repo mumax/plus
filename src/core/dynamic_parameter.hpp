@@ -15,6 +15,7 @@ public:
 
   virtual ~DynamicParameter() = default;
   /** Add time-dependent function that is the same for every grid cell.
+  * The input parameter value will be copied.
   * 
   * Parameter values will be evaluated as:
   * a) uniform_value + term(t)
@@ -22,8 +23,9 @@ public:
   * 
   * @param term time-dependent function.
   */
-  void addTimeDependentTerm(const std::function<T(real)>& term) { time_dep_terms.emplace_back(term, Field()); }
+  void addTimeDependentTerm(const std::function<T(real)>& term) { time_dep_terms.emplace_back(std::function<T(real)>(term), Field()); }
   /** Add time-dependent function that is the same for every grid cell.
+  * The input parameter values will be copied.
   * 
   * Parameter values will be evaluated as:
   * a) uniform_value + term(t) * mask
@@ -38,6 +40,8 @@ public:
   void removeAllTimeDependentTerms() { time_dep_terms.clear(); }
   /** Return true if parameter has non-zero time dependent terms. */
   bool isDynamic() const noexcept { return !time_dep_terms.empty(); };
+  /** Return true if dynamic parameter values are independent of the cell location. */
+  bool isUniform() const;
 protected:
   /** Store time-dependent field values to be used on device. */
   mutable std::unique_ptr<Field> dynamicField_;

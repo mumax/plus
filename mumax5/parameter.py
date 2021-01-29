@@ -1,8 +1,8 @@
 """Patameter implementation."""
 
-from typing import Type, ValuesView
-import numpy as _np
+import numpy as np
 
+import _mumax5cpp as _cpp
 from .fieldquantity import FieldQuantity
 
 
@@ -20,6 +20,16 @@ class Parameter(FieldQuantity):
     def __repr__(self):
         """Return Parameter string representation."""
         return super().__repr__().replace("FieldQuantity", "Parameter")
+
+    def eval(self):
+        """Estimate parameter value on the given grid.
+        
+        Returns
+        -------
+        numpy.ndarray
+            Parameter value.
+        """
+        return self._impl.eval()
 
     @property
     def is_uniform(self):
@@ -57,66 +67,72 @@ class Parameter(FieldQuantity):
             An numpy array defining how the magnitude of the time-dependent function
             should be weighted depending on the cell coordinates. In example, it can
             be an array of 0s and 1s. The number of components of the Parameter
-            instance and mask should be the same. Default value is None.
+            instance and the shape of mask should conform. Default value is None.
         """
+        if isinstance(self._impl, _cpp.VectorParameter):
+            # The VectorParameter value should be a sequence of size 3
+            # here we convert that sequence to a numpy array
+            original_term = term
+            term = lambda t: np.array(original_term(t), dtype=float)
+
         if mask is None:
             self._impl.add_time_terms(term)
         else:
-            # if mask.shape != self.ncomp: should be a different check function
-            #     raise ValueError(
-            #         f"mask has unexpected shape. Expected {mask.shape}, provided "
-            #         f"{self.ncomp}"
-            #     )
-
             self._impl.add_time_terms(term, mask)
-
 
     def remove_time_terms(self):
         """Remove all time dependent terms."""
         self._impl.remove_time_terms()
 
-
     def set(self, value):
-        # change docs to show that we can set time-functions as well
         """Set the parameter value.
+
+        Use a single float to set a uniform scalar parameter or a tuple of three
+        floats for a uniform vector parameter.
+
+        To set the values of an inhomogeneous parameter, use a numpy array or a function
+        which returns the parameter value as a function of the position, i.e.
+        (x: float, y: float, z: float) -> float or
+        (x: float, y: float, z: float) -> sequence[float] of size 3.
+        
+        To assign time-dependant terms using this method use either a single-argument
+        function, i.e. (float t) -> float or (t: float) -> sequence[float] of size 3;
+        or a tuple of size two consisting of a time-dependent term as its first entry
+        and the mask of the function as its second entry, i.e.
+        ((float t) -> float, numpy.ndarray) or ((float t) -> [float], numpy.ndarray).
 
         Parameters
         ----------
         value: float, tuple of floats, numpy array, or callable
-            The new value for the parameter. Use a single float to set a uniform scalar
-            parameter or a tuple of three floats for a uniform vector parameter. To set
-            the values of an inhomogeneous parameter, use a numpy array or a function
-            which returns the parameter value as a function of the position.
+            The new value for the parameter.
         """
         if callable(value):
             # test whether given function takes 1 or 3 arguments
-            time_func = True
+            is_time_function = True
             try:
                 value(0)
             except TypeError:
-                time_func = False
+                is_time_function = False
 
-            if time_func:
-                self.set(0)
+            if is_time_function:
                 self.add_time_terms(value)
             else:
                 self._set_func(value)
         elif isinstance(value, tuple) and callable(value[0]):
             # first term is time-function, second term is a mask
-            self.set(0)
             self.add_time_terms(*value)
         else:
             self._impl.set(value)
 
     def _set_func(self, func):
-        value = _np.zeros(self.shape, dtype=_np.float32)
+        value = np.zeros(self.shape, dtype=np.float32)
 
         for iz in range(value.shape[1]):
             for iy in range(value.shape[2]):
                 for ix in range(value.shape[3]):
 
                     pos = self._impl.system.cell_position((ix, iy, iz))
-                    cell_value = _np.array(func(*pos), ndmin=1)
+                    cell_value = np.array(func(*pos), ndmin=1)
 
                     for ic in range(value.shape[0]):
                         value[ic, iz, iy, ix] = cell_value[ic]

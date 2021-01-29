@@ -122,7 +122,7 @@ class Ferromagnet:
 
     @bias_magnetic_field.setter
     def bias_magnetic_field(self, value):
-        self._impl.bias_magnetic_field.set(value)
+        self.bias_magnetic_field.set(value)
 
     def minimize(self):
         """Minimize the total energy."""
@@ -158,7 +158,7 @@ class Ferromagnet:
         self.aex.set(value)
 
     @property
-    def ku1(self):
+    def ku1(self) -> Parameter:
         """Uniaxial anisotropy parameter Ku1."""
         return Parameter(self._impl.ku1)
 
@@ -167,7 +167,7 @@ class Ferromagnet:
         self.ku1.set(value)
 
     @property
-    def ku2(self):
+    def ku2(self) -> Parameter:
         """Uniaxial anisotropy parameter Ku2."""
         return Parameter(self._impl.ku2)
 

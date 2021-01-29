@@ -50,10 +50,6 @@ outputquantities = {
     "mx": lambda: magnet.magnetization.average()[0],
     "my": lambda: magnet.magnetization.average()[1],
     "mz": lambda: magnet.magnetization.average()[2],
-    "e_total": magnet.total_energy,
-    "e_exchange": magnet.exchange_energy,
-    "e_zeeman": magnet.zeeman_energy,
-    "e_demag": magnet.demag_energy,
 }
 
 # --- RUN THE SOLVER ---
@@ -85,16 +81,3 @@ plt.title("Mumax5 - Python")
 plt.show()
 
 show_field(magnet.magnetization)
-
-
-plt.subplot(211)
-for key in ["mx", "my", "mz"]:
-    plt.plot(output["time"], output[key], label=key)
-plt.legend()
-
-plt.subplot(212)
-for key in ["e_total", "e_exchange", "e_zeeman", "e_demag"]:
-    plt.plot(timepoints, output[key], label=key)
-plt.legend()
-
-plt.show()

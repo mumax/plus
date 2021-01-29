@@ -1,5 +1,6 @@
 #include <pybind11/numpy.h>
 
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -48,7 +49,10 @@ void setArrayInField(Field& f, py::array_t<real> data) {
 
   if (ndim == 1) {
     if (data.shape(0) != f.ncomp()) {
-      throw std::runtime_error("The number of components do not match");
+      std::stringstream ss;
+      ss << "The number of components do not match, "
+         << "expected " << data.shape(0) << ", got " << f.ncomp() << ".";
+      throw std::runtime_error(ss.str());
     }
 
     py::buffer_info buf = data.request();
@@ -74,8 +78,13 @@ void setArrayInField(Field& f, py::array_t<real> data) {
 
     for (ssize_t i = 0; i < ndim; i++) {
       if (shape[i] != data.shape(i)) {
-        throw std::runtime_error(
-            "The shape of the data does not match the shape of the field");
+        std::stringstream ss;
+        ss << "The shape of the data does not match the shape of the field, "
+           << "expected (" << shape[0] << ", " << shape[1] << ", " << shape[2]
+           << ", " << shape[3] << "), got (" << data.shape(0) << ", "
+           << data.shape(1) << ", " << data.shape(2) << ", " << data.shape(3)
+           << ").";
+        throw std::runtime_error(ss.str());
       }
     }
     py::buffer_info buf = data.request();

@@ -26,7 +26,7 @@ void Parameter::set(const Field& values) {
 }
 
 bool Parameter::isUniform() const {
-  return !staticField_;
+  return !staticField_ && DynamicParameter<real>::isUniform();
 }
 
 bool Parameter::assuredZero() const {
@@ -98,7 +98,7 @@ void VectorParameter::set(const Field& values) {
 }
 
 bool VectorParameter::isUniform() const {
-  return !staticField_;
+  return !staticField_ && DynamicParameter<real3>::isUniform();
 }
 
 bool VectorParameter::assuredZero() const {

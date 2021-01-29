@@ -1,7 +1,7 @@
-#include <memory>
-
 #include <pybind11/functional.h>
 #include <pybind11/numpy.h>
+
+#include <memory>
 
 #include "field.hpp"
 #include "fieldquantity.hpp"
@@ -11,14 +11,21 @@
 
 void wrap_parameter(py::module& m) {
   py::class_<Parameter, FieldQuantity>(m, "Parameter")
-      .def("add_time_terms", py::overload_cast<const std::function<real(real)>&>(&Parameter::addTimeDependentTerm))
-      .def("add_time_terms", [](Parameter* p,
-                                std::function<real(real)>& term,
-                                py::array_t<real> mask) {
-          Field field_mask(p->system(), 1);
-          setArrayInField(field_mask, mask);
-          p->addTimeDependentTerm(term, field_mask);
-        })
+      .def("add_time_terms",
+           py::overload_cast<const std::function<real(real)>&>(
+               &Parameter::addTimeDependentTerm))
+      .def("add_time_terms",
+           [](Parameter* p, std::function<real(real)>& term,
+              py::array_t<real> mask) {
+             Field field_mask(p->system(), 1);
+             setArrayInField(field_mask, mask);
+             p->addTimeDependentTerm(term, field_mask);
+           })
+      .def("eval",
+           [](Parameter* p) {
+             auto f = p->eval();
+             return fieldToArray(f);
+           })
       .def("is_uniform", &Parameter::isUniform)
       .def("is_dynamic", &Parameter::isDynamic)
       .def("remove_time_terms", &Parameter::removeAllTimeDependentTerms)
@@ -30,14 +37,59 @@ void wrap_parameter(py::module& m) {
       });
 
   py::class_<VectorParameter, FieldQuantity>(m, "VectorParameter")
-      .def("add_time_terms", py::overload_cast<const std::function<real3(real)>&>(&VectorParameter::addTimeDependentTerm))
-      .def("add_time_terms", [](VectorParameter* p,
-                                std::function<real3(real)>& term,
-                                py::array_t<real> mask) {
-        Field field_mask(p->system(), 1);
-        setArrayInField(field_mask, mask);
-        p->addTimeDependentTerm(term, field_mask);
-      })
+      .def(
+          "add_time_terms",
+          [](VectorParameter* p, std::function<py::array_t<real>(real)>& term) {
+            auto cpp_term = [term](real t) -> real3 {
+              auto np_ndarray = term(t);
+              auto buffer = np_ndarray.request();
+
+              if (buffer.ndim != 1)
+                throw std::runtime_error("Number of dimensions must be one.");
+
+              if (buffer.size != 3)
+                throw std::runtime_error(
+                    "VectorPameter value should be of size 3, got " +
+                    buffer.size);
+
+              real* ptr = static_cast<real*>(buffer.ptr);
+
+              return real3{ptr[0], ptr[1], ptr[2]};
+            };
+
+            p->addTimeDependentTerm(cpp_term);
+          })
+      .def("add_time_terms",
+           [](VectorParameter* p, std::function<py::array_t<real>(real)>& term,
+              py::array_t<real> mask) {
+             int ncomp = 3;
+             Field field_mask(p->system(), ncomp);
+             setArrayInField(field_mask, mask);
+
+             auto cpp_term = [term](real t) -> real3 {
+               auto np_ndarray = term(t);
+               auto buffer = np_ndarray.request();
+
+               if (buffer.ndim != 1)
+                 throw std::runtime_error("Number of dimensions must be one.");
+
+               if (buffer.size != 3)
+                 throw std::runtime_error(
+                     "VectorPameter value should be of size 3, got " +
+                     buffer.size);
+
+               real* ptr = static_cast<real*>(buffer.ptr);
+
+               return real3{ptr[0], ptr[1], ptr[2]};
+             };
+
+             p->addTimeDependentTerm(cpp_term, field_mask);
+           })
+      .def("eval",
+           [](VectorParameter* p) {
+             auto f = p->eval();
+             return fieldToArray(f);
+           })
       .def("is_uniform", &VectorParameter::isUniform)
       .def("is_dynamic", &VectorParameter::isDynamic)
       .def("remove_time_terms", &VectorParameter::removeAllTimeDependentTerms)
