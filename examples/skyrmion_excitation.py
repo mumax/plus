@@ -20,14 +20,12 @@ cell_size = (d / nx, d / nx, 1E-9)
 
 world = World(cell_size)
 
-geometry_func = lambda x, y, z: (x - 4.84E-8) ** 2 +  (y -  4.84E-8) ** 2 <= (0.5 * d) ** 2
 # CREATE A FERROMAGNET
 magnet = Ferromagnet(world, Grid(size=grid_size))
 magnet.msat = 1E6
 magnet.aex = 15E-12
 
-mask = np.zeros(shape=(1, 1, 32, 32))
-magnet.ku1 = lambda t: 1E6 * (1 + 0.01 * np.sinc(2 * fmax * (t - t0))), mask
+magnet.ku1 = lambda t: 1E6 * (1 + 0.01 * np.sinc(2 * fmax * (t - t0)))
 
 magnet.idmi = 3E-3
 magnet.anisU = (0, 0, 1)

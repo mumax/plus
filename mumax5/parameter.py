@@ -1,6 +1,7 @@
 """Patameter implementation."""
 
 import numpy as np
+from numpy.core.fromnumeric import ndim, shape
 
 import _mumax5cpp as _cpp
 from .fieldquantity import FieldQuantity
@@ -74,11 +75,37 @@ class Parameter(FieldQuantity):
             # here we convert that sequence to a numpy array
             original_term = term
             term = lambda t: np.array(original_term(t), dtype=float)
+            # change mask dimensions to include components dimension
+            mask = self._check_mask_shape(mask, ncomp=3)
+        elif isinstance(self._impl, _cpp.Parameter):
+            # change mask dimensions to include components dimension
+            mask = self._check_mask_shape(mask, ncomp=1)
 
         if mask is None:
             self._impl.add_time_term(term)
         else:
             self._impl.add_time_term(term, mask)
+
+    def _check_mask_shape(self, mask, ncomp):
+        """Change mask shape to have 4 dimensions and correct components."""
+        ndim = 4
+        if (mask is not None):
+            if len(mask.shape) != ndim:
+                expected_mask_shape = (ncomp, *mask.shape)
+            elif mask.shape[0] != ncomp:
+                expected_mask_shape = (ncomp, *mask.shape[1:])
+            else:
+                expected_mask_shape = mask.shape
+            
+            if expected_mask_shape != mask.shape:
+                new_mask = np.zeros(shape=expected_mask_shape)
+
+                for i in range(ncomp):
+                    new_mask[i] = mask
+            else:
+                new_mask = mask
+
+            return new_mask
 
     def remove_time_terms(self):
         """Remove all time dependent terms."""
@@ -115,11 +142,13 @@ class Parameter(FieldQuantity):
                 is_time_function = False
 
             if is_time_function:
+                self.remove_time_terms()
                 self.add_time_term(value)
             else:
                 self._set_func(value)
         elif isinstance(value, tuple) and callable(value[0]):
             # first term is time-function, second term is a mask
+            self.remove_time_terms()
             self.add_time_term(*value)
         else:
             self._impl.set(value)
