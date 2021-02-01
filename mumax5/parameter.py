@@ -41,7 +41,7 @@ class Parameter(FieldQuantity):
         """Return True if a Parameter instance has time dependent terms, otherwise False."""
         return self._impl.is_dynamic()
 
-    def add_time_terms(self, term, mask=None):
+    def add_time_term(self, term, mask=None):
         """Add a time-dependent term.
         
         If mask is None, then the value of the time-dependent term will be the same for
@@ -76,9 +76,9 @@ class Parameter(FieldQuantity):
             term = lambda t: np.array(original_term(t), dtype=float)
 
         if mask is None:
-            self._impl.add_time_terms(term)
+            self._impl.add_time_term(term)
         else:
-            self._impl.add_time_terms(term, mask)
+            self._impl.add_time_term(term, mask)
 
     def remove_time_terms(self):
         """Remove all time dependent terms."""
@@ -115,12 +115,12 @@ class Parameter(FieldQuantity):
                 is_time_function = False
 
             if is_time_function:
-                self.add_time_terms(value)
+                self.add_time_term(value)
             else:
                 self._set_func(value)
         elif isinstance(value, tuple) and callable(value[0]):
             # first term is time-function, second term is a mask
-            self.add_time_terms(*value)
+            self.add_time_term(*value)
         else:
             self._impl.set(value)
 

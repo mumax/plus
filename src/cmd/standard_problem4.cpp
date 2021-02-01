@@ -1,6 +1,7 @@
 #include "examples.hpp"
 
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 #include <vector>
 
@@ -13,7 +14,7 @@
 #include "torque.hpp"
 
 void standard_problem4() {
-  std::cout << "Standard Problem 4" << std::endl;
+  std::cout << "************ Standard Problem 4 ***********" << std::endl;
 
   real length = 500E-9, width = 125E-9, thickness = 3E-9;
   int3 n = make_int3(128, 32, 1);
@@ -38,10 +39,11 @@ void standard_problem4() {
   int n_timepoints = 1000;
   real start = 0, stop = 1E-9, delta = (stop - start) / (n_timepoints - 1);
 
-  std::string out_file_path = "./magnetization.csv";
+  std::string out_file_path = "magnetization.csv";
   std::ofstream magn_csv(out_file_path);
   magn_csv << "t,mx,my,mz," << std::endl;
 
+  std::cout << "Running simulation..." << std::endl;
   for (int i = 0; i < n_timepoints; i++) {
     mWorld.timesolver().run(delta);
     auto m = magnet->magnetization()->average();
@@ -49,6 +51,7 @@ void standard_problem4() {
              << "," << std::endl;
   }
 
-  std::cout << "Simulation results were saved into " << out_file_path
+  std::cout << "Simulation results were saved into\n"
+            << std::filesystem::current_path().append(out_file_path).string()
             << std::endl;
 }

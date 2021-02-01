@@ -97,8 +97,8 @@ def test_add_multiple_scalar_time_dependent_terms(test_parameters: Tuple[World, 
     term2 = lambda t: -24 * np.sinc(t)
 
     magnet.alpha = alpha_value
-    magnet.alpha.add_time_terms(term1)
-    magnet.alpha.add_time_terms(term2, mask_value2 *
+    magnet.alpha.add_time_term(term1)
+    magnet.alpha.add_time_term(term2, mask_value2 *
         np.ones(shape=(ncomp,*magnet.grid.shape)))
 
     assert magnet.alpha.is_dynamic == True
@@ -176,8 +176,8 @@ def test_add_multiple_vector_time_dependent_terms(test_parameters: Tuple[World, 
     expected_value[2, :, :, :] = term_value[2]
 
     magnet.bias_magnetic_field = b_value
-    magnet.bias_magnetic_field.add_time_terms(term1)
-    magnet.bias_magnetic_field.add_time_terms(term2, mask_value2 *
+    magnet.bias_magnetic_field.add_time_term(term1)
+    magnet.bias_magnetic_field.add_time_term(term2, mask_value2 *
         np.ones(shape=(ncomp, *magnet.grid.shape)))
 
     assert magnet.bias_magnetic_field.is_dynamic == True

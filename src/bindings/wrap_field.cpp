@@ -52,7 +52,7 @@ void setArrayInField(Field& f, py::array_t<real> data) {
       std::stringstream ss;
       ss << "The number of components do not match, "
          << "expected " << data.shape(0) << ", got " << f.ncomp() << ".";
-      throw std::runtime_error(ss.str());
+      throw std::invalid_argument(ss.str());
     }
 
     py::buffer_info buf = data.request();
@@ -84,14 +84,14 @@ void setArrayInField(Field& f, py::array_t<real> data) {
            << ", " << shape[3] << "), got (" << data.shape(0) << ", "
            << data.shape(1) << ", " << data.shape(2) << ", " << data.shape(3)
            << ").";
-        throw std::runtime_error(ss.str());
+        throw std::invalid_argument(ss.str());
       }
     }
     py::buffer_info buf = data.request();
     f.setData(reinterpret_cast<real*>(buf.ptr));
 
   } else {
-    throw std::runtime_error(
+    throw std::invalid_argument(
         "The shape of the data does not match the shape of the field");
   }
 }

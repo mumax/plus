@@ -11,10 +11,10 @@
 
 void wrap_parameter(py::module& m) {
   py::class_<Parameter, FieldQuantity>(m, "Parameter")
-      .def("add_time_terms",
+      .def("add_time_term",
            py::overload_cast<const std::function<real(real)>&>(
                &Parameter::addTimeDependentTerm))
-      .def("add_time_terms",
+      .def("add_time_term",
            [](Parameter* p, std::function<real(real)>& term,
               py::array_t<real> mask) {
              Field field_mask(p->system(), 1);
@@ -38,17 +38,17 @@ void wrap_parameter(py::module& m) {
 
   py::class_<VectorParameter, FieldQuantity>(m, "VectorParameter")
       .def(
-          "add_time_terms",
+          "add_time_term",
           [](VectorParameter* p, std::function<py::array_t<real>(real)>& term) {
             auto cpp_term = [term](real t) -> real3 {
               auto np_ndarray = term(t);
               auto buffer = np_ndarray.request();
 
               if (buffer.ndim != 1)
-                throw std::runtime_error("Number of dimensions must be one.");
+                throw std::invalid_argument("Number of dimensions must be one.");
 
               if (buffer.size != 3)
-                throw std::runtime_error(
+                throw std::invalid_argument(
                     "VectorPameter value should be of size 3, got " +
                     buffer.size);
 
@@ -59,7 +59,7 @@ void wrap_parameter(py::module& m) {
 
             p->addTimeDependentTerm(cpp_term);
           })
-      .def("add_time_terms",
+      .def("add_time_term",
            [](VectorParameter* p, std::function<py::array_t<real>(real)>& term,
               py::array_t<real> mask) {
              int ncomp = 3;
@@ -71,10 +71,10 @@ void wrap_parameter(py::module& m) {
                auto buffer = np_ndarray.request();
 
                if (buffer.ndim != 1)
-                 throw std::runtime_error("Number of dimensions must be one.");
+                 throw std::invalid_argument("Number of dimensions must be one.");
 
                if (buffer.size != 3)
-                 throw std::runtime_error(
+                 throw std::invalid_argument(
                      "VectorPameter value should be of size 3, got " +
                      buffer.size);
 
