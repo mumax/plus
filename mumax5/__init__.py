@@ -6,6 +6,7 @@ from .ferromagnet import Ferromagnet
 from .fieldquantity import FieldQuantity
 from .grid import Grid
 from .parameter import Parameter
+from .scalarquantity import ScalarQuantity
 from .strayfield import StrayField
 from .timesolver import TimeSolver
 from .variable import Variable
@@ -17,6 +18,7 @@ __all__ = [
     "FieldQuantity",
     "Grid",
     "Parameter",
+    "ScalarQuantity",
     "StrayField",
     "TimeSolver",
     "Variable",

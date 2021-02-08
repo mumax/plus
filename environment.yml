@@ -22,3 +22,9 @@ dependencies:
 
   # optional
   - ipython
+  - jupyter
+
+  # documentation generation
+  - sphinx
+  - sphinx_rtd_theme
+  - numpydoc

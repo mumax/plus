@@ -1,7 +1,4 @@
 # Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Path setup --------------------------------------------------------------
@@ -9,21 +6,15 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../mumax5'))
-
+sys.path.insert(0, os.path.abspath("../mumax5"))
 
 # -- Project information -----------------------------------------------------
 
-project = 'mumax5'
-copyright = '2020, Jeroen Mulkers'
-author = 'Jeroen Mulkers'
-
-# The full version, including alpha/beta/rc tags
-release = '0.0.0'
-
+project = "mumax5"
+author = "Oleh Kozynets, Jeroen Mulkers"
+release = "0.0.0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -31,34 +22,33 @@ release = '0.0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'numpydoc'
+    "sphinx.ext.autodoc", 
+    "sphinx.ext.autosummary", 
+    "numpydoc", 
 ]
 
-autodoc_default_flags = ['members']
+# The default options for autodoc directives. They are applied to all autodoc directives
+# automatically. It must be a dictionary which maps option names to the values.
+autodoc_default_options = {
+    "members": True,
+    "inherited-members": True,
+    "special-members": "__call__, __getitem__",
+}
+
+# Boolean indicating whether to scan all found documents for autosummary directives, and
+# to generate stub pages for each.
 autosummary_generate = True
 
-numpydoc_class_members_toctree = False
+# If True, methods and attributes will be shown twice
 numpydoc_show_class_members = False
-
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
+exclude_patterns = ["_build"]
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
+# The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
-#
-html_theme = 'sphinx_rtd_theme'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_theme = "sphinx_rtd_theme"

@@ -12,3 +12,5 @@ API Reference
     TimeSolver
     Variable
     Parameter
+    FieldQuantity
+    ScalarQuantity
