@@ -75,6 +75,13 @@ To start debugging session:
 5. Rebuild the mumax5.sln solution with VS
 6. Launch a debugging session via *Extensions->NSight->Start CUDA Debugging*
 
+# Building the documentation
+
+Documentation for mumax5 can be generated using [Sphinx](https://www.sphinx-doc.org). Run the following command in the docs directory to let Sphinx build the HTML documentation pages:
+```
+make html
+```
+The documentation can now be found at `docs/_build/html/index.html`.
 
 # Contributing
 Contributions are gratefully accepted. To contribute code, fork our repo on github and send a pull request.
