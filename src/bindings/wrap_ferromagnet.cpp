@@ -3,12 +3,12 @@
 
 #include "anisotropy.hpp"
 #include "demag.hpp"
+#include "dmi.hpp"
 #include "effectivefield.hpp"
 #include "energy.hpp"
 #include "exchange.hpp"
 #include "ferromagnet.hpp"
 #include "fieldquantity.hpp"
-#include "interfacialdmi.hpp"
 #include "mumaxworld.hpp"
 #include "parameter.hpp"
 #include "strayfieldkernel.hpp"
@@ -40,11 +40,11 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("ku2", &Ferromagnet::ku2)
       .def_readonly("aex", &Ferromagnet::aex)
       .def_readonly("anisU", &Ferromagnet::anisU)
-      .def_readonly("idmi", &Ferromagnet::idmi)
       .def_readonly("xi", &Ferromagnet::xi)
       .def_readonly("pol", &Ferromagnet::pol)
       .def_readonly("jcur", &Ferromagnet::jcur)
       .def_readonly("temperature", &Ferromagnet::temperature)
+      .def_readonly("dmi_tensor", &Ferromagnet::dmiTensor)
 
       .def(
           "magnetic_field_from_magnet",
@@ -77,9 +77,9 @@ void wrap_ferromagnet(py::module& m) {
   m.def("exchange_energy", &exchangeEnergyQuantity);
   m.def("max_angle", &maxAngle);
 
-  m.def("interfacialdmi_field", &interfacialDmiFieldQuantity);
-  m.def("interfacialdmi_energy_density", &interfacialDmiEnergyDensityQuantity);
-  m.def("interfacialdmi_energy", &interfacialDmiEnergyQuantity);
+  m.def("dmi_field", &dmiFieldQuantity);
+  m.def("dmi_energy_density", &dmiEnergyDensityQuantity);
+  m.def("dmi_energy", &dmiEnergyQuantity);
 
   m.def("external_field", &externalFieldQuantity);
   m.def("zeeman_energy_density", &zeemanEnergyDensityQuantity);

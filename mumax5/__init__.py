@@ -2,6 +2,7 @@
 
 import _mumax5cpp as _cpp
 
+from .dmitensor import DmiTensor
 from .ferromagnet import Ferromagnet
 from .fieldquantity import FieldQuantity
 from .grid import Grid
@@ -14,6 +15,7 @@ from .world import World
 
 __all__ = [
     "_cpp",
+    "DmiTensor",
     "Ferromagnet",
     "FieldQuantity",
     "Grid",

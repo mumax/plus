@@ -1,11 +1,11 @@
 #include "anisotropy.hpp"
 #include "cudalaunch.hpp"
 #include "demag.hpp"
+#include "dmi.hpp"
 #include "energy.hpp"
 #include "exchange.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
-#include "interfacialdmi.hpp"
 #include "world.hpp"
 #include "zeeman.hpp"
 
@@ -50,7 +50,7 @@ Field evalTotalEnergyDensity(const Ferromagnet* magnet) {
   edens += evalAnisotropyEnergyDensity(magnet);
   edens += evalExchangeEnergyDensity(magnet);
   edens += evalZeemanEnergyDensity(magnet);
-  edens += evalInterfacialDmiEnergyDensity(magnet);
+  edens += evalDmiEnergyDensity(magnet);
   return edens;
 }
 

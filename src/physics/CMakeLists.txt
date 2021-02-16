@@ -6,6 +6,10 @@ add_library(physics STATIC
     constants.hpp
     demag.cpp
     demag.hpp
+    dmi.cu
+    dmi.hpp
+    dmitensor.cpp
+    dmitensor.hpp
     effectivefield.hpp 
     effectivefield.cpp
     energy.hpp 
@@ -16,8 +20,6 @@ add_library(physics STATIC
     ferromagnet.hpp 
     ferromagnetquantity.cpp 
     ferromagnetquantity.hpp 
-    interfacialdmi.cu
-    interfacialdmi.hpp
     minimizer.cu
     minimizer.hpp
     mumaxworld.cpp

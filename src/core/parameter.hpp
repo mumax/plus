@@ -6,11 +6,11 @@
 
 #include "datatypes.hpp"
 #include "dynamic_parameter.hpp"
+#include "field.hpp"
 #include "fieldquantity.hpp"
 #include "grid.hpp"
 #include "system.hpp"
 
-class Field;
 class CuParameter;
 
 class Parameter : public FieldQuantity, public DynamicParameter<real> {

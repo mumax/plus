@@ -6,6 +6,7 @@ pybind11_add_module(_mumax5cpp
     cast.hpp
     main.cpp
     wrappers.hpp
+    wrap_dmitensor.cpp
     wrap_ferromagnet.cpp
     wrap_field.cpp
     wrap_fieldquantity.cpp

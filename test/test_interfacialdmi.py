@@ -10,29 +10,30 @@ def compute_interfacialdmi_numpy(magnet):
     cs = magnet.cellsize
     h = np.zeros(m.shape)
 
+    Dxxz = magnet.dmi_tensor.xxz.average()
+    Dyyz = magnet.dmi_tensor.yyz.average()
+
     # -x neighbor
     m_ = np.roll(m, 1, axis=3)
-    h[X][:, :, 1:] -= m_[Z][:, :, 1:] / cs[0]
-    h[Z][:, :, 1:] += m_[X][:, :, 1:] / cs[0]
+    h[X][:, :, 1:] -= Dxxz * m_[Z][:, :, 1:] / cs[0]
+    h[Z][:, :, 1:] += Dxxz * m_[X][:, :, 1:] / cs[0]
 
     # +x neighbor
     m_ = np.roll(m, -1, axis=3)
-    h[X][:, :, 0:-1] += m_[Z][:, :, 0:-1] / cs[0]
-    h[Z][:, :, 0:-1] -= m_[X][:, :, 0:-1] / cs[0]
+    h[X][:, :, 0:-1] += Dxxz * m_[Z][:, :, 0:-1] / cs[0]
+    h[Z][:, :, 0:-1] -= Dxxz * m_[X][:, :, 0:-1] / cs[0]
 
     # -y neighbor
     m_ = np.roll(m, 1, axis=2)
-    h[Y][:, 1:, :] -= m_[Z][:, 1:, :] / cs[1]
-    h[Z][:, 1:, :] += m_[Y][:, 1:, :] / cs[1]
+    h[Y][:, 1:, :] -= Dyyz * m_[Z][:, 1:, :] / cs[1]
+    h[Z][:, 1:, :] += Dyyz * m_[Y][:, 1:, :] / cs[1]
 
     # +y neighbor
     m_ = np.roll(m, -1, axis=2)
-    h[Y][:, 0:-1, :] += m_[Z][:, 0:-1, :] / cs[1]
-    h[Z][:, 0:-1, :] -= m_[Y][:, 0:-1, :] / cs[1]
+    h[Y][:, 0:-1, :] += Dyyz * m_[Z][:, 0:-1, :] / cs[1]
+    h[Z][:, 0:-1, :] -= Dyyz * m_[Y][:, 0:-1, :] / cs[1]
 
-    idmi = magnet.idmi.average()[0]
-    msat = magnet.msat.average()[0]
-    h *= idmi / msat
+    h /= magnet.msat.average()[0]
     return h
 
 
@@ -42,9 +43,10 @@ class TestInterfacialDmi:
         world = World(cellsize)
         magnet = Ferromagnet(world, Grid((4, 5, 3)))
         magnet.msat = 3.1
-        magnet.idmi = 7.1
+        magnet.dmi_tensor.xxz = 7.1
+        magnet.dmi_tensor.yyz = -7.1
 
-        result = magnet.interfacialdmi_field.eval()
+        result = magnet.dmi_field.eval()
         wanted = compute_interfacialdmi_numpy(magnet)
 
         relative_error = np.abs(result - wanted) / np.abs(wanted)

@@ -26,7 +26,7 @@ magnet.aex = 15E-12
 
 magnet.ku1 = lambda t: 1E6 * (1 + 0.01 * np.sinc(2 * fmax * (t - t0)))
 
-magnet.idmi = 3E-3
+magnet.dmi_tensor.set_interfacial_dmi(3E-3)
 magnet.anisU = (0, 0, 1)
 magnet.alpha = 0.001
 

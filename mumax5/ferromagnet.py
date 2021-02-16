@@ -4,6 +4,7 @@ import numpy as _np
 
 import _mumax5cpp as _cpp
 
+from .dmitensor import DmiTensor
 from .fieldquantity import FieldQuantity
 from .grid import Grid
 from .parameter import Parameter
@@ -185,15 +186,6 @@ class Ferromagnet:
         self.anisU.set(value)
 
     @property
-    def idmi(self):
-        """Interfacial DMI strength."""
-        return Parameter(self._impl.idmi)
-
-    @idmi.setter
-    def idmi(self, value):
-        self.idmi.set(value)
-
-    @property
     def xi(self):
         """Non-adiabaticity of the spin-transfer torque."""
         return Parameter(self._impl.xi)
@@ -228,6 +220,21 @@ class Ferromagnet:
     @temperature.setter
     def temperature(self, value):
         self.temperature.set(value)
+
+    @property
+    def dmi_tensor(self):
+        """Get the DMI tensor of this Ferromagnet.
+
+        See Also
+        --------
+        DmiTensor
+
+        Returns
+        -------
+        DmiTensor
+            The DMI tensor of this ferromagnet.
+        """
+        return DmiTensor(self._impl.dmi_tensor)
 
     # ----- QUANTITIES ----------------------
 
@@ -298,20 +305,43 @@ class Ferromagnet:
         return ScalarQuantity(_cpp.max_angle(self._impl))
 
     @property
-    def interfacialdmi_field(self):
-        """Effective field of the Dzyaloshinskii-Moriya interaction."""
-        return FieldQuantity(_cpp.interfacialdmi_field(self._impl))
+    def dmi_field(self):
+        """Effective field of the Dzyaloshinskii-Moriya interaction.
+
+        Returns a FieldQuantity which evaluates the effective field corresponding to the
+        DMI energy density.
+
+        Returns
+        -------
+        dmi_field : mumax5.FieldQuantity
+        """
+        return FieldQuantity(_cpp.dmi_field(self._impl))
 
     @property
-    def interfacialdmi_energy_density(self):
-        """Energy density related to the interfacial Dzyaloshinskii-Moriya\
-         interaction."""
-        return FieldQuantity(_cpp.interfacialdmi_energy_density(self._impl))
+    def dmi_energy_density(self):
+        r"""Energy density related to the Dzyaloshinskii-Moriya interaction.
+
+        Returns a FieldQuantity which evaluates the Dzyaloshinskii-Moriya energy
+        density:
+
+        .. math:: \varepsilon_{\text{DMI}} = \frac{1}{2} D_{ijk}
+              \left[ m_j \frac{d}{dx_i} m_k - m_k \frac{d}{dx_i} m_j \right]
+
+        Returns
+        -------
+        dmi_energy_density : mumax5.FieldQuantity
+        """
+        return FieldQuantity(_cpp.dmi_energy_density(self._impl))
 
     @property
-    def interfacialdmi_energy(self):
-        """Energy related to the interfacial Dzyaloshinskii-Moriya interaction."""
-        return ScalarQuantity(_cpp.interfacialdmi_energy(self._impl))
+    def dmi_energy(self):
+        """Energy related to the Dzyaloshinskii-Moriya interaction.
+
+        Returns
+        -------
+        dmi_energy_density : float
+        """
+        return ScalarQuantity(_cpp.dmi_energy(self._impl))
 
     @property
     def external_field(self):

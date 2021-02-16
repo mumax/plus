@@ -11,15 +11,14 @@ magnet.enable_demag = False
 magnet.msat = 580e3
 magnet.aex = 15e-12
 magnet.ku1 = 0.8e6
-magnet.idmi = 3.2e-3
 magnet.anisU = (0, 0, 1)
 magnet.alpha = 0.2
+magnet.dmi_tensor.set_interfacial_dmi(3.2e-3)
 
 # set and relax the initial magnetization
-magnet.magnetization = neelskyrmion(position=(64e-9, 32e-9, 0),
-                                    radius=10e-9,
-                                    charge=-1,
-                                    polarization=1)
+magnet.magnetization = neelskyrmion(
+    position=(64e-9, 32e-9, 0), radius=10e-9, charge=-1, polarization=1
+)
 magnet.minimize()
 
 # add a current

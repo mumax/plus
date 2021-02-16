@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "dmitensor.hpp"
 #include "field.hpp"
 #include "gpubuffer.hpp"
 #include "grid.hpp"
@@ -75,4 +76,6 @@ class Ferromagnet {
   Parameter xi;
   Parameter pol;
   curandGenerator_t randomGenerator;
+
+  DmiTensor dmiTensor;
 };

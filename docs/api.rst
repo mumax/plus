@@ -14,3 +14,4 @@ API Reference
     Parameter
     FieldQuantity
     ScalarQuantity
+    DmiTensor
