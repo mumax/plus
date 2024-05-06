@@ -9,7 +9,6 @@
 #include "world.hpp"
 
 class Stepper;
-class Relaxer;
 enum class RKmethod;
 
 class TimeSolver {
@@ -33,6 +32,7 @@ class TimeSolver {
   real time() const { return time_; }
   real timestep() const { return timestep_; }
   bool hasAdaptiveTimeStep() const { return !fixedTimeStep_; }
+  bool hasPrecession() const { return precession_; }
   real maxerror() const { return maxerror_; }
 
   //------------- SET SOLVER SETTINGS ------------------------------------------
@@ -43,6 +43,8 @@ class TimeSolver {
   void setTimeStep(real dt) { timestep_ = dt; }
   void enableAdaptiveTimeStep() { fixedTimeStep_ = false; }
   void disableAdaptiveTimeStep() { fixedTimeStep_ = true; }
+  void enablePrecession() { precession_ = true; }
+  void disablePrecession() { precession_ = false; }
   void setMaxError(real maxerror) { maxerror_ = maxerror; }
 
   //------------- EXECUTING THE SOLVER -----------------------------------------
@@ -64,6 +66,7 @@ class TimeSolver {
   real time_ = 0.0;
   real timestep_ = 0.0;
   bool fixedTimeStep_ = false;
+  bool precession_ = true; // LL precession
   std::vector<DynamicEquation> eqs_;
 
   //------------- THE INTERNAL STEPPER -----------------------------------------
