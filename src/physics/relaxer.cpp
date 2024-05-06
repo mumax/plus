@@ -1,12 +1,10 @@
+#include "butchertableau.hpp"
 #include "energy.hpp"
 #include "ferromagnet.hpp"
-#include "field.hpp"
 #include "reduce.hpp"
 #include "relaxer.hpp"
 #include "timesolver.hpp"
 #include "torque.hpp"
-#include <iostream>
-#include <iomanip>
 
 Relaxer::Relaxer(const Ferromagnet* magnet, real RelaxTorqueThreshold)
     : magnet_(magnet),
@@ -14,18 +12,26 @@ Relaxer::Relaxer(const Ferromagnet* magnet, real RelaxTorqueThreshold)
       torque_(relaxTorqueQuantity(magnet)) {}
       
 
-/*void Relaxer::getWorldTimesolver(TimeSolver& solver) {
-  timesolver_ = solver;
-}*/
-
 void Relaxer::exec() {
 
-  // Store solver settings
-
-  // Kijk nog of "class Relaxer" weg mag uit timesolver.hpp
-  // Remove nog "iostream"-header etc. in deze file.
-
   TimeSolver &timesolver = magnet_->world()->timesolver();
+  
+  // Store current solver settings
+  real time = timesolver.time();
+  real timestep = timesolver.timestep();
+  bool adaptive = timesolver.hasAdaptiveTimeStep();
+  real maxerr = timesolver.maxerror();
+  bool prec = timesolver.hasPrecession();
+  std::string method = getRungeKuttaNameFromMethod(timesolver.getRungeKuttaMethod());
+
+
+
+  // Set solver settings for relax
+  timesolver.disablePrecession();
+  timesolver.enableAdaptiveTimeStep();
+  timesolver.setRungeKuttaMethod("BogackiShampine"); // From Mumax3, check again if best solver for relax
+
+
   // Run while monitoring energy
   const int N = 3; // evaluates energy every N steps (expenisve)  
 
@@ -39,8 +45,6 @@ void Relaxer::exec() {
   }
 
   // Run while monitoring torque
-  // Set relax solver settings (RK, damping torque, fixed-timestep...)
-
   // If threshold = -1 (default): relax until torque is steady or increasing.
   if (threshold_ == -1) {
     real t0 = 0;
@@ -72,9 +76,11 @@ void Relaxer::exec() {
     }
   }
 
-  // Restore solver settings at the end of exec
-
-
-
+  // Restore solver settings after relaxing
+  timesolver.setTime(time);
+  timesolver.setTimeStep(timestep);
+  if (!adaptive) { timesolver.disableAdaptiveTimeStep(); }
+  timesolver.setMaxError(maxerr);
+  if (prec) { timesolver.enablePrecession(); }
+  timesolver.setRungeKuttaMethod(method);
 }
-
