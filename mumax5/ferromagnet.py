@@ -158,13 +158,14 @@ class Ferromagnet:
         """Minimize the total energy."""
         self._impl.minimize()
 
-    def relax(self, RelaxTorqueThreshold=-1):
+    def relax(self):
         """Relax the state to a energy minimum."""
-        self._impl.relax(RelaxTorqueThreshold)
+        self._impl.relax()
 
     @property
     def RelaxTorqueThreshold(self):
-        return self._impl.RelaxTorqueThreshold    
+        return self._impl.RelaxTorqueThreshold
+        
     @RelaxTorqueThreshold.setter
     def RelaxTorqueThreshold(self, value):
         self.RelaxTorqueThreshold.set(value)

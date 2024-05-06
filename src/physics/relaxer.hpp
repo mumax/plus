@@ -1,9 +1,10 @@
 #pragma once
 
 #include "ferromagnetquantity.hpp"
+#include "timesolver.hpp"
 
 class Ferromagnet;
-class TimeSolver;
+//class TimeSolver;
 
 // Relax the system to a minimum energy state by first minimizing the total energy
 // and then minimizing the total torque.
@@ -11,13 +12,12 @@ class TimeSolver;
 class Relaxer {
  public:
   Relaxer(const Ferromagnet*, real RelaxTorqueThreshold);
-
-  void getWorldTimesolver(TimeSolver*);
+  
+  //void getWorldTimesolver(TimeSolver&);
 
   void exec();
 
- protected:
-   TimeSolver* timesolver_ = nullptr;
+
 
  private:
   const Ferromagnet* magnet_;
