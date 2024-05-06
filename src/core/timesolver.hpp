@@ -9,6 +9,7 @@
 #include "world.hpp"
 
 class Stepper;
+class Relaxer;
 enum class RKmethod;
 
 class TimeSolver {

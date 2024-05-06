@@ -73,6 +73,7 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("conductivity", &Ferromagnet::conductivity)
       .def_readonly("amr_ratio", &Ferromagnet::amrRatio)
       .def_readonly("amr_ratio2", &Ferromagnet::amrRatio2)
+      .def_readonly("RelaxTorqueThreshold", &Ferromagnet::RelaxTorqueThreshold)
       .def_readonly("poisson_system", &Ferromagnet::poissonSystem)
       
       .def(
@@ -87,7 +88,8 @@ void wrap_ferromagnet(py::module& m) {
           py::return_value_policy::reference)
 
       .def("minimize", &Ferromagnet::minimize, py::arg("tol") = 1e-6,
-           py::arg("nsamples") = 10);
+           py::arg("nsamples") = 10)
+      .def("relax", &Ferromagnet::relax);
 
   m.def("torque", &torqueQuantity);
   m.def("llg_torque", &llgTorqueQuantity);

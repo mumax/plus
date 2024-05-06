@@ -48,6 +48,7 @@ class Ferromagnet {
   void removeStrayField(const Ferromagnet*);
 
   void minimize(real tol = 1e-6, int nSamples = 10);
+  void relax();
 
  private:
   Ferromagnet(const Ferromagnet&);
@@ -106,6 +107,7 @@ class Ferromagnet {
   Parameter conductivity2;
   Parameter amrRatio;
   Parameter amrRatio2;
+  real RelaxTorqueThreshold;
 
   curandGenerator_t randomGenerator;
 

@@ -12,6 +12,7 @@
 #include "minimizer.hpp"
 #include "mumaxworld.hpp"
 #include "poissonsystem.hpp"
+#include "relaxer.hpp"
 #include "strayfield.hpp"
 #include "system.hpp"
 
@@ -62,6 +63,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world,
       conductivity2(system_, 0.0),
       amrRatio(system_, 0.0),
       amrRatio2(system_, 0.0),
+      RelaxTorqueThreshold(-1.0),
       poissonSystem(this) {
   {
     // TODO: this can be done much more efficient somewhere else
@@ -123,6 +125,11 @@ const GpuBuffer<bool>& Ferromagnet::getGeometry() const {
 void Ferromagnet::minimize(real tol, int nSamples) {
   Minimizer minimizer(this, tol, nSamples);
   minimizer.exec();
+}
+
+void Ferromagnet::relax() {
+  Relaxer relaxer(this, this->RelaxTorqueThreshold);
+  relaxer.exec();
 }
 
 const StrayField* Ferromagnet::getStrayField(const Ferromagnet* magnet) const {

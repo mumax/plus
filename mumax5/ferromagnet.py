@@ -158,6 +158,19 @@ class Ferromagnet:
         """Minimize the total energy."""
         self._impl.minimize()
 
+    def relax(self, RelaxTorqueThreshold=-1):
+        """Relax the state to a energy minimum."""
+        self._impl.relax(RelaxTorqueThreshold)
+
+    @property
+    def RelaxTorqueThreshold(self):
+        return self._impl.RelaxTorqueThreshold    
+    @RelaxTorqueThreshold.setter
+    def RelaxTorqueThreshold(self, value):
+        self.RelaxTorqueThreshold.set(value)
+    # voeg nog documentatie toe
+    # voeg nog assert uniform (i.e. gwn een float) toe
+
     # ----- MATERIAL PARAMETERS -----------
 
     @property
