@@ -23,6 +23,15 @@ TimeSolver::~TimeSolver() {}
 void TimeSolver::setRungeKuttaMethod(RKmethod method) {
   stepper_ = std::make_unique<RungeKuttaStepper>(this, method);
   timestep_ = sensibleTimeStep();
+  method_ = method;
+}
+
+void TimeSolver::setRungeKuttaMethod(std::string method) {
+  setRungeKuttaMethod(getRungeKuttaMethodFromName(method));
+}
+
+RKmethod TimeSolver::getRungeKuttaMethod() {
+  return method_;
 }
 
 real TimeSolver::sensibleTimeStep() const {

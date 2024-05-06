@@ -25,6 +25,7 @@ const std::map<RKmethod, std::string> RungeKuttaMethodNames{
 };
 
 RKmethod getRungeKuttaMethodFromName(const std::string& name);
+std::string getRungeKuttaNameFromMethod(const RKmethod& method);
 
 /// Extended Butcher Tableau for Adaptive Runge-Kutta methods
 class ButcherTableau {

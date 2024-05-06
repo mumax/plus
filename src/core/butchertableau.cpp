@@ -19,6 +19,14 @@ RKmethod getRungeKuttaMethodFromName(const std::string& name) {
   return method;
 }
 
+std::string getRungeKuttaNameFromMethod(const RKmethod& method) {
+  auto it =
+      std::find_if(RungeKuttaMethodNames.begin(), RungeKuttaMethodNames.end(),
+                   [method](const auto& kv) { return kv.first == method; });
+  std::string name = it->second;
+  return name;
+}
+
 ButcherTableau::ButcherTableau(std::vector<real> nodes,
                                std::vector<std::vector<real>> rkMatrix,
                                std::vector<real> weights1,
