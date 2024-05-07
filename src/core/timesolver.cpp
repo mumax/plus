@@ -26,7 +26,7 @@ void TimeSolver::setRungeKuttaMethod(RKmethod method) {
   method_ = method;
 }
 
-void TimeSolver::setRungeKuttaMethod(std::string method) {
+void TimeSolver::setRungeKuttaMethod(const std::string& method) {
   setRungeKuttaMethod(getRungeKuttaMethodFromName(method));
 }
 

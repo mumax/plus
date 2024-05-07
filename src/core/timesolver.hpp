@@ -39,7 +39,7 @@ class TimeSolver {
   //------------- SET SOLVER SETTINGS ------------------------------------------
 
   void setRungeKuttaMethod(RKmethod);
-  void setRungeKuttaMethod(std::string);
+  void setRungeKuttaMethod(const std::string& method);
   void setEquations(std::vector<DynamicEquation> eq);
   void setTime(real time) { time_ = time; }
   void setTimeStep(real dt) { timestep_ = dt; }
