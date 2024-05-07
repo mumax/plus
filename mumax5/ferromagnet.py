@@ -174,7 +174,6 @@ class Ferromagnet:
     def RelaxTorqueThreshold(self, value):
         assert isinstance(value, float), "The relax threshold should be uniform."
         self.RelaxTorqueThreshold.set(value)
-    # voeg nog assert uniform (i.e. gwn een float) toe
 
     # ----- MATERIAL PARAMETERS -----------
 

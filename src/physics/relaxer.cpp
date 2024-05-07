@@ -11,7 +11,6 @@ Relaxer::Relaxer(const Ferromagnet* magnet, real RelaxTorqueThreshold)
       threshold_(RelaxTorqueThreshold),
       torque_(relaxTorqueQuantity(magnet)) {}
       
-
 void Relaxer::exec() {
 
   TimeSolver &timesolver = magnet_->world()->timesolver();
@@ -24,13 +23,10 @@ void Relaxer::exec() {
   bool prec = timesolver.hasPrecession();
   std::string method = getRungeKuttaNameFromMethod(timesolver.getRungeKuttaMethod());
 
-
-
   // Set solver settings for relax
   timesolver.disablePrecession();
   timesolver.enableAdaptiveTimeStep();
-  timesolver.setRungeKuttaMethod("BogackiShampine"); // From Mumax3, check again if best solver for relax
-
+  timesolver.setRungeKuttaMethod("BogackiShampine");
 
   // Run while monitoring energy
   const int N = 3; // evaluates energy every N steps (expenisve)  
@@ -43,7 +39,7 @@ void Relaxer::exec() {
     E0 = E1;
     E1 = evalTotalEnergy(magnet_, true) + evalTotalEnergy(magnet_, false);
   }
-
+  
   // Run while monitoring torque
   // If threshold = -1 (default): relax until torque is steady or increasing.
   if (threshold_ == -1) {
@@ -77,10 +73,10 @@ void Relaxer::exec() {
   }
 
   // Restore solver settings after relaxing
-  timesolver.setTime(time);
-  timesolver.setTimeStep(timestep);
-  if (!adaptive) { timesolver.disableAdaptiveTimeStep(); }
-  timesolver.setMaxError(maxerr);
-  if (prec) { timesolver.enablePrecession(); }
   timesolver.setRungeKuttaMethod(method);
+  timesolver.setMaxError(maxerr);
+  if (!adaptive) { timesolver.disableAdaptiveTimeStep(); }
+  if (prec) { timesolver.enablePrecession(); }
+  timesolver.setTime(time);
+  timesolver.setTimeStep(timestep); 
 }
