@@ -159,7 +159,7 @@ class Ferromagnet:
         self._impl.minimize()
 
     def relax(self):
-        """Relax the state to a energy minimum."""
+        """Relax the state to an energy minimum."""
         self._impl.relax()
 
     @property
