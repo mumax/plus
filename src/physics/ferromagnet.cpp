@@ -63,7 +63,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world,
       conductivity2(system_, 0.0),
       amrRatio(system_, 0.0),
       amrRatio2(system_, 0.0),
-      RelaxTorqueThreshold(-1.0),
+      RelaxTorqueThreshold(system_, -1.0),
       poissonSystem(this) {
   {
     // TODO: this can be done much more efficient somewhere else
@@ -128,7 +128,8 @@ void Ferromagnet::minimize(real tol, int nSamples) {
 }
 
 void Ferromagnet::relax() {
-  Relaxer relaxer(this, this->RelaxTorqueThreshold);
+  real threshold = this->RelaxTorqueThreshold.average()[0];
+  Relaxer relaxer(this, threshold);
   relaxer.exec();
 }
 

@@ -107,7 +107,7 @@ class Ferromagnet {
   Parameter conductivity2;
   Parameter amrRatio;
   Parameter amrRatio2;
-  real RelaxTorqueThreshold;
+  Parameter RelaxTorqueThreshold;
 
   curandGenerator_t randomGenerator;
 

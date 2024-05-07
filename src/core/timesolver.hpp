@@ -35,7 +35,6 @@ class TimeSolver {
   bool hasAdaptiveTimeStep() const { return !fixedTimeStep_; }
   bool hasPrecession() const { return precession_; }
   real maxerror() const { return maxerror_; }
-  
 
   //------------- SET SOLVER SETTINGS ------------------------------------------
 

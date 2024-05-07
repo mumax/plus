@@ -164,12 +164,16 @@ class Ferromagnet:
 
     @property
     def RelaxTorqueThreshold(self):
-        return self._impl.RelaxTorqueThreshold
+        """Threshold torque used for relaxing the system.
+
+        If not set, the system relaxes until the torque is steady or increasing.
+        """
+        return Parameter(self._impl.RelaxTorqueThreshold)
         
     @RelaxTorqueThreshold.setter
     def RelaxTorqueThreshold(self, value):
+        assert isinstance(value, float), "The relax threshold should be uniform."
         self.RelaxTorqueThreshold.set(value)
-    # voeg nog documentatie toe
     # voeg nog assert uniform (i.e. gwn een float) toe
 
     # ----- MATERIAL PARAMETERS -----------
