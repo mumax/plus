@@ -20,11 +20,11 @@ RKmethod getRungeKuttaMethodFromName(const std::string& name) {
 }
 
 std::string getRungeKuttaNameFromMethod(const RKmethod& method) {
-  auto it =
-      std::find_if(RungeKuttaMethodNames.begin(), RungeKuttaMethodNames.end(),
-                   [method](const auto& kv) { return kv.first == method; });
-  std::string name = it->second;
-  return name;
+  auto pos = RungeKuttaMethodNames.find(method);
+  if (pos == RungeKuttaMethodNames.end()) {
+    throw std::invalid_argument("Got an invalid RKmethod");
+  }
+  return pos->second;
 }
 
 ButcherTableau::ButcherTableau(std::vector<real> nodes,
