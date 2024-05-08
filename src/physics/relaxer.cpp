@@ -69,6 +69,7 @@ void Relaxer::exec() {
       while (maxVecNorm(torque_.eval())  > threshold_) {timesolver.steps(N);}
       err /= std::sqrt(2);
       timesolver.setMaxError(err);
+      timesolver.steps(N);
     }
   }
 
