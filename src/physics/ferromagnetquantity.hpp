@@ -66,7 +66,7 @@ class FM_ScalarQuantity : public ScalarQuantity {
   std::string name() const { return name_; }
   std::string unit() const { return unit_; }
   real eval() const { return evalfunc_(ferromagnet_, lattice_); }
-  std::string getSuffixByLattice() const { return (lattice_ == 0) ? '' : ((lattice_ == 1) ? '_sub1' : '_sub2'); }
+  std::string getSuffixByLattice() const { return (lattice_ == 0) ? "" : ((lattice_ == 1) ? "_sub1" : "_sub2"); }
  private:
   const Ferromagnet* ferromagnet_;
   int lattice_;

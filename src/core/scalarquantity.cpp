@@ -2,7 +2,7 @@
 
 ScalarQuantity::~ScalarQuantity() {}
 
-bool ScalarQuantity::sub2() const {
+int ScalarQuantity::lattice() const {
   return 0;
 }
 
