@@ -128,7 +128,7 @@ void Ferromagnet::minimize(real tol, int nSamples) {
 }
 
 void Ferromagnet::relax() {
-  real threshold = this->RelaxTorqueThreshold.average()[0];
+  real threshold = this->RelaxTorqueThreshold.getUniformValue();
   Relaxer relaxer(this, threshold);
   relaxer.exec();
 }

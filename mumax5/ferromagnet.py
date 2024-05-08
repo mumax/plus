@@ -166,7 +166,7 @@ class Ferromagnet:
     def RelaxTorqueThreshold(self):
         """Threshold torque used for relaxing the system.
 
-        If not set, the system relaxes until the torque is steady or increasing.
+        If not set (or set to default value -1), the system relaxes until the torque is steady or increasing.
         """
         return Parameter(self._impl.RelaxTorqueThreshold)
         

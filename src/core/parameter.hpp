@@ -27,7 +27,8 @@ class Parameter : public FieldQuantity, public DynamicParameter<real> {
   std::shared_ptr<const System> system() const;
   /** Evaluate parameter on its field. */
   Field eval() const;
-
+  /** Get value of uniform parameter.*/
+  real getUniformValue() const;
   /** Send parameter data to the device. */
   CuParameter cu() const;
 
