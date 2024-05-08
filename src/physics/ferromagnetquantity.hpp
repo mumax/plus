@@ -12,7 +12,7 @@
 class Ferromagnet;
 
 typedef std::function<Field(const Ferromagnet*)> FM_FieldFunc;
-typedef std::function<real(const Ferromagnet*, const bool sub2)> FM_ScalarFunc;
+typedef std::function<real(const Ferromagnet*, const int lattice)> FM_ScalarFunc;
 
 class FM_FieldQuantity : public FieldQuantity {
  public:
@@ -53,23 +53,23 @@ class FM_ScalarQuantity : public ScalarQuantity {
  public:
   FM_ScalarQuantity(const Ferromagnet* ferromagnet,
                     FM_ScalarFunc evalfunc,
-                    bool sub2,
+                    int lattice,
                     std::string name,
                     std::string unit)
       : ferromagnet_(ferromagnet),
         evalfunc_(evalfunc),
-        sub2_(sub2),
+        lattice_(lattice),
         name_(name),
         unit_(unit) {}
 
-  bool sub2() const { return sub2_;}
+  int lattice() const { return lattice_; }
   std::string name() const { return name_; }
   std::string unit() const { return unit_; }
-  real eval() const { return evalfunc_(ferromagnet_, sub2_); }
-
+  real eval() const { return evalfunc_(ferromagnet_, lattice_); }
+  std::string getSuffixByLattice() const { return (lattice_ == 0) ? '' : ((lattice_ == 1) ? '_sub1' : '_sub2'); }
  private:
   const Ferromagnet* ferromagnet_;
-  bool sub2_;
+  int lattice_;
   std::string name_;
   std::string unit_;
   FM_ScalarFunc evalfunc_;
