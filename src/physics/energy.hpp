@@ -11,6 +11,7 @@ class Field;
 Field evalEnergyDensity(const Ferromagnet*, const Field&, real prefactor);
 
 Field evalTotalEnergyDensity(const Ferromagnet*);
+real evalTotalSublatticeEnergy(const Ferromagnet*, const bool sub2);
 real evalTotalEnergy(const Ferromagnet*, const bool sub2);
 
 FM_FieldQuantity totalEnergyDensityQuantity(const Ferromagnet*);

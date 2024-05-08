@@ -70,7 +70,7 @@ Field evalTotalEnergyDensity(const Ferromagnet* magnet) {
   return edens;
 }
 
-real evalTotalEnergy(const Ferromagnet* magnet, const bool sub2) {
+real evalTotalSublatticeEnergy(const Ferromagnet* magnet, const bool sub2) {
   int ncells = magnet->grid().ncells();
   real edensAverage;
   if (!sub2) 
@@ -82,12 +82,26 @@ real evalTotalEnergy(const Ferromagnet* magnet, const bool sub2) {
   return ncells * edensAverage * cellVolume;
 }
 
+real evalTotalEnergy(const Ferromagnet* magnet, const bool sub2) {
+  int ncells = magnet->grid().ncells();
+  std::vector<real> edensAverage = totalEnergyDensityQuantity(magnet).average();
+  real cellVolume = magnet->world()->cellVolume();
+  if (magnet->magnetization()->ncomp() == 3)
+    return ncells * cellVolume * edensAverage[0];
+  else 
+    return ncells * cellVolume * (edensAverage[0] + edensAverage[1]);
+}
+
 FM_FieldQuantity totalEnergyDensityQuantity(const Ferromagnet* magnet) {
   return FM_FieldQuantity(magnet, evalTotalEnergyDensity, magnet->magnetization()->ncomp() / 3,
                           "total_energy_density", "J/m3");
 }
 
-FM_ScalarQuantity totalEnergyQuantity(const Ferromagnet* magnet, const bool sub2) {
+FM_ScalarQuantity totalSublatticeEnergyQuantity(const Ferromagnet* magnet, const bool sub2) {
   std::string name = (sub2) ? "total_energy2" : "total_energy";
-  return FM_ScalarQuantity(magnet, evalTotalEnergy, sub2, name, "J");
+  return FM_ScalarQuantity(magnet, evalTotalSublatticeEnergy, sub2, name, "J");
+}
+
+FM_ScalarQuantity totalEnergyQuantity(const Ferromagnet* magnet, const bool sub2) {
+  return FM_ScalarQuantity(magnet, evalTotalEnergy, sub2, "total_energy", "J");
 }

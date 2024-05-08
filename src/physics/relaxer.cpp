@@ -31,13 +31,13 @@ void Relaxer::exec() {
   // Run while monitoring energy
   const int N = 3; // evaluates energy every N steps (expenisve)  
 
-  real E0 = evalTotalEnergy(magnet_, true) + evalTotalEnergy(magnet_, false);
+  real E0 = evalTotalEnergy(magnet_, true);
   timesolver.steps(N);
-  real E1 = evalTotalEnergy(magnet_, true) + evalTotalEnergy(magnet_, false);
+  real E1 = evalTotalEnergy(magnet_, true);
   while (E1 < E0) {
     timesolver.steps(N);
     E0 = E1;
-    E1 = evalTotalEnergy(magnet_, true) + evalTotalEnergy(magnet_, false);
+    E1 = evalTotalEnergy(magnet_, true);
   }
   
   // Run while monitoring torque
