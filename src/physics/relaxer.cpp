@@ -42,7 +42,7 @@ void Relaxer::exec() {
   
   // Run while monitoring torque
   // If threshold = -1 (default): relax until torque is steady or increasing.
-  if (threshold_ < 0) {
+  if (threshold_ <= 0) {
     real t0 = 0;
     real t1 = dotSum(torque_.eval(), torque_.eval());
     real err = timesolver.maxerror();
