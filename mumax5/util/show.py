@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as _plt
 import numpy as _np
+import pyvista as _pv
 
 import mumax5 as _m5
 
@@ -53,18 +54,36 @@ def _quantity_img_xy_extent(quantity):
     ]
     return extent
 
-def get_rgba(field, quantity=None, layer=0):
-    # TODO also CUDAfy this function. This is exactly what GPUs are made for.
-    field = field[:, layer]  # select the layer
+def get_rgba(field, quantity=None, layer=None):
+    """Get rgba values of given field.
+    There is also a CUDA version of this function which utilizes the GPU.
+    Use `quantity.get_rgb()`, but it has a different shape.
+
+    Parameters
+    ----------
+    quantity : FieldQuantity (default None)
+        Used to set alpha value to 0 where geometry is False.
+    layer : int (default None)
+        z-layer of which to get rgba. Calculates rgba for all layers if None.
+
+    Returns
+    -------
+    rgba : ndarray
+        shape (ny, nx, 4) if layer is given, otherwise (nz, ny, nx, 4).
+    """
+    if layer is not None:
+        field = field[:, layer]  # select the layer
     field /= _np.max(_np.linalg.norm(field, axis=0))  # rescale to make maximum norm 1
 
     # Create rgba image from the vector data
-    _, ny, nx = field.shape  # image size
-    rgba = _np.ones((ny, nx, 4))  # last index for R,G,B, and alpha channel
-    rgba[:,:,0], rgba[:,:,1], rgba[:,:,2] = vector_to_rgb(field[0,:,:], field[1,:,:], field[2,:,:])
+    rgba = _np.ones((*(field.shape[1:]), 4))  # last index for R,G,B, and alpha channel
+    rgba[...,0], rgba[...,1], rgba[...,2] = vector_to_rgb(field[0], field[1], field[2])
 
     # Set alpha channel to one inside the geometry, and zero outside
-    if quantity is not None: rgba[:, :, 3] = quantity._impl.system.geometry[layer]
+    if quantity is not None:
+        geom = quantity._impl.system.geometry
+        rgba[..., 3] = geom[layer] if layer is not None else geom
+
     return rgba
 
 
@@ -180,3 +199,107 @@ def show_neel_quiver(quantity, title=''):
     if title:
         ax.set_title(title)
     _plt.show()
+
+
+def show_magnet_geometry(magnet):
+    """Show the geometry of a mumax5.ferromagnet."""
+    geom = magnet.geometry
+
+                 # [::-1] for [x,y,z] not [z,y,x] and +1 for cells, not points
+    image_data = _pv.ImageData(dimensions=_np.array(geom.shape[::-1])+1,  
+                 spacing=magnet.cellsize,
+                 origin=_np.array(magnet.origin) - 0.5*_np.array(magnet.cellsize))
+    image_data.cell_data["values"] = _np.float32(geom.flatten("C"))  # "C" because [z,y,x]
+    threshed = image_data.threshold_percent(0.5)  # only show True
+
+    plotter = _pv.Plotter()
+    plotter.add_mesh(threshed, color="lightgrey",
+                     show_edges=True, show_scalar_bar=False, lighting=False)
+    plotter.add_title(f"{magnet.name} geometry")
+    plotter.show_axes()
+    plotter.view_xy()
+    plotter.add_mesh(image_data.outline(), color="black", lighting=False)
+    plotter.show()
+
+
+def show_field_3D(quantity, cmap="mumax3", quiver=True):
+    """Plot a mumax5.FieldQuantity with 3 components as a vectorfield.
+
+    Parameters
+    ----------
+    quantity : mumax5.FieldQuantity (3 components)
+        The `FieldQuantity` to plot as a vectorfield.
+    cmap : string, optional, default: "mumax3"
+        A colormap to use. By default the mumax3 colormap is used.
+        Any matplotlib colormap can also be given to color the vectors according
+        to their z-component. It's best to use diverging colormaps, like "bwr".
+    quiver : boolean, optional, default: True
+        If set to True, a cone is placed at each cell indicating the direction.
+        If False, colored voxels are used instead.
+    """
+
+    if not isinstance(quantity, _m5.FieldQuantity):
+        raise TypeError("The first argument should be a FieldQuantity")
+
+    if (quantity.ncomp != 3):  # TODO support 6 components somehow
+        raise ValueError("Can not create a vector field image because the field"
+                         + " quantity does not have 3 components.")
+
+    # set global theme, because individual plotter instance themes are broken
+    _pv.global_theme = _pv.themes.DarkTheme()
+    # the plotter
+    plotter = _pv.Plotter()
+
+    # make pyvista grid
+    shape = quantity.shape[-1:0:-1]  # xyz not 3zyx
+    cell_size = quantity._impl.system.cellsize
+    image_data = _pv.ImageData(dimensions=_np.asarray(shape)+1,  # cells, not points
+                 spacing=cell_size,
+                 origin=_np.asarray(quantity._impl.system.origin)
+                                    - 0.5*_np.asarray(cell_size))
+
+    image_data.cell_data["field"] = quantity.eval().reshape((3, -1)).T  # cell data
+
+    # don't show cells without geometry
+    image_data.cell_data["geom"] = _np.float32(quantity._impl.system.geometry).flatten("C")
+    threshed = image_data.threshold_percent(0.5, scalars="geom")
+
+    if quiver:  # use cones to display direction
+        cres = 6  # number of vertices in cone base
+        cone = _pv.Cone(center=(1/4, 0, 0), radius=0.32, height=1, resolution=cres)
+        factor = min(cell_size[0:2]) if shape[2]==1 else min(cell_size)
+        factor *= 0.95  # no touching
+
+        quiver = threshed.glyph(orient="field", scale=False, factor=factor, geom=cone)
+
+        # color
+        if "mumax" in cmap.lower():  # Use the mumax3 colorscheme
+            # don't need quantity to set opacity for geometry, threshold did this
+            rgba = get_rgba(threshed["field"].T, quantity=None, layer=None)
+            # we need to color every quiver vertex individually, each cone has cres+1
+            quiver.point_data["rgba"] = _np.repeat(rgba, cres+1, axis=0)
+            plotter.add_mesh(quiver, scalars="rgba", rgba=True, lighting=False)
+        else:  # matplotlib colormap
+            quiver.point_data["z-component"] = _np.repeat(threshed["field"][:,2], cres+1, axis=0)
+            plotter.add_mesh(quiver, scalars="z-component", cmap=cmap,
+                             clim=(-1,1), lighting=False)
+    else:  # use colored voxels
+        if "mumax" in cmap.lower():  # Use the mumax3 colorscheme
+            # don't need quantity to set opacity for geometry, threshold did this
+            threshed.cell_data["rgba"] = get_rgba(threshed["field"].T,
+                                                  quantity=None, layer=None)
+            plotter.add_mesh(threshed, scalars="rgba", rgba=True, lighting=False)
+        else:  # matplotlib colormap
+            threshed.cell_data["z-component"] = threshed["field"][:,2]
+            plotter.add_mesh(threshed, scalars="z-component", cmap=cmap,
+                             clim=(-1,1), lighting=False)
+
+    # final touches
+    plotter.add_mesh(image_data.outline(), color="white", lighting=False)
+    plotter.add_title(quantity.name)
+    plotter.show_axes()
+    plotter.view_xy()
+    plotter.set_background((0.3, 0.3, 0.3))  # otherwise black or white is invisible
+    plotter.show()
+    _pv.global_theme = _pv.themes.Theme()  # reset theme
+

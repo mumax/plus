@@ -19,13 +19,13 @@ std::unique_ptr<StrayFieldExecutor> StrayFieldExecutor::create(
       // grid sizes) when choosing between fft or
       // brute method. For now, we choose fft method
       return std::make_unique<StrayFieldFFTExecutor>(magnet, system);
-      break;
     case StrayFieldExecutor::METHOD_FFT:
       return std::make_unique<StrayFieldFFTExecutor>(magnet, system);
-      break;
     case StrayFieldExecutor::METHOD_BRUTE:
       return std::make_unique<StrayFieldBruteExecutor>(magnet, system);
-      break;
+    default:  // TODO: should it throw an error or default to METHOD_AUTO?
+      throw std::invalid_argument("Stray field executor method number '"
+                       + std::to_string(method) + "' does not exist");
   }
 }
 

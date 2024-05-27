@@ -30,6 +30,10 @@ std::vector<real> FieldQuantity::average() const {
   return fieldAverage(eval());
 }
 
+Field FieldQuantity::getRGB() const {
+  return fieldGetRGB(eval());
+}
+
 const World* FieldQuantity::world() const {
   const System* sys = system().get();
   if (sys)

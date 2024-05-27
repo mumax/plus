@@ -29,3 +29,6 @@ Field operator*(real6 a, const Field& x);
 
 Field normalized(const Field& src);
 void normalize(Field&);
+
+/// Map vector field to RGB field
+Field fieldGetRGB(const Field& src);

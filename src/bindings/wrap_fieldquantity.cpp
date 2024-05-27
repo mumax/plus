@@ -17,7 +17,8 @@ void wrap_fieldquantity(py::module& m) {
       // exec does the same as eval but without returning the result (useful for
       // benchmarking)
       .def("exec", [](const FieldQuantity* q) { q->eval(); })
-      .def("average", &FieldQuantity::average);
+      .def("average", &FieldQuantity::average)
+      .def("get_rgb", &FieldQuantity::getRGB);
 }
 
 void wrap_ferromagnetfieldquantity(py::module& m) {
