@@ -8,6 +8,7 @@ void wrap_system(py::module& m) {
       .def_property_readonly("grid", &System::grid)
       .def_property_readonly("cellsize", &System::cellsize)
       .def("cell_position", &System::cellPosition)
+      .def_property_readonly("origin", &System::origin)
       .def_property_readonly("center", &System::center)
       .def_property_readonly("geometry", [](const System* system) {
         bool* geometry;

@@ -99,6 +99,17 @@ class Ferromagnet:
         return self._impl.system.geometry
 
     @property
+    def origin(self):
+        """Origin of the ferromagnet.
+
+        Returns
+        -------
+        origin: tuple[float] of size 3
+            xyz coordinate of the origin of the ferromagnet.
+        """
+        return self._impl.system.origin
+
+    @property
     def center(self):
         """Center of the ferromagnet.
 

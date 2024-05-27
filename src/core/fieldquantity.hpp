@@ -43,6 +43,9 @@ class FieldQuantity {
   /// Eval the quantity and return the average of each component
   virtual std::vector<real> average() const;
 
+  /// Eval the quantity and return its RGB representation
+  virtual Field getRGB() const;
+
   /// If assuredZero() returns true, then addTo(field) doesn't add anything to
   /// the field. This function returns false, but can be overriden in derived
   /// classes for optimization. In this case, it is also recommended to check in

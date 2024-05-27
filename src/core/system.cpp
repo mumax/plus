@@ -34,6 +34,10 @@ real3 System::cellPosition(int3 idx) const {
   return real3{p.x * c.x, p.y * c.y, p.z * c.z};
 }
 
+real3 System::origin() const {
+  return cellPosition({0, 0, 0});
+}
+
 real3 System::center() const {
   int3 size = grid().size();
   real3 corner1 = cellPosition({0, 0, 0});

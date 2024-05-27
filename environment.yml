@@ -24,7 +24,10 @@ dependencies:
   # optional
   - ipython
   - jupyter
+  - ipywidgets
   - scipy
+  - pyvista
+  - pillow  # should be contained in matplotlib
 
   # documentation generation
   - sphinx
