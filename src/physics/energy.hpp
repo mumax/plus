@@ -15,4 +15,5 @@ real evalTotalSublatticeEnergy(const Ferromagnet*, const bool sub2);
 real evalTotalEnergy(const Ferromagnet*, const bool sub2);
 
 FM_FieldQuantity totalEnergyDensityQuantity(const Ferromagnet*);
+FM_ScalarQuantity totalSublatticeEnergyQuantity(const Ferromagnet* magnet, const bool sub2);
 FM_ScalarQuantity totalEnergyQuantity(const Ferromagnet*, const bool sub2);
