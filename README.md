@@ -5,7 +5,7 @@ GPU accelerated micromagnetic simulator.
 
 * MSVC 2019 (Windows)
 * CUDA 10.x
-* cmake>=3.18
+* cmake>=3.24
 * CPython 3
 * pybind11
 * NumPy
@@ -17,7 +17,7 @@ Make sure that the following applications and build tools are installed:
 * c++ compiler which supports c++17
 * CPython *(version 3.x recommended)* and pip 
 * CUDA Toolkit *(version 10.0 or later)*
-* cmake *(version 3.18 or later)*. This can be installed using pip.
+* cmake *(version 3.24 or later)*. This can be installed using pip.
 * git
 
 Make especially sure that everything CUDA-related (like `nvcc`) can be found inside your path. This can be done by editing your `~/.bashrc` file and adding the following lines.
