@@ -3,12 +3,12 @@ channels:
   - conda-forge
 dependencies:
   # required
-  - python=3.8
+  - python=3.12
   - conda-build
   - pytest
   - matplotlib
   - numpy
-  - cmake=3.16.3
+  - cmake=3.30.2
 
   # code checks
   - black
