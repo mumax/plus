@@ -81,6 +81,5 @@ class TestZhangLi:
 
     def test_STT(self, simulations):
         world, magnet, mumax3sim = simulations
-        # absolute error: mx goes through 0, but is unitless
         err = max_relative_error(magnet.spin_transfer_torque.eval(), mumax3sim.get_field("STT") * GAMMALL)
         assert err < ATOL
