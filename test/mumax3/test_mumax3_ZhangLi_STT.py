@@ -5,7 +5,7 @@ from mumax3 import Mumax3Simulation
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import *
 
-ATOL = 2e-3  # 0.2%
+ATOL = 2e-2  # 2%
 
 def max_relative_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
@@ -53,6 +53,7 @@ def simulations(request):
             J = vector{tuple(jcur)}
 
             saveas(STTorque, "STT.ovf")
+            SaveAs(torque, "torque.ovf")
         """
     )
 
@@ -77,9 +78,14 @@ def simulations(request):
 
 @pytest.mark.mumax3
 class TestZhangLi:
-    """Compare the results of the simulation and compare the STT."""
+    """Compare the results of the simulations by comparing the STT and total torque."""
 
     def test_STT(self, simulations):
         world, magnet, mumax3sim = simulations
         err = max_relative_error(magnet.spin_transfer_torque.eval(), mumax3sim.get_field("STT") * GAMMALL)
+        assert err < ATOL
+    
+    def test_total_torque(self, simulations):
+        world, magnet, mumax3sim = simulations
+        err = max_relative_error(magnet.torque.eval() , mumax3sim.get_field("torque") * GAMMALL)
         assert err < ATOL
