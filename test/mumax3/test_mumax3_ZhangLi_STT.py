@@ -68,7 +68,6 @@ def simulations(request):
     magnet.alpha = alpha
 
     magnet.magnetization = mumax3sim.get_field("m_initial")
-    magnet.minimize()
 
     magnet.xi = xi
     magnet.pol = pol
