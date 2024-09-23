@@ -5,7 +5,7 @@ from mumax3 import Mumax3Simulation
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import *
 
-ATOL = 2e-2  # 2%
+RTOL = 2e-2  # 2%
 
 def max_relative_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
@@ -83,9 +83,9 @@ class TestZhangLi:
     def test_STT(self, simulations):
         world, magnet, mumax3sim = simulations
         err = max_relative_error(magnet.spin_transfer_torque.eval(), mumax3sim.get_field("STT") * GAMMALL)
-        assert err < ATOL
+        assert err < RTOL
     
     def test_total_torque(self, simulations):
         world, magnet, mumax3sim = simulations
         err = max_relative_error(magnet.torque.eval() , mumax3sim.get_field("torque") * GAMMALL)
-        assert err < ATOL
+        assert err < RTOL
