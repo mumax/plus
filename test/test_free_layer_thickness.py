@@ -1,11 +1,13 @@
+"""This test checks if the Slonczewski torque remains the same
+if empty layers are added to the system.
+"""
+
+
 import pytest
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 
-"""This test checks if the Slonczewski torque remains the same
-if empty layers are added to the system.
-"""
 
 RTOL = 1e-5  # 0.001%
 
