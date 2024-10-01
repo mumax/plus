@@ -26,7 +26,7 @@ def relative_error(result, wanted):
     relerr = err / np.linalg.norm(wanted, axis=0)
     return relerr
 
-def simulation():
+def test_free_layer():
     # === Create a simulation ==
     world_wanted = World(cellsize=(1e-9, 1e-9, 1e-9))
     magnet_wanted = Ferromagnet(world_wanted, Grid((1, 1, 2)))
@@ -53,9 +53,5 @@ def simulation():
 
     torque_result = magnet_wanted.spin_transfer_torque.eval()[:,0,0,0]
 
-    return torque_result, torque_wanted
-
-def test_free_layer():
-    result, wanted = simulation()
-    err = relative_error(result, wanted)
+    err = relative_error(torque_result, torque_wanted)
     assert err < RTOL
