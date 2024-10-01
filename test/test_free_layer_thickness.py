@@ -26,38 +26,36 @@ def relative_error(result, wanted):
     relerr = err / np.linalg.norm(wanted, axis=0)
     return relerr
 
-class TestFreeLayer:
-    def setup_class(self):
-        # === Create a simulation ==
-        world_wanted = World(cellsize=(1e-9, 1e-9, 1e-9))
-        magnet_wanted = Ferromagnet(world_wanted, Grid((1, 1, 2)))
+def simulation():
+    # === Create a simulation ==
+    world_wanted = World(cellsize=(1e-9, 1e-9, 1e-9))
+    magnet_wanted = Ferromagnet(world_wanted, Grid((1, 1, 2)))
 
-        magnet_wanted.msat = msat
-        magnet_wanted.jcur = jcur
-        magnet_wanted.pol = pol
-        magnet_wanted.fixed_layer = fixed_layer
-        magnet_wanted.free_layer_thickness = free_layer_thickness
-        magnet_wanted.magnetization = magnetization
+    magnet_wanted.msat = msat
+    magnet_wanted.jcur = jcur
+    magnet_wanted.pol = pol
+    magnet_wanted.fixed_layer = fixed_layer
+    magnet_wanted.free_layer_thickness = free_layer_thickness
+    magnet_wanted.magnetization = magnetization
 
-        self.torque_wanted = np.array([magnet_wanted.spin_transfer_torque.eval()[0,0,0,0],
-                                  magnet_wanted.spin_transfer_torque.eval()[1,0,0,0],
-                                  magnet_wanted.spin_transfer_torque.eval()[2,0,0,0]])
-        
-        # === Create the same simulation with empty layers ===
-        world_result = World(cellsize=(1e-9, 1e-9, 1e-9))
-        magnet_result = Ferromagnet(world_result, Grid((1, 1, 4)), geometry=np.array([[[True]], [[True]], [[False]], [[False]]]))
+    torque_wanted = magnet_wanted.spin_transfer_torque.eval()[:,0,0,0]
 
-        magnet_result.msat = msat
-        magnet_result.jcur = jcur
-        magnet_result.pol = pol
-        magnet_result.fixed_layer = fixed_layer
-        magnet_result.free_layer_thickness = free_layer_thickness
-        magnet_result.magnetization = magnetization
+    # === Create the same simulation with empty layers ===
+    world_result = World(cellsize=(1e-9, 1e-9, 1e-9))
+    magnet_result = Ferromagnet(world_result, Grid((1, 1, 4)), geometry=np.array([[[True]], [[True]], [[False]], [[False]]]))
 
-        self.torque_result = np.array([magnet_result.spin_transfer_torque.eval()[0,0,0,0],
-                                  magnet_result.spin_transfer_torque.eval()[1,0,0,0],
-                                  magnet_result.spin_transfer_torque.eval()[2,0,0,0]])
-    
-    def test_free_layer(self):
-        err = relative_error(self.torque_result, self.torque_wanted)
-        assert err < RTOL
+    magnet_result.msat = msat
+    magnet_result.jcur = jcur
+    magnet_result.pol = pol
+    magnet_result.fixed_layer = fixed_layer
+    magnet_result.free_layer_thickness = free_layer_thickness
+    magnet_result.magnetization = magnetization
+
+    torque_result = magnet_wanted.spin_transfer_torque.eval()[:,0,0,0]
+
+    return torque_result, torque_wanted
+
+def test_free_layer():
+    result, wanted = simulation()
+    err = relative_error(result, wanted)
+    assert err < RTOL
