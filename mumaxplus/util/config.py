@@ -20,7 +20,8 @@ def twodomain(m1, m2, mw, wallposition, wallthickness=0.):
     wallthickness: float
         The thickness of the wall.
         If given, wallposition corresponds to the center
-        of the domain wall.
+        of the domain wall. Used to smooth out the wall.
+        If <= 0, there is no wall.
     """
     wallidx = int(_np.nonzero(wallposition)[0][0])
     '''
@@ -33,12 +34,16 @@ def twodomain(m1, m2, mw, wallposition, wallthickness=0.):
          return mw
     '''
     def func(x, y, z):
-        if x < wallposition - wallthickness:
-            return m1
-        elif x > wallposition + wallthickness:
-            return m2
+        if x < wallposition:
+            m = m1
         else:
-            return mw
+            m = m2
+        if wallthickness <= 0:
+            return m
+        gauss = _np.exp(-((x - wallposition)/wallthickness)**2)
+        return ((1-gauss) * m[0] + gauss * mw[0],
+                (1-gauss) * m[1] + gauss * mw[1],
+                (1-gauss) * m[2] + gauss * mw[2])
     return func
 
 
