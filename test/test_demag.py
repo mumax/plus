@@ -338,7 +338,7 @@ class TestDemagSmall:
     
     def test_yy(self):
         self.magnet.magnetization = (0,1,0)
-        assert abs(self.magnet.demag_field.average()[1] - 0.05676037073) < self.ATOL
+        assert abs(self.magnet.demag_field.average()[1] - -0.05676037073) < self.ATOL
     
     def test_yz(self):
         self.magnet.magnetization = (0,1,0)
