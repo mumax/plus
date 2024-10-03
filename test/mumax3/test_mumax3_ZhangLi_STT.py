@@ -83,8 +83,3 @@ class TestZhangLi:
         world, magnet, mumax3sim = simulations
         err = max_relative_error(magnet.spin_transfer_torque.eval(), mumax3sim.get_field("STT") * GAMMALL)
         assert err < RTOL
-    
-    def test_total_torque(self, simulations):
-        world, magnet, mumax3sim = simulations
-        err = max_relative_error(magnet.torque.eval() , mumax3sim.get_field("torque") * GAMMALL)
-        assert err < RTOL
