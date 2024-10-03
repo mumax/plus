@@ -2,7 +2,7 @@
 
 import numpy as _np
 
-def twodomain(m1, m2, mw, wallposition, wallthickness=0.):
+def twodomain(m1, mw, m2, wallposition, wallthickness=0.):
     """Return a two-domain state magnetization configuration
     with a domain wall which is perpendicular to the x-axis.
 

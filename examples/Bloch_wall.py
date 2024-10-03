@@ -27,7 +27,7 @@ magnet.ku1 = 1.27e6
 magnet.anisU = (0, 0, 1)
 
 # --- Create a Bloch wall ---
-magnet.magnetization = twodomain((0, 0, -1), (0, 0, 1), (1, 1, 0), length/2, 3e-9)
+magnet.magnetization = twodomain((0, 0, -1), (1, 1, 0), (0, 0, 1), length/2, 3e-9)
 
 # --- Set up simulation parameters ---
 mx, my = [], []
@@ -54,4 +54,4 @@ plt.ylim(-0.001, 0.1)
 plt.xlabel(r"$D_{int}$ (mJ/m²)")
 plt.ylabel("Domain wall moments (a.u.)")
 plt.legend()
-plt.show()
+plt.savefig("bloch.png")
