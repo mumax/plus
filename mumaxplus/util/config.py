@@ -4,8 +4,7 @@ import numpy as _np
 
 def twodomain(m1, m2, mw, wallposition, wallthickness=0.):
     """Return a two-domain state magnetization configuration
-    with a domain wall which is perpendicular to one of the
-    three principal axes.
+    with a domain wall which is perpendicular to the x-axis.
 
     Parameters
     ----------
@@ -18,10 +17,10 @@ def twodomain(m1, m2, mw, wallposition, wallthickness=0.):
     wallposition: float
         The position of the domain wall.
     wallthickness: float
-        The thickness of the wall.
+        The thickness of the wall, which smooths out
+        the wall with a Gaussian distribution.
         If given, wallposition corresponds to the center
-        of the domain wall. Used to smooth out the wall.
-        If <= 0, there is no wall.
+        of the domain wall. If <= 0, there is no wall.
     """
     wallidx = int(_np.nonzero(wallposition)[0][0])
     '''
