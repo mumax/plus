@@ -79,9 +79,35 @@ FM_FieldQuantity effectiveBodyForceQuantity(const Ferromagnet* magnet) {
 
 // ========== Elastic Accelleration ==========
 
+__global__ void k_divideByParam(CuField field, const CuParameter param) {
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const CuSystem system = field.system;
+  const Grid grid = system.grid;
+
+  // When outside the geometry, set to zero and return early
+  if (!system.inGeometry(idx)) {
+    if (grid.cellInGrid(idx)) {
+      field.setVectorInCell(idx, real3{0, 0, 0});
+    }
+    return;
+  }
+
+  real p = param.valueAt(idx);
+  if (p != 0) {
+    field.setVectorInCell(idx, field.vectorAt(idx) / p);
+  } else {
+    field.setVectorInCell(idx, real3{0, 0, 0});  // substitue for infinity
+  }
+}
+
 Field evalElasticAcceleration(const Ferromagnet* magnet) {
   Field aField = evalEffectiveBodyForce(magnet) + evalElasticDamping(magnet);
-  // TODO: add division by rho
+  
+  // divide by rho if possible
+  if (!magnet->rho.assuredZero())
+    cudaLaunch(aField.grid().ncells(), k_divideByParam,
+               aField.cu(), magnet->rho.cu());
+
   return aField;
 }
 
