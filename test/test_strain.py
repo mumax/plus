@@ -53,10 +53,11 @@ def create_magnet(i_comp, j_comp):
 
     # derivative of sine is cosine
     cos = np.zeros(shape=strain_anal[0,...].shape)
-    index = [slice(None), slice(None), slice(None)]
-    index[(i_comp+1)%3] = 0  # indexes with length 1
-    index[(i_comp+2)%3] = 0  # indexes with length 1
+    index = [0, 0, 0]
+    index[i_comp] = slice(None)  # index with length N
+    
     cos[index[2], index[1], index[0]] = A * np.cos(k * cellsize[i_comp] * np.arange(0,N))
+
     if i_comp == j_comp:
         strain_anal[j_comp,...] = k * cos
     else:
