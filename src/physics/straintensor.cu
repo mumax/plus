@@ -11,9 +11,9 @@ bool strainTensorAssuredZero(const Ferromagnet* magnet) {
 
 
 __global__ void k_strainTensor(CuField strain,
-               const CuField u,
-               const real3 cellsize,
-               const Grid mastergrid) {
+                               const CuField u,
+                               const real3 cellsize,
+                               const Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = strain.system;
   const Grid grid = system.grid;
@@ -21,7 +21,8 @@ __global__ void k_strainTensor(CuField strain,
   // When outside the geometry, set to zero and return early
   if (!system.inGeometry(idx)) {
     if (grid.cellInGrid(idx)) {
-      strain.setVectorInCell(idx, real3{0, 0, 0});
+      for (int i=0; i<strain.ncomp; i++)
+        strain.setValueInCell(idx, i, 0);
     }
     return;
   }
@@ -98,9 +99,7 @@ __global__ void k_strainTensor(CuField strain,
 Field evalStrainTensor(const Ferromagnet* magnet) {
   Field strain(magnet->system(), 6, 0.0);
 
-  if (strainTensorAssuredZero(magnet)) {
-    return strain;
-  }
+  if (strainTensorAssuredZero(magnet)) return strain;
 
   int ncells = strain.grid().ncells();
   CuField u = magnet->elasticDisplacement()->field().cu();
