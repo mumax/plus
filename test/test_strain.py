@@ -23,7 +23,7 @@ def max_semirelative_error(result, wanted):
     return max_absolute_error(result, wanted) / np.max(abs(wanted))
 
 
-def create_magnet(d_comp):
+def create_magnet(d_comp, cos_comp):
     """Makes a world with a 1D magnet in the d_comp direction.
     """
     gridsize, gridsize_magnet, pbc_repetitions = [0, 0, 0], [1, 1, 1], [0, 0, 0]
@@ -35,13 +35,6 @@ def create_magnet(d_comp):
     magnet =  Ferromagnet(world, Grid(gridsize_magnet))
     magnet.enable_elastodynamics = True
 
-    return world, magnet
-
-
-def sine_displacement(magnet, d_comp, cos_comp):
-    """Creates the magnetization following a sine in the d_comp direction
-    and cosine in another direction it then calculates the magnetoelasticforce.
-    """
     magnet.enable_elastodynamics = True  # just in case
 
     L = N*cellsize[d_comp]
@@ -60,36 +53,29 @@ def sine_displacement(magnet, d_comp, cos_comp):
     strain_anal = np.zeros(shape=strain_num.shape)
     strain_anal[d_comp,...] = k * magnet.elastic_displacement.eval()[cos_comp,...]
     strain_anal[2 + d_comp + cos_comp,...] = - 0.5 * k * magnet.elastic_displacement.eval()[d_comp,...]
-    print("--------------------------------------------------------------------------------------------------------")
     assert max_semirelative_error(strain_num, strain_anal) < RTOL
 
 
 def test_sinx_cosx_0():
     d_comp = 0
-    world, magnet = create_magnet(d_comp)
-    sine_displacement(magnet, d_comp, (d_comp+1)%3)
+    create_magnet(d_comp, (d_comp+1)%3)
 
 def test_0_siny_cosy():
     d_comp = 1
-    world, magnet = create_magnet(d_comp)
-    sine_displacement(magnet, d_comp, (d_comp+1)%3)
+    create_magnet(d_comp, (d_comp+1)%3)
 
 def test_cosz_0_sinz():
     d_comp = 2
-    world, magnet = create_magnet(d_comp)
-    sine_displacement(magnet, d_comp, (d_comp+1)%3)
+    create_magnet(d_comp, (d_comp+1)%3)
 
 def test_sinx_0_cosx():
     d_comp = 0
-    world, magnet = create_magnet(d_comp)
-    sine_displacement(magnet, d_comp, (d_comp+2)%3)
+    create_magnet(d_comp, (d_comp+2)%3)
 
 def test_cosy_siny_0():
     d_comp = 1
-    world, magnet = create_magnet(d_comp)
-    sine_displacement(magnet, d_comp, (d_comp+2)%3)
+    create_magnet(d_comp, (d_comp+2)%3)
 
 def test_0_cosz_sinz():
     d_comp = 2
-    world, magnet = create_magnet(d_comp)
-    sine_displacement(magnet, d_comp, (d_comp+2)%3)
+    create_magnet(d_comp, (d_comp+2)%3)
