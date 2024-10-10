@@ -23,7 +23,7 @@ def max_semirelative_error(result, wanted):
     return max_absolute_error(result, wanted) / np.max(abs(wanted))
 
 
-def create_magnet(i_comp, j_comp):
+def check_strain(i_comp, j_comp):
     """Makes a world with a 1D magnet in the d_comp direction.
     """
     gridsize, gridsize_magnet, pbc_repetitions = [0, 0, 0], [1, 1, 1], [0, 0, 0]
@@ -68,24 +68,36 @@ def create_magnet(i_comp, j_comp):
 
 def test_Exx():
     i, j = 0, 0
-    create_magnet(i, j)
+    check_strain(i, j)
 
 def test_Eyy():
     i, j = 1, 1
-    create_magnet(i, j)
+    check_strain(i, j)
 
 def test_Ezz():
     i, j = 2, 2
-    create_magnet(i, j)
+    check_strain(i, j)
 
 def test_Exy():
     i, j = 0, 1
-    create_magnet(i, j)
+    check_strain(i, j)
 
 def test_Exz():
     i, j = 0, 2
-    create_magnet(i, j)
+    check_strain(i, j)
 
 def test_Eyz():
     i, j = 1, 2
-    create_magnet(i, j)
+    check_strain(i, j)
+
+def test_Eyx():
+    i, j = 1, 0
+    check_strain(i, j)
+
+def test_Ezx():
+    i, j = 2, 0
+    check_strain(i, j)
+
+def test_Ezy():
+    i, j = 2, 1
+    check_strain(i, j)
