@@ -9,7 +9,7 @@ RTOL = 1e-4
 cx, cy, cz = 1.5e-9, 2e-9, 2.5e-9
 cellsize = (cx, cy, cz)
 P = 2  # periods
-A = 1  # amplitude
+A = 4  # amplitude
 N = 128  # number of 1D cells
 
 def max_absolute_error(result, wanted):
