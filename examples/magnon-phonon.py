@@ -11,7 +11,7 @@ import os.path
 from mumaxplus.util.constants import *
 
 # angle between magnetization and wave propagation
-theta = 0
+theta = np.pi/6
 
 # time settings
 dt = 1e-11
@@ -130,24 +130,25 @@ y_start = int((ymin - extent[2]) / (extent[3] - extent[2]) * steps)
 y_end = int((ymax - extent[2]) / (extent[3] - extent[2]) * steps)
 
 ux_FT = np.abs(np.fft.fftshift(np.fft.fft2(u[:,0,0,0,:])))
-ux_FT /= np.max(ux_FT[y_start:y_end,x_start:x_end])
+ux_max = np.max(ux_FT[y_start:y_end,x_start:x_end])
 
 uy_FT = np.abs(np.fft.fftshift(np.fft.fft2(u[:,1,0,0,:])))
-uy_FT /= np.max(uy_FT[y_start:y_end,x_start:x_end])
+uy_max = np.max(uy_FT[y_start:y_end,x_start:x_end])
 
 uz_FT = np.abs(np.fft.fftshift(np.fft.fft2(u[:,2,0,0,:])))
-uz_FT /= np.max(uz_FT[y_start:y_end,x_start:x_end])
+uz_max = np.max(uz_FT[y_start:y_end,x_start:x_end])
 
 mx_FT = np.abs(np.fft.fftshift(np.fft.fft2(m[:,0,0,0,:])))
-mx_FT /= np.max(mx_FT[y_start:y_end,x_start:x_end])
+mx_max = np.max(mx_FT[y_start:y_end,x_start:x_end])
 
 my_FT = np.abs(np.fft.fftshift(np.fft.fft2(m[:,1,0,0,:])))
-my_FT /= np.max(my_FT[y_start:y_end,x_start:x_end])
+my_max = np.max(my_FT[y_start:y_end,x_start:x_end])
 
 mz_FT = np.abs(np.fft.fftshift(np.fft.fft2(m[:,2,0,0,:])))
-mz_FT /= np.max(mz_FT[y_start:y_end,x_start:x_end])
+mz_max = np.max(mz_FT[y_start:y_end,x_start:x_end])
 
-FT_tot = ux_FT + uy_FT + uz_FT + mx_FT + my_FT + mz_FT
+FT_tot = ux_FT/ux_max + uy_FT/uy_max + uz_FT/uz_max  # everything important
+FT_tot += (mx_FT + my_FT + mz_FT)/np.max([mx_max, my_max, mz_max])  # remove noise
 
 # numerical calculations
 lambda_exch = (2*aex) / (MU0*msat**2)
