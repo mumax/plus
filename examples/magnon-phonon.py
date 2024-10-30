@@ -116,7 +116,7 @@ else:
 
 # plotting ranges
 xmin, xmax = 2, 20
-ymin, ymax = 3, 14
+ymin, ymax = 3, 8
 extent = [-(2 * np.pi) / (2 * cx) * (nx+1)/nx * 1e-6,
           (2 * np.pi) / (2 * cx) * (nx-1)/nx * 1e-6,
           -1 / (2 * dt) * steps/(steps-1) * 1e-9,
@@ -152,7 +152,7 @@ FT_tot += (mx_FT + my_FT + mz_FT)/np.max([mx_max, my_max, mz_max])  # remove noi
 
 # numerical calculations
 lambda_exch = (2*aex) / (MU0*msat**2)
-k = np.linspace(xmin*1e6, xmax*1e6, 100)
+k = np.linspace(xmin*1e6, xmax*1e6, 2000)
 
 # elastic waves
 vt = np.sqrt(c44/rho)
@@ -166,11 +166,23 @@ omega_M = GAMMALL * MU0 * msat
 P = 1 - (1 - np.exp(-k*cz)) / (k*cz)
 omega_fx = omega_0 + omega_M * (lambda_exch * k**2 + P * np.sin(theta)**2)
 omega_fy = omega_0 + omega_M * (lambda_exch * k**2 + 1 - P)
+omega_fm = np.sqrt(omega_fx*omega_fy)
 
 # plot analytical results
-plt.plot(k*1e-6, omega_t/(2*np.pi)*1e-9)
-plt.plot(k*1e-6, omega_l/(2*np.pi)*1e-9)
-plt.plot(k*1e-6, np.sqrt(omega_fx*omega_fy)/(2*np.pi)*1e-9)
+plt.plot(k*1e-6, omega_t/(2*np.pi)*1e-9, color="orange", lw=5)
+plt.plot(k*1e-6, omega_l/(2*np.pi)*1e-9, color="orange", lw=5)
+plt.plot(k*1e-6, omega_fm/(2*np.pi)*1e-9, color="blue", lw=5)
+
+# exact coupled analytical result
+J = GAMMALL * B1**2 / (rho * msat)
+
+omega = np.linspace(ymin*(2*np.pi)*1e9, ymax*(2*np.pi)*1e9, 2000)
+k, omega = np.meshgrid(k,omega)
+
+equation = (omega**2 - omega_l**2) * ((omega**2 - omega_t**2)**2 * (omega**2 - omega_fm**2)
+                                      - (omega**2 - omega_t**2) * J*k**2 * (omega_fx*np.cos(theta)**2 + omega_fy*np.cos(2*theta)**2) - J**2*k**4*np.cos(2*theta)**2*np.cos(theta)**2)
+equation += -(omega**2 - omega_t**2) * J*k**2 * (omega_fy*(omega**2 - omega_t**2)*np.sin(2*theta)**2 + J*k**2 * np.sin(2*theta)**2 * np.cos(theta)**2)
+plt.contour(k*1e-6, omega/(2*np.pi)*1e-9, equation, [0], colors="red", linewidths=5)
 
 # plot numerical result
 plt.imshow(FT_tot**2, aspect='auto', origin='lower', extent=extent,
