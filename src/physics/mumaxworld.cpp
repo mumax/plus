@@ -7,6 +7,7 @@
 #include "antiferromagnet.hpp"
 #include "datatypes.hpp"
 #include "dynamicequation.hpp"
+#include "elastodynamics.hpp"
 #include "ferromagnet.hpp"
 #include "gpubuffer.hpp"
 #include "grid.hpp"
@@ -175,6 +176,30 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
       equations.push_back(eq);
     }
   }
+
+  for (const auto& namedMagnet : magnets_) {
+    const Magnet* magnet = namedMagnet.second;
+
+    // add elastodynamics if enabled
+    // TODO: this does not play nice with relax()
+    if (magnet->enableElastodynamics()) {
+
+      // change in displacement = velocity
+      DynamicEquation dvEq(
+          magnet->elasticDisplacement(),
+          std::shared_ptr<FieldQuantity>(elasticVelocityQuantity(magnet).clone()));
+          // No thermal noise
+      equations.push_back(dvEq);
+
+      // change in velocity = acceleration
+      DynamicEquation vaEq(
+          magnet->elasticVelocity(),
+          std::shared_ptr<FieldQuantity>(elasticAccelerationQuantity(magnet).clone()));
+          // No thermal noise
+      equations.push_back(vaEq);
+    }
+  }
+
   timesolver_->setEquations(equations);
 }
 

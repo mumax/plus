@@ -12,7 +12,7 @@ def max_absolute_error(result, wanted):
 xi1, xi2, xi3, xi4 = 0.0, 0.05, 0.1, 0.5
 @pytest.fixture(scope="class", params=[xi1, xi2, xi3, xi4])
 def simulations(request):
-    """Sets up and runs standard problem 5 for both mumaxplus and mumax3, given
+    """Sets up and runs standard problem 5 for both mumax⁺ and mumax³, given
     a specific non-adiabacity xi. The magnetization throughout time can later
     be compared quickly.
     This is very slow, but it rigorously tests Zhang-Li spin transfer torque.
@@ -20,7 +20,7 @@ def simulations(request):
 
     # === specifications ===
     length, width, thickness = 100e-9, 100e-9, 10e-9
-    nx, ny, nz = 50, 50, 5  # following mumax3 paper
+    nx, ny, nz = 50, 50, 5  # following mumax³ paper
     cellsize = (length/nx, width/ny, thickness/nz)
     gridsize = (nx, ny, nz)
 
@@ -35,7 +35,7 @@ def simulations(request):
     max_time = 5e-9
     step_time = 5e-12
 
-    # === mumax3 ===
+    # === mumax³ ===
     mumax3sim = Mumax3Simulation(
         f"""
             setcellsize{tuple(cellsize)}
@@ -58,7 +58,7 @@ def simulations(request):
         """
     )
 
-    # === mumaxplus ===
+    # === mumax⁺ ===
 
     world = World(cellsize=cellsize)
     magnet = Ferromagnet(world, Grid(gridsize))
@@ -88,7 +88,7 @@ def simulations(request):
 @pytest.mark.slow
 @pytest.mark.mumax3
 class TestStandardProblem5:
-    """Compare the results of standard problem #5 of mumaxplus against mumax3.
+    """Compare the results of standard problem #5 of mumax⁺ against mumax³.
     Standard Problems: http://www.ctcms.nist.gov/~rdm/mumag.org.html
     Number 5: https://www.ctcms.nist.gov/~rdm/std5/spec5.xhtml
     """

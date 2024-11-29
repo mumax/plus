@@ -1,4 +1,4 @@
-Welcome to MuMaxPlus's documentation!
+Welcome to mumax⁺'s documentation!
 =====================================
 
 

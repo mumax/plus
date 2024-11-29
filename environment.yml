@@ -9,6 +9,7 @@ dependencies:
   - matplotlib
   - numpy
   - cmake=3.16.3
+  - scipy
 
   # code checks
   - black
@@ -25,7 +26,6 @@ dependencies:
   - ipython
   - jupyter
   - ipywidgets
-  - scipy
   - pyvista
   - pillow  # should be contained in matplotlib
   - pandas

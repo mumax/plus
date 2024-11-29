@@ -163,7 +163,6 @@ class TestAfmExchange:
         MuMax3" up to 20°. https://doi.org/10.1063/1.4899186 """
 
         msat = 800e3
-        aex = 5e-12
         afmex_nn = -15e-12
         afmex_cell = -100e-12
         l = 0.35e-9 # Default lattice constant

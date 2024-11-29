@@ -23,7 +23,7 @@ B1 = (-24.6e-3, 4.3e-3, 0)  # field 1
 B2 = (-35.5e-3, -6.3e-3, 0)  # field 2
 @pytest.fixture(scope="class", params=[B1, B2])
 def simulations(request):
-    """Sets up and runs standard problem 4 for both mumaxplus and mumax3, given
+    """Sets up and runs standard problem 4 for both mumax⁺ and mumax³, given
     a specific magnetic field. The magnetization and energies throughout time
     can later be compared quickly.
     """
@@ -43,7 +43,7 @@ def simulations(request):
     step_time = 1e-12
     
 
-    # === mumaxplus ===
+    # === mumax⁺ ===
     world = World(cellsize=(length / nx, width / ny, thickness / nz))
     magnet = Ferromagnet(world, Grid((nx, ny, nz)))
     
@@ -70,7 +70,7 @@ def simulations(request):
     mumaxplusoutput = world.timesolver.solve(timepoints, outputquantities)
 
 
-    # === mumax3 ===
+    # === mumax³ ===
     mumax3sim = Mumax3Simulation(
         f"""
             setcellsize{tuple(world.cellsize)}
@@ -99,7 +99,7 @@ def simulations(request):
 
 @pytest.mark.mumax3
 class TestStandardProblem4:
-    """Compare the results of standard problem #4 of mumaxplus against mumax3.
+    """Compare the results of standard problem #4 of mumax⁺ against mumax³.
     Standard Problems: http://www.ctcms.nist.gov/~rdm/mumag.org.html
     Number 4: https://www.ctcms.nist.gov/~rdm/std4/spec4.html
     """

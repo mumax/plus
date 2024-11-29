@@ -14,6 +14,8 @@
 #include "fieldquantity.hpp"
 #include "fullmag.hpp"
 #include "magnet.hpp"
+#include "magnetoelasticfield.hpp"
+#include "magnetoelasticforce.hpp"
 #include "mumaxworld.hpp"
 #include "parameter.hpp"
 #include "stt.hpp"
@@ -62,6 +64,8 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("amr_ratio", &Ferromagnet::amrRatio)
       .def_readwrite("RelaxTorqueThreshold", &Ferromagnet::RelaxTorqueThreshold)
       .def_readonly("poisson_system", &Ferromagnet::poissonSystem)
+      .def_readonly("B1", &Ferromagnet::B1)
+      .def_readonly("B2", &Ferromagnet::B2)
       
       .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Ferromagnet::relax, py::arg("tol"));
@@ -102,8 +106,10 @@ void wrap_ferromagnet(py::module& m) {
   m.def("zeeman_energy", &zeemanEnergyQuantity);
 
   m.def("effective_field", &effectiveFieldQuantity);
-  m.def("total_energy_density", &totalEnergyDensityQuantity);
-  m.def("total_energy", &totalEnergyQuantity);
+  m.def("total_energy_density",
+        py::overload_cast<const Ferromagnet*>(&totalEnergyDensityQuantity));
+  m.def("total_energy",
+        py::overload_cast<const Ferromagnet*>(&totalEnergyQuantity));
 
   m.def("conductivity_tensor", &conductivityTensorQuantity);
   m.def("electrical_potential", &electricalPotentialQuantity);
@@ -112,4 +118,11 @@ void wrap_ferromagnet(py::module& m) {
 
   m.def("full_magnetization",
         py::overload_cast<const Ferromagnet*>(&fullMagnetizationQuantity));
+
+  // Magnetoelasticity
+  m.def("magnetoelastic_field", &magnetoelasticFieldQuantity);
+  m.def("magnetoelastic_energy_density", &magnetoelasticEnergyDensityQuantity);
+  m.def("magnetoelastic_energy", &magnetoelasticEnergyQuantity);
+
+  m.def("magnetoelastic_force", &magnetoelasticForceQuantity);
 }

@@ -212,7 +212,10 @@ class Ferromagnet(Magnet):
 
     @property
     def msat(self):
-        """Saturation magnetization (A/m)."""
+        """Saturation magnetization (A/m).
+        
+        Default = 1.0 A/m
+        """
         return Parameter(self._impl.msat)
 
     @msat.setter
@@ -588,6 +591,36 @@ class Ferromagnet(Magnet):
     @amr_ratio.setter
     def amr_ratio(self, value):
         self.amr_ratio.set(value)
+
+    # --- magnetoelasticity ---
+
+    @property
+    def B1(self):
+        """First magnetoelastic coupling constant (J/m³).
+        
+        See Also
+        --------
+        B2
+        """
+        return Parameter(self._impl.B1)
+
+    @B1.setter
+    def B1(self, value):
+        self.B1.set(value)
+
+    @property
+    def B2(self):
+        """Second magnetoelastic coupling constant (J/m³).
+        
+        See Also
+        --------
+        B1
+        """
+        return Parameter(self._impl.B2)
+
+    @B2.setter
+    def B2(self, value):
+        self.B2.set(value)
 
     # ----- POISSON SYSTEM ----------------------
 
@@ -965,3 +998,50 @@ class Ferromagnet(Magnet):
         homogeneous_exchange_field, homogeneous_exchange_energy_density
         """
         return ScalarQuantity(_cpp.homogeneous_exchange_energy(self._impl))
+
+
+    # --- magnetoelasticity ---
+    # all elasticity is found in the Magnet parent
+
+    @property
+    def magnetoelastic_field(self):
+        """Magnetoelastic effective field due to effects of inverse
+        magnetostriction (T).
+
+        See Also
+        --------
+        B1, B2
+        magnetoelastic_force
+        """
+        return FieldQuantity(_cpp.magnetoelastic_field(self._impl))
+    
+    @property
+    def magnetoelastic_energy_density(self):
+        """Energy density related to magnetoelastic field (J/m³).
+
+        See Also
+        --------
+        magnetoelastic_energy, magnetoelastic_field
+        """
+        return FieldQuantity(_cpp.magnetoelastic_energy_density(self._impl))
+    
+    @property
+    def magnetoelastic_energy(self):
+        """Energy related to magnetoelastic field (J).
+
+        See Also
+        --------
+        magnetoelastic_energy_density, magnetoelastic_field
+        """
+        return ScalarQuantity(_cpp.magnetoelastic_energy(self._impl))
+
+    @property
+    def magnetoelastic_force(self):
+        """Magnetoelastic body force density due to magnetostriction effect (N/m³).
+
+        See Also
+        --------
+        B1, B2
+        effective_body_force, magnetoelastic_field
+        """
+        return FieldQuantity(_cpp.magnetoelastic_force(self._impl))

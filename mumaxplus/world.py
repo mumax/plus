@@ -284,7 +284,7 @@ class World:
             minimum bounding box of the magnets currently inside the world, but
             infinitely large (size 0, no periodicity) for any direction set to 0
             in `pbc_repetitions`.
-            This reflects the behavior of the MuMax3 SetPBC function.
+            This reflects the behavior of the mumax³ SetPBC function.
             This will throw an error if there are no magnets in the world.
 
         See Also

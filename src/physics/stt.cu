@@ -119,7 +119,7 @@ __global__ void k_Slonczewski(CuField torque,
   real3 m = mField.vectorAt(idx);
  
   const real3 jj = jcurParam.vectorAt(idx);
-  const real jz = jj.z;  // consistent with mumax3 TODO: make more general?
+  const real jz = jj.z;  // consistent with mumax³ TODO: make more general?
 
   const real msat = msatParam.valueAt(idx);
   const real pol = polParam.valueAt(idx);

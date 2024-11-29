@@ -54,7 +54,10 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
       conductivity(system(), 0.0, name + ":conductivity", "S/m"),
       amrRatio(system(), 0.0, name + ":amr_ratio", ""),
       RelaxTorqueThreshold(-1.0),
-      poissonSystem(this) {
+      poissonSystem(this), 
+      // magnetoelasticity
+      B1(system(), 0.0, name + ":B1", "J/m3"),
+      B2(system(), 0.0, name + ":B1", "J/m3") {
     {// Initialize random magnetization
     // TODO: this can be done much more efficient somewhere else
     int nvalues = 3 * this->grid().ncells();
@@ -74,8 +77,8 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
   // TODO: move the generator to somewhere else
   curandCreateGenerator(&randomGenerator, CURAND_RNG_PSEUDO_DEFAULT);
   curandSetPseudoRandomGeneratorSeed(randomGenerator,
-    static_cast<int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
-  }
+  static_cast<int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+}
 
 Ferromagnet::Ferromagnet(MumaxWorld* world,
                          Grid grid,

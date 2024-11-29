@@ -13,15 +13,15 @@ def max_relative_error(result, wanted):
 
 @pytest.mark.mumax3
 class TestMumax3:
-    """ Test the effective fields of mumaxplus against mumax3 """
+    """ Test the effective fields of mumax⁺ against mumax³ """
 
     def setup_class(self):
         """1. Creates a magnet with arbitrary material parameters and grid
-        2. Creates a mumax3 simulation with the same parameters
-        3. Copies the magnetization of the mumax3 simulation to the magnet
+        2. Creates a mumax³ simulation with the same parameters
+        3. Copies the magnetization of the mumax³ simulation to the magnet
 
         The effective fields of the magnet should now match the effective fields
-        of the mumax3 simulation.
+        of the mumax³ simulation.
         """
 
         self.world = World((1e-9, 2e-9, 3.2e-9))
@@ -89,7 +89,7 @@ class TestMumax3:
 
     def test_demag_field(self):
         # Here we compare to the demagfield of mumax with an increased tollerance.
-        # Because mumax3 and mumaxplus approximate in a different way the demag kernel
+        # Because mumax³ and mumax⁺ approximate in a different way the demag kernel
         err = max_relative_error(
             result=self.magnet.demag_field.eval(),
             wanted=self.mumax3sim.get_field("b_demag"),
@@ -98,7 +98,7 @@ class TestMumax3:
 
     def test_effective_field(self):
         # Here we compare to the demagfield of mumax with an increased tollerance.
-        # Because mumax3 and mumaxplus approximate in a different way the demag kernel
+        # Because mumax³ and mumax⁺ approximate in a different way the demag kernel
         err = max_relative_error(
             result=self.magnet.effective_field.eval(),
             wanted=self.mumax3sim.get_field("b_eff"),

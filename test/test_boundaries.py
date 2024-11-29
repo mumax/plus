@@ -11,10 +11,10 @@ result, as well as the numerical results obtained with open and Neumann BC are
 slightly wrong because the width of the nanowire is not taken into account
 properly.
 
-Due to this difference, the Neumann result is compared with the MuMax3 Neumann
+Due to this difference, the Neumann result is compared with the mumax³ Neumann
 result.
 
-The MuMax3 results are as follows:
+The mumax³ results are as follows:
 Neumann:   0.44716486657643906
 Open:      0.5958252040658198
 Periodic:  0.5958256832017506
@@ -57,7 +57,7 @@ def analytic():
 
 
 def simulation(x_dir):
-    """Sets up the MuMaxPlus simulation"""
+    """Sets up the mumax⁺ simulation"""
 
     world = World(cellsize=(cs, cs, cs))
 
@@ -86,7 +86,7 @@ class TestBoundaries:
         self.wanted = analytic()
     
     def test_neumann_x(self):
-        """Compare the Neumann boundary conditions with MuMax3
+        """Compare the Neumann boundary conditions with mumax³
         for a wire in the x-direction."""
         self.magnet_x.enable_openbc = False
         self.magnet_x.minimize(minimizerstop)
@@ -114,7 +114,7 @@ class TestBoundaries:
         assert err < RTOL
     
     def test_neumann_y(self):
-        """Compare the Neumann boundary conditions with MuMax3
+        """Compare the Neumann boundary conditions with mumax³
         for a wire in the y-direction."""
         self.magnet_y.enable_openbc = False
         self.magnet_y.minimize(minimizerstop)

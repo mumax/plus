@@ -13,7 +13,7 @@ class Parameter(FieldQuantity):
     def __init__(self, impl):
         """Initialize a python Parameter from a c++ Parameter instance.
 
-        Parameters should only have to be initialized within the mumaxplus
+        Parameters should only have to be initialized within the mumax⁺
         module and not by the end user.
         """
         self._impl = impl

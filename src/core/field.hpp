@@ -122,6 +122,9 @@ struct CuField {
   __device__ real3 vectorAt(int idx) const;
   __device__ real3 vectorAt(int3 coo) const;
 
+  __device__ real3 vectorAt(int idx, int3 comps) const;
+  __device__ real3 vectorAt(int3 coo, int3 comps) const;
+
   __device__ void setValueInCell(int idx, int comp, real value);
   __device__ void setVectorInCell(int idx, real3 vec);
 };
@@ -164,6 +167,14 @@ __device__ inline real3 CuField::vectorAt(int idx) const {
 
 __device__ inline real3 CuField::vectorAt(int3 coo) const {
   return vectorAt(system.grid.coord2index(coo));
+}
+
+__device__ inline real3 CuField::vectorAt(int idx, int3 comps) const {
+  return real3{ptrs[comps.x][idx], ptrs[comps.y][idx], ptrs[comps.z][idx]};
+}
+
+__device__ inline real3 CuField::vectorAt(int3 coo, int3 comps) const {
+  return vectorAt(system.grid.coord2index(coo), comps);
 }
 
 __device__ inline void CuField::setValueInCell(int idx, int comp, real value) {

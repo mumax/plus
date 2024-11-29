@@ -14,7 +14,7 @@ def max_absolute_error(result, wanted):
 
 @pytest.fixture(scope="class", params=[True, False])
 def simulations(request):
-    """Sets up and runs a Slonczewski STT test for mumaxplus and mumax3.
+    """Sets up and runs a Slonczewski STT test for mumax⁺ and mumax³.
     This is based on a test in the paper "The design and verification of MuMax3".
     https://doi.org/10.1063/1.4899186 """
 
@@ -40,7 +40,7 @@ def simulations(request):
     step_time = 0.5e-12
 
 
-    # === mumaxplus ===
+    # === mumax⁺ ===
     world = World(cellsize=(cx, cy, cz))
     magnet = Ferromagnet(world, Grid((nx, ny, nz)))
     magnet.msat = msat
@@ -63,7 +63,7 @@ def simulations(request):
     mumaxplusoutput = world.timesolver.solve(timepoints, outputquantities)
 
 
-    # === mumax3 ===
+    # === mumax³ ===
     if request.param:
         FixedLayerPosition = "FIXEDLAYER_TOP"
     else:
@@ -96,7 +96,7 @@ def simulations(request):
 
 @pytest.mark.mumax3
 class TestSlonczewskiSTT:
-    """Compare the results of a Slonczewski STT test of mumaxplus against mumax3.
+    """Compare the results of a Slonczewski STT test of mumax⁺ against mumax³.
     This is based on a test in the paper "The design and verification of MuMax3".
     https://doi.org/10.1063/1.4899186 """
 

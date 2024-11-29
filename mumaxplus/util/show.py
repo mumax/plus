@@ -90,7 +90,7 @@ def get_rgba(field, quantity=None, layer=None):
 
 
 def show_field(quantity, layer=0):
-    """Plot a mumaxplus.FieldQuantity with 3 components using the mumax3 colorscheme."""
+    """Plot a mumaxplus.FieldQuantity with 3 components using the mumax³ colorscheme."""
     if not isinstance(quantity, _mxp.FieldQuantity):
         raise TypeError("The first argument should be a FieldQuantity")
     
@@ -147,7 +147,7 @@ def show_neel_quiver(quantity, title=''):
     
     # Still needs some fudging...
     # Function uses ancient representation of Antiferromagnet.
-    # This does NOT work in the current version of Mumax+.
+    # This does NOT work in the current version of mumax⁺.
 
     field = quantity.eval()
     m1, m2 = field[0:3], field[3:6]
@@ -210,7 +210,7 @@ def show_field_3D(quantity, cmap="mumax3", quiver=True):
     quantity : mumaxplus.FieldQuantity (3 components)
         The `FieldQuantity` to plot as a vectorfield.
     cmap : string, optional, default: "mumax3"
-        A colormap to use. By default the mumax3 colormap is used.
+        A colormap to use. By default the mumax³ colormap is used.
         Any matplotlib colormap can also be given to color the vectors according
         to their z-component. It's best to use diverging colormaps, like "bwr".
     quiver : boolean, optional, default: True
@@ -253,7 +253,7 @@ def show_field_3D(quantity, cmap="mumax3", quiver=True):
         quiver = threshed.glyph(orient="field", scale=False, factor=factor, geom=cone)
 
         # color
-        if "mumax" in cmap.lower():  # Use the mumax3 colorscheme
+        if "mumax" in cmap.lower():  # Use the mumax³ colorscheme
             # don't need quantity to set opacity for geometry, threshold did this
             rgba = get_rgba(threshed["field"].T, quantity=None, layer=None)
             # we need to color every quiver vertex individually, each cone has cres+1
@@ -264,7 +264,7 @@ def show_field_3D(quantity, cmap="mumax3", quiver=True):
             plotter.add_mesh(quiver, scalars="z-component", cmap=cmap,
                              clim=(-1,1), lighting=False)
     else:  # use colored voxels
-        if "mumax" in cmap.lower():  # Use the mumax3 colorscheme
+        if "mumax" in cmap.lower():  # Use the mumax³ colorscheme
             # don't need quantity to set opacity for geometry, threshold did this
             threshed.cell_data["rgba"] = get_rgba(threshed["field"].T,
                                                   quantity=None, layer=None)

@@ -51,7 +51,7 @@ class Mumax3Simulation:
 
     @property
     def table(self):
-        """Returns a pandas dataframe of the mumax3 table, or None if no table
+        """Returns a pandas dataframe of the mumax³ table, or None if no table
         was found."""
         return self._table
 

@@ -1,6 +1,7 @@
 """Common magnetization configurations."""
 
 import numpy as _np
+import math as _math
 
 def twodomain(m1, mw, m2, wallposition, wallthickness=0.):
     """Return a two-domain state magnetization configuration
@@ -199,4 +200,103 @@ def blochskyrmion(position, radius, charge, polarization):
         my = (x * charge / r) * (1 - _np.abs(mz))
         return (mx, my, mz)
 
+    return func
+
+# --------------------------------------------------
+# elastic displacement initial states
+
+def gaussian_spherical_OoP(position, amplitude, sigma_x, sigma_y):
+    """Return an out-of-xy-plane gaussian distribution centered on the specified
+    position with given standard deviations.
+    
+    (0, 0, A exp(- (x - x0)²/2σx² * (y - y0)/2σy²))
+
+    Parameters
+    ----------
+    position : tuple of three floats
+        The position of the Gaussian distribution.
+    amplitude : float
+        The amplitude of the Gaussian distribution.
+    sigma_x : float
+        The standard deviation in the x-direction of the Gaussian distribution.
+    sigma_y : float
+        The standard deviation in the y-direction of the Gaussian distribution.
+    """
+    
+    x0, y0, _ = position
+    denom = (4 * sigma_x*sigma_x * sigma_y*sigma_y)
+
+    def func(x, y, z):
+        uz = amplitude * _math.exp(- (x - x0)*(x - x0) * (y - y0)*(y - y0) / denom)
+        return (0, 0, uz)
+    
+    return func
+
+def gaussian_spherical_IP(position, amplitude, angle, sigma_x, sigma_y):
+    """Return an in-xy-plane vector field with uniform orientation specified by
+    the given angle. The amplitude is modified by a gaussian distribution
+    centered on the specified position with given standard deviations.
+    
+    (A cos(θ) exp(- (x - x0)²/2σx² * (y - y0)/2σy²),
+     A sin(θ) exp(- (x - x0)²/2σx² * (y - y0)/2σy²),
+     0)
+
+    Parameters
+    ----------
+    position : tuple of three floats
+        The position of the Gaussian distribution.
+    amplitude : float
+        The amplitude of the uniform vector field.
+    angle : float
+        The angle in radians of the uniform vector field direction.
+    sigma_x : float
+        The standard deviation in the x-direction of the Gaussian distribution.
+    sigma_y : float
+        The standard deviation in the y-direction of the Gaussian distribution.
+    """
+    
+    x0, y0, _ = position
+    denom = 4 * sigma_x*sigma_x * sigma_y*sigma_y
+    AC, AS = amplitude * _math.cos(angle), amplitude * _math.sin(angle)
+
+    def func(x, y, z):
+        E = _math.exp(- (x - x0)*(x - x0) * (y - y0)*(y - y0) / denom)
+        return (AC*E, AS*E, 0)
+
+    return func
+
+def gaussian_uniform_IP(amplitude, theta, gausspos, sigma, phi):
+    """Return an in-xy-plane vector field with uniform orientation specified by
+    the given angle theta. The amplitude is modified by a one-dimensional
+    Gaussian distribution centered on gausspos, which varies along the
+    transverse direction in the xy-plane specified by angle phi.
+
+    (A cos(θ) exp(-(x'-x0)²/2σ²),
+     A sin(θ) exp(-(x'-x0)²/2σ²),
+     0)
+    with x0 = gausspos and x' = x*cos(ϕ) + y*sin(ϕ)
+    
+    Parameters
+    ----------
+    amplitude : float
+        The amplitude of the vector field.
+    theta : float
+        The angle in radians of the uniform vector field direction.
+    gausspos : floats
+        The center position of the Gaussian distribution.
+    sigma : float
+        The gaussian standard deviation.
+    phi : float
+        The angle in radians of the transverse direction.
+    """
+
+    denom = 2 * sigma*sigma
+    Cphi, Sphi = _math.cos(phi), _math.sin(phi)
+    ACtheta, AStheta = amplitude * _math.cos(theta), amplitude * _math.sin(theta)
+
+    def func(x, y, z):
+        x_ = Cphi*x + Sphi*y
+        E = _math.exp(- (x_ - gausspos)*(x_ - gausspos) / denom)
+        return (ACtheta * E, AStheta * E, 0)
+    
     return func

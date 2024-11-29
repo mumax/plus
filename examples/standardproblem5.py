@@ -18,7 +18,7 @@ def get_initial_config(position, Radius):
 
 # world specifications
 length, width, thickness = 100e-9, 100e-9, 10e-9
-nx, ny, nz = 50, 50, 5  # following mumax3 paper
+nx, ny, nz = 50, 50, 5  # following mumax³ paper
 world = World(cellsize=(length / nx, width / ny, thickness / nz))
 
 # parameters

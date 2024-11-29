@@ -5,8 +5,12 @@ from abc import ABC, abstractmethod
 
 import _mumaxpluscpp as _cpp
 
+from .fieldquantity import FieldQuantity
 from .grid import Grid
+from .parameter import Parameter
+from .scalarquantity import ScalarQuantity
 from .strayfield import StrayField
+from .variable import Variable
 
 
 class Magnet(ABC):
@@ -170,6 +174,282 @@ class Magnet(ABC):
     def enable_as_stray_field_destination(self, value):
         self._impl.enable_as_stray_field_destination = value
 
+    # ----- ELASTIC VARIABLES  -------
+
+    @property
+    def elastic_displacement(self):
+        """Elastic displacement vector (m).
+
+        The elastic displacement is uninitialized (does not exist) if the
+        elastodynamics are disabled.
+        
+        See Also
+        --------
+        elastic_velocity
+        enable_elastodynamics
+        """
+        return Variable(self._impl.elastic_displacement)
+
+    @elastic_displacement.setter
+    def elastic_displacement(self, value):
+        self.elastic_displacement.set(value)
+
+    @property
+    def elastic_velocity(self):
+        """Elastic velocity vector (m/s).
+        
+        The elastic velocity is uninitialized (does not exist) if the
+        elastodynamics are disabled.
+
+        elastic_displacement
+        enable_elastodynamics
+        """
+        return Variable(self._impl.elastic_velocity)
+
+    @elastic_velocity.setter
+    def elastic_velocity(self, value):
+        self.elastic_velocity.set(value)
+
+    @property
+    def enable_elastodynamics(self):
+        """Enable/disable elastodynamic time evolution.
+
+        If elastodynamics are disabled (default), the elastic displacement and
+        velocity are uninitialized to save memory.
+        """
+        return self._impl.enable_elastodynamics
+
+    @enable_elastodynamics.setter
+    def enable_elastodynamics(self, value):
+        self._impl.enable_elastodynamics = value
+
+    # ----- ELASTIC PARAMETERS -------
+
+    @property
+    def external_body_force(self):
+        """External body force density f_ext that is added to the effective body
+        force density (N/m³).
+
+        See Also
+        --------
+        effective_body_force
+        """
+        return Parameter(self._impl.external_body_force)
+
+    @external_body_force.setter
+    def external_body_force(self, value):
+        self.external_body_force.set(value)
+
+    @property
+    def c11(self):
+        """Stiffness constant c11 = c22 = c33 of the stiffness tensor (N/m²).
+        
+        See Also
+        --------
+        c12, c44, stress_tensor
+        """
+        return Parameter(self._impl.c11)
+
+    @c11.setter
+    def c11(self, value):
+        self.c11.set(value)
+
+    @property
+    def c12(self):
+        """Stiffness constant c12 = c13 = c23 of the stiffness tensor (N/m²).
+        
+        See Also
+        --------
+        c11, c44, stress_tensor
+        """
+        return Parameter(self._impl.c12)
+
+    @c12.setter
+    def c12(self, value):
+        self.c12.set(value)
+
+    @property
+    def c44(self):
+        """Stiffness constant c44 = c55 = c66 of the stiffness tensor (N/m²).
+        
+        See Also
+        --------
+        c11, c12, stress_tensor
+        """
+        return Parameter(self._impl.c44)
+
+    @c44.setter
+    def c44(self, value):
+        self.c44.set(value)
+
+    @property
+    def eta(self):
+        """Phenomenological elastic damping constant (kg/m³s)."""
+        return Parameter(self._impl.eta)
+
+    @eta.setter
+    def eta(self, value):
+        self.eta.set(value)
+
+    @property
+    def rho(self):
+        """Mass density (kg/m³).
+        
+        Default = 1.0 kg/m³
+        """
+        return Parameter(self._impl.rho)
+
+    @rho.setter
+    def rho(self, value):
+        self.rho.set(value)
+
+    # ----- ELASTIC QUANTITIES -------
+
+    @property
+    def strain_tensor(self):
+        """Strain tensor (m/m), calculated according to ε = 1/2 (∇u + (∇u)^T),
+        with u the elastic displacement.
+
+        This quantity has six components (εxx, εyy, εzz, εxy, εxz, εyz),
+        which forms the symmetric strain tensor::
+
+               εxx εxy εxz
+               εxy εyy εyz
+               εxz εyz εzz
+
+        Note that the strain corresponds to the real strain and not the
+        engineering strain, which would be (εxx, εyy, εzz, 2*εxy, 2*εxz, 2*εyz).
+
+        See Also
+        --------
+        elastic_energy, elastic_energy_density, elastic_displacement, stress_tensor
+        """
+        return FieldQuantity(_cpp.strain_tensor(self._impl))
+    
+    @property
+    def stress_tensor(self):
+        """Stress tensor (N/m²), calculated according to Hooke's law
+        σ = cε.
+
+        This quantity has six components (σxx, σyy, σzz, σxy, σxz, σyz),
+        which forms the symmetric stress tensor::
+
+               σxx σxy σxz
+               σxy σyy σyz
+               σxz σyz σzz
+
+        See Also
+        --------
+        c11, c12, c44
+        """
+        return FieldQuantity(_cpp.stress_tensor(self._impl))
+
+    @property
+    def elastic_force(self):
+        """Elastic body force density due to mechanical stress gradients (N/m³).
+
+        f = ∇σ = ∇(cε)
+        
+        See Also
+        --------
+        c11, c12, c44
+        effective_body_force
+        """
+        return FieldQuantity(_cpp.elastic_force(self._impl))
+
+    @property
+    def effective_body_force(self):
+        """Elastic effective body force density is the sum of elastic,
+        magnetoelastic and external body force densities (N/m³).
+        Elastic damping is not included.
+
+        f_eff = f_el + f_mel + f_ext
+
+        In the case of this Magnet being a host (antiferromagnet),
+        f_mel is the sum of all magnetoelastic body forces of all sublattices.
+
+        See Also
+        --------
+        elastic_force, external_body_force, magnetoelastic_force
+        """
+        return FieldQuantity(_cpp.effective_body_force(self._impl))
+
+    @property
+    def elastic_damping(self):
+        """Elastic damping body force density proportional to η and velocity: -ηv (N/m³).
+
+        See Also
+        --------
+        eta, elastic_velocity
+        """
+        return FieldQuantity(_cpp.elastic_damping(self._impl))
+
+    @property
+    def elastic_acceleration(self):
+        """Elastic acceleration includes all effects that influence the elastic
+        velocity including elastic, magnetoelastic and external body force
+        densities, and elastic damping (m/s²).
+
+        See Also
+        --------
+        rho
+        effective_body_force, elastic_damping
+        """
+        return FieldQuantity(_cpp.elastic_acceleration(self._impl))
+
+    @property
+    def kinetic_energy_density(self):
+        """Kinetic energy density related to the elastic velocity (J/m³).
+        
+        See Also
+        --------
+        elastic_velocity, kinetic_energy, rho
+        """
+        return FieldQuantity(_cpp.kinetic_energy_density(self._impl))
+
+    @property
+    def kinetic_energy(self):
+        """Kinetic energy related to the elastic velocity (J/m³).
+        
+        See Also
+        --------
+        elastic_velocity, kinetic_energy_density, rho
+        """
+        return ScalarQuantity(_cpp.kinetic_energy(self._impl))
+
+    @property
+    def elastic_energy_density(self):
+        """Potential energy density related to elastics (J/m³).
+        This is given by 1/2 σ:ε
+        
+        See Also
+        --------
+        elastic_energy, strain_tensor, stress_tensor
+        """
+        return FieldQuantity(_cpp.elastic_energy_density(self._impl))
+
+    @property
+    def elastic_energy(self):
+        """Potential energy related to elastics (J).
+        
+        See Also
+        --------
+        elastic_energy_density, strain_tensor, stress_tensor
+        """
+        return ScalarQuantity(_cpp.elastic_energy(self._impl))
+
+    @property
+    def poynting_vector(self):
+        """Poynting vector (W/m2).
+        This is given by P = - σv
+        
+        See Also
+        --------
+        elastic_velocity, stress_tensor
+        """
+        return FieldQuantity(_cpp.poynting_vector(self._impl))
+
+    # --- stray field ---
 
     def stray_field_from_magnet(self, source_magnet: "Magnet"):
         """Return the magnetic field created by the given input `source_magnet`,

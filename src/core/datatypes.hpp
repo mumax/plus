@@ -155,6 +155,10 @@ __CUDAOP__ real3 operator/(const real3& a, const real3& b) {
   return real3{a.x / b.x, a.y / b.y, a.z / b.z};
 }
 
+__CUDAOP__ real3 operator/(const real& a, const real3& b) {
+  return real3{a / b.x, a / b.y, a / b.z};
+}
+
 __CUDAOP__ real dot(const int3& a, const real3& b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }

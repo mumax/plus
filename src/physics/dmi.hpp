@@ -3,7 +3,7 @@
  * effective field term and energy(density) related to the Dzyaloshinskii-
  * Moriya interaction (DMI).
  *
- * In mumaxplus, the DMI is defined by the following local energy density:
+ * In mumax⁺, the DMI is defined by the following local energy density:
  *
  *   e = D_ijk [ m_j d_i(m_k) - m_k d_i(m_j) ]
  *

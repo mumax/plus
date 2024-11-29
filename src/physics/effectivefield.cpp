@@ -9,6 +9,7 @@
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "fieldops.hpp"
+#include "magnetoelasticfield.hpp"
 #include "zeeman.hpp"
 
 Field evalEffectiveField(const Ferromagnet* magnet) {
@@ -18,6 +19,7 @@ Field evalEffectiveField(const Ferromagnet* magnet) {
   if (!externalFieldAssuredZero(magnet)) {h += evalExternalField(magnet);}
   if (!dmiAssuredZero(magnet)) {h += evalDmiField(magnet);}
   if (!demagFieldAssuredZero(magnet)) {h += evalDemagField(magnet);}
+  if (!magnetoelasticAssuredZero(magnet)) {h += evalMagnetoelasticField(magnet);}
   if (magnet->isSublattice())
       if (!inHomoAfmExchangeAssuredZero(magnet)) {h += evalInHomogeneousAfmExchangeField(magnet);}
       if (!homoAfmExchangeAssuredZero(magnet)) {h += evalHomogeneousAfmExchangeField(magnet);}

@@ -18,6 +18,8 @@ void wrap_antiferromagnetfieldquantity(py::module& m);
 void wrap_antiferromagnetscalarquantity(py::module& m);
 void wrap_ferromagnet(py::module& m);
 void wrap_magnet(py::module& m);
+void wrap_magnetfieldquantity(py::module& m);
+void wrap_magnetscalarquantity(py::module& m);
 void wrap_field(py::module& m);
 void wrap_grid(py::module& m);
 void wrap_parameter(py::module& m);

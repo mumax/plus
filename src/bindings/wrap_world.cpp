@@ -34,7 +34,7 @@ auto add_magnet(MumaxWorld* world,
 }
 
 void wrap_world(py::module& m) {
-  // in mumaxplus module, MumaxWorld is the World
+  // in mumax⁺ module, MumaxWorld is the World
   py::class_<MumaxWorld>(m, "World")
 
       .def(py::init<real3>(), py::arg("cellsize"),

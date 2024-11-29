@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "dmitensor.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "gpubuffer.hpp"
@@ -48,6 +49,8 @@ class Antiferromagnet : public Magnet {
   Parameter latcon;
   Ferromagnet sub1_;
   Ferromagnet sub2_;
+
+  DmiTensor dmiTensor;
  
  private:
   std::vector<const Ferromagnet*> sublattices_ = {&sub1_, &sub2_};

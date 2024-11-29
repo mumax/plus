@@ -94,11 +94,15 @@ mx_fft = np.fft.fftshift(mx_fft)
 
 plt.figure(figsize=(10, 6))
 
-# extent of k values and frequencies, compensated for cell-width
-extent = [-(2 * np.pi) / (2 * dx) * (nx+1)/nx,
-          (2 * np.pi) / (2 * dx) * (nx-1)/nx,
-          -1 / (2 * dt) * nt/(nt-1),
-          1 / (2 * dt) * nt/(nt-1)]
+# x- and y-coordinates of FT cell centers
+ks = np.fft.fftshift(np.fft.fftfreq(nx, dx) * 2*np.pi)
+fs = np.fft.fftshift(np.fft.fftfreq(nt, dt))
+# FT cell widths
+dk = ks[1] - ks[0]
+df = fs[1] - fs[0]
+# image extent of k-values and frequencies, compensated for cell-width
+extent = [ks[0] - dk/2, ks[-1] + dk/2, fs[0] - df/2, fs[-1] + df/2]
+
 # Show the intensity plot of the 2D FFT
 plt.imshow(np.abs(mx_fft)**2, extent=extent,
            aspect='auto', origin='lower', cmap="inferno")

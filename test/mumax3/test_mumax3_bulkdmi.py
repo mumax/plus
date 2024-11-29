@@ -26,10 +26,10 @@ def simulations(request):
             m = randommag()
             saveas(m, "m.ovf")
             
-            // default in mumax3 is false, these tests use both
+            // default in mumax³ is false, these tests use both
             openbc = {openbc}
 
-            // The dmi is included in the exchange in mumax3
+            // The dmi is included in the exchange in mumax³
             // because Aex is set to zero here, b_exch is the dmi field
             saveas(b_exch, "b_exch_dmi.ovf")      
             saveas(edens_exch, "edens_exch_dmi.ovf") 
@@ -51,7 +51,7 @@ def simulations(request):
 
 @pytest.mark.mumax3
 class TestBulkDMI:
-    """Test bulk dmi against mumax3."""
+    """Test bulk dmi against mumax³."""
 
     def test_dmi_field(self, simulations):
         world, magnet, mumax3sim = simulations

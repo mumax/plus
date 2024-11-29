@@ -8,7 +8,9 @@
 #include "field.hpp"
 #include "gpubuffer.hpp"
 #include "grid.hpp"
+#include "parameter.hpp"
 #include "strayfield.hpp"
+#include "variable.hpp"
 #include "world.hpp"
 #include "system.hpp"
 
@@ -55,27 +57,38 @@ class Magnet {
   std::string name_;
   std::map<const Magnet*, StrayField*> strayFields_;
 
+  // these take a lot of memory. Don't initialize unless wanted!
+  std::unique_ptr<Variable> elasticDisplacement_;
+  std::unique_ptr<Variable> elasticVelocity_;
+  bool enableElastodynamics_;
+
  public:
   bool enableAsStrayFieldSource;
   bool enableAsStrayFieldDestination;
+  bool enableElastodynamics() const {return enableElastodynamics_;}
+  void setEnableElastodynamics(bool);
+
+  // Elasticity
+  const Variable* elasticDisplacement() const;
+  const Variable* elasticVelocity() const;
+
+  VectorParameter externalBodyForce;  // Externally applied force density
+
+  // stiffness constants; TODO: can this be generalized to a 6x6 tensor?
+  Parameter c11;  // c11 = c22 = c33
+  Parameter c12;  // c12 = c13 = c23
+  Parameter c44;  // c44 = c55 = c66
+
+  Parameter eta;  // Phenomenological elastic damping constant
+  Parameter rho;  // Mass density
+
 
   // Delete copy constructor and copy assignment operator to prevent shallow copies
   Magnet(const Magnet&) = delete;
   Magnet& operator=(const Magnet&) = delete;
 
-  Magnet(Magnet&& other) noexcept : system_(other.system_), name_(other.name_) {
-        other.system_ = nullptr;
-        other.name_ = "";
-    }
+  Magnet(Magnet&& other) noexcept;
 
   // Provide move constructor and move assignment operator
-  Magnet& operator=(Magnet&& other) noexcept {
-        if (this != &other) {
-            system_ = other.system_;
-            name_ = other.name_;
-            other.system_ = nullptr;
-            other.name_ = "";
-        }
-        return *this;
-    }
+  Magnet& operator=(Magnet&& other) noexcept;
 };

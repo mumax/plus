@@ -176,15 +176,21 @@ __global__ void k_exchangeField(CuField hField,
       if (a == 0)
         continue;
 
+      real3 m2 = m2Field.vectorAt(idx);
       real3 Gamma1 = getGamma(dmiTensor, idx, normal, m);
-      real fac = an / (2 * a);
+
       real delta = dot(rel_coo, system.cellsize);
-      if (abs(fac) == 1)
-        m_ = m + Gamma1 / (4*a) * delta;
-      else {
-        real3 Gamma2 = getGamma(dmiTensor, idx, normal, m2Field.vectorAt(idx));
-        m_ = m + delta / (a * 2 * (1 - fac*fac)) * (Gamma1 - fac * Gamma2);
+
+      real3 d_m2{0, 0, 0};
+      int3 other_neighbor_coo = mastergrid.wrap(coo - rel_coo);
+      if(hField.cellInGeometry(other_neighbor_coo)) {
+        // Approximate normal derivative of sister sublattice by taking
+        // the bulk derivative closest to the edge.
+        real3 m2__ = m2Field.vectorAt(other_neighbor_coo);
+        d_m2 = (m2 - m2__) / delta;
       }
+
+      m_ = m + (an * cross(cross(d_m2, m), m) + Gamma1) * delta / (2*a);
       a_ = a;
     }
 

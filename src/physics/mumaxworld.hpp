@@ -21,7 +21,7 @@ class TimeSolver;
 typedef std::function<FM_FieldQuantity(const Ferromagnet*)> FM_Field;
 
 /** MumaxWorld is World with additional functionalities for the actual physics
- *  of mumaxplus.
+ *  of mumax⁺.
  */
 class MumaxWorld : public World {
  public:
@@ -131,7 +131,7 @@ class MumaxWorld : public World {
    * 
    * This will recalculate all strayfield kernels of all magnets in the world.
    * 
-   * This function reflects the behavior of the MuMax3 SetPBC function.
+   * This function reflects the behavior of the mumax³ SetPBC function.
    * 
    * @param pbcRepetitions The number of repetitions for everything inside
    * mastergrid in the x, y and z directions to create periodic boundary

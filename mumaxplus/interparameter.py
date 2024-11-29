@@ -11,7 +11,7 @@ class InterParameter():
     def __init__(self, impl):
         """Initialize a python InterParameter from a c++ InterParameter instance.
 
-        InterParameters should only have to be initialized within the mumaxplus
+        InterParameters should only have to be initialized within the mumax⁺
         module and not by the end user.
         """
         self._impl = impl

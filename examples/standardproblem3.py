@@ -1,6 +1,6 @@
 # This script solves micromagnetic standard problem 3. The Problem specification
 # can be found on https://www.ctcms.nist.gov/~rdm/mumag.org.html
-# Only flower and vortex states are studied, but the MuMax3 paper shows there to
+# Only flower and vortex states are studied, but the mumax³ paper shows there to
 # be a twisted flower state and a canted vortex state as well.
 # https://doi.org/10.1063/1.4899186
 

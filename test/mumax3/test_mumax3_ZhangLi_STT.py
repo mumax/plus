@@ -15,13 +15,13 @@ def max_relative_error(result, wanted):
 xi1, xi2, xi3, xi4 = 0.0, 0.05, 0.1, 0.5
 @pytest.fixture(scope="class", params=[xi1, xi2, xi3, xi4])
 def simulations(request):
-    """Sets up a simulation to check the STT for both mumaxplus and mumax3, given
+    """Sets up a simulation to check the STT for both mumax⁺ and mumax³, given
     a specific non-adiabacity xi. This is meant to be a quicker test than STP5.
     """
 
     # === specifications ===
     length, width, thickness = 100e-9, 100e-9, 10e-9
-    nx, ny, nz = 50, 50, 5  # following mumax3 paper
+    nx, ny, nz = 50, 50, 5  # following mumax³ paper
     cellsize = (length/nx, width/ny, thickness/nz)
     gridsize = (nx, ny, nz)
 
@@ -33,7 +33,7 @@ def simulations(request):
     pol = 1.0  # purely polarized current
     jcur = (1e12, 0, 0)
 
-    # === mumax3 ===
+    # === mumax³ ===
     mumax3sim = Mumax3Simulation(
         f"""
             setcellsize{tuple(cellsize)}
@@ -56,7 +56,7 @@ def simulations(request):
         """
     )
 
-    # === mumaxplus ===
+    # === mumax⁺ ===
 
     world = World(cellsize=cellsize)
     magnet = Ferromagnet(world, Grid(gridsize))

@@ -1,4 +1,4 @@
-"""Physical constants used in mumaxplus.
+"""Physical constants used in mumax⁺.
 This file copies src/physics/constants.hpp.
 
 The values of these constants might differ from what you find elsewhere. These

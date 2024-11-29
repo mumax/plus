@@ -12,14 +12,14 @@ def max_relative_error(result, wanted):
     return np.max(relerr)
 
 def simulate():
-    """Creates a MuMaxPlus world with the same settings as the
-    PBC1.mx3 test in MuMax3 without PBC.    
+    """Creates a mumax⁺ world with the same settings as the
+    PBC1.mx3 test in mumax³ without PBC.    
     """
     c = 5e-9
     nx = 128
     ny = int(nx/2)
 
-    # === mumaxplus ===
+    # === mumax⁺ ===
     world = World(cellsize=(c,c,c))
     r = shape.Rectangle(nx/2*c, ny/2*c)
     r.translate((nx/2)*c, (ny/2)*c, 0)
@@ -34,14 +34,14 @@ def simulate():
 
 
 def simulate_PBC(corners=False):
-    """Creates a MuMaxPlus world with the same settings as the
-    PBC1.mx3 test in MuMax3 with PBC.    
+    """Creates a mumax⁺ world with the same settings as the
+    PBC1.mx3 test in mumax³ with PBC.    
     """
     c = 5e-9
     nx = 128
     ny = int(nx/2)
 
-    # === mumaxplus PBC ===
+    # === mumax⁺ PBC ===
     world_PBC = World(cellsize=(c,c,c), mastergrid=Grid((nx,ny,0)), pbc_repetitions=(2,2,0))
     r_PBC = shape.Rectangle(nx/2*c, ny/2*c)
     r_PBC.translate((nx/2)*c, (ny/2)*c, 0)
@@ -74,7 +74,7 @@ class TestPBC:
         assert err < RTOL
     
     def test_PBC_run_center(self):
-        """Perform the same comparison with the PBC as in MuMax3 with the magnet in the center."""
+        """Perform the same comparison with the PBC as in mumax³ with the magnet in the center."""
         world_PBC, magnet_PBC = simulate_PBC()
         world_PBC.timesolver.run(1e-9)
         av_mag = magnet_PBC.magnetization.average()
@@ -83,7 +83,7 @@ class TestPBC:
         assert err < RTOL
     
     def test_PBC_run_corners(self):
-        """Perform the same comparison with the PBC as in MuMax3 with the magnet in the corners."""
+        """Perform the same comparison with the PBC as in mumax³ with the magnet in the corners."""
         world_PBC, magnet_PBC = simulate_PBC(True)
         world_PBC.timesolver.run(1e-9)
         av_mag = magnet_PBC.magnetization.average()

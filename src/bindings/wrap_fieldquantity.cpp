@@ -21,6 +21,10 @@ void wrap_fieldquantity(py::module& m) {
       .def("get_rgb", &FieldQuantity::getRGB);
 }
 
+void wrap_magnetfieldquantity(py::module& m) {
+  py::class_<M_FieldQuantity, FieldQuantity>(m, "MagnetFieldQuantity");
+}
+
 void wrap_ferromagnetfieldquantity(py::module& m) {
   py::class_<FM_FieldQuantity, FieldQuantity>(m, "FerromagnetFieldQuantity");
 }

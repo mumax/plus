@@ -9,6 +9,10 @@ void wrap_scalarquantity(py::module& m) {
       .def("eval", &ScalarQuantity::eval);
 }
 
+void wrap_magnetscalarquantity(py::module& m) {
+  py::class_<M_ScalarQuantity, ScalarQuantity>(m, "MagnetScalarQuantity");
+}
+
 void wrap_ferromagnetscalarquantity(py::module& m) {
   py::class_<FM_ScalarQuantity, ScalarQuantity>(m, "FerromagnetScalarQuantity");
 }

@@ -3,6 +3,8 @@
 
 #include "afmexchange.hpp"
 #include "antiferromagnet.hpp"
+#include "dmi.hpp"
+#include "energy.hpp"
 #include "fieldquantity.hpp"
 #include "magnet.hpp"
 #include "mumaxworld.hpp"
@@ -25,6 +27,8 @@ void wrap_antiferromagnet(py::module& m) {
       .def_readonly("inter_afmex_nn", &Antiferromagnet::interAfmExchNN)
       .def_readonly("scale_afmex_nn", &Antiferromagnet::scaleAfmExchNN)
       .def_readonly("latcon", &Antiferromagnet::latcon)
+      .def_readonly("dmi_tensor", &Antiferromagnet::dmiTensor)
+
       .def("minimize", &Antiferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Antiferromagnet::relax, py::arg("tol"));
       
@@ -34,4 +38,9 @@ void wrap_antiferromagnet(py::module& m) {
 
   m.def("angle_field", &angleFieldQuantity);
   m.def("max_intracell_angle", &maxAngle);
+
+  m.def("total_energy_density",
+        py::overload_cast<const Antiferromagnet*>(&totalEnergyDensityQuantity));
+  m.def("total_energy",
+        py::overload_cast<const Antiferromagnet*>(&totalEnergyQuantity));
 }

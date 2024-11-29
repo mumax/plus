@@ -91,4 +91,8 @@ class Ferromagnet : public Magnet {
   curandGenerator_t randomGenerator;
 
   DmiTensor dmiTensor;
+
+  // Magnetoelasticity
+  Parameter B1;  // First magnetoelastic coupling constant
+  Parameter B2;  // Second magnetoelastic coupling constant
 };
