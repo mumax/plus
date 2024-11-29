@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the following paper."
+authors:
+  - family-names: Mulkers
+    given-names: Jeroen
+    orcid: "https://orcid.org/0000-0002-4000-9275"
+  - family-names: Moreels
+    given-names: Lars
+    orcid: "https://orcid.org/0000-0001-7362-2466"
+  - family-names: Lateur
+    given-names: Ian
+    orcid: "https://orcid.org/0009-0003-8283-4083"
+  - family-names: De Gusem
+    given-names: Diego
+    orcid: "https://orcid.org/0009-0008-3341-0555"
+title: "mumax⁺"
+version: 1.0.0
+date-released: 2024-11-29
+url: "https://github.com/mumax/plus"
+preferred-citation:
+  type: generic
+  authors:
+    - family-names: Moreels
+      given-names: Lars
+      orcid: "https://orcid.org/0000-0001-7362-2466"
+    - family-names: Lateur
+      given-names: Ian
+      orcid: "https://orcid.org/0009-0003-8283-4083"
+    - family-names: De Gusem
+      given-names: Diego
+      orcid: "https://orcid.org/0009-0008-3341-0555"
+    - family-names: Mulkers
+      given-names: Jeroen
+      orcid: "https://orcid.org/0000-0002-4000-9275"
+    - family-names: Maes
+      given-names: Jonathan
+      orcid: "https://orcid.org/0000-0003-4973-8383"
+    - family-names: Milosevic
+      given-names: Milorad V.
+      orcid: "https://orcid.org/0000-0002-5431-377X"
+    - family-names: Leliaert
+      given-names: Jonathan
+      orcid: "https://orcid.org/0000-0001-8778-3092"
+    - family-names: Van Waeyenberge
+      given-names: Bartel
+      orcid: "https://orcid.org/0000-0001-7523-1661"
+  year: 2024
+  month: 11
+  day: 27
+  title: "mumax+: extensible GPU-accelerated micromagnetics and beyond"
+  doi: "10.48550/arXiv.2411.18194"
+  url: https://arxiv.org/abs/2411.18194
