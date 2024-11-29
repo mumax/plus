@@ -149,7 +149,7 @@ else:
     m, u = simulation(theta)
 
 # plotting ranges
-xmin, xmax = -0.6, 0.6  # rad/nm
+xmin, xmax = 0.01, 0.5  # rad/nm
 ymin, ymax = 0.2/(2*np.pi), 2.5/(2*np.pi)  # THz
 
 # x- and y-coordinates of FT cell centers
@@ -258,6 +258,6 @@ ax.set_xlim(xmin, xmax)
 ax.set_ylim(ymin, ymax)
 ax.set_xlabel("Wavenumber (rad/nm)")
 ax.set_ylabel("Frequency (THz)")
-ax.legend(loc="lower left", fontsize="5")
+ax.legend(loc="upper left", fontsize="5")
 plt.tight_layout()
 plt.savefig("AFMEL_dispersion_theory.pdf", dpi=1200)
