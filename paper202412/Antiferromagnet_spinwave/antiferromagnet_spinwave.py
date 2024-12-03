@@ -10,7 +10,7 @@ from matplotlib.patches import ConnectionPatch
 
 
 font = {'family' : 'serif',
-        'size'   : 6}
+        'size'   : 7}
 
 matplotlib.rc('font', **font)
 plt.rc('text', usetex=True)
