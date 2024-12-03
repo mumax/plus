@@ -158,7 +158,7 @@ if static:
 
     plt.legend(fontsize="5")
     plt.xlim(np.min(x), np.max(x))
-    plt.xlabel(r"Anisotropy constant $K_u$ (kJ / m$^3$)")
+    plt.xlabel(r"Anisotropy constant $K_{u1}$ (kJ/m$^3$)")
     plt.ylabel(r"Domain wall width (nm)")
     plt.tight_layout()
     plt.savefig("dww.pdf", dpi=1200)
