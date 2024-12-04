@@ -205,7 +205,7 @@ if dynamic:
         DWtheo.append(theory)
         
     plt.xlim(0, 3.5)
-    plt.xlabel(r"Applied current $J$ (TA/m$^2$)")
+    plt.xlabel(r"Current density $J$ (TA/m$^2$)")
     plt.ylabel(r"Velocity (km/s)")
     plt.legend(fontsize="5")
     plt.tight_layout()
