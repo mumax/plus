@@ -183,7 +183,7 @@ for i in range(3):
     m_i /= m_i_max
     m_FT[i,...] = m_i
 
-FT_tot = u_FT[0,...] + u_FT[2,...] + m_FT[2,...]
+FT_tot = u_FT[0,...] + u_FT[1,...] + u_FT[2,...] + m_FT[2,...]
 
 fig, ax = plt.subplots(figsize=(2.5, 4.8/6.4 * 2.5))
 linewidth = 1
