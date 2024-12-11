@@ -37,9 +37,9 @@ rho = 2800
 B = -55e6
 B1 = B
 B2 = B
-c11 = 200e9
-c44 = 70e9
-c12 = c11 - 2*c44  # assume isotropic
+C11 = 200e9
+C44 = 70e9
+C12 = C11 - 2*C44  # assume isotropic
 eta = 2e11
 
 # time settings
@@ -91,9 +91,9 @@ def simulation(theta):
         sub.B1 = B1
         sub.B2 = B2
     magnet.rho = rho
-    magnet.c11 = c11 
-    magnet.c44 = c44
-    magnet.c12 = c12
+    magnet.C11 = C11 
+    magnet.C44 = C44
+    magnet.C12 = C12
 
     # no displacement initially
     magnet.elastic_displacement = (0, 0, 0)
@@ -203,8 +203,8 @@ lambda_exch = (2*aex) / (MU0*msat**2)
 k = np.linspace(xmin*1e9, xmax*1e9, 2000)
 
 # elastic waves
-vt = np.sqrt(c44/rho)
-vl = np.sqrt(c11/rho)
+vt = np.sqrt(C44/rho)
+vl = np.sqrt(C11/rho)
 w_t = np.abs(vt*k)
 w_l = np.abs(vl*k)
 ax.plot(k*1e-9, w_t/(2*np.pi)*1e-12, color="red", lw=linewidth, ls=ls, label="El. trans.")
@@ -260,4 +260,5 @@ ax.set_xlabel("Wavenumber (rad/nm)")
 ax.set_ylabel("Frequency (THz)")
 ax.legend(loc="upper left", fontsize="5")
 plt.tight_layout()
+#ax.text(-0.1, 0.39, r"\textbf{(b)}")
 plt.savefig("AFMEL_dispersion_theory.pdf", dpi=1200)
