@@ -47,5 +47,5 @@ void wrap_system(py::module& m) {
       .def_property_readonly("geometry", [](const System* system) {
           return get_data<bool>(system, &System::geometry, true); })
       .def_property_readonly("regions", [](const System* system) {
-          return get_data<uint>(system, &System::regions, 0); });
+          return get_data<unsigned int>(system, &System::regions, 0); });
 }

@@ -14,8 +14,8 @@
 
 bool elasticityAssuredZero(const Magnet* magnet) {
   return ((!magnet->enableElastodynamics()) ||
-          (magnet->c11.assuredZero() && magnet->c12.assuredZero() &&
-           magnet->c44.assuredZero()));
+          (magnet->C11.assuredZero() && magnet->C12.assuredZero() &&
+           magnet->C44.assuredZero()));
 }
 
 // ========== Effective Body Force ==========

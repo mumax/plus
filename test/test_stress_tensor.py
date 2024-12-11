@@ -9,7 +9,7 @@ cx, cy, cz = 1.5e-9, 2e-9, 2.5e-9
 cellsize = (cx, cy, cz)
 nx, ny, nz = 128, 64, 1  # number of 1D cells
 msat = 800e3
-c11, c12, c44 = 283e9, 58e9, 166e9
+C11, C12, C44 = 283e9, 58e9, 166e9
 
 def max_absolute_error(result, wanted):
     """Maximum error for vector quantities."""
@@ -31,9 +31,9 @@ def test_stress():
 
     magnet.msat = msat
 
-    magnet.c11 = c11
-    magnet.c12 = c12
-    magnet.c44 = c44
+    magnet.C11 = C11
+    magnet.C12 = C12
+    magnet.C44 = C44
 
     def displacement_func(x, y, z):
         return tuple(np.random.rand(3))
@@ -48,7 +48,7 @@ def test_stress():
         ip1 = (i+1)%3
         ip2 = (i+2)%3
 
-        stress_anal[i,...] = c11 * strain[i,...] + c12 * strain[ip1,...] + c12 * strain[ip2,...]
-        stress_anal[i+3,...] = 2 * c44 * strain[i+3,...]  # using real strain
+        stress_anal[i,...] = C11 * strain[i,...] + C12 * strain[ip1,...] + C12 * strain[ip2,...]
+        stress_anal[i+3,...] = 2 * C44 * strain[i+3,...]  # using real strain
 
     assert max_semirelative_error(stress_num, stress_anal) < RTOL

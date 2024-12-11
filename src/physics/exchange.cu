@@ -77,8 +77,8 @@ __global__ void k_exchangeField(CuField hField,
         m_ = mField.vectorAt(idx_);
         a_ = aex.valueAt(idx_);
 
-        uint ridx = system.getRegionIdx(idx);
-        uint ridx_ = system.getRegionIdx(idx_);
+        unsigned int ridx = system.getRegionIdx(idx);
+        unsigned int ridx_ = system.getRegionIdx(idx_);
 
         if (ridx != ridx_) {
           scale = scaleEx.valueBetween(ridx, ridx_);
@@ -164,8 +164,8 @@ __global__ void k_exchangeField(CuField hField,
       m_ = m1Field.vectorAt(idx_);
       a_ = aex.valueAt(idx_);
 
-      uint ridx = system.getRegionIdx(idx);
-      uint ridx_ = system.getRegionIdx(idx_);
+      unsigned int ridx = system.getRegionIdx(idx);
+      unsigned int ridx_ = system.getRegionIdx(idx_);
 
       if (ridx != ridx_) {
         scale = scaleEx.valueBetween(ridx, ridx_);

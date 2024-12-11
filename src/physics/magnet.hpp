@@ -75,9 +75,9 @@ class Magnet {
   VectorParameter externalBodyForce;  // Externally applied force density
 
   // stiffness constants; TODO: can this be generalized to a 6x6 tensor?
-  Parameter c11;  // c11 = c22 = c33
-  Parameter c12;  // c12 = c13 = c23
-  Parameter c44;  // c44 = c55 = c66
+  Parameter C11;  // C11 = c22 = c33
+  Parameter C12;  // C12 = c13 = c23
+  Parameter C44;  // C44 = c55 = c66
 
   Parameter eta;  // Phenomenological elastic damping constant
   Parameter rho;  // Mass density

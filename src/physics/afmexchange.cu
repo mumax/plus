@@ -115,8 +115,8 @@ __global__ void k_afmExchangeFieldNN(CuField hField,
         m2_ = m2Field.vectorAt(idx_);
         ann_ = afmex_nn.valueAt(idx_);
 
-        uint ridx = system.getRegionIdx(idx);
-        uint ridx_ = system.getRegionIdx(idx_);
+        unsigned int ridx = system.getRegionIdx(idx);
+        unsigned int ridx_ = system.getRegionIdx(idx_);
 
         if (ridx != ridx_) {
           scale = scaleExch.valueBetween(ridx, ridx_);

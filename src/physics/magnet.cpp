@@ -25,9 +25,9 @@ Magnet::Magnet(std::shared_ptr<System> system_ptr,
       // elasticity
       enableElastodynamics_(false),
       externalBodyForce(system(), {0, 0, 0}, name + ":external_body_force", "N/m3"),
-      c11(system(), 0.0, name + ":c11", "N/m2"),
-      c12(system(), 0.0, name + ":c12", "N/m2"),
-      c44(system(), 0.0, name + ":c44", "N/m2"),
+      C11(system(), 0.0, name + ":C11", "N/m2"),
+      C12(system(), 0.0, name + ":C12", "N/m2"),
+      C44(system(), 0.0, name + ":C44", "N/m2"),
       eta(system(), 0.0, name + ":eta", "kg/m3s"),
       rho(system(), 1.0, name + ":rho", "kg/m3") {
   // Check that the system has at least size 1
@@ -50,7 +50,7 @@ Magnet::Magnet(Magnet&& other) noexcept
       name_(other.name_),
       
       externalBodyForce(other.externalBodyForce),
-      c11(other.c11), c12(other.c12), c44(other.c44),
+      C11(other.C11), C12(other.C12), C44(other.C44),
       eta(other.eta), rho(other.rho) {
   other.system_ = nullptr;
   other.name_ = "";
@@ -67,9 +67,9 @@ Magnet& Magnet::operator=(Magnet&& other) noexcept {
 
         // TODO: add reset to `other` of some kind? idk
         externalBodyForce = other.externalBodyForce;
-        c11 = other.c11;
-        c12 = other.c12;
-        c44 = other.c44;
+        C11 = other.C11;
+        C12 = other.C12;
+        C44 = other.C44;
         eta = other.eta;
         rho = other.rho;
       }

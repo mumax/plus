@@ -38,9 +38,9 @@ magnet.enable_elastodynamics = True
 magnet.rho = 8e3
 magnet.B1 = -8.8e6
 magnet.B2 = -8.8e6
-magnet.c11 = 283e9
-magnet.c44 = 58e9
-magnet.c12 = 166e9
+magnet.C11 = 283e9
+magnet.C44 = 58e9
+magnet.C12 = 166e9
 
 magnet.elastic_displacement = (0, 0, 0)
 

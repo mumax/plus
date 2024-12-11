@@ -9,9 +9,9 @@
 
 struct Center {
   real3 pos;
-  uint ridx;
+  unsigned int ridx;
   Center() : pos{0, 0, 0}, ridx(0) {}
-  Center(real3 position, uint region_idx)
+  Center(real3 position, unsigned int region_idx)
       : pos(position), ridx(region_idx) {}
 };
 
@@ -33,11 +33,11 @@ class VoronoiTessellator {
   ~VoronoiTessellator() = default;
 
   // * Generate a Voronoi tessellation
-  GpuBuffer<uint> generate();
+  GpuBuffer<unsigned int> generate();
 
  private:
   // * Calc nearest center and assign center index to coo
-  uint regionOf(real3 coo);
+  unsigned int regionOf(real3 coo);
 
   // * Calculate position and index of centers in tile
   std::vector<Center> centersInTile(int3 pos);
@@ -50,12 +50,12 @@ class VoronoiTessellator {
 
 public:
   Grid grid;
-  GpuBuffer<uint> tessellation;
+  GpuBuffer<unsigned int> tessellation;
 private:
   real grainsize_;
   real3 cellsize_;
   real tilesize_;
-  uint centerIdx_ = 0;
+  unsigned int centerIdx_ = 0;
   std::unordered_map<int3, Tile, Int3Hash> tileCache_;
 
  // RNG related members

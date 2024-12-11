@@ -12,7 +12,7 @@ InterParameter::InterParameter(std::shared_ptr<const System> system,
       uniformValue_(value),
       valuesBuffer_() {
   size_t N = 1;  // at least 1 region: default 0
-  std::vector<uint> uni = system->uniqueRegions;
+  std::vector<unsigned int> uni = system->uniqueRegions;
   if (!uni.empty()) {
     N = *std::max_element(uni.begin(), uni.end()) + 1;
   }
@@ -40,7 +40,7 @@ void InterParameter::set(real value) {
     valuesBuffer_.recycle();
 }
 
-void InterParameter::setBetween(uint i, uint j, real value) {
+void InterParameter::setBetween(unsigned int i, unsigned int j, real value) {
   system_->checkIdxInRegions(i);
   system_->checkIdxInRegions(j);
   if (i == j) {
@@ -69,7 +69,7 @@ real InterParameter::getUniformValue() const {
   return uniformValue_;
 }
 
-real InterParameter::getBetween(uint i, uint j) const {
+real InterParameter::getBetween(unsigned int i, unsigned int j) const {
   system_->checkIdxInRegions(i);
   system_->checkIdxInRegions(j);
   if (i == j) {

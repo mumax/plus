@@ -28,7 +28,7 @@ Antiferromagnet::Antiferromagnet(MumaxWorld* world,
                          Grid grid,
                          std::string name,
                          GpuBuffer<bool> geometry,
-                         GpuBuffer<uint> regions)
+                         GpuBuffer<unsigned int> regions)
     : Antiferromagnet(std::make_shared<System>(world, grid, geometry, regions), name) {}
 
 const Ferromagnet* Antiferromagnet::sub1() const {

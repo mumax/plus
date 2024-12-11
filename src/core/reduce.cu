@@ -194,7 +194,7 @@ real dotSum(const Field& f, const Field& g) {
   return result;
 }
 
-__global__ void k_idxInRegions(bool* result, uint* regions, size_t size, uint ridx) {
+__global__ void k_idxInRegions(bool* result, unsigned int* regions, size_t size, unsigned int ridx) {
   __shared__ bool sdata[BLOCKDIM];
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   int thread_id = threadIdx.x;
@@ -223,7 +223,7 @@ __global__ void k_idxInRegions(bool* result, uint* regions, size_t size, uint ri
     *result = sdata[0];
 }
 
-bool idxInRegions(GpuBuffer<uint> regions, uint idx) {
+bool idxInRegions(GpuBuffer<unsigned int> regions, unsigned int idx) {
 
   GpuBuffer<bool> d_result(1);
   cudaLaunchReductionKernel(k_idxInRegions, d_result.get(), regions.get(), regions.size(), idx);

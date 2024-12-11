@@ -20,15 +20,15 @@ auto add_magnet(MumaxWorld* world,
                 std::string& name,
                 FuncType addFunc) {
      GpuBuffer<bool> geometry;
-     GpuBuffer<uint> regions;
+     GpuBuffer<unsigned int> regions;
 
      if (!py::isinstance<py::none>(geometryArray)) {
           py::buffer_info buf = geometryArray.cast<py::array_t<bool>>().request();
           geometry = GpuBuffer<bool>(buf.size, reinterpret_cast<bool*>(buf.ptr));
      }
      if (!py::isinstance<py::none>(regionsArray)) {
-          py::buffer_info buf = regionsArray.cast<py::array_t<uint>>().request();
-          regions = GpuBuffer<uint>(buf.size, reinterpret_cast<uint*>(buf.ptr));
+          py::buffer_info buf = regionsArray.cast<py::array_t<unsigned int>>().request();
+          regions = GpuBuffer<unsigned int>(buf.size, reinterpret_cast<unsigned int*>(buf.ptr));
      }
      return (world->*addFunc)(grid, geometry, regions, name);
 }

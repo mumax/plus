@@ -38,7 +38,7 @@ void Parameter::set(const Field& values) {
     staticField_ = new Field(values);
 }
 
-void Parameter::setInRegion(const uint region_idx, real value) {
+void Parameter::setInRegion(const unsigned int region_idx, real value) {
   if (isUniform()) {
     if (value == uniformValue_) return;
     staticField_ = new Field(system_, 1, uniformValue_);
@@ -141,7 +141,7 @@ void VectorParameter::set(const Field& values) {
     staticField_ = new Field(values);
 }
 
-void VectorParameter::setInRegion(const uint region_idx, real3 value) {
+void VectorParameter::setInRegion(const unsigned int region_idx, real3 value) {
   if (isUniform()) {
     if (value == uniformValue_) return;
     staticField_ = new Field(system_, 3, uniformValue_);

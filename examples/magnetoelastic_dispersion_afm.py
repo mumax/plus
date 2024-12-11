@@ -31,9 +31,9 @@ rho = 2800
 B = -55e6
 B1 = B
 B2 = B
-c11 = 200e9
-c44 = 70e9
-c12 = c11 - 2*c44  # assume isotropic
+C11 = 200e9
+C44 = 70e9
+C12 = C11 - 2*C44  # assume isotropic
 eta = 2e11
 
 # time settings
@@ -85,9 +85,9 @@ def simulation(theta):
         sub.B1 = B1
         sub.B2 = B2
     magnet.rho = rho
-    magnet.c11 = c11 
-    magnet.c44 = c44
-    magnet.c12 = c12
+    magnet.C11 = C11 
+    magnet.C44 = C44
+    magnet.C12 = C12
 
     # no displacement initially
     magnet.elastic_displacement = (0, 0, 0)
@@ -181,8 +181,8 @@ linewidth = 2
 fig_im, ax_im = plt.subplots()  # also show without lines
 
 # elastic waves
-vt = np.sqrt(c44/rho)
-vl = np.sqrt(c11/rho)
+vt = np.sqrt(C44/rho)
+vl = np.sqrt(C11/rho)
 w_t = np.abs(vt*k)
 w_l = np.abs(vl*k)
 ax.plot(k*1e-9, w_t/(2*np.pi)*1e-12, color="red", lw=linewidth, label="elastic trans.")

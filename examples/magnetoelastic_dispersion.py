@@ -28,9 +28,9 @@ Bdc = 50e-3
 rho = 8900
 B1 = -10e6
 B2 = -10e6
-c11 = 245e9 
-c44 = 75e9
-c12 = c11 - 2*c44  # assume isotropic
+C11 = 245e9 
+C44 = 75e9
+C12 = C11 - 2*C44  # assume isotropic
 
 # time settings
 fmax = 20E9                  # maximum frequency (in Hz) of the sinc pulse
@@ -70,9 +70,9 @@ def simulation(theta):
     magnet.rho = rho
     magnet.B1 = B1
     magnet.B2 = B2
-    magnet.c11 = c11 
-    magnet.c44 = c44
-    magnet.c12 = c12
+    magnet.C11 = C11 
+    magnet.C44 = C44
+    magnet.C12 = C12
 
     # no displacement initially
     magnet.elastic_displacement = (0, 0, 0)
@@ -161,8 +161,8 @@ lambda_exch = (2*aex) / (MU0*msat**2)
 k = np.linspace(xmin*1e6, xmax*1e6, 2000)
 
 # elastic waves
-vt = np.sqrt(c44/rho)
-vl = np.sqrt(c11/rho)
+vt = np.sqrt(C44/rho)
+vl = np.sqrt(C11/rho)
 omega_t = vt*k
 omega_l = vl*k
 

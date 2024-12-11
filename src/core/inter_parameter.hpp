@@ -29,14 +29,14 @@ class InterParameter {
 
   // set to uniform value
   void set(real value);
-  void setBetween(uint i, uint j, real value);
+  void setBetween(unsigned int i, unsigned int j, real value);
   real getUniformValue() const;
-  real getBetween(uint i, uint j) const;
+  real getBetween(unsigned int i, unsigned int j) const;
 
   CuInterParameter cu() const;
 
   // TODO: these user-convenience functions should probably move
-  const std::vector<uint> uniqueRegions() const { return system_->uniqueRegions; }
+  const std::vector<unsigned int> uniqueRegions() const { return system_->uniqueRegions; }
   int numberOfRegions() const { return system_->uniqueRegions.size(); }
 
  private:
@@ -62,7 +62,7 @@ class CuInterParameter {
  public:
   explicit CuInterParameter(const InterParameter* p);
   __device__ bool isUniform() const { return !valuesPtr_; }
-  __device__ real valueBetween(uint i, uint j) const;
+  __device__ real valueBetween(unsigned int i, unsigned int j) const;
 };
 
 inline CuInterParameter::CuInterParameter(const InterParameter* p)
@@ -84,7 +84,7 @@ __device__ __host__ inline int getLutIndex(int i, int j) {
   return j * (j - 1) / 2 + i;
 }
 
-__device__ inline real CuInterParameter::valueBetween(uint idx1, uint idx2) const {
+__device__ inline real CuInterParameter::valueBetween(unsigned int idx1, unsigned int idx2) const {
   if (isUniform())
     return uniformValue_;
   return valuesPtr_[getLutIndex(idx1, idx2)];

@@ -13,9 +13,9 @@ cx, cy, cz = 1.5e-9, 2e-9, 2.5e-9
 cellsize = (cx, cy, cz)
 nx, ny, nz = 256, 128, 1
 N = 1  # PBC
-c11 = 283e9
-c44 = 58e9
-c12 = 166e9
+C11 = 283e9
+C44 = 58e9
+C12 = 166e9
 B1 = -8.8e6
 B2 = -4.4e6
 
@@ -43,9 +43,9 @@ class TestForces:
         self.magnet.eta = np.random.rand(1, nz,ny,nx)
         self.magnet.rho = np.random.rand(1, nz,ny,nx)
 
-        self.magnet.c11 = c11
-        self.magnet.c12 = c12
-        self.magnet.c44 = c44
+        self.magnet.C11 = C11
+        self.magnet.C12 = C12
+        self.magnet.C44 = C44
 
         self.magnet.B1 = B1
         self.magnet.B2 = B2

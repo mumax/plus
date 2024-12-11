@@ -84,7 +84,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world,
                          Grid grid,
                          std::string name,
                          GpuBuffer<bool> geometry,
-                         GpuBuffer<uint> regions)
+                         GpuBuffer<unsigned int> regions)
     : Ferromagnet(std::make_shared<System>(world, grid, geometry, regions), name) {}
 
 Ferromagnet::~Ferromagnet() {

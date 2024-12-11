@@ -8,9 +8,9 @@
 
 __global__ void k_stressTensor(CuField stressTensor,
                          const CuField strain,
-                         const CuParameter c11,
-                         const CuParameter c12,
-                         const CuParameter c44) {
+                         const CuParameter C11,
+                         const CuParameter C12,
+                         const CuParameter C44) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = stressTensor.system;
 
@@ -30,12 +30,12 @@ __global__ void k_stressTensor(CuField stressTensor,
     if (ip2 >= 3) ip2 -= 3;
 
     stressTensor.setValueInCell(idx, i,
-                               c11.valueAt(idx) * strain.valueAt(idx, i) +
-                               c12.valueAt(idx) * strain.valueAt(idx, ip1) +
-                               c12.valueAt(idx) * strain.valueAt(idx, ip2));
+                               C11.valueAt(idx) * strain.valueAt(idx, i) +
+                               C12.valueAt(idx) * strain.valueAt(idx, ip1) +
+                               C12.valueAt(idx) * strain.valueAt(idx, ip2));
     
     // factor two because we use real strain, not engineering strain
-    stressTensor.setValueInCell(idx, i+3, 2 * c44.valueAt(idx) * strain.valueAt(idx, i+3));
+    stressTensor.setValueInCell(idx, i+3, 2 * C44.valueAt(idx) * strain.valueAt(idx, i+3));
   }
 }
 
@@ -48,11 +48,11 @@ Field evalStressTensor(const Magnet* magnet) {
 
   int ncells = stressTensor.grid().ncells();
   Field strain = evalStrainTensor(magnet);
-  CuParameter c11 = magnet->c11.cu();
-  CuParameter c12 = magnet->c12.cu();
-  CuParameter c44 = magnet->c44.cu();
+  CuParameter C11 = magnet->C11.cu();
+  CuParameter C12 = magnet->C12.cu();
+  CuParameter C44 = magnet->C44.cu();
 
-  cudaLaunch(ncells, k_stressTensor, stressTensor.cu(), strain.cu(), c11, c12, c44);
+  cudaLaunch(ncells, k_stressTensor, stressTensor.cu(), strain.cu(), C11, C12, C44);
   return stressTensor;
 }
 

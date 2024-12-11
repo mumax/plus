@@ -33,7 +33,7 @@ class Ferromagnet : public Magnet {
               Grid grid,
               std::string name,
               GpuBuffer<bool> geometry,
-              GpuBuffer<uint> regions);
+              GpuBuffer<unsigned int> regions);
   ~Ferromagnet() override;
 
   const Variable* magnetization() const;

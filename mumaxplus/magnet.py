@@ -241,46 +241,46 @@ class Magnet(ABC):
         self.external_body_force.set(value)
 
     @property
-    def c11(self):
-        """Stiffness constant c11 = c22 = c33 of the stiffness tensor (N/m²).
+    def C11(self):
+        """Stiffness constant C11 = c22 = c33 of the stiffness tensor (N/m²).
         
         See Also
         --------
-        c12, c44, stress_tensor
+        C12, C44, stress_tensor
         """
-        return Parameter(self._impl.c11)
+        return Parameter(self._impl.C11)
 
-    @c11.setter
-    def c11(self, value):
-        self.c11.set(value)
+    @C11.setter
+    def C11(self, value):
+        self.C11.set(value)
 
     @property
-    def c12(self):
-        """Stiffness constant c12 = c13 = c23 of the stiffness tensor (N/m²).
+    def C12(self):
+        """Stiffness constant C12 = c13 = c23 of the stiffness tensor (N/m²).
         
         See Also
         --------
-        c11, c44, stress_tensor
+        C11, C44, stress_tensor
         """
-        return Parameter(self._impl.c12)
+        return Parameter(self._impl.C12)
 
-    @c12.setter
-    def c12(self, value):
-        self.c12.set(value)
+    @C12.setter
+    def C12(self, value):
+        self.C12.set(value)
 
     @property
-    def c44(self):
-        """Stiffness constant c44 = c55 = c66 of the stiffness tensor (N/m²).
+    def C44(self):
+        """Stiffness constant C44 = c55 = c66 of the stiffness tensor (N/m²).
         
         See Also
         --------
-        c11, c12, stress_tensor
+        C11, C12, stress_tensor
         """
-        return Parameter(self._impl.c44)
+        return Parameter(self._impl.C44)
 
-    @c44.setter
-    def c44(self, value):
-        self.c44.set(value)
+    @C44.setter
+    def C44(self, value):
+        self.C44.set(value)
 
     @property
     def eta(self):
@@ -340,7 +340,7 @@ class Magnet(ABC):
 
         See Also
         --------
-        c11, c12, c44
+        C11, C12, C44
         """
         return FieldQuantity(_cpp.stress_tensor(self._impl))
 
@@ -352,7 +352,7 @@ class Magnet(ABC):
         
         See Also
         --------
-        c11, c12, c44
+        C11, C12, C44
         effective_body_force
         """
         return FieldQuantity(_cpp.elastic_force(self._impl))

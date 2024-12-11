@@ -10,7 +10,7 @@
 #include "reduce.hpp"
 #include "world.hpp"
 
-System::System(const World* world, Grid grid, GpuBuffer<bool> geometry, GpuBuffer<uint> regions)
+System::System(const World* world, Grid grid, GpuBuffer<bool> geometry, GpuBuffer<unsigned int> regions)
     : grid_(grid),
       world_(world),
       geometry_(geometry),
@@ -27,9 +27,9 @@ System::System(const World* world, Grid grid, GpuBuffer<bool> geometry, GpuBuffe
   }
   if (regions.size() != 0) {
     // Filter out unique region indices
-    std::vector<uint> regionsVec = regions.getData();
-    std::set<uint> uni(regionsVec.begin(), regionsVec.end()); // The order is of no importance
-    uniqueRegions = std::vector<uint>(uni.begin(), uni.end());
+    std::vector<unsigned int> regionsVec = regions.getData();
+    std::set<unsigned int> uni(regionsVec.begin(), regionsVec.end()); // The order is of no importance
+    uniqueRegions = std::vector<unsigned int>(uni.begin(), uni.end());
   }
 }
 
@@ -66,12 +66,12 @@ const GpuBuffer<bool>& System::geometry() const {
   return geometry_;
 }
 
-const GpuBuffer<uint>& System::regions() const {
+const GpuBuffer<unsigned int>& System::regions() const {
   return regions_;
 }
 
 void System::checkIdxInRegions(int idx) const {
-  if (!idxInRegions(GpuBuffer<uint>(uniqueRegions), idx)) {
+  if (!idxInRegions(GpuBuffer<unsigned int>(uniqueRegions), idx)) {
     throw std::invalid_argument("The region index " + std::to_string(idx)
                                                    + " is not defined.");
   }

@@ -16,9 +16,9 @@ VoronoiTessellator::VoronoiTessellator(Grid grid, real grainsize, real3 cellsize
         tessellation = this->generate();
     }
 
-GpuBuffer<uint> VoronoiTessellator::generate() {
+GpuBuffer<unsigned int> VoronoiTessellator::generate() {
 
-   std::vector<uint> data(grid.ncells());
+   std::vector<unsigned int> data(grid.ncells());
    for (int nx = 0; nx < grid.size().x; nx++) {
         for (int ny = 0; ny < grid.size().y; ny++) {
             real3 coo = real3{nx * cellsize_.x,
@@ -27,10 +27,10 @@ GpuBuffer<uint> VoronoiTessellator::generate() {
             data[nx * grid.size().y + ny] = regionOf(coo);
         }
     }
-    return GpuBuffer<uint>(data);
+    return GpuBuffer<unsigned int>(data);
 }
 
-uint VoronoiTessellator::regionOf(real3 coo) {
+unsigned int VoronoiTessellator::regionOf(real3 coo) {
     Tile t = tileOfCell(coo);
     Center nearest = Center{coo, 0};
     real mindist = INFINITY;

@@ -62,6 +62,11 @@ pip install -ve .
 ```
 If changes are made to the C++ code, then `pip install -ve .` can be used to rebuild mumax⁺.
 
+You could also compile the source code with double precision, by changing `FP_PRECISION` in `CMakeLists.txt` from `SINGLE` to `DOUBLE` before rebuilding.
+```cmake
+add_definitions(-DFP_PRECISION=DOUBLE) # FP_PRECISION should be SINGLE or DOUBLE
+```
+
 ### Windows
 
 **These instructions are old and worked at some point (2021), but not today. If you are brave enough to try Windows and you manage to get it working, please let us know!**

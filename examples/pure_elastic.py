@@ -59,9 +59,9 @@ magnet.enable_elastodynamics = True
 
 magnet.msat = 0
 magnet.rho = 8e3
-magnet.c11 = 283e9
-magnet.c44 = 58e9
-magnet.c12 = 166e9
+magnet.C11 = 283e9
+magnet.C44 = 58e9
+magnet.C12 = 166e9
 magnet.eta = 1e12
 
 magnet.elastic_displacement = gaussian_spherical_IP(

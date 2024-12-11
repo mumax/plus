@@ -12,7 +12,7 @@ nx, ny, nz = 128, 64, 1  # number of 1D cells
 msat = 800e3
 B1 = -8.8e6
 B2 = B1/2
-c11, c12, c44 = 283e9, 58e9, 166e9
+C11, C12, C44 = 283e9, 58e9, 166e9
 
 def max_absolute_error(result, wanted):
     """Maximum error for vector quantities."""
@@ -35,9 +35,9 @@ class TestElasticEnergies:
 
         self.magnet.msat = msat
 
-        self.magnet.c11 = c11
-        self.magnet.c12 = c12
-        self.magnet.c44 = c44
+        self.magnet.C11 = C11
+        self.magnet.C12 = C12
+        self.magnet.C44 = C44
 
         self.magnet.B1 = B1
         self.magnet.B2 = B2

@@ -68,9 +68,9 @@ void RungeKuttaStepper::step() {
     // update the timestep
     real corrFactor;
     if (success) {
-      corrFactor = std::pow(solver_->maxError() / error, 1. / butcher_.order2);
+      corrFactor = std::pow(solver_->maxError() / error, 1. / (butcher_.order2 + 1));
     } else {
-      corrFactor = std::pow(solver_->maxError() / error, 1. / butcher_.order1);
+      corrFactor = std::pow(solver_->maxError() / error, 1. / (butcher_.order1 + 1));
     }
     solver_->adaptTimeStep(corrFactor);
 

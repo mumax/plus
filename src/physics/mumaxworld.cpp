@@ -55,7 +55,7 @@ void MumaxWorld::checkAddibility(Grid grid, std::string name) const {
 
 Ferromagnet* MumaxWorld::addFerromagnet(Grid grid,
                                         GpuBuffer<bool> geometry,
-                                        GpuBuffer<uint> regions,
+                                        GpuBuffer<unsigned int> regions,
                                         std::string name) {
   // Create name if not given.
   static int idxUnnamed = 1;
@@ -80,7 +80,7 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid,
 
 Antiferromagnet* MumaxWorld::addAntiferromagnet(Grid grid,
                                                 GpuBuffer<bool> geometry,
-                                                GpuBuffer<uint> regions,
+                                                GpuBuffer<unsigned int> regions,
                                                 std::string name) {
   // Create name if not given.
   static int idxUnnamed = 1;
