@@ -103,7 +103,7 @@ else:
 # everything for the main plot
 
 # plotting ranges
-xmin, xmax = -1.25, 1.25  # rad/nm
+xmin, xmax = -1, 1  # rad/nm
 ymin, ymax = 0, 50  # THz
 
 # x- and y-coordinates of FT cell centers
@@ -241,22 +241,26 @@ ax2.spines['bottom'].set_color('white')
 ax2.spines['top'].set_color('white') 
 ax2.spines['right'].set_color('white')
 ax2.spines['left'].set_color('white')
-ax2.tick_params(axis='x', bottom=False, labelbottom=False)
-ax2.tick_params(axis='y', left=False, labelleft=False)
+ax2.tick_params(axis='x', colors="white", labelsize=5, length=2, pad=2)
+ax2.tick_params(axis='y', colors="white", labelsize=5, length=2, pad=2)
 ax2.yaxis.label.set_color('white')
 ax2.xaxis.label.set_color('white')
+ax2.set_xlabel('rad/µm', fontsize=5, labelpad=-0.5)
+ax2.xaxis.label.set_color('white')
+ax2.set_xticks([-0.002, 0.002], [-2, 2])
+ax2.set_yticks([0.5, 0.6])
 
 # zoom lines
 rect = [xmin_zoom, ymin_zoom, xmax_zoom-xmin_zoom, ymax_zoom-ymin_zoom]
 box = ax.indicate_inset(rect, edgecolor="white", lw=0.2,
-                        ls=":", alpha=1)
+                        ls="-", alpha=1)
 cp1 = ConnectionPatch(xyA=(xmin_zoom, ymax_zoom), xyB=(0, 0), axesA=ax, axesB=ax2,
                       coordsA="data", coordsB="axes fraction", lw=0.7, ls=":", color="white")
 cp2 = ConnectionPatch(xyA=(xmax_zoom, ymax_zoom), xyB=(1, 0), axesA=ax, axesB=ax2,
                       coordsA="data", coordsB="axes fraction", lw=0.7, ls=":",
                       color="white")
-cp1.set_zorder(11)
-cp2.set_zorder(10)
+cp1.set_zorder(2)
+cp2.set_zorder(2)
 
 ax.add_patch(cp1)
 ax.add_patch(cp2)
