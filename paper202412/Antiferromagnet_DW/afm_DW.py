@@ -151,7 +151,7 @@ if static:
                 DWs.append(fit_domain_wall(magnet)[-1]*1e9)
 
         x = np.linspace(35, 105, 100)
-        lab = "Model" if a == 10 else ""
+        lab = "Analytical model" if a == 10 else ""
         plt.plot(x, np.sqrt((2*a*1e-12 - (-5e-12)) / (2*x*1e3))*1e9, 'k--', label=lab, lw=0.5)
         plt.plot(Krange, DWs, '.', label=r"$A_{{11}}$ = {} pJ/m".format(a))
         DWdata.append(DWs)
@@ -198,7 +198,7 @@ if dynamic:
                 phi2s.append(p2)
                 theory.append(compute_domain_wall_speed(magnet, j*1e12, p1, p2))
 
-        plt.plot(jrange, [t * 1e-3 for t in theory], 'k--', label=lab*"Model", lw=0.5)
+        plt.plot(jrange, [t * 1e-3 for t in theory], 'k--', label=lab*"Analytical model", lw=0.5)
         plt.plot(jrange[1:8], [s * 1e-3 for s in speeds[1:8]], '.', label=r"$A_{{12}}$ = -{} pJ/m".format(int(a)))
         lab = False
         DWdata.append(speeds)
