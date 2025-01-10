@@ -37,7 +37,7 @@ aex = 2.48e-12
 A_c = -9.93e5 * a**2
 A_nn = 0
 K = 611e3
-alpha = 2e-3
+alpha = 1e-4
 Bdc = 2
 
 # magnetoelastic parameters
@@ -48,7 +48,7 @@ B2 = B
 C11 = 200e9
 C44 = 70e9
 C12 = C11 - 2*C44  # assume isotropic
-eta = 2e11
+eta = 1e12
 
 # time settings
 fmax = 5e12/(2*np.pi)        # maximum frequency (in Hz) of the sinc pulse
@@ -116,11 +116,11 @@ def simulation(theta):
     u = np.zeros(shape=(nt, 3, nz, ny, nx))
     
     # add magnetic field and external force excitation in the middle of the magnet
-    Fac = 1e16  # force pulse strength
-    Bac = 1e3  # magnetic pulse strength
+    Fac = 1e9  # force pulse strength
+    Bac = 1e0  # magnetic pulse strength
 
-    mask = np.zeros(shape=(1, 1, nx))
     # Put signal at the center of the simulation box
+    mask = np.zeros(shape=(1, 1, nx))
     mask[:, :, nx // 2 - 1:nx // 2 + 1] = 1
     Fac_dir = np.array([Fac, Fac, Fac])/np.sqrt(3)
     Bac_dir = np.array([Bac, Bac, Bac])/np.sqrt(3)
@@ -211,7 +211,7 @@ RGBs = []
 components = [u[:,0,0,0,:], u[:,1,0,0,:], u[:,2,0,0,:], m[:,2,0,0,:]]
 hues = np.array([320, 140, 20, 250]) * np.pi/180
 if plot_mode == "light": hues += np.pi
-powers = [0.7, 0.8, 0.8, 1.0]
+powers = [0.7, 1.0, 1.0, 0.8]
 for comp, hue, power in zip(components, hues, powers):
     FT = np.abs(np.fft.fftshift(np.fft.fft2(comp)))[y_start:y_end, x_start:x_end]
     FT_max = np.max(FT)
