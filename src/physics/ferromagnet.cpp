@@ -54,6 +54,7 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
       conductivity(system(), 0.0, name + ":conductivity", "S/m"),
       amrRatio(system(), 0.0, name + ":amr_ratio", ""),
       RelaxTorqueThreshold(-1.0),
+      magnetizationMaxError(1e-5),
       poissonSystem(this), 
       // magnetoelasticity
       B1(system(), 0.0, name + ":B1", "J/m3"),

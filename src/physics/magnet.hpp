@@ -82,6 +82,9 @@ class Magnet {
   Parameter eta;  // Phenomenological elastic damping constant
   Parameter rho;  // Mass density
 
+  real displacementMaxError;
+  real velocityMaxError;
+
 
   // Delete copy constructor and copy assignment operator to prevent shallow copies
   Magnet(const Magnet&) = delete;

@@ -208,6 +208,21 @@ class Ferromagnet(Magnet):
         assert value != 0, "The relax threshold should not be zero."
         self._impl.RelaxTorqueThreshold = value
 
+    @property
+    def magnetization_max_error(self):
+        """Return the maximum error per step the solver can tollerate for the
+        magnetization-torque equations of motion (rad).
+        
+        The default value is 1e-5.
+        """
+
+        return self._impl.torque_max_error
+
+    @magnetization_max_error.setter
+    def magnetization_max_error(self, error):
+        assert error > 0, "The maximum error should be bigger than 0."
+        self._impl.magnetization_max_error = error
+
     # ----- MATERIAL PARAMETERS -----------
 
     @property

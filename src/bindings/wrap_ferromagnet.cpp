@@ -63,6 +63,7 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("conductivity", &Ferromagnet::conductivity)
       .def_readonly("amr_ratio", &Ferromagnet::amrRatio)
       .def_readwrite("RelaxTorqueThreshold", &Ferromagnet::RelaxTorqueThreshold)
+      .def_readwrite("magnetization_max_error", &Ferromagnet::magnetizationMaxError)
       .def_readonly("poisson_system", &Ferromagnet::poissonSystem)
       .def_readonly("B1", &Ferromagnet::B1)
       .def_readonly("B2", &Ferromagnet::B2)

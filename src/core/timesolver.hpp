@@ -32,7 +32,6 @@ class TimeSolver {
   RKmethod getRungeKuttaMethod();
   real headroom() const { return headroom_; }
   real lowerBound() const { return lowerBound_; }
-  real maxError() const { return maxError_; }
   real sensibleFactor() const { return sensibleFactor_; }
   real time() const { return time_; }
   real timestep() const { return timestep_; }
@@ -46,7 +45,6 @@ class TimeSolver {
   void setEquations(std::vector<DynamicEquation> eq);
   void setHeadroom(real headroom) { headroom_ = headroom; }
   void setLowerBound(real lowerBound) { lowerBound_ = lowerBound; }
-  void setMaxError(real maxError) { maxError_ = maxError; }
   void setSensibleFactor(real factor) { sensibleFactor_ = factor; }
   void setTime(real time) { time_ = time; }
   void setTimeStep(real dt) { timestep_ = dt; }
@@ -63,6 +61,7 @@ class TimeSolver {
 
   //------------- HELPER FUNCTIONS FOR ADAPTIVE TIMESTEPPING -------------------
 
+  // TODO: take a look at sensible timestep
   real sensibleTimeStep() const; /** Computes a sensible timestep */
   void adaptTimeStep(real corr);
 
@@ -71,7 +70,6 @@ class TimeSolver {
 
   real headroom_ = 0.8;
   real lowerBound_ = 0.5;
-  real maxError_ = 1e-5;
   real sensibleFactor_ = 0.01;
   real time_ = 0.0;
   real timestep_ = 0.0;

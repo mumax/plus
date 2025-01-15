@@ -74,10 +74,6 @@ for i in range(3):
     u[i, ...] -= u_avg[i]
 magnet.elastic_displacement = u
 
-# adaptive time stepping does not work for magnetoelastics
-world.timesolver.adaptive_timestep = False
-world.timesolver.timestep = 1e-13
-
 # simulation
 time = np.linspace(0, 1e-10, 500)
 energies = {"E_kin": lambda : magnet.kinetic_energy.eval()*J_to_eV,

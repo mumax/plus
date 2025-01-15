@@ -303,6 +303,44 @@ class Magnet(ABC):
     def rho(self, value):
         self.rho.set(value)
 
+    @property
+    def displacement_max_error(self):
+        """Return the maximum error per step the solver can tollerate for the
+        displacement-velocity equations of motion (m).
+        
+        The default value is 1e-18.
+
+        See Also
+        --------
+        velocity_max_error
+        """
+
+        return self._impl.displacement_max_error
+
+    @displacement_max_error.setter
+    def displacement_max_error(self, error):
+        assert error > 0, "The maximum error should be bigger than 0."
+        self._impl.displacement_max_error = error
+
+    @property
+    def velocity_max_error(self):
+        """Return the maximum error per step the solver can tollerate for the
+        velocity-acceleration equations of motion (m/s).
+        
+        The default value is 1e-7.
+
+        See Also
+        --------
+        displacement_max_error
+        """
+
+        return self._impl.velocity_max_error
+
+    @velocity_max_error.setter
+    def velocity_max_error(self, error):
+        assert error > 0, "The maximum error should be bigger than 0."
+        self._impl.velocity_max_error = error
+
     # ----- ELASTIC QUANTITIES -------
 
     @property

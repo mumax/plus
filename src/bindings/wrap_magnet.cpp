@@ -40,6 +40,9 @@ void wrap_magnet(py::module& m) {
       .def_readonly("eta", &Magnet::eta)
       .def_readonly("rho", &Magnet::rho)
 
+      .def_readwrite("displacement_max_error", &Magnet::displacementMaxError)
+      .def_readwrite("velocity_max_error", &Magnet::velocityMaxError)
+
       .def("stray_field_from_magnet",
           [](const Magnet* m, Magnet* magnet) {
             const StrayField* strayField = m->getStrayField(magnet);

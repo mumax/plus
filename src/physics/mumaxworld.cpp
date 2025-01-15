@@ -162,7 +162,8 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
     DynamicEquation eq(
         magnet->magnetization(),
         std::shared_ptr<FieldQuantity>(torque(magnet).clone()),
-        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(magnet).clone()));
+        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(magnet).clone()),
+        &magnet->magnetizationMaxError);
     equations.push_back(eq);
   }
 
@@ -172,7 +173,8 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
       DynamicEquation eq(
         sub->magnetization(),
         std::shared_ptr<FieldQuantity>(torque(sub).clone()),
-        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()));
+        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()),
+        &sub->magnetizationMaxError);
       equations.push_back(eq);
     }
   }
@@ -187,15 +189,17 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
       // change in displacement = velocity
       DynamicEquation dvEq(
           magnet->elasticDisplacement(),
-          std::shared_ptr<FieldQuantity>(elasticVelocityQuantity(magnet).clone()));
+          std::shared_ptr<FieldQuantity>(elasticVelocityQuantity(magnet).clone()),
           // No thermal noise
+          &magnet->displacementMaxError);
       equations.push_back(dvEq);
 
       // change in velocity = acceleration
       DynamicEquation vaEq(
           magnet->elasticVelocity(),
-          std::shared_ptr<FieldQuantity>(elasticAccelerationQuantity(magnet).clone()));
+          std::shared_ptr<FieldQuantity>(elasticAccelerationQuantity(magnet).clone()),
           // No thermal noise
+          &magnet->velocityMaxError);
       equations.push_back(vaEq);
     }
   }

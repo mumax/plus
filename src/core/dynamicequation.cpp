@@ -9,8 +9,9 @@
 
 DynamicEquation::DynamicEquation(const Variable* x,
                                  std::shared_ptr<FieldQuantity> rhs,
-                                 std::shared_ptr<FieldQuantity> noiseTerm)
-    : x(x), rhs(rhs), noiseTerm(noiseTerm) {
+                                 std::shared_ptr<FieldQuantity> noiseTerm,
+                                 const real* maxError)
+    : x(x), rhs(rhs), noiseTerm(noiseTerm), maxError_(maxError) {
   if (x->system() != rhs->system()) {
     throw std::runtime_error(
         "The variable and the r.h.s. of a dynamic equation should have the "
@@ -36,6 +37,11 @@ DynamicEquation::DynamicEquation(const Variable* x,
   }
 }
 
+DynamicEquation::DynamicEquation(const Variable* x,
+                                 std::shared_ptr<FieldQuantity> rhs,
+                                 const real* maxError)
+    : DynamicEquation(x, rhs, nullptr, maxError) {}
+
 int DynamicEquation::ncomp() const {
   return x->ncomp();
 }
@@ -46,4 +52,9 @@ Grid DynamicEquation::grid() const {
 
 std::shared_ptr<const System> DynamicEquation::system() const {
   return x->system();
+}
+
+real DynamicEquation::maxError() const {
+  if (maxError_) { return *maxError_; }
+  return 1e-5;  // default value, usually good for magnetic systems
 }

@@ -87,6 +87,7 @@ class Ferromagnet : public Magnet {
   Parameter conductivity;
   Parameter amrRatio;
   real RelaxTorqueThreshold;
+  real magnetizationMaxError;
   
   curandGenerator_t randomGenerator;
 

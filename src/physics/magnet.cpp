@@ -29,7 +29,10 @@ Magnet::Magnet(std::shared_ptr<System> system_ptr,
       C12(system(), 0.0, name + ":C12", "N/m2"),
       C44(system(), 0.0, name + ":C44", "N/m2"),
       eta(system(), 0.0, name + ":eta", "kg/m3s"),
-      rho(system(), 1.0, name + ":rho", "kg/m3") {
+      rho(system(), 1.0, name + ":rho", "kg/m3"),
+      // TODO: may need to change default values
+      displacementMaxError(1e-18),
+      velocityMaxError(1e-7) {
   // Check that the system has at least size 1
   int3 size = system_->grid().size();
   if (size.x < 1 || size.y < 1 || size.z < 1)

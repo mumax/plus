@@ -31,4 +31,5 @@ class Relaxer {
   TimeSolver &timesolver_;
   const MumaxWorld* world_;
   real tol_;
+  real maxerr_;
 };

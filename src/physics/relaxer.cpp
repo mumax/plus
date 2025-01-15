@@ -18,12 +18,14 @@ Relaxer::Relaxer(const Magnet* magnet, std::vector<real> RelaxTorqueThreshold, r
       timesolver_(magnet->world()->timesolver()),
       world_(magnet->mumaxWorld()),
       tol_(tol),
-      threshold_(RelaxTorqueThreshold) {}
+      threshold_(RelaxTorqueThreshold),
+      maxerr_(1e-5) {}  // TODO: make user assignable?
 
 Relaxer::Relaxer(const MumaxWorld* world, real RelaxTorqueThreshold, real tol)
     : timesolver_(world->timesolver()),
       world_(world),
-      tol_(tol) {
+      tol_(tol),
+      maxerr_(1e-5) {
         for (const auto& pair : world->magnets()) {
           magnets_.push_back(pair.second);
           threshold_.push_back(RelaxTorqueThreshold);
@@ -39,7 +41,8 @@ std::vector<DynamicEquation> Relaxer::getEquation(const Magnet* magnet) {
       DynamicEquation eq(
           mag->magnetization(),
           std::shared_ptr<FieldQuantity>(relaxTorqueQuantity(mag).clone()),
-          std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(mag).clone()));
+          std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(mag).clone()),
+          &maxerr_);  // adaptive equations should listen to maxerr_ of Relaxer
       eqs.push_back(eq);
     }
     else if (const Antiferromagnet* mag = magnet->asAFM()) {
@@ -47,7 +50,8 @@ std::vector<DynamicEquation> Relaxer::getEquation(const Magnet* magnet) {
         DynamicEquation eq(
           sub->magnetization(),
           std::shared_ptr<FieldQuantity>(relaxTorqueQuantity(sub).clone()),
-          std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()));
+          std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()),
+          &maxerr_);
         eqs.push_back(eq);
       }
     }
@@ -90,7 +94,6 @@ void Relaxer::exec() {
   real time = timesolver_.time();
   real timestep = timesolver_.timestep();
   bool adaptive = timesolver_.hasAdaptiveTimeStep();
-  real maxerr = timesolver_.maxError();
   std::string method = getRungeKuttaNameFromMethod(timesolver_.getRungeKuttaMethod());
   auto eqs = timesolver_.equations();
 
@@ -119,12 +122,9 @@ void Relaxer::exec() {
     std::vector<FM_FieldQuantity> torque = getTorque();
     real t0 = 0;
     real t1 = calcTorque(torque);
-  
-    real err = timesolver_.maxError();
 
-    while (err > tol_) {
-      err /= std::sqrt(2);
-      timesolver_.setMaxError(err);
+    while (maxerr_ > tol_) {
+      maxerr_ /= std::sqrt(2);  // reduce maxError to which the new DynamicEquations listen
 
       timesolver_.steps(N);
       t0 = t1;
@@ -144,10 +144,9 @@ void Relaxer::exec() {
   // If threshold is set by user: relax until torque is smaller than or equal to threshold.
   else {
 
-    real err = timesolver_.maxError();
     std::vector<FM_FieldQuantity> torque = getTorque();
 
-    while (err > tol_) {
+    while (maxerr_ > tol_) {
       bool torqueConverged = true;
       for (size_t i = 0; i < torque.size(); i++) {
         if (maxVecNorm(torque[i].eval()) > threshold_[i]) {
@@ -157,8 +156,7 @@ void Relaxer::exec() {
       }
 
       if (torqueConverged) {    
-        err /= std::sqrt(2);
-        timesolver_.setMaxError(err);
+        maxerr_ /= std::sqrt(2);
       }
       timesolver_.steps(N);
     }
@@ -166,7 +164,6 @@ void Relaxer::exec() {
 
   // Restore solver settings after relaxing
   timesolver_.setRungeKuttaMethod(method);
-  timesolver_.setMaxError(maxerr);
   if (!adaptive) { timesolver_.disableAdaptiveTimeStep(); }
   timesolver_.setTime(time);
   timesolver_.setTimeStep(timestep); 
