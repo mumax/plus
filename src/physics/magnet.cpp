@@ -187,10 +187,12 @@ void Magnet::setEnableElastodynamics(bool value) {
     if (value) {
       // properly initialize Variables now
       elasticDisplacement_ = std::make_unique<Variable>(system(), 3,
-                                        name() + ":elastic_displacement", "m");
+                                        name() + ":elastic_displacement", "m",
+                                        MaxError::DISPLACEMENT);
       elasticDisplacement_->set(real3{0,0,0});
       elasticVelocity_ = std::make_unique<Variable>(system(), 3,
-                                        name() + ":elastic_velocity", "m/s");
+                                        name() + ":elastic_velocity", "m/s",
+                                        MaxError::VELOCITY);
       elasticVelocity_->set(real3{0,0,0});
     } else {
       // free memory of unnecessary Variables
