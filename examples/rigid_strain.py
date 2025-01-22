@@ -86,7 +86,7 @@ def norm_strain_t_sin(t):
 
 def shear_strain_xyz_cos(x,y,z):
     exy = 0
-    exz = E*np.cos(k*x + np.pi/2)
+    exz = E*np.cos(k*x)
     eyz = 0
     return (exy, exz, eyz)
 
