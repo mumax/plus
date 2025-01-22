@@ -23,8 +23,10 @@ B = -84e6
 B1 = B
 B2 = B
 
-# amplitude, frequency and wave vector of the strain
-E, w, k = 105e-6, 1.3e9 * 2*np.pi, 2*np.pi / 2.8e-6
+# amplitude, angular frequency and wave vector of the strain
+E = 105e-6
+w = 1.3e9 * 2*np.pi
+k = 2*np.pi / 2.8e-6
 
 # simulation grid parameters
 nx, ny, nz = 2000, 250, 1
@@ -34,9 +36,7 @@ cx, cy, cz = 4e-9, 4e-9, 3e-9
 cellsize = (cx, cy, cz)
 grid = Grid((nx, ny, nz))
 world = World(cellsize)
-magnet = Ferromagnet(world, grid) #, geometry=shape.Ellipse(nx*cx, ny*cy).translate(nx*cx/2 - cx/2, ny*cy/2 - cy/2, 0))
-magnet.enable_demag = True
-
+magnet = Ferromagnet(world, grid)
 # setting magnet parameters
 magnet.msat = msat
 magnet.aex = aex
@@ -149,9 +149,6 @@ for i in range(steps):
 
 # final magnetization
 ax2.imshow(np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], axes=(1,2,0)), origin="lower", extent=im_extent, aspect="equal")
-ax2.set_title("Final magnetization")
-ax2.set_xlabel("x (µm)")
-ax2.set_ylabel("y (µm)")
 
 plt.show()
 
