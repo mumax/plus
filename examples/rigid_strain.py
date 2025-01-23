@@ -12,22 +12,6 @@ run = 10e-9
 steps = 1000
 dt = run/steps
 
-# magnet parameters
-msat = 1.5e6
-aex = 10.5e-12
-alpha = 0.02
-K = 7e3
-
-# Elastic coupling constant
-B = -84e6
-B1 = B
-B2 = B
-
-# amplitude, angular frequency and wave vector of the strain
-E = 105e-6
-w = 1.3e9 * 2*np.pi
-k = 2*np.pi / 2.8e-6
-
 # simulation grid parameters
 nx, ny, nz = 2000, 250, 1
 cx, cy, cz = 4e-9, 4e-9, 3e-9
@@ -38,13 +22,19 @@ grid = Grid((nx, ny, nz))
 world = World(cellsize)
 magnet = Ferromagnet(world, grid)
 # setting magnet parameters
-magnet.msat = msat
-magnet.aex = aex
-magnet.alpha = alpha
-magnet.ku1 = K
+magnet.msat = 1.5e6
+magnet.aex = 10.5e-12
+magnet.alpha = 0.02
+magnet.ku1 = 7e3
 magnet.anisU = (1,0,0)
-magnet.B1 = B1
-magnet.B2 = B2
+B = -84e6
+magnet.B1 = B
+magnet.B2 = B
+
+# amplitude, angular frequency and wave vector of the strain
+E = 105e-6
+w = 1.3e9 * 2*np.pi
+k = 2*np.pi / 2.8e-6
 
 # To set the strain we need time and space functions
 # Different strain components are given by
@@ -54,71 +44,26 @@ magnet.B2 = B2
 # exy = 0
 # exz = E cos(kx - wt)
 # eyz = 0
-# These can all be rewritten by using sum and difference formulas
-# By using add_time_term we can create a f(x,y,z,t) = h(x,y,z)*g(t) function
-# By then adding a second time function we can recreate the effect of the sin and cos
-
-# Splitting everything in single components for the strain results in 8 functions
-def norm_strain_xyz_sin(x,y,z):
-    exx = E*np.sin(k*x)
-    eyy = 0
-    ezz = -E*np.sin(k*x)
-    return (exx, eyy, ezz)
-
-def norm_strain_xyz_cos(x,y,z):
-    exx = -E*np.cos(k*x)
-    eyy = 0
-    ezz = E*np.cos(k*x)
-    return (exx, eyy, ezz)
-
-def norm_strain_t_cos(t):
-    exx = np.cos(w*t)
-    eyy = 0
-    ezz = np.cos(w*t)
-    return (exx, eyy, ezz)
-
-def norm_strain_t_sin(t):
-    exx = np.sin(w*t)
-    eyy = 0
-    ezz = np.sin(w*t)
-    return (exx, eyy, ezz)
-
-
-def shear_strain_xyz_cos(x,y,z):
-    exy = 0
-    exz = E*np.cos(k*x)
-    eyz = 0
-    return (exy, exz, eyz)
-
-def shear_strain_xyz_sin(x,y,z):
-    exy = 0
-    exz = E*np.sin(k*x)
-    eyz = 0
-    return (exy, exz, eyz)
-
-def shear_strain_t_cos(t):
-    exy = 0
-    exz = np.cos(w*t)
-    eyz = 0
-    return (exy, exz, eyz)
-
-def shear_strain_t_sin(t):
-    exy = 0
-    exz = np.sin(w*t)
-    eyz = 0
-    return (exy, exz, eyz)
+# These can all be rewritten by using sum and difference formulas.
+# By using add_time_term we can create a f(x,y,z,t) = h(x,y,z)*g(t) function.
+# By then adding a second time function we can recreate the effect of the sin and cos.
+# Splitting everything in single components for the strain results in 8 functions.
 
 # normal stain
-# Create the first time term f(x,y,z) = h(x,y,z)*g(t)
-magnet.rigid_norm_strain.add_time_term(norm_strain_t_cos, mask=norm_strain_xyz_sin)
-# Add a second time term to obtain sin and cos
-magnet.rigid_norm_strain.add_time_term(norm_strain_t_sin, mask=norm_strain_xyz_cos)
+# Create the first time term f(t,x,y,z) = g(t)*h(x,y,z)
+magnet.rigid_norm_strain.add_time_term(lambda t: (np.cos(w*t), 0., np.cos(w*t)),
+                                       lambda x,y,z: (E*np.sin(k*x), 0., -E*np.sin(k*x)))
+# Add a second time term to obtain sin
+magnet.rigid_norm_strain.add_time_term(lambda t: (np.sin(w*t), 0., np.sin(w*t)),
+                                       lambda x,y,z: (-E*np.cos(k*x), 0., E*np.cos(k*x)))
 
 # shear strain
-# Create the first time term f(x,y,z) = h(x,y,z)*g(t)
-magnet.rigid_shear_strain.add_time_term(shear_strain_t_cos, mask=shear_strain_xyz_cos)
-# Add a second time term to obtain sin and cos
-magnet.rigid_shear_strain.add_time_term(shear_strain_t_sin, mask=shear_strain_xyz_sin)
+# Create the first time term f(t,x,y,z) = g(t)*h(x,y,z)
+magnet.rigid_shear_strain.add_time_term(lambda t: (0., np.cos(w*t), 0.),
+                                        lambda x,y,z: (0., E*np.cos(k*x), 0.))
+# Add a second time term to obtain cos
+magnet.rigid_shear_strain.add_time_term(lambda t: (0., np.sin(w*t), 0.),
+                                        lambda x,y,z: (0., E*np.sin(k*x), 0.))
 
 # Create a domain wall
 magnet.magnetization = twodomain((1,0,0), (0,-1,0), (-1,0,0), nx*cx/2, 10*cx)
