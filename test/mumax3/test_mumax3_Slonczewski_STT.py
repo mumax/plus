@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import math
 
 from mumax3 import Mumax3Simulation
 from mumaxplus import Ferromagnet, Grid, World
@@ -34,7 +35,7 @@ def simulations(request):
     epsilon_prime = 1
     jz = -6e-3/(length*width)
     jcur = (0, 0, jz)
-    mp = (np.cos(20*np.pi/180), np.sin(20*np.pi/180), 0)  # fixed layer mag
+    mp = (math.cos(20*np.pi/180), math.sin(20*np.pi/180), 0)  # fixed layer mag
 
     max_time = 0.5e-9
     step_time = 0.5e-12
