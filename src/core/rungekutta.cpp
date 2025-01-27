@@ -57,20 +57,20 @@ void RungeKuttaStepper::step() {
     if (!solver_->hasAdaptiveTimeStep())
       break;
 
-    // loop over equations and get the largest error
+    // loop over equations and get the largest scaled error
     real error = 0.0;
     for (auto& eq : equations)
-      if (real e = eq.getError(); e > error)
+      if (real e = eq.getScaledError(); e > error)
         error = e;
 
-    success = error < solver_->maxError();
+    success = error < 1.;
 
     // update the timestep
     real corrFactor;
     if (success) {
-      corrFactor = std::pow(solver_->maxError() / error, 1. / (butcher_.order2 + 1));
+      corrFactor = std::pow(1. / error, 1. / (butcher_.order2 + 1));
     } else {
-      corrFactor = std::pow(solver_->maxError() / error, 1. / (butcher_.order1 + 1));
+      corrFactor = std::pow(1. / error, 1. / (butcher_.order1 + 1));
     }
     solver_->adaptTimeStep(corrFactor);
 
@@ -148,4 +148,12 @@ real RungeKuttaStepper::RungeKuttaStageExecutor::getError() const {
     addTo(err, dt * (butcher.weights1[i] - butcher.weights2[i]), k[i]);
 
   return maxVecNorm(err);
+}
+
+real RungeKuttaStepper::RungeKuttaStageExecutor::maxError() const {
+  return stepper.solver_->getMaxError(x.maxError());
+}
+
+real RungeKuttaStepper::RungeKuttaStageExecutor::getScaledError() const {
+  return getError() / maxError();
 }

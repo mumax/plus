@@ -9,16 +9,24 @@
 class CuField;
 class System;
 
+enum class MaxError {
+  MAGNETIZATION,
+  DISPLACEMENT,
+  VELOCITY
+};
+
 class Variable : public FieldQuantity {
  public:
   Variable(std::shared_ptr<const System> system, int ncomp,
-           std::string name = "", std::string unit = "");
+           std::string name = "", std::string unit = "",
+           MaxError maxError = MaxError::MAGNETIZATION);
   ~Variable();
 
   int ncomp() const;
   std::shared_ptr<const System> system() const;
   std::string name() const;
   std::string unit() const;
+  MaxError maxError() const;
 
   Field eval() const;
 
@@ -39,6 +47,7 @@ class Variable : public FieldQuantity {
  private:
   std::string name_;
   std::string unit_;
+  MaxError maxError_;  // enum to select appropriate max error for adaptive time stepping
 };
 
 // Exactly the same as variable, but when values are set, the values are
@@ -46,7 +55,8 @@ class Variable : public FieldQuantity {
 class NormalizedVariable : public Variable {
  public:
   NormalizedVariable(std::shared_ptr<const System> system, int ncomp,
-                     std::string name = "", std::string unit = "");
+                     std::string name = "", std::string unit = "",
+                     MaxError maxError = MaxError::MAGNETIZATION);
   void set(const Field&) const;
   void set(real) const;
   void set(real3) const;

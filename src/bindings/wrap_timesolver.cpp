@@ -23,7 +23,12 @@ void wrap_timesolver(py::module& m) {
            })
       .def_property("headroom", &TimeSolver::headroom, &TimeSolver::setHeadroom)
       .def_property("lower_bound", &TimeSolver::lowerBound, &TimeSolver::setLowerBound)
-      .def_property("max_error", &TimeSolver::maxError, &TimeSolver::setMaxError)
+      .def_property("magnetization_max_error", &TimeSolver::magnetizationMaxError,
+                                               &TimeSolver::setMagnetizationMaxError)
+      .def_property("displacement_max_error", &TimeSolver::displacementMaxError,
+                                              &TimeSolver::setDisplacementMaxError)
+      .def_property("velocity_max_error", &TimeSolver::velocityMaxError,
+                                          &TimeSolver::setVelocityMaxError)
       .def_property("sensible_factor", &TimeSolver::sensibleFactor, &TimeSolver::setSensibleFactor)
       .def_property("upper_bound", &TimeSolver::upperBound, &TimeSolver::setUpperBound)
       .def("step", &TimeSolver::step)

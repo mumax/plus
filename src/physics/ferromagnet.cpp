@@ -20,7 +20,7 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
                          Antiferromagnet* hostMagnet)
     : Magnet(system_ptr, name),
       hostMagnet_(hostMagnet),
-      magnetization_(system(), 3, name + ":magnetization", ""),
+      magnetization_(system(), 3, name + ":magnetization", "", MaxError::MAGNETIZATION),
       msat(system(), 1.0, name + ":msat", "A/m"),
       aex(system(), 0.0, name + ":aex", "J/m"),
       interExch(system(), 0.0, name + ":inter_exchange", "J/m"),

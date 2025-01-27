@@ -9,8 +9,8 @@
 #include "system.hpp"
 
 Variable::Variable(std::shared_ptr<const System> system, int ncomp,
-                   std::string name, std::string unit)
-    : name_(name), unit_(unit) {
+                   std::string name, std::string unit, MaxError maxError)
+    : name_(name), unit_(unit), maxError_(maxError) {
   field_ = new Field(system, ncomp);
 }
 
@@ -32,6 +32,10 @@ std::string Variable::name() const {
 
 std::string Variable::unit() const {
   return unit_;
+}
+
+MaxError Variable::maxError() const {
+  return maxError_;
 }
 
 Field Variable::eval() const {
@@ -70,8 +74,9 @@ void Variable::set(real3 value) const {
 NormalizedVariable::NormalizedVariable(std::shared_ptr<const System> system,
                                        int ncomp,
                                        std::string name,
-                                       std::string unit)
-    : Variable(system, ncomp, name, unit) {}
+                                       std::string unit,
+                                       MaxError maxError)
+    : Variable(system, ncomp, name, unit, maxError) {}
 
 void NormalizedVariable::set(const Field& src) const {
   // TODO: check if this is possible without the extra copy
