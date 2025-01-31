@@ -7,23 +7,34 @@
 #include "stresstensor.hpp"
 
 
-__device__ int tensorComp(int row, int col) {
-  return (row == col) ? row : row+col+2;
+/** Returns coo+relcoo if it is inside the geometry, otherwise it returns coo
+ * itself (assumed to be safe). This mimics open boundary conditions.
+*/
+__device__ int3 safeCoord(int3 coo, int3 relcoo,
+                          const CuSystem& system, const Grid& mastergrid) {
+  int3 coo_ = mastergrid.wrap(coo + relcoo);
+  if (system.inGeometry(coo_)) {  // don't convert to index if outside grid!
+    return coo_;
+  }
+  return coo;
 }
 
-__device__ int3 tensorRowComps(int row) {
-  return int3{tensorComp(row, 0), tensorComp(row, 1), tensorComp(row, 2)};
-}
-
-// Numerical divergence of stress with central five-point stencil in bulk material.
-// Lower order accuracy (three-point stencil) central difference is used in bulk
-// or 1 cell away from boundary.
-// At the boundary, traction-free bondary conditions are implemented, inspired
-// by a three-point stencil with step size h equal to half cellsize.
+/**
+ * Elastic force kernel translated directly from the mumax³ implementation.
+ * https://github.com/Fredericvdv/Magnetoelasticity_MuMax3/blob/magnetoelastic/cuda/elas_free_bndry.cu
+ * This calculation assumes a convex geometry and a uniform displacement in the
+ * z-direction, ideal for xy-plane rectangles, and it applies traction-free
+ * boundary conditions, as described in
+ * https://doi.org/10.12688/openreseurope.13302.1
+ */
 __global__ void k_elasticForce(CuField fField,
-                               const CuField stressTensor,
-                               const real3 w,  // 1 / 2*cellsize
-                               const Grid mastergrid) {
+                               const CuField uField,
+                               const CuParameter C11,
+                               const CuParameter C12,
+                               const CuParameter C44,
+                               const real3 w,  // 1 / cellsize
+                               const Grid mg  // mastergrid
+                               ) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = fField.system;
   const Grid grid = system.grid;
@@ -36,57 +47,558 @@ __global__ void k_elasticForce(CuField fField,
     return;
   }
 
-  // array instead of real3 to get indexing [i]
-  const real ws[3] = {w.x, w.y, w.z};
-  const int3 im2_arr[3] = {int3{-2, 0, 0}, int3{0,-2, 0}, int3{0, 0,-2}};
-  const int3 im1_arr[3] = {int3{-1, 0, 0}, int3{0,-1, 0}, int3{0, 0,-1}};
-  const int3 ip1_arr[3] = {int3{ 1, 0, 0}, int3{0, 1, 0}, int3{0, 0, 1}};
-  const int3 ip2_arr[3] = {int3{ 2, 0, 0}, int3{0, 2, 0}, int3{0, 0, 2}};
+  // Central cell
   const int3 coo = grid.index2coord(idx);
+  real3 u0 = uField.vectorAt(idx);
+  real3 cc;
+  real C11_0 = C11.valueAt(coo);
+  real C12_0 = C12.valueAt(coo);
+  real C44_0 = C44.valueAt(coo);
+  
+  // Neighbor cell
+  int3 coo_;
+  real3 u_, d_, cc_;
+  real d__, cc__;
+
+  // Result
+  real3 f{0., 0., 0.};
+
+  // x-interface
+  if (!system.inGeometry(mg.wrap(coo + int3{-1, 0, 0}))) {  // Left
+    if (!system.inGeometry(mg.wrap(coo + int3{0, -1, 0}))) {
+      // Left-down corner
+
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.x += cc__*w.x*w.x * (uField.valueAt(coo_, 0) - u0.x);
+      
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{1, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      // coo_ = mg.wrap(coo + int3{0, 0, 0});
+      cc__ += C12_0;
+      d__ -= u0.y;
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      cc__ *= 0.25;
+      f.x += cc__*w.x*w.y*0.5*d__;
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.y += cc__*w.y*w.y * (uField.valueAt(coo_, 1) - u0.y);
+
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{1, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      // coo_ = mg.wrap(coo + int3{0, 0, 0});
+      cc__ += C12_0;
+      d__ -= u0.x;
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.x += cc__*w.x*w.y*0.5*d__;
     
-  real3 f = {0, 0, 0};  // elastic force vector
-  for (int i = 0; i < 3; i++) {
-    // i is {x, y, z} derivative direction and stress tensor row
-    // f_j = ∂i σ_ij
+    } else if (!system.inGeometry(mg.wrap(coo + int3{0, 1, 0}))) {
+      // Left-upper corner
+      
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.x += cc__*w.x*w.x * (uField.valueAt(coo_, 0) - u0.x);
 
-    int3 stressRow = tensorRowComps(i);
+      // coo_ = mg.wrap(coo + int{0, 0, 0});
+      cc__ = C12_0;
+      d__ = u0.y;
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{1, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      cc__ *= 0.25;
+      f.x += cc__*w.x*w.y*0.5*d__;
 
-    // translate in direction i
-    int3 im2 = im2_arr[i], im1 = im1_arr[i];  // transl in direction -i
-    int3 ip1 = ip1_arr[i], ip2 = ip2_arr[i];  // transl in direction +i
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.y += cc__*w.y*w.y * (uField.valueAt(coo_, 1) - u0.y);
 
-    int3 coo_im2 = mastergrid.wrap(coo + im2);
-    int3 coo_im1 = mastergrid.wrap(coo + im1);
-    int3 coo_ip1 = mastergrid.wrap(coo + ip1);
-    int3 coo_ip2 = mastergrid.wrap(coo + ip2);
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{1, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      // coo_ = mg.wrap(coo + int{0, 0, 0});
+      cc__ += C12_0;
+      d__ -= u0.x;
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.x += cc__*w.x*w.y*0.5*d__;
 
-    bool im2_inGeo = system.inGeometry(coo_im2);
-    bool im1_inGeo = system.inGeometry(coo_im1);
-    bool ip1_inGeo = system.inGeometry(coo_ip1);
-    bool ip2_inGeo = system.inGeometry(coo_ip2);
-    if (!im1_inGeo && !ip1_inGeo) {
-      // --1-- zero
-      continue;
-    } else if (!im1_inGeo) {
-      // --11- left boundary, apply central difference + traction free BC
-      f += ws[i] * (stressTensor.vectorAt(coo_ip1, stressRow) +
-                    stressTensor.vectorAt(idx, stressRow));
-    } else if (!ip1_inGeo) {
-      // -11-- right boundary, apply central difference + traction free BC
-      f -= ws[i] * (stressTensor.vectorAt(idx, stressRow) +
-                    stressTensor.vectorAt(coo_im1, stressRow));
-    } else if (!im2_inGeo || !ip2_inGeo) {
-      // -111-, 1111-, -1111 central difference,  ε ~ h^2
-      f += ws[i] * (stressTensor.vectorAt(coo_ip1, stressRow) -
-                    stressTensor.vectorAt(coo_im1, stressRow));
-    } else {  // all 5 points are safe for sure
-      // 11111 central difference,  ε ~ h^4
-      f += ws[i] * ((4.0/3.0) * (stressTensor.vectorAt(coo_ip1, stressRow) -
-                                  stressTensor.vectorAt(coo_im1, stressRow)) + 
-                    (1.0/6.0) * (stressTensor.vectorAt(coo_im2, stressRow) -
-                                 stressTensor.vectorAt(coo_ip2, stressRow)));
+    } else {
+      // Left interface
+
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.x += cc__*w.x*w.x * (uField.valueAt(coo_, 0) - u0.x);
+          
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{1, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{1, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      cc__ *= 0.25;
+      f.x += cc__*w.x*w.y*0.25*d__;
+      
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C44.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{1, 1, 0});
+      cc__ += C44.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C44.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{1, -1, 0});
+      cc__ += C44.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.y += cc__*w.x*w.y*0.25*d__;
+
+      coo_ = mg.wrap(coo + int3{1, 0, 0});
+      cc__ = 0.5 * (C44_0 + C44.valueAt(coo_));
+      f.y += cc__*w.x*w.x * (uField.valueAt(coo_, 1) - u0.y);
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C11.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C11.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      cc__ += 2 * C11_0;
+      d__ -= 2 * u0.y;
+      cc__ *= 0.25;
+      f.y += cc__*w.y*w.y*d__;
+
+      coo_ = mg.wrap(coo + int3{1, 1, 0});
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{1, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.y += cc__*w.x*w.y*0.5*d__;
+
     }
+  } else if (!system.inGeometry(mg.wrap(coo + int3{1, 0, 0}))) {  // Right
+    if (!system.inGeometry(mg.wrap(coo + int3{0, -1, 0}))) {
+      // Right-down corner
+            
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.x += cc__*w.x*w.x * (uField.valueAt(coo_, 0) - u0.x);
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{-1, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      // coo_ = mg.wrap(coo + int3{0, 0, 0});
+      cc__ += C12_0;
+      d__ -= u0.y;
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      cc__ *= 0.25;
+      f.x += -cc__*w.x*w.y*0.5*d__;
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.y += cc__*w.y*w.y * (uField.valueAt(coo_, 1) - u0.y);
+
+      // coo_ = mg.wrap(coo + int3{0, 0, 0});
+      cc__ = C12_0;
+      d__ = u0.x;
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.x += -cc__*w.x*w.y*0.5*d__;
+
+    } else if (!system.inGeometry(mg.wrap(coo + int3{0, 1, 0}))) {
+      // Right-upper corner
+
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.x += -cc__*w.x*w.x * (u0.x - uField.valueAt(coo_, 0));
+
+      // coo_ = mg.wrap(coo + int3{0, 0, 0});
+      cc__ = C12_0;
+      d__ = u0.y;
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{-1, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      cc__ *= 0.25;
+      f.x += -cc__*w.x*w.y*0.5*d__;
+
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.y += -cc__*w.y*w.y * (u0.y - uField.valueAt(coo_, 1));
+
+      // coo_ = mg.wrap(coo + int3{0, 0, 0});
+      cc__ = C12_0;
+      d__ = u0.x;
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.x += -cc__*w.x*w.y*0.5*d__;
+
+    } else {
+      // Right interface
+
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+      f.x += cc__*w.x*w.x * (uField.valueAt(coo_, 0) - u0.x);
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0}); 
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{-1, 1, 0}); 
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{0, -1, 0}); 
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{-1, -1, 0}); 
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 1);
+      cc__ *= 0.25;
+      f.x += -cc__*w.x*w.y*0.25*d__;
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C44.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, 1, 0});
+      cc__ += C44.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C44.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, -1, 0});
+      cc__ += C44.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.y += -cc__*w.x*w.y*0.25*d__;
+
+      coo_ = mg.wrap(coo + int3{-1, 0, 0});
+      cc__ = 0.5 * (C44_0 + C44.valueAt(coo_));
+      f.y += cc__*w.x*w.x * (uField.valueAt(coo_, 1) - u0.y);
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C11.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 1);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C11.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 1);
+      cc__ += 2 * C11_0;
+      d__ -= 2 * u0.y;
+      cc__ *= 0.25;
+      f.y += cc__*w.y*w.y*d__;
+
+      coo_ = mg.wrap(coo + int3{0, 1, 0});
+      cc__ = C12.valueAt(coo_);
+      d__ = uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, 1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{0, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ -= uField.valueAt(coo_, 0);
+      coo_ = mg.wrap(coo + int3{-1, -1, 0});
+      cc__ += C12.valueAt(coo_);
+      d__ += uField.valueAt(coo_, 0);
+      cc__ *= 0.25;
+      f.y += cc__*w.x*w.y*0.5*d__;
+
+    }
+  // y-interface
+  } else if (!system.inGeometry(mg.wrap(coo + int3{0, -1, 0}))) {
+    // Down interface
+
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ = C11.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C11.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 0);
+    cc__ += 2 * C11_0;
+    d__ -= 2 * u0.x;
+    cc__ *= 0.25;
+    f.x += cc__*w.x*w.x*d__;
+
+    coo_ = mg.wrap(coo + int3{1, 1, 0});
+    cc__ = C12.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, 1, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 1);
+    cc__ *= 0.25;
+    f.x += cc__*w.x*w.y*0.5*d__;
+
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ = C44.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{1, 1, 0});
+    cc__ += C44.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C44.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, 1, 0});
+    cc__ += C44.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    cc__ *= 0.25;
+    f.x += cc__*w.x*w.y*0.25*d__;
+
+    coo_ = mg.wrap(coo + int3{0, 1, 0});
+    cc__ = 0.5 * (C44_0 + C44.valueAt(coo_));
+    f.x += cc__*w.y*w.y * (uField.valueAt(coo_, 0) - u0.x);
+
+    // coo_ = mg.wrap(coo + int3{0, 1, 0});
+    cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+    f.y += cc__*w.y*w.y * (uField.valueAt(coo_, 1) - u0.y);
+
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ = C12.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{1, 1, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{-1, 1, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 0);
+    cc__ *= 0.25;
+    f.y += cc__*w.x*w.y*0.25*d__;
+
+  } else if (!system.inGeometry(mg.wrap(coo + int3{0, 1, 0}))) {
+    // Upper interface
+
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ = C11.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C11.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 0);
+    cc__ += 2 * C11_0;
+    d__ -= 2 * u0.x;
+    cc__ *= 0.25;
+    f.x += cc__*w.x*w.x*d__;
+
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ = C12.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{1, -1, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, -1, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 1);
+    cc__ *= 0.25;
+    f.x +=  cc__*w.x*w.y*0.5*d__;
+
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ = C44.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{1, -1, 0});
+    cc__ += C44.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C44.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    coo_ = mg.wrap(coo + int3{-1, -1, 0});
+    cc__ += C44.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 1);
+    cc__ *= 0.25;
+    f.x += -cc__*w.x*w.y*0.25*d__;
+
+    coo_ = mg.wrap(coo + int3{0, -1, 0});
+    cc__ = 0.5 * (C44_0 + C44.valueAt(coo_));
+    f.x += cc__*w.y*w.y * (uField.valueAt(coo_, 0) - u0.x);
+
+    coo_ = mg.wrap(coo + int3{0, -1, 0});
+    cc__ = 0.5 * (C11_0 + C11.valueAt(coo_));
+    f.y += cc__*w.y*w.y * (uField.valueAt(coo_, 1) - u0.y);
+
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    cc__ = C12.valueAt(coo_);
+    d__ = uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{1, -1, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ += uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 0);
+    coo_ = mg.wrap(coo + int3{-1, -1, 0});
+    cc__ += C12.valueAt(coo_);
+    d__ -= uField.valueAt(coo_, 0);
+    cc__ *= 0.25;
+    f.y += -cc__*w.x*w.y*0.25*d__;
+
+  } else {
+    // Bulk
+
+    // Double derivative in x-direction
+    // d_ = real3{0., 0., 0.};
+    cc = real3{C11_0, C44_0, C44_0};
+    // Right neighbor
+    coo_ = mg.wrap(coo + int3{1, 0, 0});
+    u_ = uField.vectorAt(coo_);
+    cc_ = real3{C11.valueAt(coo_), C44.valueAt(coo_), C44.valueAt(coo_)};
+    cc_ = 0.5 * (cc + cc_);
+    d_ = w.x*w.x * cc_ * (u_ - u0);
+    // Left neighbor
+    coo_ = mg.wrap(coo + int3{-1, 0, 0});
+    u_ = uField.vectorAt(coo_);
+    cc_ = real3{C11.valueAt(coo_), C44.valueAt(coo_), C44.valueAt(coo_)};
+    cc_ = 0.5 * (cc + cc_);
+    d_ += w.x*w.x * cc_ * (u_ - u0);
+
+    f.x += d_.x;
+    f.y += d_.y;
+    // f.z += 0;
+
+    // Double derivative in y-direction
+    // d_ = real3{0., 0., 0.};
+    cc = real3{C44_0, C11_0, C44_0};
+    // Right neighbor
+    coo_ = mg.wrap(coo + int3{0, 1, 0});
+    u_ = uField.vectorAt(coo_);
+    cc_ = real3{C44.valueAt(coo_), C11.valueAt(coo_), C44.valueAt(coo_)};
+    cc_ = 0.5 * (cc + cc_);
+    d_ = w.y*w.y * cc_ * (u_ - u0);
+    //Left neighbour
+    coo_ = mg.wrap(coo + int3{0, -1, 0});
+    u_ = uField.vectorAt(coo_);
+    cc_ = real3{C44.valueAt(coo_), C11.valueAt(coo_), C44.valueAt(coo_)};
+    cc_ = 0.5 * (cc + cc_);
+    d_ += w.y*w.y * cc_ * (u_ - u0);
+
+    f.x += d_.x;
+    f.y += d_.y;
+    // f.z += 0;
+
+    //dxy without boundaries
+    d_ = real3{0., 0., 0.};
+    cc__ = 0.;
+    // (i+1,j+1)
+    coo_ = mg.wrap(coo + int3{1, 1, 0});
+    d_ += uField.vectorAt(coo_);
+    cc__ += C12.valueAt(coo_) + C44.valueAt(coo_);
+    // (i-1,j-1)
+    coo_ = mg.wrap(coo + int3{-1, -1, 0});
+    d_ += uField.vectorAt(coo_);
+    cc__ += C12.valueAt(coo_) + C44.valueAt(coo_);
+    // (i+1,j-1)
+    coo_ = mg.wrap(coo + int3{1, -1, 0});
+    d_ -= uField.vectorAt(coo_);
+    cc__ += C12.valueAt(coo_) + C44.valueAt(coo_);
+    // (i-1,j+1)
+    coo_ = mg.wrap(coo + int3{-1, 1, 0});
+    d_ -= uField.vectorAt(coo_);
+    cc__ += C12.valueAt(coo_) + C44.valueAt(coo_);
+
+    cc__ += 4 * (C12_0 + C44_0);
+    cc__ *= 0.125;
+    d_ = cc__*d_*0.25*w.x*w.y;
+
+    f.x += d_.y;
+    f.y += d_.x;
+    // f.z += 0;
+
   }
+  // Out of plane component has just Neumann boundary conditions
+
+  // Double derivative in x-direction
+  // Right neighbor
+  coo_ = safeCoord(coo, int3{1, 0, 0}, system, mg);
+  cc__ = 0.5 * (C44.valueAt(coo_) + C44_0);
+  d__ = w.x*w.x*cc__ * (uField.valueAt(coo_, 2) - u0.z);
+  f.z += d__;
+  // Left neighbor
+  coo_ = safeCoord(coo, int3{-1, 0, 0}, system, mg);
+  cc__ = 0.5 * (C44.valueAt(coo_) + C44_0);
+  d__ = w.x*w.x*cc__ * (uField.valueAt(coo_, 2) - u0.z);
+  f.z += d__;
+
+  // Double derivative in y-direction
+  // Top neighbor
+  coo_ = safeCoord(coo, int3{0, 1, 0}, system, mg);
+  cc__ = 0.5 * (C44.valueAt(coo_) + C44_0);
+  d__ = w.y*w.y*cc__ * (uField.valueAt(coo_, 2) - u0.z);
+  f.z += d__;
+  // Bottom neighbor
+  coo_ = safeCoord(coo, int3{0, -1, 0}, system, mg);
+  cc__ = 0.5 * (C44.valueAt(coo_) + C44_0);
+  d__ = w.y*w.y*cc__ * (uField.valueAt(coo_, 2) - u0.z);
+  f.z += d__;
+
 
   fField.setVectorInCell(idx, f);
 }
@@ -101,11 +613,14 @@ Field evalElasticForce(const Magnet* magnet) {
   }
 
   int ncells = fField.grid().ncells();
-  Field stressTensor = evalStressTensor(magnet);
-  real3 w = 0.5 / magnet->cellsize();  // 1 / 2*cellsize
+  CuField uField = magnet->elasticDisplacement()->field().cu();
+  CuParameter C11 = magnet->C11.cu();
+  CuParameter C12 = magnet->C12.cu();
+  CuParameter C44 = magnet->C44.cu();
+  real3 w = 1 / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
 
-  cudaLaunch(ncells, k_elasticForce, fField.cu(), stressTensor.cu(), w, mastergrid);
+  cudaLaunch(ncells, k_elasticForce, fField.cu(), uField, C11, C12, C44, w, mastergrid);
 
   return fField;
 }
