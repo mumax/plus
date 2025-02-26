@@ -17,8 +17,8 @@ void wrap_voronoi(py::module& m) {
                 py::arg("seed"))
         .def("coo_to_idx", &VoronoiTessellator::regionOf)
         // TODO: create template function (wrap_system.cpp)
-        .def("generate", [](VoronoiTessellator& t, Grid grid, real3 cellsize) {
-            unsigned int* tess = t.generate(grid, cellsize).getHostCopy();
+        .def("generate", [](VoronoiTessellator& t, Grid grid, real3 cellsize, const bool pbc) {
+            unsigned int* tess = t.generate(grid, cellsize, pbc).getHostCopy();
 
             // Create python capsule which will free tess
             py::capsule free_when_done(tess, [](void* p) {
