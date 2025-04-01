@@ -10,7 +10,7 @@
 #include "poyntingvector.hpp"
 #include "straintensor.hpp"
 #include "strayfieldkernel.hpp"
-#include "stresstensor.hpp"
+#include "stressrate.hpp"
 #include "world.hpp"
 #include "wrappers.hpp"
 
@@ -20,9 +20,9 @@ void wrap_magnet(py::module& m) {
       .def_property_readonly("system", &Magnet::system)
       .def_property_readonly("world", &Magnet::mumaxWorld)
 
-      .def_property_readonly("elastic_displacement",
-                             &Magnet::elasticDisplacement)
+      .def_property_readonly("elastic_displacement", &Magnet::elasticDisplacement)
       .def_property_readonly("elastic_velocity", &Magnet::elasticVelocity)
+      .def_property_readonly("elastic_stress_tensor", &Magnet::elasticStressTensor)
 
       .def_readwrite("enable_as_stray_field_source",
                      &Magnet::enableAsStrayFieldSource)
@@ -31,6 +31,9 @@ void wrap_magnet(py::module& m) {
       .def_property("enable_elastodynamics",
                     &Magnet::enableElastodynamics,
                     &Magnet::setEnableElastodynamics)
+      .def_property("enable_elastic_displacement",
+                    &Magnet::enableElasticDisplacement,
+                    &Magnet::setEnableElasticDisplacement)
 
       // elasticity parameters
       .def_readonly("external_body_force", &Magnet::externalBodyForce)
@@ -60,7 +63,7 @@ void wrap_magnet(py::module& m) {
 
   // Elasticity
   m.def("strain_tensor", &strainTensorQuantity);
-  m.def("stress_tensor", &stressTensorQuantity);
+  m.def("stress_rate", &stressRateQuantity);
 
   m.def("elastic_force", &elasticForceQuantity);
   m.def("effective_body_force", &effectiveBodyForceQuantity);

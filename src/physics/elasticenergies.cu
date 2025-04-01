@@ -6,7 +6,6 @@
 #include "field.hpp"
 #include "parameter.hpp"
 #include "straintensor.hpp"
-#include "stresstensor.hpp"
 
 
 // ========== Kinetic Energy ==========
@@ -98,7 +97,7 @@ Field evalElasticEnergyDensity(const Magnet* magnet) {
   }
 
   int ncells = elField.grid().ncells();
-  Field stress = evalStressTensor(magnet);
+  Field stress = magnet->elasticStressTensor()->field();
   Field strain = evalStrainTensor(magnet);
   cudaLaunch(ncells, k_elasticEnergyDensity, elField.cu(), stress.cu(), strain.cu());
   return elField;

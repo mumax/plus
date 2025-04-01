@@ -192,12 +192,17 @@ class Magnet(ABC):
         """Elastic displacement vector (m).
 
         The elastic displacement is uninitialized (does not exist) if the
-        elastodynamics are disabled.
+        elastodynamics or elastic displacement are disabled.
+        
+        If enabled, this Variable is evolved in time using the elastic velocity
+        purely for convenience, but is otherwise not used in any further
+        physics. The user has to make sure themselves that the initial
+        displacement and stress tensor match.
         
         See Also
         --------
-        elastic_velocity
-        enable_elastodynamics
+        elastic_velocity, elastic_stress
+        enable_elastodynamics, enable_elastic_displacement
         """
         return Variable(self._impl.elastic_displacement)
 
@@ -212,7 +217,7 @@ class Magnet(ABC):
         The elastic velocity is uninitialized (does not exist) if the
         elastodynamics are disabled.
 
-        elastic_displacement
+        elastic_stress_tensor
         enable_elastodynamics
         """
         return Variable(self._impl.elastic_velocity)
@@ -222,11 +227,36 @@ class Magnet(ABC):
         self.elastic_velocity.set(value)
 
     @property
+    def elastic_stress_tensor(self):
+        """Elastic stress tensor (N/m²).
+
+        This quantity has six components (σxx, σyy, σzz, σxy, σxz, σyz),
+        which forms the symmetric stress tensor::
+
+               σxx σxy σxz
+               σxy σyy σyz
+               σxz σyz σzz
+
+        The elastic stress tensor is uninitialized (does not exist) if the
+        elastodynamics are disabled.
+        
+        See Also
+        --------
+        elastic_velocity
+        enable_elastodynamics
+        """
+        return Variable(self._impl.elastic_stress_tensor)
+
+    @elastic_stress_tensor.setter
+    def elastic_stress_tensor(self, value):
+        self.elastic_stress_tensor.set(value)
+
+    @property
     def enable_elastodynamics(self):
         """Enable/disable elastodynamic time evolution.
 
-        If elastodynamics are disabled (default), the elastic displacement and
-        velocity are uninitialized to save memory.
+        If elastodynamics are disabled (default), the elastic velocity and
+        stress tensor are uninitialized to save memory.
 
         Elastodynamics can not be used together with rigid normal and shear
         strain, where strain is set by the user instead.
@@ -240,6 +270,25 @@ class Magnet(ABC):
     @enable_elastodynamics.setter
     def enable_elastodynamics(self, value):
         self._impl.enable_elastodynamics = value
+
+    @property
+    def enable_elastic_displacement(self):
+        """Enable/disable tracking of the time evolution of the elastic
+        displacement. Elastodynamics also needs to be enabled.
+
+        If disabled (default), the elastic displacement is uninitialized to save
+        memory.
+
+        See Also
+        --------
+        elastic_displacement
+        enable_elastodynamics
+        """
+        return self._impl.enable_elastic_displacement
+
+    @enable_elastic_displacement.setter
+    def enable_elastic_displacement(self, value):
+        self._impl.enable_elastic_displacement = value
 
     # ----- ELASTIC PARAMETERS -------
 
@@ -260,11 +309,12 @@ class Magnet(ABC):
 
     @property
     def C11(self):
-        """Stiffness constant C11 = c22 = c33 of the stiffness tensor (N/m²).
+        """Stiffness constant C11 = C22 = C33 of the stiffness tensor (N/m²).
         
         See Also
         --------
-        C12, C44, stress_tensor
+        C12, C44
+        elastic_stress_tensor, strain_tensor
         """
         return Parameter(self._impl.C11)
 
@@ -274,11 +324,12 @@ class Magnet(ABC):
 
     @property
     def C12(self):
-        """Stiffness constant C12 = c13 = c23 of the stiffness tensor (N/m²).
+        """Stiffness constant C12 = C13 = C23 of the stiffness tensor (N/m²).
         
         See Also
         --------
-        C11, C44, stress_tensor
+        C11, C44
+        elastic_stress_tensor, strain_tensor
         """
         return Parameter(self._impl.C12)
 
@@ -288,11 +339,12 @@ class Magnet(ABC):
 
     @property
     def C44(self):
-        """Stiffness constant C44 = c55 = c66 of the stiffness tensor (N/m²).
+        """Stiffness constant C44 = C55 = C66 of the stiffness tensor (N/m²).
         
         See Also
         --------
-        C11, C12, stress_tensor
+        C11, C12
+        elastic_stress_tensor, strain_tensor
         """
         return Parameter(self._impl.C44)
 
@@ -381,8 +433,8 @@ class Magnet(ABC):
 
     @property
     def strain_tensor(self):
-        """Strain tensor (m/m), calculated according to ε = 1/2 (∇u + (∇u)^T),
-        with u the elastic displacement.
+        """Strain tensor (m/m), calculated according to the inverted Hooke's law
+        ε = c⁻¹σ.
 
         This quantity has six components (εxx, εyy, εzz, εxy, εxz, εyz),
         which forms the symmetric strain tensor::
@@ -399,34 +451,29 @@ class Magnet(ABC):
 
         See Also
         --------
-        elastic_energy, elastic_energy_density, elastic_displacement, stress_tensor
+        elastic_energy, elastic_energy_density, elastic_stress_tensor
         rigid_norm_strain, rigid_shear_strain
         """
         return FieldQuantity(_cpp.strain_tensor(self._impl))
-    
+
     @property
-    def stress_tensor(self):
-        """Stress tensor (N/m²), calculated according to Hooke's law
-        σ = cε.
-
-        This quantity has six components (σxx, σyy, σzz, σxy, σxz, σyz),
-        which forms the symmetric stress tensor::
-
-               σxx σxy σxz
-               σxy σyy σyz
-               σxz σyz σzz
+    def stress_rate(self):
+        """Time derivative of the stress tensor (Pa/s), calculated from the time
+        derivative of Hooke's law
+        dσ/dt = d(C:ε)/dt = C:(∇v + (∇v)^T)/2
+        and used to integrate the stress tensor.
 
         See Also
         --------
-        C11, C12, C44
+        elastic_velocity, elastic_stress_tensor
         """
-        return FieldQuantity(_cpp.stress_tensor(self._impl))
-
+        return FieldQuantity(_cpp.stress_rate)
+    
     @property
     def elastic_force(self):
         """Elastic body force density due to mechanical stress gradients (N/m³).
 
-        f = ∇σ = ∇(cε)
+        f = ∇σ
         
         See Also
         --------
@@ -502,7 +549,7 @@ class Magnet(ABC):
         
         See Also
         --------
-        elastic_energy, strain_tensor, stress_tensor
+        elastic_energy, strain_tensor, elastic_stress_tensor
         """
         return FieldQuantity(_cpp.elastic_energy_density(self._impl))
 
@@ -512,7 +559,7 @@ class Magnet(ABC):
         
         See Also
         --------
-        elastic_energy_density, strain_tensor, stress_tensor
+        elastic_energy_density, strain_tensor, elastic_stress_tensor
         """
         return ScalarQuantity(_cpp.elastic_energy(self._impl))
 
@@ -523,7 +570,7 @@ class Magnet(ABC):
         
         See Also
         --------
-        elastic_velocity, stress_tensor
+        elastic_velocity, elastic_stress_tensor
         """
         return FieldQuantity(_cpp.poynting_vector(self._impl))
 

@@ -28,6 +28,8 @@ class Variable : public FieldQuantity {
   virtual void set(real) const;
   virtual void set(real3) const;
 
+  void makeZero() const;
+
   // Assignment operators which call the respective set function
   void operator=(const Field& f) const { set(f); }
   void operator=(real val) const { set(val); }

@@ -12,5 +12,5 @@ Field evalStrainTensor(const Magnet*);
 
 // Strain tensor quantity with 6 symmetric strain components
 // [εxx, εyy, εzz, εxy, εxz, εyz],
-// calculated according to ε = 1/2 (∇u + (∇u)^T).
+// calculated according to ε = C⁻¹ : σ.
 M_FieldQuantity strainTensorQuantity(const Magnet*);

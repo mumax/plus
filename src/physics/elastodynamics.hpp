@@ -7,7 +7,7 @@ class Field;
 
 
 // Should only be checked for host-magnets: AFM or independent FM
-bool elasticityAssuredZero(const Magnet*);
+bool elasticityAssuredZero(const Magnet*);  // TODO: check relevancy in velocity-stress scheme
 
 Field evalEffectiveBodyForce(const Magnet*);  // TODO: or overload?
 Field evalElasticAcceleration(const Magnet*);

@@ -14,6 +14,7 @@
 #include "magnet.hpp"
 #include "minimizer.hpp"
 #include "relaxer.hpp"
+#include "stressrate.hpp"
 #include "system.hpp"
 #include "thermalnoise.hpp"
 #include "timesolver.hpp"
@@ -181,22 +182,30 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
     const Magnet* magnet = namedMagnet.second;
 
     // add elastodynamics if enabled
+    // No thermal noise
     // TODO: this does not play nice with relax()
     if (magnet->enableElastodynamics()) {
 
-      // change in displacement = velocity
-      DynamicEquation dvEq(
-          magnet->elasticDisplacement(),
-          std::shared_ptr<FieldQuantity>(elasticVelocityQuantity(magnet).clone()));
-          // No thermal noise
-      equations.push_back(dvEq);
-
       // change in velocity = acceleration
       DynamicEquation vaEq(
-          magnet->elasticVelocity(),
-          std::shared_ptr<FieldQuantity>(elasticAccelerationQuantity(magnet).clone()));
-          // No thermal noise
+        magnet->elasticVelocity(),
+        std::shared_ptr<FieldQuantity>(elasticAccelerationQuantity(magnet).clone()));
       equations.push_back(vaEq);
+
+      // change in stress = stress rate
+      DynamicEquation ssEq(
+        magnet->elasticStressTensor(),
+        std::shared_ptr<FieldQuantity>(stressRateQuantity(magnet).clone()));
+      equations.push_back(ssEq);
+    
+      // also track displacement if enabled
+      if (magnet->enableElasticDisplacement()) {
+        // change in displacement = velocity
+        DynamicEquation dvEq(
+          magnet->elasticDisplacement(),
+          std::shared_ptr<FieldQuantity>(elasticVelocityQuantity(magnet).clone()));
+        equations.push_back(dvEq);
+      }
     }
   }
 

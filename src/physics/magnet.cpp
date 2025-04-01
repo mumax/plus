@@ -159,9 +159,9 @@ void Magnet::removeStrayField(const Magnet* magnet) {
 }
 
 const Variable* Magnet::elasticDisplacement() const {
-  if (!this->enableElastodynamics()) {
+  if (!(this->enableElastodynamics() && this->enableElasticDisplacement())) {
     throw std::domain_error("elasticDisplacement Variable does not exist yet. "
-                            "Enable elastodynamics first.");
+                            "Enable elastodynamics and elastic displacement first.");
   }
   return elasticDisplacement_.get();
 }
@@ -172,6 +172,14 @@ const Variable* Magnet::elasticVelocity() const {
                             "Enable elastodynamics first.");
   }
   return elasticVelocity_.get();
+}
+
+const Variable* Magnet::elasticStressTensor() const {
+  if (!this->enableElastodynamics()) {
+    throw std::domain_error("elasticStressTensor Variable does not exist yet. "
+                            "Enable elastodynamics first.");
+  }
+  return elasticStressTensor_.get();
 }
 
 void Magnet::setEnableElastodynamics(bool value) {
@@ -196,17 +204,53 @@ void Magnet::setEnableElastodynamics(bool value) {
 
     if (value) {
       // properly initialize Variables now
-      elasticDisplacement_ = std::make_unique<Variable>(system(), 3,
-                                        name() + ":elastic_displacement", "m");
-      elasticDisplacement_->set(real3{0,0,0});
       elasticVelocity_ = std::make_unique<Variable>(system(), 3,
                                         name() + ":elastic_velocity", "m/s");
       elasticVelocity_->set(real3{0,0,0});
+
+      elasticStressTensor_ = std::make_unique<Variable>(system(), 6,  // sym. 3x3 tensor
+                                     name() + ":elastic_stress_tensor", "N/m2");
+      elasticStressTensor_->makeZero();
     } else {
       // free memory of unnecessary Variables
-      elasticDisplacement_.reset();
       elasticVelocity_.reset();
+      elasticStressTensor_.reset();
     }
+
+    // possibly update displacement tracking
+    this->setEnableElasticDisplacement(this->enableElasticDisplacement());
+
+    this->mumaxWorld()->resetTimeSolverEquations();
+  }
+}
+
+void Magnet::setEnableElasticDisplacement(bool value) {
+  // if this is a ferromagnetic sublattice, stop!
+  auto thisFM = this->asFM();
+  if (thisFM) {
+    if (thisFM->isSublattice()) {
+      throw std::invalid_argument(
+        "Cannot enable/disable elastic displacement for a sublattice.");
+    }
+  }
+
+  if (!this->enableElastodynamics()) {
+    throw std::domain_error("Cannot track elastic displacement without elastodynamics. "
+                            "Enable elastodynamics first.");
+  }
+
+  enableElasticDisplacement_ = value;
+
+  if (value && this->enableElastodynamics() && !elasticDisplacement_) {
+    // properly initialize Variable now
+    elasticDisplacement_ = std::make_unique<Variable>(system(), 3,
+                                      name() + ":elastic_displacement", "m");
+    elasticDisplacement_->set(real3{0,0,0});
+
+    this->mumaxWorld()->resetTimeSolverEquations();
+  } else if ((!value || !this->enableElastodynamics()) && elasticDisplacement_) {
+    // free memory of unnecessary Variable
+    elasticDisplacement_.reset();
 
     this->mumaxWorld()->resetTimeSolverEquations();
   }

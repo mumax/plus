@@ -1,7 +1,6 @@
 #include "cudalaunch.hpp"
 #include "elastodynamics.hpp"
 #include "poyntingvector.hpp"
-#include "stresstensor.hpp"
 
 
 __global__ void k_poyntingVector(CuField poyntingField,
@@ -38,10 +37,10 @@ Field evalPoyntingVector(const Magnet* magnet) {
   }
 
   int ncells = poyntingField.grid().ncells();
-  Field stress = evalStressTensor(magnet);
+  CuField stress = magnet->elasticStressTensor()->field().cu();
   CuField velocity = magnet->elasticVelocity()->field().cu();
 
-  cudaLaunch(ncells, k_poyntingVector, poyntingField.cu(), stress.cu(), velocity);
+  cudaLaunch(ncells, k_poyntingVector, poyntingField.cu(), stress, velocity);
   return poyntingField;
 }
 

@@ -60,17 +60,22 @@ class Magnet {
   // these take a lot of memory. Don't initialize unless wanted!
   std::unique_ptr<Variable> elasticDisplacement_;
   std::unique_ptr<Variable> elasticVelocity_;
+  std::unique_ptr<Variable> elasticStressTensor_;
   bool enableElastodynamics_;
+  bool enableElasticDisplacement_;
 
  public:
   bool enableAsStrayFieldSource;
   bool enableAsStrayFieldDestination;
   bool enableElastodynamics() const {return enableElastodynamics_;}
   void setEnableElastodynamics(bool);
+  bool enableElasticDisplacement() const {return enableElasticDisplacement_;}
+  void setEnableElasticDisplacement(bool);
 
   // Elasticity
   const Variable* elasticDisplacement() const;
   const Variable* elasticVelocity() const;
+  const Variable* elasticStressTensor() const;
 
   VectorParameter externalBodyForce;  // Externally applied force density
   VectorParameter rigidNormStrain;

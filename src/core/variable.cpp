@@ -67,6 +67,10 @@ void Variable::set(real3 value) const {
   field_->setUniformComponent(2, value.z);
 }
 
+void Variable::makeZero() const {
+  field_->makeZero();
+}
+
 NormalizedVariable::NormalizedVariable(std::shared_ptr<const System> system,
                                        int ncomp,
                                        std::string name,

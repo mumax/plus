@@ -58,8 +58,6 @@ add_library(physics STATIC
     relaxer.cpp
     straintensor.cu
     straintensor.hpp
-    stresstensor.cu
-    stresstensor.hpp
     strayfield.cpp
     strayfield.hpp
     strayfieldbrute.cu
@@ -68,6 +66,8 @@ add_library(physics STATIC
     strayfieldfft.hpp
     strayfieldkernel.cu
     strayfieldkernel.hpp
+    stressrate.cu
+    stressrate.hpp
     stt.cu
     stt.hpp
     thermalnoise.cu
