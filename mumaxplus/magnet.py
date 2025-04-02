@@ -467,7 +467,7 @@ class Magnet(ABC):
         --------
         elastic_velocity, elastic_stress_tensor
         """
-        return FieldQuantity(_cpp.stress_rate)
+        return FieldQuantity(_cpp.stress_rate(self._impl))
     
     @property
     def elastic_force(self):
