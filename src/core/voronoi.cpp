@@ -5,24 +5,23 @@
 #include "gpubuffer.hpp"
 #include "voronoi.hpp"
 
-VoronoiTessellator::VoronoiTessellator(Grid grid, real grainsize, real3 cellsize)
-    : grid(grid),
-      grainsize_(grainsize),
-      cellsize_(cellsize),
-      distReal_(0.0, 1.0) {
+VoronoiTessellator::VoronoiTessellator(real grainsize, unsigned int maxIdx, int seed)
+    : grainsize_(grainsize),
+      seed_(seed),
+      distReal_(0.0, 1.0),
+      distInt_(0, maxIdx) {
         real tilesize_in_grains = 2; // tile size in unit grains
         tilesize_ = tilesize_in_grains * grainsize;
         lambda_ = tilesize_in_grains * tilesize_in_grains;
-        tessellation = this->generate();
     }
 
-GpuBuffer<unsigned int> VoronoiTessellator::generate() {
+GpuBuffer<unsigned int> VoronoiTessellator::generate(Grid grid, real3 cellsize) {
 
    std::vector<unsigned int> data(grid.ncells());
    for (int nx = 0; nx < grid.size().x; nx++) {
         for (int ny = 0; ny < grid.size().y; ny++) {
-            real3 coo = real3{nx * cellsize_.x,
-                              ny * cellsize_.y,
+            real3 coo = real3{nx * cellsize.x,
+                              ny * cellsize.y,
                               0};
             data[nx + grid.size().x * ny] = regionOf(coo);
         }
@@ -60,7 +59,7 @@ std::vector<Center> VoronoiTessellator::centersInTile(int3 pos) {
 
     int64_t seed = (int64_t(pos.y) + (1<<24)) * (1<<24)
                  + (int64_t(pos.x) + (1<<24));
-    engine_.seed (seed ^ 1234567);
+    engine_.seed (seed ^ seed_);
 
     int N = Poisson(lambda_);
 
@@ -70,8 +69,7 @@ std::vector<Center> VoronoiTessellator::centersInTile(int3 pos) {
         real cx = (pos.x + distReal_(engine_)) * tilesize_;
         real cy = (pos.y + distReal_(engine_)) * tilesize_;
 
-        centers[n] = Center(real3{cx, cy, 0}, centerIdx_);
-        centerIdx_ += 1;
+        centers[n] = Center(real3{cx, cy, 0}, distInt_(engine_));
     }
     
     // Cache centers belonging to this tile

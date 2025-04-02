@@ -29,16 +29,16 @@ struct Int3Hash {
 
 class VoronoiTessellator {
  public:
-  VoronoiTessellator(Grid grid, real grainsize, real3 cellsize);
+  VoronoiTessellator(real grainsize, unsigned int maxIdx=256, int seed=1234567);
   ~VoronoiTessellator() = default;
 
   // * Generate a Voronoi tessellation
-  GpuBuffer<unsigned int> generate();
+  GpuBuffer<unsigned int> generate(Grid grid, real3 cellsize);
 
- private:
   // * Calc nearest center and assign center index to coo
   unsigned int regionOf(real3 coo);
 
+  private:
   // * Calculate position and index of centers in tile
   std::vector<Center> centersInTile(int3 pos);
 
@@ -49,17 +49,16 @@ class VoronoiTessellator {
   Tile tileOfCell(real3 coo);
 
 public:
-  Grid grid;
   GpuBuffer<unsigned int> tessellation;
 private:
   real grainsize_;
-  real3 cellsize_;
   real tilesize_;
-  unsigned int centerIdx_ = 0;
+  int seed_;
   std::unordered_map<int3, Tile, Int3Hash> tileCache_;
 
  // RNG related members
   real lambda_; // Poisson parameter
   std::default_random_engine engine_;
   std::uniform_real_distribution<> distReal_;
+  std::uniform_int_distribution<> distInt_;
 };

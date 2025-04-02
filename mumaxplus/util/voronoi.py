@@ -3,18 +3,44 @@ import numpy as _np
 import _mumaxpluscpp as _cpp
 class VoronoiTessellator:
 
-    def __init__(self, world, grid, grainsize):
-        self._impl = _cpp.VoronoiTessellator(grid._impl, grainsize, world.cellsize)
+    def __init__(self, grainsize, max_idx=256, seed=1234567):
+        """Create a Voronoi tessellator instance.
         
-    @property
-    def tessellation(self):
-        """Returns a Voronoi tessellation.
+        This class is used to generate a Voronoi tessellation, which can
+        be done using either the `generate` or the `coo_to_idx` method.
+
+        **Important:** other methods in this class cannot be used unless
+        `generate` has been called. E.g. retrieving a list of region
+        indices requires a specified world and grid.
+
+        Parameters
+        ----------
+        grainsize : float
+            The average grain diameter.
+        max_idx : int (default=256)
+            The maximum region index within the tessellation. This value
+            has no upper bound.
+        seed : int (default=1234567)
+            The seed of the used random number generators. This seed affects
+            the values of the generated region indices and the number and
+            positions of the Voronoi centers
+        """
+        self._impl = _cpp.VoronoiTessellator(grainsize, max_idx, seed)
+
+    def generate(self, world, grid):
+        """Generates a Voronoi tessellation.
 
         Returns an ndarray of shape (nz, ny, nx) which is filled
         with region indices."""
+        self.tessellation = self._impl.generate(grid._impl, world.cellsize)
 
-        return self._impl.tessellation
+        return self.tessellation
     
+    def coo_to_idx(self, x, y, z):
+        """Returns the region index (int) of the given coordinate within the
+        Voronoi tessellation."""
+        return self._impl.coo_to_idx((x,y,z))
+
     @property
     def indexDictionary(self):
         """Create a dictionary where each region (key) is linked
@@ -38,11 +64,11 @@ class VoronoiTessellator:
     @property
     def indices(self):
         """Returns list of unique region indices."""
-        return _np.unique(_np.ravel(self._impl.tessellation)).astype(int)
+        return _np.unique(_np.ravel(self.tessellation)).astype(int)
 
     @property
     def number_of_regions(self):
         """Returns number of unique region indices."""
-        return _np.unique(_np.ravel(self._impl.tessellation)).size
+        return _np.unique(_np.ravel(self.tessellation)).size
 
     # TODO: implement (C++) function which returns neighbouring regions of a certain idx

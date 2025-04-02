@@ -11,10 +11,14 @@
 void wrap_voronoi(py::module& m) {
     py::class_<VoronoiTessellator>(m, "VoronoiTessellator")
 
-        .def(py::init<Grid, real, real3>(), py::arg("grid"), py::arg("grainsize"), py::arg("cellsize"))
+        .def(py::init<real, unsigned int, int>(),
+                py::arg("grainsize"),
+                py::arg("max_idx"),
+                py::arg("seed"))
+        .def("coo_to_idx", &VoronoiTessellator::regionOf)
         // TODO: create template function (wrap_system.cpp)
-        .def_property_readonly("tessellation", [](VoronoiTessellator t) {
-            unsigned int* tess = t.generate().getHostCopy();
+        .def("generate", [](VoronoiTessellator& t, Grid grid, real3 cellsize) {
+            unsigned int* tess = t.generate(grid, cellsize).getHostCopy();
 
             // Create python capsule which will free tess
             py::capsule free_when_done(tess, [](void* p) {
@@ -22,7 +26,7 @@ void wrap_voronoi(py::module& m) {
             delete[] tess;
             });
 
-            int3 size = t.grid.size();
+            int3 size = grid.size();
             int shape[3] = {size.z, size.y, size.x};
             int strides[3];
             strides[0] = sizeof(unsigned int) * size.x * size.y;
