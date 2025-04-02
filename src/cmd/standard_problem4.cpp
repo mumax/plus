@@ -22,7 +22,9 @@ void standard_problem4() {
 
   MumaxWorld mWorld(cellsize);
   Grid mGrid(n);
-  auto magnet = mWorld.addFerromagnet(mGrid, 3, ferromagnet_name);
+  GpuBuffer<bool> geometry;
+  GpuBuffer<unsigned int> regions;
+  auto magnet = mWorld.addFerromagnet(mGrid, geometry, regions, ferromagnet_name);
 
   magnet->msat.set(800E3);
   magnet->aex.set(13E-12);

@@ -5,7 +5,7 @@
 int main() {
   int example_number = 0;
 
-  std::cout << "************ Mumax C++ Exaples ************\n"
+  std::cout << "************ Mumax C++ Examples ************\n"
             << "1. Standard Problem 4.\n"
             << "2. Spinwave Dispersion.\n"
             << "*******************************************\n"
