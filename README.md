@@ -18,15 +18,13 @@ You should install these yourself
 * On Windows (good luck): MSVC 2019
 
 These will be installed automatically within the conda environment
-* cmake 3.16
-* Python 3.8
-* pybind11 v2.5
+* cmake 4.0.0
+* Python 3.13
+* pybind11 v2.13.6
 * NumPy
 * matplotlib
 * SciPy
 * Sphinx
-
-As of now, we are stuck with Python 3.8, because newer versions of pybind11 do not work well with CUDA. We are working on a (clean) way around this issue.
 
 ## Installation from Source
 
