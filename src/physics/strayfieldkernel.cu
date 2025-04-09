@@ -4,6 +4,7 @@
 #include "field.hpp"
 #include "grid.hpp"
 #include "newell.hpp"
+#include "demagasymptotic.hpp"
 #include "strayfieldkernel.hpp"
 #include "system.hpp"
 #include "world.hpp"
@@ -37,13 +38,41 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
   for (int i = -pbcRepetitions.x; i <= pbcRepetitions.x; i++) {
     for (int j = -pbcRepetitions.y; j <= pbcRepetitions.y; j++) {
       for (int k = -pbcRepetitions.z; k <= pbcRepetitions.z; k++) {
-          int3 coo_ = coo + (int3{i,j,k} * mastergrid.size());
+        int3 coo_ = coo + (int3{i,j,k} * mastergrid.size());
+
+        // Assume the following errors on the analytical and asymptotic result
+        // E_analytic = eps R³/V
+        // E_asymptotic = V R²/(5(R²-dmax²)) dmax^(n-3)/R^(n)
+        // Here V is dx*dy*dz, dmax = max(dx,dy,dz), n is the order of asymptote
+        // and eps is a constant determined by trial and error.
+        // Use the analytical model when
+        // E_analytic / E_asymptotic < 1
+
+        // Todo: make the order variable?
+        // Todo: switch to O(R⁻³) when far away?
+
+        double x = coo_.x * cellsize.x;
+        double y = coo_.y * cellsize.y;
+        double z = coo_.z * cellsize.z;
+        double R = sqrtf(x*x + y*y + z*z);
+        double V = cellsize.x * cellsize.y * cellsize.z;
+        double h = fmax(cellsize.x,fmax(cellsize.y,cellsize.z));
+        
+        if (5 * 1e-10 * (R*R - h*h)/(V*V) * pow(R,11+1)/pow(h,11-3) < 1) {
           Nxx += calcNewellNxx(coo_, cellsize);
           Nyy += calcNewellNyy(coo_, cellsize);
           Nzz += calcNewellNzz(coo_, cellsize);
           Nxy += calcNewellNxy(coo_, cellsize);
           Nxz += calcNewellNxz(coo_, cellsize);
           Nyz += calcNewellNyz(coo_, cellsize);
+        } else {
+          Nxx += calcAsymptoticNxx(coo_, cellsize);
+          Nyy += calcAsymptoticNyy(coo_, cellsize);
+          Nzz += calcAsymptoticNzz(coo_, cellsize);
+          Nxy += calcAsymptoticNxy(coo_, cellsize);
+          Nxz += calcAsymptoticNxz(coo_, cellsize);
+          Nyz += calcAsymptoticNyz(coo_, cellsize);
+        }
       }
     }
   }

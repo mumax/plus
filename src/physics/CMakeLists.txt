@@ -12,6 +12,8 @@ add_library(physics STATIC
     constants.hpp
     demag.cpp
     demag.hpp
+    demagasymptotic.cu
+    demagasymptotic.hpp
     dmi.cu
     dmi.hpp
     dmitensor.cpp
