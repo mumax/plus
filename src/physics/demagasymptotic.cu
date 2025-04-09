@@ -4,9 +4,9 @@
 #include <cstdio>
 
 
-// Todo: Allow a user to chose an order and don't hardcode the orders?
-//       This would need variable array sizes :(
+// Todo: Allow a user to chose an order?
 
+// Function to calculate factorials
 __host__ __device__ int fac(int val) {
   double result = 1;
   for (int i = 1; i <= val; i++) {
@@ -15,9 +15,9 @@ __host__ __device__ int fac(int val) {
   return result;
 }
 
-/** Calculate the asymptotic solution of the demagkernel component Nxx up to
- *  order R⁻¹¹. This method is based on the method used in OOMMF.
- *  https://math.nist.gov/~MDonahue/talks/mmm2020-talk.pdf
+/** Calculate the asymptotic solution of the demagkernel component Nxx. 
+    This method is based on the method used in OOMMF.
+    https://math.nist.gov/~MDonahue/talks/mmm2020-talk.pdf
  */
 __host__ __device__ real calcAsymptoticNxx(int3 idx, real3 cellsize, int* expansionNxxptr, size_t sizeNxx) {
 
@@ -59,9 +59,9 @@ __host__ __device__ real calcAsymptoticNxx(int3 idx, real3 cellsize, int* expans
   return result;
 }
 
-/** Calculate the asymptotic solution of the demagkernel component Nxy up to
- *  order R⁻¹¹. This method is based on the method used in OOMMF.
- *  https://math.nist.gov/~MDonahue/talks/mmm2020-talk.pdf
+/** Calculate the asymptotic solution of the demagkernel component Nxy.
+    This method is based on the method used in OOMMF.
+    https://math.nist.gov/~MDonahue/talks/mmm2020-talk.pdf
  */
 __host__ __device__ real calcAsymptoticNxy(int3 idx, real3 cellsize, int* expansionNxyptr, size_t sizeNxy) {
 
