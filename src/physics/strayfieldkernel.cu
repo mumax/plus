@@ -2,11 +2,13 @@
 
 #include "cudalaunch.hpp"
 #include "field.hpp"
+#include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "newell.hpp"
 #include "demagasymptotic.hpp"
 #include "strayfieldkernel.hpp"
 #include "system.hpp"
+#include <vector>
 #include "world.hpp"
 
 StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world) {
@@ -24,7 +26,10 @@ std::shared_ptr<const System> StrayFieldKernel::kernelSystem() const {
 }
 
 __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
-                                   const int3 pbcRepetitions) {
+                                   const int3 pbcRepetitions,
+                                   int* expansionNxxptr, size_t sizeNxx,
+                                   int* expansionNxyptr, size_t sizeNxy,
+                                   int order) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!kernel.cellInGrid(idx))
     return;
@@ -58,7 +63,7 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
         double V = cellsize.x * cellsize.y * cellsize.z;
         double h = fmax(cellsize.x,fmax(cellsize.y,cellsize.z));
         
-        if (5 * 1e-10 * (R*R - h*h)/(V*V) * pow(R,11+1)/pow(h,11-3) < 1) {
+        if (5 * 1e-10 * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
           Nxx += calcNewellNxx(coo_, cellsize);
           Nyy += calcNewellNyy(coo_, cellsize);
           Nzz += calcNewellNzz(coo_, cellsize);
@@ -66,12 +71,12 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
           Nxz += calcNewellNxz(coo_, cellsize);
           Nyz += calcNewellNyz(coo_, cellsize);
         } else {
-          Nxx += calcAsymptoticNxx(coo_, cellsize);
-          Nyy += calcAsymptoticNyy(coo_, cellsize);
-          Nzz += calcAsymptoticNzz(coo_, cellsize);
-          Nxy += calcAsymptoticNxy(coo_, cellsize);
-          Nxz += calcAsymptoticNxz(coo_, cellsize);
-          Nyz += calcAsymptoticNyz(coo_, cellsize);
+          Nxx += calcAsymptoticNxx(coo_, cellsize, expansionNxxptr, sizeNxx);
+          Nyy += calcAsymptoticNyy(coo_, cellsize, expansionNxxptr, sizeNxx);
+          Nzz += calcAsymptoticNzz(coo_, cellsize, expansionNxxptr, sizeNxx);
+          Nxy += calcAsymptoticNxy(coo_, cellsize, expansionNxyptr, sizeNxy);
+          Nxz += calcAsymptoticNxz(coo_, cellsize, expansionNxyptr, sizeNxy);
+          Nyz += calcAsymptoticNyz(coo_, cellsize, expansionNxyptr, sizeNxy);
         }
       }
     }
@@ -85,8 +90,14 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
 }
 
 void StrayFieldKernel::compute() {
+  int order = 11;
+  std::vector<std::vector<int>> initialNxx = {{2,2,0,0,5,0,0,0}, {-1,0,2,0,5,0,0,0}, {-1,0,0,2,5,0,0,0}};
+  std::vector<std::vector<int>> initialNxy = {{3,1,1,0,5,0,0,0}};
+  GpuBuffer<int> expansionNxx(uptoOrder(order-3, initialNxx));
+  GpuBuffer<int> expansionNxy(uptoOrder(order-3, initialNxy));
   cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(),
-             mastergrid(), pbcRepetitions());
+             mastergrid(), pbcRepetitions(), expansionNxx.get(), expansionNxx.size(),
+             expansionNxy.get(), expansionNxy.size(), order);
 }
 
 Grid StrayFieldKernel::grid() const {

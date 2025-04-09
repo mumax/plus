@@ -13,6 +13,7 @@ add_library(physics STATIC
     demag.cpp
     demag.hpp
     demagasymptotic.cu
+    demagasymptotic.cpp
     demagasymptotic.hpp
     dmi.cu
     dmi.hpp
