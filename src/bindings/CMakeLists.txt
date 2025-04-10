@@ -1,5 +1,9 @@
 project(mumaxplus)
 
+# disable pybind11::(thin_)lto, as this does not work with CUDA
+# https://github.com/pybind/pybind11/issues/4825
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
+
 add_subdirectory(pybind11)
 
 pybind11_add_module(_mumaxpluscpp
