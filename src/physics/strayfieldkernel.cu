@@ -11,13 +11,14 @@
 #include <vector>
 #include "world.hpp"
 
-StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world) {
+StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order)
+    : order_(order) {
   kernel_ = std::make_unique<Field>(std::make_shared<System>(world, grid), 6);
   compute();
 }
 
-StrayFieldKernel::StrayFieldKernel(Grid dst, Grid src, const World* world)
-    : StrayFieldKernel(kernelGrid(dst, src), world) {}
+StrayFieldKernel::StrayFieldKernel(Grid dst, Grid src, const World* world, int order)
+    : StrayFieldKernel(kernelGrid(dst, src), world, order) {}
 
 StrayFieldKernel::~StrayFieldKernel() {}
 
@@ -90,14 +91,13 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
 }
 
 void StrayFieldKernel::compute() {
-  int order = 11;
   std::vector<std::vector<int>> initialNxx = {{2,2,0,0,5,0,0,0}, {-1,0,2,0,5,0,0,0}, {-1,0,0,2,5,0,0,0}};
   std::vector<std::vector<int>> initialNxy = {{3,1,1,0,5,0,0,0}};
-  GpuBuffer<int> expansionNxx(uptoOrder(order-3, initialNxx));
-  GpuBuffer<int> expansionNxy(uptoOrder(order-3, initialNxy));
+  GpuBuffer<int> expansionNxx(uptoOrder(order_-3, initialNxx));
+  GpuBuffer<int> expansionNxy(uptoOrder(order_-3, initialNxy));
   cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(),
              mastergrid(), pbcRepetitions(), expansionNxx.get(), expansionNxx.size(),
-             expansionNxy.get(), expansionNxy.size(), order);
+             expansionNxy.get(), expansionNxy.size(), order_);
 }
 
 Grid StrayFieldKernel::grid() const {
@@ -112,7 +112,9 @@ real3 StrayFieldKernel::cellsize() const {
 const int3 StrayFieldKernel::pbcRepetitions() const {
   return kernelSystem()->world()->pbcRepetitions();
 }
-
+int StrayFieldKernel::order() const {
+  return order_;
+}
 const Field& StrayFieldKernel::field() const {
   return *kernel_;
 }

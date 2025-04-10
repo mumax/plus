@@ -37,7 +37,7 @@ class StrayFieldExecutor {
   static std::unique_ptr<StrayFieldExecutor> create(
       const Magnet* magnet,
       std::shared_ptr<const System> system,
-      Method method);
+      Method method, int order);
 
  protected:
   /** Constructor only to be used in constructor of derived classes. */
@@ -53,6 +53,9 @@ class StrayFieldExecutor {
 
   /** Return the method of the executor. */
   virtual Method method() const = 0;
+
+  /** Return the order of the executor. */
+  virtual int order() const = 0;
 
  protected:
   /** Source of the stray field*/
@@ -81,7 +84,8 @@ class StrayField : public FieldQuantity {
    */
   StrayField(const Magnet* magnet,
              std::shared_ptr<const System> system,
-             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
+             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO,
+             int order = 11);
 
   /**
    * Constructor of a StrayField on a specified grid.
@@ -94,13 +98,17 @@ class StrayField : public FieldQuantity {
    */
   StrayField(const Magnet* magnet,
              Grid grid,
-             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
+             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO,
+             int order = 11);
 
   /** Destructor. */
   ~StrayField();
 
   /** Set the method for the computation of the stray field. */
   void setMethod(StrayFieldExecutor::Method);
+
+  /** Set the order for the computation of the stray field. */
+  void setOrder(int);
 
   /** Recreate the StrayFieldExecutor. */
   void recreateStrayFieldExecutor();

@@ -34,3 +34,9 @@ class StrayField(FieldQuantity):
             The default value is "fft".
         """
         self._impl.set_method(method)
+
+    def set_order(self, order):
+        """Set the order of 1/R in the asymptotic expansion of the demag kernel.
+        The default value is 11.
+        """
+        self._impl.set_order(order)

@@ -58,9 +58,9 @@ __global__ void k_demagfield(CuField hField,
 
 StrayFieldBruteExecutor::StrayFieldBruteExecutor(
     const Magnet* magnet,
-    std::shared_ptr<const System> system)
+    std::shared_ptr<const System> system, int order)
     : StrayFieldExecutor(magnet, system),
-      kernel_(system->grid(), magnet_->grid(), magnet_->world()) {}
+      kernel_(system->grid(), magnet_->grid(), magnet_->world(), order) {}
 
 Field StrayFieldBruteExecutor::exec() const {
   

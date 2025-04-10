@@ -14,17 +14,18 @@
 std::unique_ptr<StrayFieldExecutor> StrayFieldExecutor::create(
     const Magnet* magnet,
     std::shared_ptr<const System> system,
-    Method method) {
+    Method method,
+    int order) {
   switch (method) {
     case StrayFieldExecutor::METHOD_AUTO:
       // TODO: make smart choice (dependent on the
       // grid sizes) when choosing between fft or
       // brute method. For now, we choose fft method
-      return std::make_unique<StrayFieldFFTExecutor>(magnet, system);
+      return std::make_unique<StrayFieldFFTExecutor>(magnet, system, order);
     case StrayFieldExecutor::METHOD_FFT:
-      return std::make_unique<StrayFieldFFTExecutor>(magnet, system);
+      return std::make_unique<StrayFieldFFTExecutor>(magnet, system, order);
     case StrayFieldExecutor::METHOD_BRUTE:
-      return std::make_unique<StrayFieldBruteExecutor>(magnet, system);
+      return std::make_unique<StrayFieldBruteExecutor>(magnet, system, order);
     default:  // TODO: should it throw an error or default to METHOD_AUTO?
       throw std::invalid_argument("Stray field executor method number '"
                        + std::to_string(method) + "' does not exist");
@@ -37,29 +38,37 @@ StrayFieldExecutor::StrayFieldExecutor(const Magnet* magnet,
 
 StrayField::StrayField(const Magnet* magnet,
                        std::shared_ptr<const System> system,
-                       StrayFieldExecutor::Method method)
+                       StrayFieldExecutor::Method method,
+                       int order)
     : magnet_(magnet), system_(system), executor_(nullptr) {
-  setMethod(method);
+  executor_ = StrayFieldExecutor::create(magnet_, system_, method, order);
 }
 
 StrayField::StrayField(const Magnet* magnet,
                        Grid grid,
-                       StrayFieldExecutor::Method method)
+                       StrayFieldExecutor::Method method,
+                       int order)
     : magnet_(magnet), executor_(nullptr) {
   system_ = std::make_shared<System>(magnet->world(), grid);
-  setMethod(method);
+  executor_ = StrayFieldExecutor::create(magnet_, system_, method, order);
 }
 
 StrayField::~StrayField() {}
 
 void StrayField::setMethod(StrayFieldExecutor::Method method) {
   if (!executor_ || executor_->method() != method) {
-    executor_ = StrayFieldExecutor::create(magnet_, system_, method);
+    executor_ = StrayFieldExecutor::create(magnet_, system_, method, executor_->order());
+  }
+}
+
+void StrayField::setOrder(int order) {
+  if (!executor_ || executor_->order() != order) {
+    executor_ = StrayFieldExecutor::create(magnet_, system_, executor_->method(), order);
   }
 }
 
 void StrayField::recreateStrayFieldExecutor() {
-  executor_ = StrayFieldExecutor::create(magnet_, system_, executor_->method());
+  executor_ = StrayFieldExecutor::create(magnet_, system_, executor_->method(), executor_->order());
 }
 
 const Magnet* StrayField::source() const {

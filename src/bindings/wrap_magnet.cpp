@@ -53,8 +53,8 @@ void wrap_magnet(py::module& m) {
           py::return_value_policy::reference)
   ;
 
-  m.def("_demag_kernel", [](const Magnet* m) {
-    StrayFieldKernel demagKernel(m->grid(), m->grid(), m->world());
+  m.def("_demag_kernel", [](const Magnet* m, int order) {
+    StrayFieldKernel demagKernel(m->grid(), m->grid(), m->world(), order);
     return fieldToArray(demagKernel.field());
   });
 

@@ -23,7 +23,7 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
    * @param system the system in which to compute the stray field
    */
   StrayFieldFFTExecutor(const Magnet* magnet,
-                        std::shared_ptr<const System> system);
+                        std::shared_ptr<const System> system, int order);
 
   /** Destruct the executor. */
   ~StrayFieldFFTExecutor();
@@ -33,6 +33,9 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
 
   /** Return the computation method which is METHOD_FFT. */
   Method method() const { return StrayFieldExecutor::METHOD_FFT; }
+
+  /** Return the computation order. */
+  int order() const { return kernel_.order(); }
 
  private:
   StrayFieldKernel kernel_;
