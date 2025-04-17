@@ -40,7 +40,7 @@ StrayField::StrayField(const Magnet* magnet,
                        std::shared_ptr<const System> system,
                        StrayFieldExecutor::Method method,
                        int order)
-    : magnet_(magnet), system_(system), executor_(nullptr) {
+    : magnet_(magnet), system_(system) {
   executor_ = StrayFieldExecutor::create(magnet_, system_, method, order);
 }
 
@@ -56,13 +56,13 @@ StrayField::StrayField(const Magnet* magnet,
 StrayField::~StrayField() {}
 
 void StrayField::setMethod(StrayFieldExecutor::Method method) {
-  if (!executor_ || executor_->method() != method) {
+  if (executor_->method() != method) {
     executor_ = StrayFieldExecutor::create(magnet_, system_, method, executor_->order());
   }
 }
 
 void StrayField::setOrder(int order) {
-  if (!executor_ || executor_->order() != order) {
+  if (executor_->order() != order) {
     executor_ = StrayFieldExecutor::create(magnet_, system_, executor_->method(), order);
   }
 }

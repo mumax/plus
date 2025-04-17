@@ -21,7 +21,7 @@ void wrap_strayfield(py::module& m) {
         } else {
           throw std::invalid_argument("Method should be \"fft\" or \"brute\"");
         }
-      });
-      //.def("set_order", &StrayField::setOrder, py::arg("order"),
-      //     "Set the order of 1/R in the asymptotic expansion of the demag kernel.");
+      })
+      .def("set_order", &StrayField::setOrder, py::arg("order"),
+           "Set the order of 1/R in the asymptotic expansion of the demag kernel.");
 }

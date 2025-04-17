@@ -4,7 +4,7 @@
 #include <vector>
 
 /* Calculate all needed derivatives for the asymptotic expansion and put the
-   result in one list.
+   result in one vector.
    The derivatives are always taken of functions of the form
    f = N * dx^d * dy^e * dz^f * x^a * y^b * z^c / R^P
    This results in a function of the same form. Each derivative generates three
@@ -138,7 +138,7 @@ std::vector<std::vector<int>> dz(std::vector<std::vector<int>> expansion) {
     return cleanup(new_expansion);
 }
 
-// Clean up by adding N values of terms with the same qoefficients
+// Clean up by adding N values of terms with the same coefficients
 std::vector<std::vector<int>> cleanup(std::vector<std::vector<int>> expansion) {
     std::vector<std::vector<int>> new_expansion;
     for (size_t i = 0; i < expansion.size(); ++i) {
@@ -173,14 +173,18 @@ void combinationsRecursive(
 ) {
     if (depth == current.size()) {
         int total = 0;
+
         for (int v : current) total += v;
+
         if (total > 0 && total <= max_order)
             result.push_back(current);
+
         return;
     }
 
     for (int val : even_orders) {
         current[depth] = val;
+
         combinationsRecursive(even_orders, max_order, depth + 1, current, result);
     }
 }
@@ -188,13 +192,13 @@ void combinationsRecursive(
 /* Determine how many times you should take the derivative to x, y and z for a term.
   This returns a vector containing vectors of three values. Those being the
   derivatives to x, y and z.*/
-std::vector<std::vector<int>> derivativeCombinations(int num_variables, int max_order) {
+std::vector<std::vector<int>> derivativeCombinations(int max_order) {
     std::vector<int> even_orders;
     for (int i = 0; i <= max_order; i += 2)
         even_orders.push_back(i);
 
     std::vector<std::vector<int>> valid_combinations;
-    std::vector<int> current(num_variables, 0);
+    std::vector<int> current(3, 0);
 
     combinationsRecursive(even_orders, max_order, 0, current, valid_combinations);
 
@@ -202,9 +206,8 @@ std::vector<std::vector<int>> derivativeCombinations(int num_variables, int max_
 }
 
 // Generate all terms up to a specific order (also including that order).
-std::vector<int> uptoOrder(int order, std::vector<std::vector<int>> expansion) {
-    int num_variables = 3;
-    std::vector<std::vector<int>> combos = derivativeCombinations(num_variables, order);
+std::vector<int> upToOrder(int order, std::vector<std::vector<int>> expansion) {
+    std::vector<std::vector<int>> combos = derivativeCombinations(order);
     std::vector<int> result;
 
     for (const std::vector<int>& term : expansion) {

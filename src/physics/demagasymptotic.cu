@@ -4,11 +4,9 @@
 #include <cstdio>
 
 
-// Todo: Allow a user to chose an order?
-
 // Function to calculate factorials
 __host__ __device__ int fac(int val) {
-  double result = 1;
+  int result = 1;
   for (int i = 1; i <= val; i++) {
     result *= i;
   }
@@ -27,7 +25,7 @@ __host__ __device__ real calcAsymptoticNxx(int3 idx, real3 cellsize, int* expans
   double x = idx.x * hx;
   double y = idx.y * hy;
   double z = idx.z * hz;
-  double R = sqrtf(x*x + y*y + z*z);
+  double R = sqrt(x*x + y*y + z*z);
   
   double result = 0;
   

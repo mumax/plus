@@ -1,4 +1,5 @@
 #include <memory>
+#include <vector>
 
 #include "cudalaunch.hpp"
 #include "field.hpp"
@@ -8,7 +9,6 @@
 #include "demagasymptotic.hpp"
 #include "strayfieldkernel.hpp"
 #include "system.hpp"
-#include <vector>
 #include "world.hpp"
 
 StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order)
@@ -46,25 +46,26 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
       for (int k = -pbcRepetitions.z; k <= pbcRepetitions.z; k++) {
         int3 coo_ = coo + (int3{i,j,k} * mastergrid.size());
 
-        // Assume the following errors on the analytical and asymptotic result
-        // E_analytic = eps R³/V
-        // E_asymptotic = V R²/(5(R²-dmax²)) dmax^(n-3)/R^(n)
-        // Here V is dx*dy*dz, dmax = max(dx,dy,dz), n is the order of asymptote
-        // and eps is a constant determined by trial and error.
-        // Use the analytical model when
-        // E_analytic / E_asymptotic < 1
+        /* Determine the switching the same way as in the OOMMF code.
+        Assume the following errors on the analytical and asymptotic result
+        E_analytic = eps R³/V
+        E_asymptotic = V R²/(5(R²-dmax²)) dmax^(n-3)/R^(n)
+        Here V is dx*dy*dz, dmax = max(dx,dy,dz), n is the order of asymptote
+        and eps = 5e-10 is a constant determined by trial and error.
+        Use the analytical model when
+        E_analytic / E_asymptotic < 1
+        */
 
-        // Todo: make the order variable?
         // Todo: switch to O(R⁻³) when far away?
 
         double x = coo_.x * cellsize.x;
         double y = coo_.y * cellsize.y;
         double z = coo_.z * cellsize.z;
-        double R = sqrtf(x*x + y*y + z*z);
+        double R = sqrt(x*x + y*y + z*z);
         double V = cellsize.x * cellsize.y * cellsize.z;
         double h = fmax(cellsize.x,fmax(cellsize.y,cellsize.z));
         
-        if (5 * 1e-10 * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
+        if (5e-10 * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
           Nxx += calcNewellNxx(coo_, cellsize);
           Nyy += calcNewellNyy(coo_, cellsize);
           Nzz += calcNewellNzz(coo_, cellsize);
@@ -93,8 +94,8 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
 void StrayFieldKernel::compute() {
   std::vector<std::vector<int>> initialNxx = {{2,2,0,0,5,0,0,0}, {-1,0,2,0,5,0,0,0}, {-1,0,0,2,5,0,0,0}};
   std::vector<std::vector<int>> initialNxy = {{3,1,1,0,5,0,0,0}};
-  GpuBuffer<int> expansionNxx(uptoOrder(order_-3, initialNxx));
-  GpuBuffer<int> expansionNxy(uptoOrder(order_-3, initialNxy));
+  GpuBuffer<int> expansionNxx(upToOrder(order_-3, initialNxx));
+  GpuBuffer<int> expansionNxy(upToOrder(order_-3, initialNxy));
   cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(),
              mastergrid(), pbcRepetitions(), expansionNxx.get(), expansionNxx.size(),
              expansionNxy.get(), expansionNxy.size(), order_);

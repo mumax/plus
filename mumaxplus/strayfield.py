@@ -36,7 +36,9 @@ class StrayField(FieldQuantity):
         self._impl.set_method(method)
 
     def set_order(self, order):
-        """Set the order of 1/R in the asymptotic expansion of the demag kernel.
+        """Set the order of 1/R, where R is the distance between cells, in the
+        asymptotic expansion of the demag kernel.
         The default value is 11.
         """
+        assert isinstance(order, int), "The order should be an integer."
         self._impl.set_order(order)

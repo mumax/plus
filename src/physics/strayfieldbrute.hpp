@@ -30,7 +30,7 @@ class StrayFieldBruteExecutor : public StrayFieldExecutor {
   /** Return the computation method which is METHOD_BRUTE. */
   Method method() const { return StrayFieldExecutor::METHOD_BRUTE; }
 
-  /** Return the computation order. */
+  /** Return the asymptotic computation order. */
   int order() const { return kernel_.order(); }
 
  private:

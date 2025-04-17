@@ -107,7 +107,7 @@ class StrayField : public FieldQuantity {
   /** Set the method for the computation of the stray field. */
   void setMethod(StrayFieldExecutor::Method);
 
-  /** Set the order for the computation of the stray field. */
+  /** Set the order for the asymptotic computation of the stray field. */
   void setOrder(int);
 
   /** Recreate the StrayFieldExecutor. */

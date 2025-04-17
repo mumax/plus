@@ -34,7 +34,7 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
   /** Return the computation method which is METHOD_FFT. */
   Method method() const { return StrayFieldExecutor::METHOD_FFT; }
 
-  /** Return the computation order. */
+  /** Return the asymptotic computation order. */
   int order() const { return kernel_.order(); }
 
  private:

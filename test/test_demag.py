@@ -1,7 +1,7 @@
 import numpy as np
 import json
 from mumaxplus import Ferromagnet, Grid, World, _cpp
-import matplotlib.pyplot as plt
+
 
 def demag_field_py(magnet):
     kernel = _cpp._demag_kernel(magnet._impl)
@@ -44,7 +44,9 @@ class TestDemag:
         err = np.max(np.abs((wanted - result) / result))
         assert err < 2e-3
 
-    # Compare the demagkernel with high accurate json files
+    # Compare the demagkernel with high accurate json files. These were made
+    # with the BigFloat package with an accuracy of 1024 bits
+    # and the analytical method.
     def test_Nxx(self):
         nx, ny, nz = 100, 100, 1
         world = World((1e-9, 1e-9, 1e-9))
