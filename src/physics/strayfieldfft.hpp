@@ -23,7 +23,7 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
    * @param system the system in which to compute the stray field
    */
   StrayFieldFFTExecutor(const Magnet* magnet,
-                        std::shared_ptr<const System> system, int order);
+                        std::shared_ptr<const System> system, int order, double switchingRadious);
 
   /** Destruct the executor. */
   ~StrayFieldFFTExecutor();
@@ -36,6 +36,9 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
 
   /** Return the asymptotic computation order. */
   int order() const { return kernel_.order(); }
+
+  /** Return the aswitching radious. */
+  double switchingRadious() const { return kernel_.switchingRadious();}
 
  private:
   StrayFieldKernel kernel_;

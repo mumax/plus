@@ -23,5 +23,7 @@ void wrap_strayfield(py::module& m) {
         }
       })
       .def("set_order", &StrayField::setOrder, py::arg("order"),
-           "Set the order of 1/R in the asymptotic expansion of the demag kernel.");
+           "Set the order of 1/R in the asymptotic expansion of the demag kernel.")
+      .def("set_switching_radious", &StrayField::setSwitchingRadious, py::arg("switching radious"),
+           "Set the radious at which the asymptotic expansion should be used.");
 }

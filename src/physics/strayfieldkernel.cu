@@ -11,14 +11,14 @@
 #include "system.hpp"
 #include "world.hpp"
 
-StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order)
-    : order_(order) {
+StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order, double switchingRadious)
+    : order_(order), switchingRadious_(switchingRadious) {
   kernel_ = std::make_unique<Field>(std::make_shared<System>(world, grid), 6);
   compute();
 }
 
-StrayFieldKernel::StrayFieldKernel(Grid dst, Grid src, const World* world, int order)
-    : StrayFieldKernel(kernelGrid(dst, src), world, order) {}
+StrayFieldKernel::StrayFieldKernel(Grid dst, Grid src, const World* world, int order, double switchingRadious)
+    : StrayFieldKernel(kernelGrid(dst, src), world, order, switchingRadious) {}
 
 StrayFieldKernel::~StrayFieldKernel() {}
 
@@ -30,7 +30,7 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
                                    const int3 pbcRepetitions,
                                    int* expansionNxxptr, size_t sizeNxx,
                                    int* expansionNxyptr, size_t sizeNxy,
-                                   int order) {
+                                   int order, double switchingRadious) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!kernel.cellInGrid(idx))
     return;
@@ -65,20 +65,39 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
         double V = cellsize.x * cellsize.y * cellsize.z;
         double h = fmax(cellsize.x,fmax(cellsize.y,cellsize.z));
         
-        if (5e-10 * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
-          Nxx += calcNewellNxx(coo_, cellsize);
-          Nyy += calcNewellNyy(coo_, cellsize);
-          Nzz += calcNewellNzz(coo_, cellsize);
-          Nxy += calcNewellNxy(coo_, cellsize);
-          Nxz += calcNewellNxz(coo_, cellsize);
-          Nyz += calcNewellNyz(coo_, cellsize);
-        } else {
-          Nxx += calcAsymptoticNxx(coo_, cellsize, expansionNxxptr, sizeNxx);
-          Nyy += calcAsymptoticNyy(coo_, cellsize, expansionNxxptr, sizeNxx);
-          Nzz += calcAsymptoticNzz(coo_, cellsize, expansionNxxptr, sizeNxx);
-          Nxy += calcAsymptoticNxy(coo_, cellsize, expansionNxyptr, sizeNxy);
-          Nxz += calcAsymptoticNxz(coo_, cellsize, expansionNxyptr, sizeNxy);
-          Nyz += calcAsymptoticNyz(coo_, cellsize, expansionNxyptr, sizeNxy);
+        if (switchingRadious == -1) {
+          if (5e-10 * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
+            Nxx += calcNewellNxx(coo_, cellsize);
+            Nyy += calcNewellNyy(coo_, cellsize);
+            Nzz += calcNewellNzz(coo_, cellsize);
+            Nxy += calcNewellNxy(coo_, cellsize);
+            Nxz += calcNewellNxz(coo_, cellsize);
+            Nyz += calcNewellNyz(coo_, cellsize);
+          } else {
+            Nxx += calcAsymptoticNxx(coo_, cellsize, expansionNxxptr, sizeNxx);
+            Nyy += calcAsymptoticNyy(coo_, cellsize, expansionNxxptr, sizeNxx);
+            Nzz += calcAsymptoticNzz(coo_, cellsize, expansionNxxptr, sizeNxx);
+            Nxy += calcAsymptoticNxy(coo_, cellsize, expansionNxyptr, sizeNxy);
+            Nxz += calcAsymptoticNxz(coo_, cellsize, expansionNxyptr, sizeNxy);
+            Nyz += calcAsymptoticNyz(coo_, cellsize, expansionNxyptr, sizeNxy);
+          }
+        }
+        else {
+          if (R < switchingRadious) {
+            Nxx += calcNewellNxx(coo_, cellsize);
+            Nyy += calcNewellNyy(coo_, cellsize);
+            Nzz += calcNewellNzz(coo_, cellsize);
+            Nxy += calcNewellNxy(coo_, cellsize);
+            Nxz += calcNewellNxz(coo_, cellsize);
+            Nyz += calcNewellNyz(coo_, cellsize);
+          } else {
+            Nxx += calcAsymptoticNxx(coo_, cellsize, expansionNxxptr, sizeNxx);
+            Nyy += calcAsymptoticNyy(coo_, cellsize, expansionNxxptr, sizeNxx);
+            Nzz += calcAsymptoticNzz(coo_, cellsize, expansionNxxptr, sizeNxx);
+            Nxy += calcAsymptoticNxy(coo_, cellsize, expansionNxyptr, sizeNxy);
+            Nxz += calcAsymptoticNxz(coo_, cellsize, expansionNxyptr, sizeNxy);
+            Nyz += calcAsymptoticNyz(coo_, cellsize, expansionNxyptr, sizeNxy);
+          }
         }
       }
     }
@@ -98,7 +117,7 @@ void StrayFieldKernel::compute() {
   GpuBuffer<int> expansionNxy(upToOrder(order_-3, initialNxy));
   cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(),
              mastergrid(), pbcRepetitions(), expansionNxx.get(), expansionNxx.size(),
-             expansionNxy.get(), expansionNxy.size(), order_);
+             expansionNxy.get(), expansionNxy.size(), order_, switchingRadious_);
 }
 
 Grid StrayFieldKernel::grid() const {
@@ -115,6 +134,9 @@ const int3 StrayFieldKernel::pbcRepetitions() const {
 }
 int StrayFieldKernel::order() const {
   return order_;
+}
+double StrayFieldKernel::switchingRadious() const {
+  return switchingRadious_;
 }
 const Field& StrayFieldKernel::field() const {
   return *kernel_;

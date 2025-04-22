@@ -22,7 +22,7 @@ class StrayFieldBruteExecutor : public StrayFieldExecutor {
    * @param system the system in which to compute the stray field
    */
   StrayFieldBruteExecutor(const Magnet* magnet,
-                          std::shared_ptr<const System> system, int order);
+                          std::shared_ptr<const System> system, int order, double switchingRadious);
 
   /** Compute and return the stray field. */
   Field exec() const;
@@ -32,6 +32,9 @@ class StrayFieldBruteExecutor : public StrayFieldExecutor {
 
   /** Return the asymptotic computation order. */
   int order() const { return kernel_.order(); }
+
+  /** Return the aswitching radious. */
+  double switchingRadious() const { return kernel_.switchingRadious();}
 
  private:
   StrayFieldKernel kernel_;

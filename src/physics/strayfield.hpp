@@ -37,7 +37,7 @@ class StrayFieldExecutor {
   static std::unique_ptr<StrayFieldExecutor> create(
       const Magnet* magnet,
       std::shared_ptr<const System> system,
-      Method method, int order);
+      Method method, int order, double switchingRadious);
 
  protected:
   /** Constructor only to be used in constructor of derived classes. */
@@ -56,6 +56,9 @@ class StrayFieldExecutor {
 
   /** Return the order of the executor. */
   virtual int order() const = 0;
+
+  /** Return the switching radious of the executor. */
+  virtual double switchingRadious() const = 0;
 
  protected:
   /** Source of the stray field*/
@@ -85,7 +88,8 @@ class StrayField : public FieldQuantity {
   StrayField(const Magnet* magnet,
              std::shared_ptr<const System> system,
              StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO,
-             int order = 11);
+             int order = 11,
+             double switchingRadious = -1);
 
   /**
    * Constructor of a StrayField on a specified grid.
@@ -99,7 +103,8 @@ class StrayField : public FieldQuantity {
   StrayField(const Magnet* magnet,
              Grid grid,
              StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO,
-             int order = 11);
+             int order = 11,
+             double switchingRadious = -1);
 
   /** Destructor. */
   ~StrayField();
@@ -109,6 +114,9 @@ class StrayField : public FieldQuantity {
 
   /** Set the order for the asymptotic computation of the stray field. */
   void setOrder(int);
+
+  /** Set the radious from which the asymptotic expansion should be used. */
+  void setSwitchingRadious(double);
 
   /** Recreate the StrayFieldExecutor. */
   void recreateStrayFieldExecutor();
