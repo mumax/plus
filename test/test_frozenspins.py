@@ -12,6 +12,7 @@ def test_frozenspins():
 
     magnet.msat = 800e3
     magnet.aex = 13e-12
+    magnet.alpha = 0.02
     magnet.bias_magnetic_field = (-24.6E-3, 4.3E-3, 0)
     magnet.frozen_spins = 1
     magnet.magnetization = (1, .1, 0)
@@ -24,14 +25,15 @@ def test_frozenspins():
 
 
 def test_frozenspins_inhomogeneous():
-    """Frozen spins in half the geometry."""
+    """Frozen spins in half the geometry.
+    Compare to vectors to make sure the behaviour did not change as of writing this test.
+    """
     world = World((500e-9/128, 125e-9/32, 3e-9/2))
     magnet = Ferromagnet(world, Grid((128, 32, 2)))
 
     magnet.msat = 800e3
     magnet.aex = 13e-12
     magnet.alpha = 0.02
-    magnet.frozen_spins = 1
     magnet.magnetization = (1, .1, 0)
 
     # freeze right half
@@ -48,4 +50,4 @@ def test_frozenspins_inhomogeneous():
     # reversal
     magnet.bias_magnetic_field = (-24.6E-3, 4.3E-3, 0)
     world.timesolver.run(1e-9)
-    expectv(magnet.magnetization.average(), [0.14499470591545105, 0.24905619025230408, 0.0021978835575282574], tol)
+    expectv(magnet.magnetization.average(), (0.14499470591545105, 0.24905619025230408, 0.0021978835575282574), tol)
