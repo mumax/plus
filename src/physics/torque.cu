@@ -63,7 +63,8 @@ __global__ void k_freezespins(CuField torque,
     return;
   }
 
-  torque.setVectorInCell(idx, torque.vectorAt(idx) * (1 - frozenSpins.valueAt(idx)));
+  if (frozenSpins.valueAt(idx) != 0)
+    torque.setVectorInCell(idx, real3{0., 0., 0.});
 }
 
 void freezeSpins(Field &torque, const Parameter &frozenSpins) {
