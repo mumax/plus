@@ -597,6 +597,15 @@ class Ferromagnet(Magnet):
     def amr_ratio(self, value):
         self.amr_ratio.set(value)
 
+    @property
+    def frozen_spins(self):
+        """Defines spins that should be fixed."""
+        return Parameter(self._impl.frozen_spins)
+    
+    @frozen_spins.setter
+    def frozen_spins(self, value):
+        self.frozen_spins.set(value)
+
     # --- magnetoelasticity ---
 
     @property

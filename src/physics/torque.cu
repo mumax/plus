@@ -15,6 +15,7 @@ Field evalTorque(const Ferromagnet* magnet) {
   Field torque = evalLlgTorque(magnet);
   if (!spinTransferTorqueAssuredZero(magnet))
     torque += evalSpinTransferTorque(magnet);
+  freezeSpins(torque, magnet->frozenSpins);
   return torque;
 }
 
@@ -51,6 +52,27 @@ Field evalLlgTorque(const Ferromagnet* magnet) {
   return torque;
 }
 
+__global__ void k_freezespins(CuField torque,
+                              const CuParameter frozenSpins) {
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+  // When outside the geometry, set to zero and return early
+  if (!torque.cellInGeometry(idx)) {
+    if (torque.cellInGrid(idx))
+      torque.setVectorInCell(idx, real3{0, 0, 0});
+    return;
+  }
+
+  torque.setVectorInCell(idx, torque.vectorAt(idx) * (1 - frozenSpins.valueAt(idx)));
+}
+
+void freezeSpins(Field &torque, const Parameter &frozenSpins) {
+  if (!frozenSpins.assuredZero()) {
+    int ncells = torque.grid().ncells();
+    cudaLaunch(ncells, k_freezespins, torque.cu(), frozenSpins.cu());
+  }
+}
+
 __global__ void k_dampingtorque(CuField torque,
                                 const CuField mField,
                                 const CuField hField) {
@@ -75,6 +97,7 @@ Field evalRelaxTorque(const Ferromagnet* magnet) {
   Field h = evalEffectiveField(magnet);
   int ncells = torque.grid().ncells();
   cudaLaunch(ncells, k_dampingtorque, torque.cu(), m.cu(), h.cu());
+  freezeSpins(torque, magnet->frozenSpins);
   return torque;
 }
 
