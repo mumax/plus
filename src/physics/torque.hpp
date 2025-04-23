@@ -6,8 +6,6 @@
 class Ferromagnet;
 class Field;
 
-void freezeSpins(Field&, const Parameter&);
-
 Field evalTorque(const Ferromagnet*);
 Field evalLlgTorque(const Ferromagnet*);
 Field evalRelaxTorque(const Ferromagnet*);
