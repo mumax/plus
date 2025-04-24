@@ -12,6 +12,8 @@ from .scalarquantity import ScalarQuantity
 from .strayfield import StrayField
 from .variable import Variable
 
+import warnings
+
 class Magnet(ABC):
     """A Magnet should never be initialized by the user. It contains no physics.
     Use ``Ferromagnet`` or ``Antiferromagnet`` instead.
@@ -551,3 +553,41 @@ class Magnet(ABC):
         """
         return StrayField._from_impl(
                         self._impl.stray_field_from_magnet(source_magnet._impl))
+    
+    # --- MFM ---
+    @property
+    def lift(self):
+        """The hight of the MFM tip above the sample
+        
+        See Also
+        --------
+        tipsize
+        """
+        return Parameter(self._impl.lift)
+
+    @lift.setter
+    def lift(self, value):
+        self.lift.set(value)
+
+        warn = False
+        if self.lift.is_uniform:
+            warn = self.lift.uniform_value < 0
+        elif _np.any(self.lift.eval() < 0):
+            warn = True
+        
+        if warn:
+            warnings.warn("The tip will scratch your sample, lift before it is too late!")
+        
+    @property
+    def tipsize(self):
+        """The distance between the two magnetic monopoles in the tip
+        
+        See Also
+        --------
+        lift
+        """
+        return Parameter(self._impl.lift)
+
+    @tipsize.setter
+    def tipsize(self, value):
+        self.tipsize.set(value)

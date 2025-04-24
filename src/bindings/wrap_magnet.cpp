@@ -42,6 +42,10 @@ void wrap_magnet(py::module& m) {
       .def_readonly("rigid_norm_strain", &Magnet::rigidNormStrain)
       .def_readonly("rigid_shear_strain", &Magnet::rigidShearStrain)
 
+      // MFM
+      .def_readonly("lift", &Ferromagnet::lift)
+      .def_readonly("tipsize", &Ferromagnet::tipsize)
+
       .def("stray_field_from_magnet",
           [](const Magnet* m, Magnet* magnet) {
             const StrayField* strayField = m->getStrayField(magnet);

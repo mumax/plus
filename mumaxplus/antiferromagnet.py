@@ -405,3 +405,7 @@ class Antiferromagnet(Magnet):
         enable_elastodynamics, elastic_energy, kinetic_energy
         """
         return ScalarQuantity(_cpp.total_energy(self._impl))
+
+    @property
+    def mfm(self):
+        return FieldQuantity(_cpp.mfm(self._impl))

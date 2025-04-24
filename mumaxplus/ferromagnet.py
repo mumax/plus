@@ -1073,3 +1073,7 @@ class Ferromagnet(Magnet):
         effective_body_force, magnetoelastic_field
         """
         return FieldQuantity(_cpp.magnetoelastic_force(self._impl))
+    
+    @property
+    def mfm(self):
+        return FieldQuantity(_cpp.mfm(self._impl))
