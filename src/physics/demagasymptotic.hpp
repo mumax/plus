@@ -4,35 +4,35 @@
 #include "gpubuffer.hpp"
 
 /** 
- *  The derivatives dx, dy and dz of a function of the form
- *  f(x,y,z) = N * hx^f * hy^g * hz^i * x^a * y^b * z^c / R^P 
- *  where N is a constant, R = sqrt(x² + y² + z²), hx, hy and hz are cell sizes
- *  and x, y and z are coordinates.
- *  These functions can be rewritten as vectors (N,a,b,c,P,f,g,i).
- *  dx, dy and dz accept a vector containing vectors of this form return the
- *  derivativesand as a vector containing vectors of that same form
+ * The derivatives dx, dy and dz of a function of the form
+ * f(x,y,z) = N * hx^f * hy^g * hz^i * x^a * y^b * z^c / R^P 
+ * where N is a constant, R = sqrt(x² + y² + z²), hx, hy and hz are cell sizes
+ * and x, y and z are coordinates.
+ * These functions can be rewritten as vectors (N,a,b,c,P,f,g,i).
+ * dx, dy and dz accept a vector containing vectors of this form return the
+ * derivativesand as a vector containing vectors of that same form
 
- *  dx: (N,a,b,c,P,f,g,i) --> (-N(P-a),a+1,b,c,P+2,f+1,g,i) +
-                              (N*a,a-1,b+2,c,P+2,f+1,g,i) + 
-                              (N*a,a-1,b,c+2,P+2,f+1,g,i)
+ * dx: (N,a,b,c,P,f,g,i) --> (-N(P-a),a+1,b,c,P+2,f+1,g,i) +
+                             (N*a,a-1,b+2,c,P+2,f+1,g,i) + 
+                             (N*a,a-1,b,c+2,P+2,f+1,g,i)
     
- *   dy: (N,a,b,c,P,f,g,i) --> (-N(P-b),a,b+1,c,P+2,f,g+1,i) +
-                               (N*b,a+2,b-1,c,P+2,f,g+1,i) + 
-                               (N*b,a,b-1,c+2,P+2,f,g+1,i)
+ *  dy: (N,a,b,c,P,f,g,i) --> (-N(P-b),a,b+1,c,P+2,f,g+1,i) +
+                              (N*b,a+2,b-1,c,P+2,f,g+1,i) + 
+                              (N*b,a,b-1,c+2,P+2,f,g+1,i)
     
- *   dz: (N,a,b,c,P,f,g,i) --> (-N(P-c),a,b,c+1,P+2,f,g,i+1) +
-                               (N*c,a+2,b,c-1,P+2,f,g,i+1) + 
-                               (N*c,a,b+2,c-1,P+2,f,g,i+1)
+ *  dz: (N,a,b,c,P,f,g,i) --> (-N(P-c),a,b,c+1,P+2,f,g,i+1) +
+                              (N*c,a+2,b,c-1,P+2,f,g,i+1) + 
+                              (N*c,a,b+2,c-1,P+2,f,g,i+1)
  */
 std::vector<std::vector<int>> dx(std::vector<std::vector<int>>);
 std::vector<std::vector<int>> dy(std::vector<std::vector<int>>);
 std::vector<std::vector<int>> dz(std::vector<std::vector<int>>);
 
 /** 
- *  This function cleans up a vector containing vectors of the form
- *  (N,a,b,c,P,f,g,i) by comparing a,b,c,P,f,g and i of one vector with another
- *  vector. If those are all equal, the N values are added together and one of
- *  them is removed.
+ * This function cleans up a vector containing vectors of the form
+ * (N,a,b,c,P,f,g,i) by comparing a,b,c,P,f,g and i of one vector with another
+ * vector. If those are all equal, the N values are added together and one of
+ * them is removed.
  */
 std::vector<std::vector<int>> cleanup(std::vector<std::vector<int>>);
 

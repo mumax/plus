@@ -12,8 +12,8 @@ class World;
 
 class StrayFieldKernel {
  public:
-  StrayFieldKernel(Grid grid, const World* world, int order, double switchingRadious);
-  StrayFieldKernel(Grid dst, Grid src, const World* world, int order, double switchingRadious);
+  StrayFieldKernel(Grid grid, const World* world, int order, double switchingradius);
+  StrayFieldKernel(Grid dst, Grid src, const World* world, int order, double switchingradius);
   ~StrayFieldKernel();
 
   Grid grid() const;
@@ -22,7 +22,7 @@ class StrayFieldKernel {
   std::shared_ptr<const System> kernelSystem() const;
   real3 cellsize() const;
   int order() const;
-  double switchingRadious() const;
+  double switchingradius() const;
   const Field& field() const;
 
   void compute();
@@ -30,7 +30,7 @@ class StrayFieldKernel {
  private:
   std::unique_ptr<Field> kernel_;
   int order_;
-  double switchingRadious_;
+  double switchingradius_;
 
  public:
   // Helper function which determines the kernel grid

@@ -43,8 +43,8 @@ class StrayField(FieldQuantity):
         assert isinstance(order, int), "The order should be an integer."
         self._impl.set_order(order)
 
-    def set_switch_radious(self, R):
-        """Set the radious from which the asymptotic expantion should be used.
+    def set_switch_radius(self, R=-1):
+        """Set the radius from which the asymptotic expantion should be used.
         Default is -1, then the OOMMF method is used:
         Assume the following errors on the analytical and asymptotic result
         E_analytic = eps R³/V
@@ -54,4 +54,4 @@ class StrayField(FieldQuantity):
         Use the analytical model when
         E_analytic / E_asymptotic < 1
         """
-        self._impl.set_switching_radious(R)
+        self._impl.set_switching_radius(R)

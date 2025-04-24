@@ -4,7 +4,7 @@ from mumaxplus import Ferromagnet, Grid, World, _cpp
 
 
 def demag_field_py(magnet):
-    kernel = _cpp._demag_kernel(magnet._impl)
+    kernel = _cpp._demag_kernel(magnet._impl, 11, -1)
     mag = magnet.msat.average() * magnet.magnetization.get()
     # add padding to the magnetization so that the size of magnetization
     # matches the size of the kernel
@@ -51,7 +51,7 @@ class TestDemag:
         nx, ny, nz = 100, 100, 1
         world = World((1e-9, 1e-9, 1e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus = _cpp._demag_kernel(magnet._impl)[0,:,ny:, nx:] # Nxx component
+        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[0,:,ny:, nx:] # Nxx component
         
         f = open("exact_Nxx", "r")
         exact = np.array(json.loads(f.read()), dtype=float)
@@ -63,7 +63,7 @@ class TestDemag:
         nx, ny, nz = 100, 100, 1
         world = World((1e-9, 1e-9, 1e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus = _cpp._demag_kernel(magnet._impl)[3,:,ny+1:, nx+1:] # Nxy component
+        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[3,:,ny+1:, nx+1:] # Nxy component
 
         f = open("exact_Nxy", "r")
         exact = np.array(json.loads(f.read()), dtype=float)[:,1:,1:]
@@ -75,7 +75,7 @@ class TestDemag:
         nx, ny, nz = 100, 100, 1
         world = World((1e-9, 1.27e-9, 1.13e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus = _cpp._demag_kernel(magnet._impl)[0,:,ny:, nx:] # Nxx component
+        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[0,:,ny:, nx:] # Nxx component
 
         f = open("exact_Nxx_aspect", "r")
         exact = np.array(json.loads(f.read()), dtype=float)
@@ -87,7 +87,7 @@ class TestDemag:
         nx, ny, nz = 100, 100, 1
         world = World((1e-9, 1.27e-9, 1.13e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus = _cpp._demag_kernel(magnet._impl)[3,:,ny+1:, nx+1:] # Nxy component
+        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[3,:,ny+1:, nx+1:] # Nxy component
 
         f = open("exact_Nxy_aspect", "r")
         exact = np.array(json.loads(f.read()), dtype=float)[:,1:,1:]
