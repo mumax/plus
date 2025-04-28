@@ -103,6 +103,19 @@ class Antiferromagnet(Magnet):
         self.sub1.bias_magnetic_field.set(value)
         self.sub2.bias_magnetic_field.set(value)
 
+    @property
+    def enable_demag(self):
+        """Enable/disable demagnetization switch of both sublattices.
+
+        Default = True.
+        """
+        return self.sub1.enable_demag
+
+    @enable_demag.setter
+    def enable_demag(self, value):
+        self.sub1.enable_demag = value
+        self.sub2.enable_demag = value
+
     def minimize(self, tol=1e-6, nsamples=20):
         """Minimize the total energy.
 

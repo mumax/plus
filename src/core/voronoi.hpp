@@ -1,3 +1,4 @@
+#include <functional>
 #include <random>
 #include <vector>
 #include <unordered_map>
@@ -29,16 +30,23 @@ struct Int3Hash {
 
 class VoronoiTessellator {
  public:
-  VoronoiTessellator(Grid grid, real grainsize, real3 cellsize);
+  VoronoiTessellator(real grainsize,
+                     int seed,
+                     unsigned int maxIdx=255,
+                     const std::function<unsigned int(real3)>& centerIdx = nullptr);
   ~VoronoiTessellator() = default;
 
   // * Generate a Voronoi tessellation
-  GpuBuffer<unsigned int> generate();
+  std::vector<unsigned int> generate(Grid grid, real3 cellsize, const bool pbc);
+  
+  real3 getTileSize(real3 griddims);
 
- private:
   // * Calc nearest center and assign center index to coo
   unsigned int regionOf(real3 coo);
 
+  real3 periodicShift(real3 coo, real3 center);
+  
+  private:
   // * Calculate position and index of centers in tile
   std::vector<Center> centersInTile(int3 pos);
 
@@ -49,17 +57,23 @@ class VoronoiTessellator {
   Tile tileOfCell(real3 coo);
 
 public:
-  Grid grid;
   GpuBuffer<unsigned int> tessellation;
 private:
   real grainsize_;
-  real3 cellsize_;
-  real tilesize_;
-  unsigned int centerIdx_ = 0;
+  real3 grid_dims_;
+  bool pbc_;
+
+  real3 tilesize_;
+  int numTiles_x;
+  int numTiles_y;
+
+  int seed_;
   std::unordered_map<int3, Tile, Int3Hash> tileCache_;
 
  // RNG related members
   real lambda_; // Poisson parameter
   std::default_random_engine engine_;
   std::uniform_real_distribution<> distReal_;
+  std::uniform_int_distribution<> distInt_;
+  std::function<unsigned int(real3)> centerIdx_;
 };

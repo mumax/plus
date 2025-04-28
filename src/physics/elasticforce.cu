@@ -15,14 +15,16 @@ __device__ int3 tensorRowComps(int row) {
   return int3{tensorComp(row, 0), tensorComp(row, 1), tensorComp(row, 2)};
 }
 
-// Numerical divergence of stress with central five-point stencil in bulk material.
-// Lower order accuracy (three-point stencil) central difference is used in bulk
-// or 1 cell away from boundary.
-// At the boundary, traction-free bondary conditions are implemented, inspired
-// by a three-point stencil with step size h equal to half cellsize.
+/**
+ * Numerical divergence of stress with central five-point stencil in bulk material.
+ * Lower order accuracy (three-point stencil) central difference is used in bulk
+ * 1 cell away from boundary.
+ * At the boundary, traction-free boundary conditions are implemented, using a
+ * custom second-order-accurate three-point stencil.
+*/
 __global__ void k_elasticForce(CuField fField,
                                const CuField stressTensor,
-                               const real3 w,  // 1 / 2*cellsize
+                               const real3 w,  // 1 / cellsize
                                const Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = fField.system;
@@ -64,27 +66,34 @@ __global__ void k_elasticForce(CuField fField,
     bool im1_inGeo = system.inGeometry(coo_im1);
     bool ip1_inGeo = system.inGeometry(coo_ip1);
     bool ip2_inGeo = system.inGeometry(coo_ip2);
+
     if (!im1_inGeo && !ip1_inGeo) {
       // --1-- zero
       continue;
     } else if (!im1_inGeo) {
-      // --11- left boundary, apply central difference + traction free BC
-      f += ws[i] * (stressTensor.vectorAt(coo_ip1, stressRow) +
-                    stressTensor.vectorAt(idx, stressRow));
+      // --11- left boundary, custom difference + traction free BC,  ε ~ h^2
+      f += ws[i] * (
+        // - 4./3. * real3{0, 0, 0}  // stress at coo_i-1/2 = boundary
+        stressTensor.vectorAt(idx, stressRow)  // +3/3 weight
+        + 1./3. * stressTensor.vectorAt(coo_ip1, stressRow)
+      );
     } else if (!ip1_inGeo) {
-      // -11-- right boundary, apply central difference + traction free BC
-      f -= ws[i] * (stressTensor.vectorAt(idx, stressRow) +
-                    stressTensor.vectorAt(coo_im1, stressRow));
+      // -11-- right boundary, custom difference + traction free BC,  ε ~ h^2
+      f += ws[i] * (
+        - 1./3. * stressTensor.vectorAt(coo_im1, stressRow)
+        - stressTensor.vectorAt(idx, stressRow)  // -3/3 weight
+        // + 4./3. * real3{0, 0, 0}  // stress at coo_i+1/2 = boundary
+      );
     } else if (!im2_inGeo || !ip2_inGeo) {
       // -111-, 1111-, -1111 central difference,  ε ~ h^2
-      f += ws[i] * (stressTensor.vectorAt(coo_ip1, stressRow) -
-                    stressTensor.vectorAt(coo_im1, stressRow));
+      f += 0.5*ws[i] * (stressTensor.vectorAt(coo_ip1, stressRow) -
+                        stressTensor.vectorAt(coo_im1, stressRow));
     } else {  // all 5 points are safe for sure
       // 11111 central difference,  ε ~ h^4
-      f += ws[i] * ((4.0/3.0) * (stressTensor.vectorAt(coo_ip1, stressRow) -
-                                  stressTensor.vectorAt(coo_im1, stressRow)) + 
-                    (1.0/6.0) * (stressTensor.vectorAt(coo_im2, stressRow) -
-                                 stressTensor.vectorAt(coo_ip2, stressRow)));
+      f += ws[i] * ((4./6.) * (stressTensor.vectorAt(coo_ip1, stressRow) -
+                               stressTensor.vectorAt(coo_im1, stressRow)) + 
+                    (1./12.)* (stressTensor.vectorAt(coo_im2, stressRow) -
+                               stressTensor.vectorAt(coo_ip2, stressRow)));
     }
   }
 
@@ -102,7 +111,7 @@ Field evalElasticForce(const Magnet* magnet) {
 
   int ncells = fField.grid().ncells();
   Field stressTensor = evalStressTensor(magnet);
-  real3 w = 0.5 / magnet->cellsize();  // 1 / 2*cellsize
+  real3 w = 1. / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
 
   cudaLaunch(ncells, k_elasticForce, fField.cu(), stressTensor.cu(), w, mastergrid);

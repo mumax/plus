@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath("../mumaxplus"))
 
 project = "mumaxplus"
 author = "Diego De Gusem, Oleh Kozynets, Ian Lateur, Lars Moreels, Jeroen Mulkers"
-release = "1.0.0"
+release = "1.0.1"
 
 # -- General configuration ---------------------------------------------------
 

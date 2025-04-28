@@ -41,6 +41,10 @@ real TimeSolver::sensibleTimeStep() const {
   for (auto eq : eqs_)
     if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > globalMaxNorm)
       globalMaxNorm = maxNorm;
+  if (globalMaxNorm == 0) {
+    throw std::runtime_error("Timesolver cannot be executed since the right hand "
+                             "sides of all dynamic equations are zero.");
+  }
   return sensibleFactor_ / globalMaxNorm;
 }
 
@@ -68,10 +72,9 @@ void TimeSolver::adaptTimeStep(real correctionFactor) {
 
 void TimeSolver::step() {
   if (timestep_ <= 0)
-    std::runtime_error(
+    throw std::runtime_error(
         "Timesolver can not make a step because the timestep is smaller than "
         "or equal to zero.");
-
   stepper_->step();
 }
 

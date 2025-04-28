@@ -58,43 +58,54 @@ magnet.bias_magnetic_field.add_time_term(
 magnet.alpha = 0.004
 magnet.eta = 1e10  # elastic force damping
 
-def displacement_to_scatter_data(magnet, scale, skip):
-    """takes magnet.elastic_displacement.eval() array and turns it into an array
-    of positions usable by plt.scatter().set_offsets"""
-
-    u = magnet.elastic_displacement.eval()  # ((ux, uy, uz), Z, Y, X)
-    coords = magnet.elastic_displacement.meshgrid + scale*u  # absolute positions amplified
-    return  np.transpose(coords[:2, 0, ::skip, ::skip].reshape(2, -1))  # to (X*Y, 2)
-
 # plotting
 fig, ax = plt.subplots()
 
-u_scale = 5e4  # amplification of displacement
-u_skip  = 5  # don't show every displacement
+u_scale = 1e5  # amplification of displacement
+u_skip  = 10  # don't show every displacement
 
 world.timesolver.adaptive_timestep = False
 world.timesolver.timestep = 1e-12
 
-steps = 400
-time_max = 0.8e-9
-duration = time_max/steps
+frames = 400
+steps_per_frame = 2
 
 # save magnetization and displacement
-m_shape = np.transpose(magnet.magnetization.eval()[1,0,:,:]).shape
-u_shape = displacement_to_scatter_data(magnet, scale=u_scale, skip=u_skip).shape
-m = np.zeros(shape=(steps,m_shape[0],m_shape[1]))
-u = np.zeros(shape=(steps,u_shape[0],u_shape[1]))
+m = np.zeros(shape=(frames, ny, nx))
+u = np.zeros(shape=(frames, *magnet.elastic_displacement.shape))
+t = np.zeros(shape=(frames))
 
 # run a simulation
 print("Simulating...")
-for i in tqdm(range(steps)):
-    world.timesolver.run(duration)
-    m[i,...] = np.transpose(magnet.magnetization.eval()[1,0,:,:])
-    u[i,...] = displacement_to_scatter_data(magnet, scale=u_scale, skip=u_skip) 
+for i in tqdm(range(frames)):
+    world.timesolver.steps(steps_per_frame)
+    m[i,...] = magnet.magnetization.eval()[1,0,:,:]
+    u[i,...] = magnet.elastic_displacement.eval()
+    t[i] = world.timesolver.time
 
-# scatter setup
-offsets = displacement_to_scatter_data(magnet, scale=u_scale, skip=u_skip)
-u_scatter = ax.scatter(offsets[:, 0], offsets[:, 1], s=10, c="black", marker=".", alpha=0.5)
+
+# Draw horizontal and vertical lines to connect neighbors
+mgrid = magnet.meshgrid
+horizontal = []
+vertical = []
+uxyz = magnet.elastic_displacement.eval()[:,...]
+coord = mgrid + uxyz*u_scale
+x, y = coord[:2,0,...]
+
+lw = 0.8
+
+for i in range(0, ny, u_skip):  # Iterate over rows
+    line = ax.plot(x[i,:], y[i,:], 'k-', lw=lw)  # Horizontal lines
+    horizontal.append(line[0])
+line = ax.plot(x[-1,:], y[-1,:], 'k-', lw=lw)  # Horizontal lines
+horizontal.append(line[0])  # include the last cell to encompass whole grid
+
+for i in range(0, nx, u_skip):  # Iterate over cols
+    line = ax.plot(x[:,i], y[:,i], 'k-', lw=lw)  # Vertical lines
+    vertical.append(line[0])
+line = ax.plot(x[:,-1], y[:,-1], 'k-', lw=lw)  # Vertical lines
+vertical.append(line[0])
+
 
 # imshow setup
 im_extent = (-0.5*cx, length - 0.5*cx, -0.5*cy, width - 0.5*cy)
@@ -114,11 +125,27 @@ ax.set_xlim(im_extent[0], im_extent[1])
 ax.set_ylim(im_extent[2], im_extent[3])
 
 def update(i):
+    ax.set_title(f"t = {t[i]*1e9:.2f} ns")
+
     m_im.set_data(m[i,...])
-    u_scatter.set_offsets(u[i,...])
-    return m_im, u_scatter
+
+    coord = mgrid + u[i,...]*u_scale
+    x,y = coord[:2,0,...]
+    
+    # Horizontal lines
+    for k, j in enumerate(range(0, ny, u_skip)):
+        horizontal[k].set_data(x[j,:], y[j,:])
+    horizontal[-1].set_data(x[-1,:], y[-1,:])
+
+    # Vertical lines
+    for k, j in enumerate(range(0, nx, u_skip)):
+        vertical[k].set_data(x[:,j], y[:,j])
+    vertical[-1].set_data(x[:,-1], y[:,-1])
+
+    return m_im, *horizontal, *vertical
 
 # animation
 print("Animating...")
-animation_fig = animation.FuncAnimation(fig, update, frames=steps, interval=40, blit=True)
+animation_fig = animation.FuncAnimation(fig, update, frames=frames, interval=40, blit=True)
 animation_fig.save("magnetoelastic.mp4")
+print("Done!")

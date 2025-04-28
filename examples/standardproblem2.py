@@ -95,7 +95,7 @@ mx_ax.plot(d_array, mx_list, marker="s", c="g")
 my_ax.plot(d_array, my_list, marker="s", c="r")
 mx_ax.set_ylabel("$m_x$")
 my_ax.set_ylabel("$m_y$")
-my_ax.set_xlabel("$d/l_ex$")
+my_ax.set_xlabel("$d/l_{ex}$")
 
 # coercivity
 if calculate_coercivity:

@@ -23,16 +23,7 @@ def twodomain(m1, mw, m2, wallposition, wallthickness=0.):
         If given, wallposition corresponds to the center
         of the domain wall. If <= 0, there is no wall.
     """
-    wallidx = int(_np.nonzero(wallposition)[0][0])
-    '''
-    def func(x, y, z):
-         coo = (x, y, z)
-         if coo[wallidx] < wallposition[wallidx] - wallthickness:
-             return m1
-         elif coo[wallidx] > wallposition[wallidx] + wallthickness:
-             return m2
-         return mw
-    '''
+
     def func(x, y, z):
         if x < wallposition:
             m = m1
@@ -44,6 +35,7 @@ def twodomain(m1, mw, m2, wallposition, wallthickness=0.):
         return ((1-gauss) * m[0] + gauss * mw[0],
                 (1-gauss) * m[1] + gauss * mw[1],
                 (1-gauss) * m[2] + gauss * mw[2])
+
     return func
 
 

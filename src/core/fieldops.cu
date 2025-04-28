@@ -363,8 +363,9 @@ __device__ real3 getRGB(real3 vec) {
 __global__ void k_fieldGetRGB(CuField dst, const CuField src) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!dst.cellInGeometry(idx)) {
+    if (dst.cellInGrid(idx))
     // not in geometry, so make grey instead
-    dst.setVectorInCell(idx, real3{0.5, 0.5, 0.5});
+      dst.setVectorInCell(idx, real3{0.5, 0.5, 0.5});
   } else {
     dst.setVectorInCell(idx, getRGB(src.vectorAt(idx)));
   }
