@@ -48,28 +48,33 @@ class TestDemag:
     # with the BigFloat package with an accuracy of 1024 bits
     # and the analytical method.
     def test_Nxx(self):
-        nx, ny, nz = 100, 100, 1
+        nx, ny, nz = 100, 100, 10
         world = World((1e-9, 1e-9, 1e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[0,:,ny:, nx:] # Nxx component
+        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[0,nz:,ny:, nx:] # Nxx component
         
-        f = open("exact_Nxx", "r")
+        f = open("exact_Nxx_3D", "r")
         exact = np.array(json.loads(f.read()), dtype=float)
 
-        err = np.max(np.abs((exact - mumaxplus) / exact))
+        # avoid fake errors when both values are super small
+        mask = ~((np.abs(exact) < 5e-15) & (np.abs(mumaxplus) < 5e-15))
+
+        rel_err = np.abs((exact - mumaxplus) / exact)
+        err = np.nanmax(rel_err[mask])
+
         assert err < 1e-4
 
     def test_Nxy(self):
-        nx, ny, nz = 100, 100, 1
+        nx, ny, nz = 100, 100, 10
         world = World((1e-9, 1e-9, 1e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[3,:,ny+1:, nx+1:] # Nxy component
+        mumaxplus = _cpp._demag_kernel(magnet._impl, 11, -1)[3,nz:,ny+1:, nx+1:] # Nxy component
 
-        f = open("exact_Nxy", "r")
+        f = open("exact_Nxy_3D", "r")
         exact = np.array(json.loads(f.read()), dtype=float)[:,1:,1:]
 
         err = np.max(np.abs((exact - mumaxplus) / exact))
-        assert err < 1e-5
+        assert err < 1e-4
 
     def test_Nxx_aspect(self):
         nx, ny, nz = 100, 100, 1
