@@ -1076,4 +1076,9 @@ class Ferromagnet(Magnet):
     
     @property
     def mfm(self):
+        """Magnetic force microscopy.
+        This returns the potential energy (in Joules) of a tip with two monopole
+        charges of +-1/µ0 feels when hovering over the magnet. This can then be
+        used to create an MFM image of the ferromagnet.
+        """
         return FieldQuantity(_cpp.mfm(self._impl))

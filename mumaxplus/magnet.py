@@ -554,10 +554,11 @@ class Magnet(ABC):
         return StrayField._from_impl(
                         self._impl.stray_field_from_magnet(source_magnet._impl))
     
-    # --- MFM ---
+    # --- Magnetic force microscopy ---
     @property
     def lift(self):
-        """The hight of the MFM tip above the sample
+        """The height (in meters) of the MFM tip above the xy-surface
+        of the sample. (Default = 10e-9 m)
         
         See Also
         --------
@@ -572,15 +573,16 @@ class Magnet(ABC):
         warn = False
         if self.lift.is_uniform:
             warn = self.lift.uniform_value < 0
-        elif _np.any(self.lift.eval() < 0):
+        elif _np.any(self.lift.eval() < 1e-9):
             warn = True
         
         if warn:
-            warnings.warn("The tip will scratch your sample, lift before it is too late!")
+            warnings.warn("The tip will scratch your sample, increase lift above 1 nm before it is too late!")
         
     @property
     def tipsize(self):
-        """The distance between the two magnetic monopoles in the tip
+        """The distance (in meters) between the two magnetic monopoles in the tip.
+        The tip is perpendicular to the xy-surface of the sample. (default = 1e-3 m)
         
         See Also
         --------

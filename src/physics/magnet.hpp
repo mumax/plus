@@ -84,8 +84,8 @@ class Magnet {
   Parameter eta;  // Phenomenological elastic damping constant
   Parameter rho;  // Mass density
 
-  // Magnetoelasticity
-  Parameter lift;     // The hight of the MFM tip above the sample
+  // mfm
+  Parameter lift;     // The height of the MFM tip above the sample
   Parameter tipsize;  // The distance between the 2 magnetic monopolese in the tip
 
 

@@ -10,13 +10,19 @@
   * B is the stray field from the tip evaluated in the cell.
   * Source: The design and verification of MuMax3.
   */
-__global__ void k_magneticForceMicroscopy(CuField kernel, CuField magnetization,
-                                          const Grid mastergrid, const int3 pbcRepetitions,
-                                          CuParameter lift, CuParameter tipsize) {
+__global__ void k_magneticForceMicroscopy(CuField kernel,
+                                          CuField magnetization,
+                                          const Grid mastergrid,
+                                          const int3 pbcRepetitions,
+                                          CuParameter lift,
+                                          CuParameter tipsize,
+                                          const real V) {
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (!kernel.cellInGrid(idx))
         return;
+
+    real pi = 3.1415926535897931f;
     
     // The cell-coordinate of the tip (without lift)
     const real3 cellsize = kernel.system.cellsize;
@@ -25,11 +31,8 @@ __global__ void k_magneticForceMicroscopy(CuField kernel, CuField magnetization,
     real y0 = coo.y * cellsize.y;
     real z0 = coo.z * cellsize.z;
 
-    real tipCharge = 1/MU0;  // charge at the tip
+    real prefactor = 1/(4*pi*MU0);  // charge at the tip is 1/µ0
     real delta = 1e-9;       // tip oscillation, take 2nd derivative over this distance
-    real V = cellsize.x * cellsize.y * cellsize.z;  // volume of a cell
-    real pi = 3.1415926535897931f;
-
     // Size of the grid
     int xmax = kernel.system.grid.size().x;
     int ymax = kernel.system.grid.size().y;
@@ -38,12 +41,12 @@ __global__ void k_magneticForceMicroscopy(CuField kernel, CuField magnetization,
     real dFdz = 0.;
 
     // Loop over pbc
-    for (int Nx = -pbcRepetitions.x; Nx <= pbcRepetitions.x; Nx++) {
-        real xpbc = Nx * mastergrid.size().x;
+    for (int Nz = -pbcRepetitions.z; Nz <= pbcRepetitions.z; Nz++) {
+        real zpbc = Nz * mastergrid.size().z;
         for (int Ny = -pbcRepetitions.y; Ny <= pbcRepetitions.y; Ny++) {
             real ypbc = Ny * mastergrid.size().y;
-            for (int Nz = -pbcRepetitions.z; Nz <= pbcRepetitions.z; Nz++) {
-                real zpbc = Nz * mastergrid.size().z;
+            for (int Nx = -pbcRepetitions.x; Nx <= pbcRepetitions.x; Nx++) {
+                real xpbc = Nx * mastergrid.size().x;            
 
                 // Loop over cells in the magnet
                 for (int iz = 0; iz < zmax; iz++) {
@@ -63,14 +66,12 @@ __global__ void k_magneticForceMicroscopy(CuField kernel, CuField magnetization,
                                            y0-y,
                                            z0 + z - (lift.valueAt(idx) + i*delta)};
                                 real r = sqrt(R.x*R.x + R.y*R.y + R.z*R.z);
-                                real3 B = R * tipCharge/(4*pi*r*r*r);
+                                real3 B = R * prefactor/(4*pi*r*r*r);
                                 
                                 // Second pole position and field
-                                R.z = z0 + z - (lift.valueAt(idx) + tipsize.valueAt(idx) + i*delta);
+                                R.z -= tipsize.valueAt(idx);
                                 r = sqrt(R.x*R.x + R.y*R.y + R.z*R.z);
-                                B.x -= R.x * tipCharge/(4*pi*r*r*r);
-                                B.y -= R.y * tipCharge/(4*pi*r*r*r);
-                                B.z -= R.z * tipCharge/(4*pi*r*r*r);
+                                B -= R * prefactor/(4*pi*r*r*r);
                                 
                                 // Energy (B.M) * V
                                 E[i+1] = (B.x * m.x + B.y * m.y + B.z * m.z) * V;
@@ -94,8 +95,9 @@ Field evalMagneticForceMicroscopy(const Ferromagnet* magnet) {
     int3 pbcRepetitions = magnet->world()->pbcRepetitions();
     CuParameter lift = magnet->lift.cu();
     CuParameter tipsize = magnet->tipsize.cu();
+    const real V = magnet->world()->cellVolume();
     int ncells = mfm.grid().ncells();
-    cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize);
+    cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize, V);
     return mfm;
 }
 
@@ -106,8 +108,9 @@ Field evalMagneticForceMicroscopyAFM(const Antiferromagnet* magnet) {
     int3 pbcRepetitions = magnet->world()->pbcRepetitions();
     CuParameter lift = magnet->lift.cu();
     CuParameter tipsize = magnet->tipsize.cu();
+    const real V = magnet->world()->cellVolume();
     int ncells = mfm.grid().ncells();
-    cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize);
+    cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize, V);
     return mfm;
 }
 
@@ -115,6 +118,6 @@ FM_FieldQuantity magneticForceMicroscopyQuantity(const Ferromagnet* magnet) {
     return FM_FieldQuantity(magnet, evalMagneticForceMicroscopy, 1, "magnetic_force_microscopy", "J");
 }
 
-AFM_FieldQuantity magneticForceMicroscopyAFMQuantity(const Antiferromagnet* magnet) {
+AFM_FieldQuantity magneticForceMicroscopyQuantity(const Antiferromagnet* magnet) {
     return AFM_FieldQuantity(magnet, evalMagneticForceMicroscopyAFM, 1, "magnetic_force_microscopy", "J");
 }

@@ -125,9 +125,8 @@ void wrap_ferromagnet(py::module& m) {
   m.def("magnetoelastic_field", &magnetoelasticFieldQuantity);
   m.def("magnetoelastic_energy_density", &magnetoelasticEnergyDensityQuantity);
   m.def("magnetoelastic_energy", &magnetoelasticEnergyQuantity);
-
   m.def("magnetoelastic_force", &magnetoelasticForceQuantity);
 
-  // mfm
-  m.def("mfm", &magneticForceMicroscopyQuantity);
+  m.def("mfm",
+        py::overload_cast<const Ferromagnet*>(&magneticForceMicroscopyQuantity));
 }

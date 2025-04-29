@@ -45,5 +45,6 @@ void wrap_antiferromagnet(py::module& m) {
   m.def("total_energy",
         py::overload_cast<const Antiferromagnet*>(&totalEnergyQuantity));
 
-  m.def("mfm", &magneticForceMicroscopyAFMQuantity);
+  m.def("mfm",
+        py::overload_cast<const Antiferromagnet*>(&magneticForceMicroscopyQuantity));
 }
