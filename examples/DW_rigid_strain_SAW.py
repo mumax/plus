@@ -38,8 +38,8 @@ magnet.dmi_tensor.set_interfacial_dmi(1e-3)
 # Create a DW
 magnet.magnetization = twodomain((0,0,1), (-1,1,0), (0,0,-1), nx*cx/3, 5*cx)
 
-print("relaxing...")
-magnet.relax()  # relax
+print("minimizing...")
+magnet.minimize()  # minimize
 
 # magnetoelastic coupling constants
 magnet.B1 = -1.5e7
@@ -59,7 +59,7 @@ magnet.rigid_norm_strain.add_time_term(lambda t: (np.cos(w*t), 0., 0.),
                                        lambda x,y,z: (-E*np.sin(k*x), 0., 0.))
 
 # plot the initial and final magnetization
-fig, axs = plt.subplots(nrows=2, ncols=1, sharex="all", sharey="all")
+fig, axs = plt.subplots(nrows=1, ncols=2, sharex="all", sharey="all")
 ax1, ax2 = axs
 im_extent = (-0.5*cx*1e6, (nx*cx - 0.5*cx)*1e6, -0.5*cy*1e6, (ny*cy - 0.5*cy)*1e6)
 
