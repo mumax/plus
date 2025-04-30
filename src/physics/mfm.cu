@@ -88,29 +88,28 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
     kernel.setValueInCell(idx, 0, dFdz);
 }
 
-Field evalMagneticForceMicroscopy(const Ferromagnet* magnet) {
+Field evalMagneticForceMicroscopy(const Magnet* magnet) {
     Field mfm(magnet->system(), 1, 0.0);
-    const CuField magnetization = fullMagnetizationQuantity(magnet).eval().cu();
     Grid mastergrid = magnet->world()->mastergrid();
     int3 pbcRepetitions = magnet->world()->pbcRepetitions();
     CuParameter lift = magnet->lift.cu();
     CuParameter tipsize = magnet->tipsize.cu();
     const real V = magnet->world()->cellVolume();
     int ncells = mfm.grid().ncells();
-    cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize, V);
-    return mfm;
-}
 
-Field evalMagneticForceMicroscopyAFM(const Antiferromagnet* magnet) {
-    Field mfm(magnet->system(), 1, 0.0);
-    const CuField magnetization = fullMagnetizationQuantity(magnet).eval().cu();
-    Grid mastergrid = magnet->world()->mastergrid();
-    int3 pbcRepetitions = magnet->world()->pbcRepetitions();
-    CuParameter lift = magnet->lift.cu();
-    CuParameter tipsize = magnet->tipsize.cu();
-    const real V = magnet->world()->cellVolume();
-    int ncells = mfm.grid().ncells();
-    cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize, V);
+    if (const Ferromagnet* mag = magnet->asFM()) {
+        const CuField magnetization = fullMagnetizationQuantity(mag).eval().cu();
+        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize, V);
+    }
+    else if (const Antiferromagnet* mag = magnet->asAFM()) {
+        const CuField magnetization = fullMagnetizationQuantity(mag).eval().cu();
+        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization, mastergrid, pbcRepetitions, lift, tipsize, V);
+    }
+    else {
+    throw std::invalid_argument("Cannot calculate MFM of instance which"
+                                "is no Ferromagnet or Antiferromagnet.");
+    }
+    
     return mfm;
 }
 
@@ -119,5 +118,5 @@ FM_FieldQuantity magneticForceMicroscopyQuantity(const Ferromagnet* magnet) {
 }
 
 AFM_FieldQuantity magneticForceMicroscopyQuantity(const Antiferromagnet* magnet) {
-    return AFM_FieldQuantity(magnet, evalMagneticForceMicroscopyAFM, 1, "magnetic_force_microscopy", "J");
+    return AFM_FieldQuantity(magnet, evalMagneticForceMicroscopy, 1, "magnetic_force_microscopy", "J");
 }
