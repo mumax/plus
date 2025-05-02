@@ -15,10 +15,12 @@ class MFM : public FieldQuantity {
 
   std::shared_ptr<const System> system() const;
 
+  void setLift(real value);
+
   real tipsize;
-  real lift;
 
  private:
+  real lift_;
   const Grid grid_;
   std::map<std::string, Magnet*> magnets_;
   std::shared_ptr<System> system_;

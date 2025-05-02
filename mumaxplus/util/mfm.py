@@ -12,7 +12,7 @@ class MFM(FieldQuantity):
     
     @lift.setter
     def lift(self, value):
-        self._impl.lift = value
+        self._impl.lift.set(value)
 
     @property
     def tipsize(self):
