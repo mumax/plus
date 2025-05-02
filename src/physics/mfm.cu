@@ -51,11 +51,11 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
 
             // Loop over cells in the magnet
             for (int iz = 0; iz < zmax; iz++) {
-                real z = iz * cellsize.z;
+                real z = (iz) * cellsize.z;
                 for (int iy = 0; iy < ymax; iy++) {
-                    real y = (iy+ypbc) * cellsize.y;
+                    real y = (iy + ypbc) * cellsize.y;
                     for (int ix = 0; ix < xmax; ix++) {
-                        real x = (ix+xpbc) * cellsize.x;
+                        real x = (ix + xpbc) * cellsize.x;
 
                         real3 m = magnetization.vectorAt(int3{ix, iy, iz});
                         real E[3];  // Energy of 3 tip positions
@@ -65,12 +65,12 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                             // First pole position and field
                             real3 R = {x0-x,
                                        y0-y,
-                                       z0 + z - (lift + i*delta)};
+                                       z0 - z + (lift + i*delta)};
                             real r = sqrt(R.x*R.x + R.y*R.y + R.z*R.z);
                             real3 B = R * prefactor/(4*pi*r*r*r);
                             
                             // Second pole position and field
-                            R.z -= tipsize;
+                            R.z += tipsize;
                             r = sqrt(R.x*R.x + R.y*R.y + R.z*R.z);
                             B -= R * prefactor/(4*pi*r*r*r);
                             
@@ -92,7 +92,7 @@ MFM::MFM(const Magnet* magnet,
          const Grid grid)
     : magnet_(magnet),
       grid_(grid),
-      system_(std::make_shared<System>(magnet->world(), grid_)),
+      system_(std::make_shared<System>(magnet_->world(), grid_)),
       tipsize(1e-3) {
     setLift(10e-9);
     if (grid_.size().z > 1) {
@@ -136,10 +136,10 @@ std::shared_ptr<const System> MFM::system() const {
 }
 
 void MFM::setLift(real value) {
+    lift_ = value;
     // z_grid * cz + lift - delta < (z_magnet + nz) * cz - cz/2
     if (grid_.origin().z * magnet_->world()->cellsize().z + lift_ - 1e-9 <= (magnet_->grid().origin().z + magnet_->grid().size().z) * magnet_->world()->cellsize().z - magnet_->world()->cellsize().z /2) {
         throw std::invalid_argument("Tip crashed into the sample. increase"
                                     "the lift or the origin of the MFM grid.");
     }
-    lift_ = value;
 }
