@@ -84,11 +84,6 @@ class Magnet {
   Parameter eta;  // Phenomenological elastic damping constant
   Parameter rho;  // Mass density
 
-  // mfm
-  Parameter lift;     // The height of the MFM tip above the sample
-  Parameter tipsize;  // The distance between the 2 magnetic monopolese in the tip
-
-
   // Delete copy constructor and copy assignment operator to prevent shallow copies
   Magnet(const Magnet&) = delete;
   Magnet& operator=(const Magnet&) = delete;

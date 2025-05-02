@@ -8,7 +8,6 @@
 #include "fieldquantity.hpp"
 #include "magnet.hpp"
 #include "mumaxworld.hpp"
-#include "mfm.hpp"
 #include "neel.hpp"
 #include "parameter.hpp"
 #include "fullmag.hpp"
@@ -44,7 +43,4 @@ void wrap_antiferromagnet(py::module& m) {
         py::overload_cast<const Antiferromagnet*>(&totalEnergyDensityQuantity));
   m.def("total_energy",
         py::overload_cast<const Antiferromagnet*>(&totalEnergyQuantity));
-
-  m.def("mfm",
-        py::overload_cast<const Antiferromagnet*>(&magneticForceMicroscopyQuantity));
 }

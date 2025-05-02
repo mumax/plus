@@ -2,11 +2,26 @@
 
 #include "quantityevaluator.hpp"
 
-class Ferromagnet;
-class Antiferromagnet;
+class Magnet;
 class Field;
 
-Field evalMagneticForceMicroscopy(const Magnet*);
+class MFM : public FieldQuantity {
+ public:
+  MFM(const Magnet*, Grid grid);
 
-FM_FieldQuantity magneticForceMicroscopyQuantity(const Ferromagnet*);
-AFM_FieldQuantity magneticForceMicroscopyQuantity(const Antiferromagnet*);
+  Field eval() const;
+
+  int ncomp() const;
+
+  std::shared_ptr<const System> system() const;
+
+  void setLift(real value);
+
+  real tipsize;
+
+ private:
+  real lift_;
+  const Grid grid_;
+  const Magnet* magnet_;
+  std::shared_ptr<System> system_;
+};

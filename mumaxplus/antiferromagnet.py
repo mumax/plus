@@ -405,12 +405,3 @@ class Antiferromagnet(Magnet):
         enable_elastodynamics, elastic_energy, kinetic_energy
         """
         return ScalarQuantity(_cpp.total_energy(self._impl))
-
-    @property
-    def mfm(self):
-        """Magnetic force microscopy.
-        This returns the potential energy (in Joules) of a tip with two monopole
-        charges of +-1/µ0 feels when hovering over the magnet. This can then be
-        used to create an MFM image of the antiferromagnet.
-        """
-        return FieldQuantity(_cpp.mfm(self._impl))
