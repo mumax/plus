@@ -164,6 +164,7 @@ std::shared_ptr<const System> MFM::system() const {
 
 void MFM::setLift(real value) {
     lift_ = value;
+    // first, check if the xy-plane overlaps
     for (const auto& pair : magnets_) {
         Magnet* magnet = pair.second;
         int x1 = max(grid_.origin().x, magnet->system()->grid().origin().x);
@@ -171,6 +172,7 @@ void MFM::setLift(real value) {
         int x2 = min(grid_.origin().x + grid_.size().x, magnet->system()->grid().origin().x + magnet->system()->grid().size().x);
         int y2 = min(grid_.origin().y + grid_.size().y, magnet->system()->grid().origin().y + magnet->system()->grid().size().y);
         if ((x2 - x1) > 0 && (y2 - y1) > 0) {
+            // check if the hight of the magnet intersects with the tip
             if (grid_.origin().z * magnet->world()->cellsize().z + lift_ - 1e-9 <= (magnet->grid().origin().z + magnet->grid().size().z) * magnet->world()->cellsize().z - magnet->world()->cellsize().z /2) {
                 throw std::invalid_argument("Tip crashed into the sample. increase"
                                             "the lift or the origin of the MFM grid.");
