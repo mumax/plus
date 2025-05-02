@@ -3,8 +3,8 @@ from mumaxplus import FieldQuantity
 
 class MFM(FieldQuantity):
 
-    def __init__(self, magnet, grid):
-        self._impl = _cpp.MFM(magnet._impl, grid._impl)
+    def __init__(self, input, grid):
+        self._impl = _cpp.MFM(input._impl, grid._impl)
     
     @property
     def lift(self):
@@ -12,7 +12,7 @@ class MFM(FieldQuantity):
     
     @lift.setter
     def lift(self, value):
-        self._impl.lift(value)
+        self._impl.lift = value
 
     @property
     def tipsize(self):

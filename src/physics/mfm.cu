@@ -3,7 +3,7 @@
 #include "fullmag.hpp"
 #include "mfm.hpp"
 #include "system.hpp"
-
+#include <map>
 #include <iostream>
 #include <stdio.h>
 
@@ -51,13 +51,13 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
 
             // Loop over cells in the magnet
             for (int iz = 0; iz < zmax; iz++) {
-                real z = (iz) * cellsize.z;
+                real z = (iz + magnetization.system.grid.origin().z) * cellsize.z;
                 for (int iy = 0; iy < ymax; iy++) {
-                    real y = (iy + ypbc) * cellsize.y;
+                    real y = (iy + magnetization.system.grid.origin().y + ypbc) * cellsize.y;
                     for (int ix = 0; ix < xmax; ix++) {
-                        real x = (ix + xpbc) * cellsize.x;
+                        real x = (ix + magnetization.system.grid.origin().x + xpbc) * cellsize.x;
 
-                        real3 m = magnetization.vectorAt(int3{ix, iy, iz});
+                        real3 m = magnetization.vectorAt(int3{ix + magnetization.system.grid.origin().x, iy + magnetization.system.grid.origin().y, iz + magnetization.system.grid.origin().z});
                         real E[3];  // Energy of 3 tip positions
 
                         // Get 3 different tip heights
@@ -88,13 +88,13 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
     kernel.setValueInCell(idx, 0, dFdz);
 }
 
-MFM::MFM(const Magnet* magnet,
+MFM::MFM(Magnet* magnet,
          const Grid grid)
-    : magnet_(magnet),
-      grid_(grid),
-      system_(std::make_shared<System>(magnet_->world(), grid_)),
+    : grid_(grid),
+      system_(std::make_shared<System>(magnet->world(), grid_)),
+      lift(10e-9),
       tipsize(1e-3) {
-    setLift(10e-9);
+    magnets_[magnet->name()] = magnet;
     if (grid_.size().z > 1) {
         throw std::invalid_argument("MFM should scan a 2D surface. Reduce"
                                     "the number of z-cells to 1.");
@@ -104,27 +104,56 @@ MFM::MFM(const Magnet* magnet,
         throw std::invalid_argument("Cannot take MFM picture of PBC in the"
                                     "z-direction.");
     }
+
+}
+
+MFM::MFM(const MumaxWorld* world,
+         const Grid grid)
+    : magnets_(world->magnets()),
+      grid_(grid),
+      system_(std::make_shared<System>(world, grid_)),
+      lift(10e-9),
+      tipsize(1e-3) {        
+    if (grid_.size().z > 1) {
+        throw std::invalid_argument("MFM should scan a 2D surface. Reduce"
+                                    "the number of z-cells to 1.");
+    }
+
+    if (world->pbcRepetitions().z > 0) {
+        throw std::invalid_argument("Cannot take MFM picture of PBC in the"
+                                    "z-direction.");
+    }
+
 }
 
 Field MFM::eval() const {
-    Field mfm(system_, 1, 0.0);
-    Grid mastergrid = magnet_->world()->mastergrid();
-    int3 pbcRepetitions = magnet_->world()->pbcRepetitions();
-    const real V = magnet_->world()->cellVolume();
-    int ncells = grid_.ncells();
-    Field magnetization;
-    if (const Ferromagnet* mag = magnet_->asFM()) {
-        magnetization = fullMagnetizationQuantity(mag).eval();
-    } else if (const Antiferromagnet* mag = magnet_->asAFM()) {
-        magnetization = fullMagnetizationQuantity(mag).eval();
-    } else {
-        throw std::invalid_argument("Cannot calculate MFM of instance which"
-                                    "is no Ferromagnet or Antiferromagnet.");
+    Field mfmTotal(system_, 1, 0.0);
+    for (const auto& pair : magnets_) {
+        Magnet* magnet = pair.second;
+
+        if (grid_.origin().z * magnet->world()->cellsize().z + lift - 1e-9 <= (magnet->grid().origin().z + magnet->grid().size().z) * magnet->world()->cellsize().z - magnet->world()->cellsize().z /2) {
+            throw std::invalid_argument("Tip crashed into the sample. increase"
+                                        "the lift or the origin of the MFM grid.");
+        }
+        Field mfm(system_, 1, 0.0);
+        Grid mastergrid = magnet->world()->mastergrid();
+        int3 pbcRepetitions = magnet->world()->pbcRepetitions();
+        const real V = magnet->world()->cellVolume();
+        int ncells = grid_.ncells();
+        Field magnetization;
+        if (const Ferromagnet* mag = magnet->asFM()) {
+            magnetization = fullMagnetizationQuantity(mag).eval();
+        } else if (const Antiferromagnet* mag = magnet->asAFM()) {
+            magnetization = fullMagnetizationQuantity(mag).eval();
+        } else {
+            throw std::invalid_argument("Cannot calculate MFM of instance which"
+                                        "is no Ferromagnet or Antiferromagnet.");
+        }
+
+        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift, tipsize, V);
+        mfmTotal += mfm;
     }
-
-    cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift_, tipsize, V);
-
-    return mfm;
+    return mfmTotal;
 }
 
 int MFM::ncomp() const {
@@ -133,13 +162,4 @@ int MFM::ncomp() const {
 
 std::shared_ptr<const System> MFM::system() const {
     return system_;
-}
-
-void MFM::setLift(real value) {
-    lift_ = value;
-    // z_grid * cz + lift - delta < (z_magnet + nz) * cz - cz/2
-    if (grid_.origin().z * magnet_->world()->cellsize().z + lift_ - 1e-9 <= (magnet_->grid().origin().z + magnet_->grid().size().z) * magnet_->world()->cellsize().z - magnet_->world()->cellsize().z /2) {
-        throw std::invalid_argument("Tip crashed into the sample. increase"
-                                    "the lift or the origin of the MFM grid.");
-    }
 }

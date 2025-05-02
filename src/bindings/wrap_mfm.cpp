@@ -10,10 +10,14 @@ void wrap_mfm(py::module& m) {
 
     py::class_<MFM, FieldQuantity>(m, "MFM")
 
-        .def(py::init<const Magnet*, const Grid>(),
+        .def(py::init<Magnet*, const Grid>(),
              py::arg("magnet"),
              py::arg("grid"))
+        
+        .def(py::init<const MumaxWorld*, const Grid>(),
+            py::arg("mumaxworld"),
+            py::arg("grid"))
 
-        .def("lift", &MFM::setLift)
+        .def_readwrite("lift", &MFM::lift)
         .def_readwrite("tipsize", &MFM::tipsize);
 }
