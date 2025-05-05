@@ -18,6 +18,6 @@ void wrap_mfm(py::module& m) {
             py::arg("mumaxworld"),
             py::arg("grid"))
 
-        .def("lift", &MFM::setLift)
+        .def_readwrite("lift", &MFM::lift)
         .def_readwrite("tipsize", &MFM::tipsize);
 }

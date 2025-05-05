@@ -92,9 +92,9 @@ MFM::MFM(Magnet* magnet,
          const Grid grid)
     : grid_(grid),
       system_(std::make_shared<System>(magnet->world(), grid_)),
+      lift(10e-9),
       tipsize(1e-3) {
     magnets_[magnet->name()] = magnet;
-    setLift(10e-9);
     if (grid_.size().z > 1) {
         throw std::invalid_argument("MFM should scan a 2D surface. Reduce"
                                     "the number of z-cells to 1.");
@@ -112,8 +112,8 @@ MFM::MFM(const MumaxWorld* world,
     : magnets_(world->magnets()),
       grid_(grid),
       system_(std::make_shared<System>(world, grid_)),
+      lift(10e-9),
       tipsize(1e-3) {   
-    setLift(10e-9);     
     if (grid_.size().z > 1) {
         throw std::invalid_argument("MFM should scan a 2D surface. Reduce"
                                     "the number of z-cells to 1.");
@@ -127,6 +127,7 @@ MFM::MFM(const MumaxWorld* world,
 }
 
 Field MFM::eval() const {
+    crash();
     Field mfmTotal(system_, 1, 0.0);
     
     // loop over all magnets
@@ -148,7 +149,7 @@ Field MFM::eval() const {
                                         "is no Ferromagnet or Antiferromagnet.");
         }
 
-        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift_, tipsize, V);
+        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift, tipsize, V);
         mfmTotal += mfm;
     }
     return mfmTotal;
@@ -162,8 +163,7 @@ std::shared_ptr<const System> MFM::system() const {
     return system_;
 }
 
-void MFM::setLift(real value) {
-    lift_ = value;
+void MFM::crash() const {
     // first, check if the xy-plane overlaps
     for (const auto& pair : magnets_) {
         Magnet* magnet = pair.second;
@@ -173,7 +173,7 @@ void MFM::setLift(real value) {
         int y2 = min(grid_.origin().y + grid_.size().y, magnet->system()->grid().origin().y + magnet->system()->grid().size().y);
         if ((x2 - x1) > 0 && (y2 - y1) > 0) {
             // check if the hight of the magnet intersects with the tip
-            if (grid_.origin().z * magnet->world()->cellsize().z + lift_ - 1e-9 <= (magnet->grid().origin().z + magnet->grid().size().z) * magnet->world()->cellsize().z - magnet->world()->cellsize().z /2) {
+            if (grid_.origin().z * magnet->world()->cellsize().z + lift - 1e-9 <= (magnet->grid().origin().z + magnet->grid().size().z) * magnet->world()->cellsize().z - magnet->world()->cellsize().z /2) {
                 throw std::invalid_argument("Tip crashed into the sample. increase"
                                             "the lift or the origin of the MFM grid.");
             }
