@@ -36,7 +36,7 @@ magnet.anisU = (0,0,1)
 magnet.dmi_tensor.set_interfacial_dmi(1e-3)
 
 # Create a DW
-magnet.magnetization = twodomain((0,0,1), (-1,1,0), (0,0,-1), nx*cx/3, 5*cx)
+magnet.magnetization = twodomain((0,0,1), (-1,0,0), (0,0,-1), nx*cx/3, 5*cx)
 
 print("minimizing...")
 magnet.minimize()  # minimize
@@ -67,8 +67,8 @@ im_extent = (-0.5*cx*1e6, (nx*cx - 0.5*cx)*1e6, -0.5*cy*1e6, (ny*cy - 0.5*cy)*1e
 ax1.imshow(np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], axes=(1,2,0)), origin="lower", extent=im_extent, aspect="equal")
 ax1.set_title("Initial magnetization")
 ax2.set_title("Final magnetization")
+ax1.set_xlabel("x (µm)")
 ax2.set_xlabel("x (µm)")
-ax2.set_ylabel("y (µm)")
 ax1.set_ylabel("y (µm)")
 
 # function to estimate the position of the DW
@@ -82,10 +82,12 @@ DW_pos[0] = DW_position(magnet)
 time = np.zeros(shape=(steps+1))
 time[0] = world.timesolver.time
 
+print("running...")
 for i in tqdm(range(1, steps+1)):
     world.timesolver.run(dt)
     DW_pos[i] = DW_position(magnet)
     time[i] = world.timesolver.time
+print("done!")
 
 # final magnetization
 ax2.imshow(np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], axes=(1,2,0)),
@@ -95,7 +97,7 @@ plt.show()
 
 # plot DW position in function of time
 plt.plot(time*1e9, DW_pos*1e6)
-plt.xlabel("time (ns)")
+plt.xlabel("Time (ns)")
 plt.ylabel("Domain wall position (µm)")
 plt.title("Domain wall position in time")
 plt.show()
