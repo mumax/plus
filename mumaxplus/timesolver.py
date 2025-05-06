@@ -272,7 +272,7 @@ class TimeSolver:
         self._impl.sensible_factor = fact
 
     @property
-    def sensible_timestep(self):
+    def sensible_timestep_default(self):
         """Return the time step which is used if no sensible time step
         can be calculated (e.g. when the total torque is zero).
 
@@ -282,9 +282,8 @@ class TimeSolver:
         --------
         headroom, lower_bound, max_error, upper_bound
         """
-        return self._impl.sensible_timestep
+        return self._impl.sensible_timestep_default
 
-    @sensible_timestep.setter
-    def sensible_timestep(self, dt):
-        assert dt > 0, "The sensible timestep should be bigger than 0."
-        self._impl.sensible_timestep = dt
+    @sensible_timestep_default.setter
+    def sensible_timestep_default(self, dt):
+        self._impl.sensible_timestep_default = dt

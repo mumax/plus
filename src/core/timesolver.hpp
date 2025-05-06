@@ -49,7 +49,7 @@ class TimeSolver {
   void setLowerBound(real lowerBound) { lowerBound_ = lowerBound; }
   void setMaxError(real maxError) { maxError_ = maxError; }
   void setSensibleFactor(real factor) { sensibleFactor_ = factor; }
-  void setSensibleTimestep(real dt) { sensibleTimestep_ = dt; }
+  void setSensibleTimestep(real dt);
   void setTime(real time) { time_ = time; }
   void setTimeStep(real dt) { timestep_ = dt; }
   void setUpperBound(real upperBound) { upperBound_ = upperBound; }

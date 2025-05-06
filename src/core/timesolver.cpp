@@ -51,6 +51,12 @@ void TimeSolver::setEquations(std::vector<DynamicEquation> eqs) {
   if (!fixedTimeStep_) timestep_ = sensibleTimeStep();
 }
 
+void TimeSolver::setSensibleTimestep(real dt) {
+  if (dt > 0)
+    throw std::runtime_error("The sensible timestep should be larger than zero.");
+  sensibleTimestep_ = dt;
+}
+
 void TimeSolver::adaptTimeStep(real correctionFactor) {
   if (fixedTimeStep_)
     return;
