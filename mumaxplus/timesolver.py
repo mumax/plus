@@ -190,7 +190,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, sensible_factor, sensible_timestep, upper_bound
+        headroom, lower_bound, sensible_factor, sensible_timestep_default, upper_bound
         """
 
         return self._impl.max_error
@@ -208,7 +208,7 @@ class TimeSolver:
 
         See Also
         --------
-        lower_bound, max_error, sensible_factor, sensible_timestep, upper_bound
+        lower_bound, max_error, sensible_factor, sensible_timestep_default, upper_bound
         """
         return self._impl.headroom
 
@@ -226,7 +226,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, max_error, sensible_factor, sensible_timestep, upper_bound
+        headroom, max_error, sensible_factor, sensible_timestep_default, upper_bound
         """
         return self._impl.lower_bound
 
@@ -244,7 +244,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_factor, sensible_timestep
+        headroom, lower_bound, max_error, sensible_factor, sensible_timestep_default
         """
         return self._impl.upper_bound
 
@@ -262,7 +262,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_timestep, upper_bound
+        headroom, lower_bound, max_error, sensible_timestep_default, upper_bound
         """
         return self._impl.sensible_factor
 

@@ -19,9 +19,6 @@ def test_frozenspins():
     
     avg0 = magnet.magnetization.average()
 
-    # Adaptive timestepping is prohibitted when the total torque is zero
-    world.timesolver.adaptive_timestep = False
-    world.timesolver.timestep = 1e-12
     world.timesolver.run(1e-9)
 
     expectv(magnet.magnetization.average(), avg0, 1e-7)
