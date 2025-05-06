@@ -41,10 +41,8 @@ real TimeSolver::sensibleTimeStep() const {
   for (auto eq : eqs_)
     if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > globalMaxNorm)
       globalMaxNorm = maxNorm;
-  if (globalMaxNorm == 0) {
-    throw std::runtime_error("Timesolver cannot be executed since the right hand "
-                             "sides of all dynamic equations are zero.");
-  }
+  if (globalMaxNorm == 0) // Sensible timestep cannot be calculated if torque is zero
+    return sensibleTimestep_;
   return sensibleFactor_ / globalMaxNorm;
 }
 

@@ -190,7 +190,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, sensible_factor, upper_bound
+        headroom, lower_bound, sensible_factor, sensible_timestep, upper_bound
         """
 
         return self._impl.max_error
@@ -208,7 +208,7 @@ class TimeSolver:
 
         See Also
         --------
-        lower_bound, max_error, sensible_factor, upper_bound
+        lower_bound, max_error, sensible_factor, sensible_timestep, upper_bound
         """
         return self._impl.headroom
 
@@ -226,7 +226,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, max_error, sensible_factor, upper_bound
+        headroom, max_error, sensible_factor, sensible_timestep, upper_bound
         """
         return self._impl.lower_bound
 
@@ -244,7 +244,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_factor
+        headroom, lower_bound, max_error, sensible_factor, sensible_timestep
         """
         return self._impl.upper_bound
 
@@ -262,7 +262,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, upper_bound
+        headroom, lower_bound, max_error, sensible_timestep, upper_bound
         """
         return self._impl.sensible_factor
 
@@ -270,3 +270,21 @@ class TimeSolver:
     def sensible_factor(self, fact):
         assert fact > 0, "The sensible factor should be bigger than 0."
         self._impl.sensible_factor = fact
+
+    @property
+    def sensible_timestep(self):
+        """Return the time step which is used if no sensible time step
+        can be calculated (e.g. when the total torque is zero).
+
+        The default value is 1e-14 s.
+
+        See Also
+        --------
+        headroom, lower_bound, max_error, upper_bound
+        """
+        return self._impl.sensible_timestep
+
+    @sensible_timestep.setter
+    def sensible_timestep(self, dt):
+        assert dt > 0, "The sensible timestep should be bigger than 0."
+        self._impl.sensible_timestep = dt
