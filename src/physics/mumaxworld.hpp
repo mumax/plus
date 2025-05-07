@@ -11,6 +11,7 @@
 #include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 #include "world.hpp"
 
 class Antiferromagnet;
@@ -188,9 +189,13 @@ class MumaxWorld : public World {
 
   // --------------------------------------------------
 
+  // Moving simulation window
+  void centerDomainWall(int comp=0);
+
 
  private:
   std::map<std::string, Magnet*> magnets_;
   std::map<std::string, std::unique_ptr<Ferromagnet>> ferromagnets_;
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
+  Window window_;
 };

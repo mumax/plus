@@ -14,10 +14,12 @@
 #include "magnet.hpp"
 #include "minimizer.hpp"
 #include "relaxer.hpp"
+#include "shift.hpp"
 #include "system.hpp"
 #include "thermalnoise.hpp"
 #include "timesolver.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 
 MumaxWorld::MumaxWorld(real3 cellsize)
     : World(cellsize),
@@ -333,3 +335,34 @@ void MumaxWorld::unsetPBC() {
 }
 
 // --------------------------------------------------
+
+// Moving simulation window
+void MumaxWorld::centerDomainWall(int comp) {
+
+  for (const auto& m : ferromagnets_) {
+    Ferromagnet* magnet = m.second.get();
+    timesolver_->setPostStepFunction([this, magnet, comp]() {
+      auto mag = magnet->magnetization()->field();
+      int dir = calculateShiftDirection(mag);
+      if (dir != 0) {
+        // Shift magnetization
+        auto shifted = window_.centerOnExcitation(mag, dir, comp);
+        magnet->magnetization()->set(shifted);
+
+        int ncells = magnet->system()->grid().ncells();
+        // Shift geometry
+        if (magnet->system()->geometry().size() != 0) {
+          auto shifted = window_.centerOnExcitation(magnet->system()->geometry(), dir, ncells, true, true);
+          magnet->system()->setGeometry(shifted);
+        }
+        // Shift regions
+        if (magnet->system()->regions().size() != 0) {
+          unsigned int left = 1;
+          unsigned int right = 1;
+          auto shifted = window_.centerOnExcitation(magnet->system()->regions(), dir, ncells, left, right);
+          magnet->system()->setRegions(shifted);
+        }
+      }
+    });
+  }
+}

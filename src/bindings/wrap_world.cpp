@@ -110,5 +110,8 @@ void wrap_world(py::module& m) {
                     &MumaxWorld::setMastergrid, "mastergrid of the world")
       .def_property("pbc_repetitions", &MumaxWorld::pbcRepetitions,
                     &MumaxWorld::setPbcRepetitions, "PBC repetitions of the world")
+
+      // Moving simulation window
+      .def("center_DW", &MumaxWorld::centerDomainWall, py::arg("comp"))
      ;
 }

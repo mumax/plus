@@ -42,6 +42,7 @@ real TimeSolver::sensibleTimeStep() const {
     if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > globalMaxNorm)
       globalMaxNorm = maxNorm;
   if (globalMaxNorm == 0) {
+    return 1e-14;
     throw std::runtime_error("Timesolver cannot be executed since the right hand "
                              "sides of all dynamic equations are zero.");
   }
@@ -81,12 +82,14 @@ void TimeSolver::step() {
 void TimeSolver::steps(unsigned int nSteps) {
   for (int i = 0; i < nSteps; i++) {
     step();
+    postStep();
   }
 }
 
 void TimeSolver::runwhile(std::function<bool(void)> runcondition) {
   while (runcondition()) {
     step();
+    postStep();
   }
 }
 

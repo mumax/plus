@@ -312,3 +312,7 @@ class World:
         set_pbc
         """
         self._impl.unset_pbc()
+
+    def center_DW(self, comp):
+        "BLABLA doc"
+        self._impl.center_DW(comp)

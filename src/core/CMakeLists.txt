@@ -23,7 +23,9 @@ add_library(core STATIC
     rungekutta.cpp
     rungekutta.hpp
     scalarquantity.cpp 
-    scalarquantity.hpp 
+    scalarquantity.hpp
+    shift.cu
+    shift.hpp
     stepper.cpp
     stepper.hpp
     system.cpp
@@ -34,6 +36,8 @@ add_library(core STATIC
     variable.cpp
     voronoi.cpp
     voronoi.hpp
+    window.cpp
+    window.hpp
     world.cpp
     world.hpp
 )

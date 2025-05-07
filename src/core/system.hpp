@@ -44,9 +44,13 @@ class System {
 
   /** Get the geometry of the system. */
   const GpuBuffer<bool>& geometry() const;
+  /** Set the geometry of the system. */
+  void setGeometry(GpuBuffer<bool> geometry) const { geometry_ = geometry; }
 
   /** Get the regions of the system. */
   const GpuBuffer<unsigned int>& regions() const;
+  /** Set the regions of the system. */
+  void setRegions(GpuBuffer<unsigned int> regions) const { regions_ = regions; }
 
   /** Check if a certain region index is defined. */
   void checkIdxInRegions(int idx) const;
@@ -64,8 +68,8 @@ class System {
  private:
   const World* world_;
   Grid grid_;
-  GpuBuffer<bool> geometry_;
-  GpuBuffer<unsigned int> regions_;
+  mutable GpuBuffer<bool> geometry_;
+  mutable GpuBuffer<unsigned int> regions_;
 
   friend CuSystem;
 };
