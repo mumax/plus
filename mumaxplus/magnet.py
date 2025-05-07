@@ -12,7 +12,6 @@ from .scalarquantity import ScalarQuantity
 from .strayfield import StrayField
 from .variable import Variable
 
-import warnings
 
 class Magnet(ABC):
     """A Magnet should never be initialized by the user. It contains no physics.

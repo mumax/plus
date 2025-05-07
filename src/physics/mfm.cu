@@ -1,5 +1,6 @@
 #include "constants.hpp"
 #include "cudalaunch.hpp"
+#include "datatypes.hpp"
 #include "fullmag.hpp"
 #include "mfm.hpp"
 #include "system.hpp"
@@ -26,7 +27,7 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
     if (!kernel.cellInGrid(idx))
         return;
 
-    real pi = 3.1415926535897931f;
+    real pi = 3.1415926535897931;
     
     // The cell-coordinate of the tip (without lift)
     const real3 cellsize = kernel.system.cellsize;
@@ -37,7 +38,7 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
 
     real prefactor = 1/(4*pi*MU0);  // charge at the tip is 1/µ0
     real delta = 1e-9;  // tip oscillation, take 2nd derivative over this distance
-    // Size of the grid
+    // Size of the magnet's grid
     int xmax = magnetization.system.grid.size().x;
     int ymax = magnetization.system.grid.size().y;
     int zmax = magnetization.system.grid.size().z;
@@ -66,16 +67,16 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                             real3 R = {x0-x,
                                        y0-y,
                                        z0 - z + (lift + i*delta)};
-                            real r = sqrt(R.x*R.x + R.y*R.y + R.z*R.z);
-                            real3 B = R * prefactor/(4*pi*r*r*r);
+                            real r = norm(R);
+                            real3 B = R * prefactor/(r*r*r);
                             
                             // Second pole position and field
                             R.z += tipsize;
-                            r = sqrt(R.x*R.x + R.y*R.y + R.z*R.z);
-                            B -= R * prefactor/(4*pi*r*r*r);
+                            r = norm(R);
+                            B -= R * prefactor/(r*r*r);
                             
                             // Energy (B.M) * V
-                            E[i+1] = (B.x * m.x + B.y * m.y + B.z * m.z) * V;
+                            E[i + 1] = dot(B, m) * V;
                         }
 
                         // dF/dz = d²E/dz²
@@ -115,19 +116,19 @@ MFM::MFM(const MumaxWorld* world,
       lift(10e-9),
       tipsize(1e-3) {   
     if (grid_.size().z > 1) {
-        throw std::invalid_argument("MFM should scan a 2D surface. Reduce"
-                                    "the number of z-cells to 1.");
+        throw std::invalid_argument("MFM should scan a 2D surface. Reduce the"
+                                    "number of cells in the z direction to 1.");
     }
 
     if (world->pbcRepetitions().z > 0) {
-        throw std::invalid_argument("Cannot take MFM picture of PBC in the"
-                                    "z-direction.");
+        throw std::invalid_argument("MFM picture cannot be taken if PBC are"
+                                    "enabled in the z-direction");
     }
 
 }
 
 Field MFM::eval() const {
-    crash();
+    checkGridCompatibility();
     Field mfmTotal(system_, 1, 0.0);
     
     // loop over all magnets
@@ -163,7 +164,7 @@ std::shared_ptr<const System> MFM::system() const {
     return system_;
 }
 
-void MFM::crash() const {
+void MFM::checkGridCompatibility() const {
     // first, check if the xy-plane overlaps
     for (const auto& pair : magnets_) {
         Magnet* magnet = pair.second;
@@ -172,7 +173,7 @@ void MFM::crash() const {
         int x2 = min(grid_.origin().x + grid_.size().x, magnet->system()->grid().origin().x + magnet->system()->grid().size().x);
         int y2 = min(grid_.origin().y + grid_.size().y, magnet->system()->grid().origin().y + magnet->system()->grid().size().y);
         if ((x2 - x1) > 0 && (y2 - y1) > 0) {
-            // check if the hight of the magnet intersects with the tip
+            // check if the height of the magnet intersects with the tip
             if (grid_.origin().z * magnet->world()->cellsize().z + lift - 1e-9 <= (magnet->grid().origin().z + magnet->grid().size().z) * magnet->world()->cellsize().z - magnet->world()->cellsize().z /2) {
                 throw std::invalid_argument("Tip crashed into the sample. increase"
                                             "the lift or the origin of the MFM grid.");

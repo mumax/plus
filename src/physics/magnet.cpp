@@ -31,8 +31,7 @@ Magnet::Magnet(std::shared_ptr<System> system_ptr,
       eta(system(), 0.0, name + ":eta", "kg/m3s"),
       rho(system(), 1.0, name + ":rho", "kg/m3"),
       rigidNormStrain(system(), {0.0, 0.0, 0.0}, name + ":rigid_norm_strain", ""),
-      rigidShearStrain(system(), {0.0, 0.0, 0.0}, name + ":rigid_shear_strain", "")
-      {
+      rigidShearStrain(system(), {0.0, 0.0, 0.0}, name + ":rigid_shear_strain", "") {
   // Check that the system has at least size 1
   int3 size = system_->grid().size();
   if (size.x < 1 || size.y < 1 || size.z < 1)

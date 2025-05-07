@@ -19,16 +19,17 @@ class MFM(FieldQuantity):
         
         Parameters
         ----------
-        input : can be either a MumaxWorld or Magnet instance. If it is a
-                MumaxWorld, all magnets in that world will be used to calculate
+        input : can be either a World or Magnet instance. If it is a
+                World, all magnets in that world will be used to calculate
                 the potential energy of the magnet.
-        grid : this is a 2D xy-grid used as a scanning surface. Physically, this
-               is the plane on which the MFM needle moves."""
+        grid : this is a Grid instance used as a scanning surface.
+               Physically, this is the plane on which the MFM needle moves."""
         self._impl = _cpp.MFM(input._impl, grid._impl)
     
     @property
     def lift(self):
-        """The height of the needle above the z-origin of the input `grid`.
+        """The height of the needle above the z component of the origin of the
+        input `grid`.
         default = 10e-9 m."""
         return self._impl.lift
     

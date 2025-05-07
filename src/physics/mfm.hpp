@@ -15,7 +15,7 @@ class MFM : public FieldQuantity {
 
   std::shared_ptr<const System> system() const;
 
-  void crash() const;
+  void checkGridCompatibility() const;
 
   real tipsize;
   real lift;
