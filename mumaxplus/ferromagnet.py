@@ -706,16 +706,6 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.max_torque(self._impl))
     
     @property
-    def demag_field(self):
-        """Demagnetization field (T).
-        
-        See Also
-        --------
-        demag_energy_density, demage_energy
-        """
-        return FieldQuantity(_cpp.demag_field(self._impl))
-
-    @property
     def demag_energy_density(self):
         """Energy density related to the demag field (J/m³).
         

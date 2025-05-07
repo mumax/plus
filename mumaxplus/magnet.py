@@ -551,3 +551,16 @@ class Magnet(ABC):
         """
         return StrayField._from_impl(
                         self._impl.stray_field_from_magnet(source_magnet._impl))
+
+    @property
+    def demag_field(self):
+        """Demagnetization field (T).
+
+        Ferromagnetic sublattices of other host magnets don't have a demag field.
+        
+        See Also
+        --------
+        stray_field_from_magnet
+        StrayField
+        """
+        return self.stray_field_from_magnet(self)
