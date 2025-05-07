@@ -7,6 +7,7 @@ from .formulary import magnetostatic_energy_density, Km, exchange_length, l_ex, 
 from .show import show_field, show_layer, show_magnet_geometry, show_field_3D
 from .shape import *
 from .voronoi import VoronoiTessellator
+from .window import Window
 
 __all__ = [
     "GAMMALL", "MU0", "KB", "QE", "MUB", "HBAR",
@@ -19,5 +20,6 @@ __all__ = [
     "show_layer",
     "show_magnet_geometry",
     "show_field_3D",
-    "VoronoiTessellator"
+    "VoronoiTessellator",
+    "Window"
 ]

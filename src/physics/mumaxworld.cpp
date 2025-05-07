@@ -343,23 +343,21 @@ void MumaxWorld::centerDomainWall(int comp) {
     Ferromagnet* magnet = m.second.get();
     timesolver_->setPostStepFunction([this, magnet, comp]() {
       auto mag = magnet->magnetization()->field();
-      int dir = calculateShiftDirection(mag);
+      int dir = calculateShiftDirection(mag, comp);
       if (dir != 0) {
         // Shift magnetization
-        auto shifted = window_.centerOnExcitation(mag, dir, comp);
+        auto shifted = window_->centerOnExcitation(mag, dir, comp);
         magnet->magnetization()->set(shifted);
 
         int ncells = magnet->system()->grid().ncells();
         // Shift geometry
         if (magnet->system()->geometry().size() != 0) {
-          auto shifted = window_.centerOnExcitation(magnet->system()->geometry(), dir, ncells, true, true);
+          auto shifted = window_->centerOnExcitation(magnet->system()->geometry(), dir, ncells);
           magnet->system()->setGeometry(shifted);
         }
         // Shift regions
         if (magnet->system()->regions().size() != 0) {
-          unsigned int left = 1;
-          unsigned int right = 1;
-          auto shifted = window_.centerOnExcitation(magnet->system()->regions(), dir, ncells, left, right);
+          auto shifted = window_->centerOnExcitation(magnet->system()->regions(), dir, ncells);
           magnet->system()->setRegions(shifted);
         }
       }

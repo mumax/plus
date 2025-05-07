@@ -57,27 +57,25 @@ __global__ void k_shift_buffer(T* data, int ncells, int dir, T leftValue, T righ
     data[idx] = val;
 }
 
-int calculateShiftDirection(const Field& field) {
+int calculateShiftDirection(const Field& field, int comp) {
     // TODO: this function only works properly if initial DW is centered.
-    GpuBuffer<int> d_result(1);
-    cudaLaunchReductionKernel(k_calculateShiftDirection, d_result.get(), field.cu());
-    
-    int result;
-    checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(int),
-                                 cudaMemcpyDeviceToHost, getCudaStream()));
-    return result;
+    real av = field.average()[comp];
+    real tolerance = 4.0 / field.grid().size().x;
+    if (abs(av) > tolerance) {
+        GpuBuffer<int> d_result(1);
+        cudaLaunchReductionKernel(k_calculateShiftDirection, d_result.get(), field.cu());
+
+        int result;
+        checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(int),
+                                    cudaMemcpyDeviceToHost, getCudaStream()));
+        if (av > tolerance) { return result * (-1); }
+        return result;
+    }
+    return 0;
 }
 
 Field shift(const Field& field, int dir, int comp, real3 leftValue, real3 rightValue) {
-    real av = field.average()[comp];
-    real tolerance = 4 / field.grid().size().x;
-    if (abs(av) > tolerance) {
-        if (av > tolerance) { dir *= -1; }
-        // TODO: remove these values:
-        leftValue = real3{1,0,0};
-        rightValue = real3{-1,0,0};
-        cudaLaunch(field.grid().ncells(), k_shift_field, field.cu(), dir, leftValue, rightValue);
-    }
+    cudaLaunch(field.grid().ncells(), k_shift_field, field.cu(), dir, leftValue, rightValue);
     return field;
 }
 

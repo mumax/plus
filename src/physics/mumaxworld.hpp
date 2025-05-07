@@ -190,6 +190,7 @@ class MumaxWorld : public World {
   // --------------------------------------------------
 
   // Moving simulation window
+  Window& window() const { return *window_; }
   void centerDomainWall(int comp=0);
 
 
@@ -197,5 +198,5 @@ class MumaxWorld : public World {
   std::map<std::string, Magnet*> magnets_;
   std::map<std::string, std::unique_ptr<Ferromagnet>> ferromagnets_;
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
-  Window window_;
+  std::unique_ptr<Window> window_ = std::make_unique<Window>(); // Should this be a member of World?
 };

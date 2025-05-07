@@ -6,6 +6,7 @@ from .timesolver import TimeSolver
 from .grid import Grid
 from .ferromagnet import Ferromagnet
 from .antiferromagnet import Antiferromagnet
+from .util.window import Window
 
 import warnings
 
@@ -312,6 +313,11 @@ class World:
         set_pbc
         """
         self._impl.unset_pbc()
+
+    @property
+    def window(self):
+        """Simulation window for this world."""
+        return Window(self._impl.window)
 
     def center_DW(self, comp):
         "BLABLA doc"
