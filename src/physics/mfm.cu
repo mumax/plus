@@ -15,6 +15,9 @@
   * B is the stray field from the tip evaluated in the cell.
   * Source: The design and verification of MuMax3.
   */
+
+__device__ int crashed = 0;  // global variable that changes in the kernel
+
 __global__ void k_magneticForceMicroscopy(CuField kernel,
                                           CuField magnetization,
                                           const Grid mastergrid,
@@ -24,7 +27,7 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                                           const real V) {
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (!kernel.cellInGrid(idx))
+    if (!kernel.cellInGrid(idx) or &crashed)  // If the tip already crashed, stop
         return;
 
     real pi = 3.1415926535897931;
@@ -56,6 +59,13 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                 for (int iy = 0; iy < ymax; iy++) {
                     real y = (iy + magnetization.system.grid.origin().y + ypbc) * cellsize.y;
                     for (int ix = 0; ix < xmax; ix++) {
+                        if (!magnetization.cellInGrid({ix,iy,iz}))
+                            return;
+                        
+                        if (coo.y == iy + magnetization.system.grid.origin().y &&
+                            coo.x == ix + magnetization.system.grid.origin().x &&
+                            z0 + lift + delta < z) {atomicExch(&crashed,1); return;}
+
                         real x = (ix + magnetization.system.grid.origin().x + xpbc) * cellsize.x;
 
                         real3 m = magnetization.vectorAt(int3{ix + magnetization.system.grid.origin().x, iy + magnetization.system.grid.origin().y, iz + magnetization.system.grid.origin().z});
@@ -128,7 +138,6 @@ MFM::MFM(const MumaxWorld* world,
 }
 
 Field MFM::eval() const {
-    checkGridCompatibility();
     Field mfmTotal(system_, 1, 0.0);
     
     // loop over all magnets
@@ -151,6 +160,12 @@ Field MFM::eval() const {
         }
 
         cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift, tipsize, V);
+        std::cout << &crashed << std::endl;
+        if (&crashed) {
+            throw std::invalid_argument("Tip crashed into the sample. increase"
+                                        "the lift or the z component of the"
+                                        "origin of the MFM grid.");
+        }
         mfmTotal += mfm;
     }
     return mfmTotal;
@@ -162,22 +177,4 @@ int MFM::ncomp() const {
 
 std::shared_ptr<const System> MFM::system() const {
     return system_;
-}
-
-void MFM::checkGridCompatibility() const {
-    // first, check if the xy-plane overlaps
-    for (const auto& pair : magnets_) {
-        Magnet* magnet = pair.second;
-        int x1 = max(grid_.origin().x, magnet->system()->grid().origin().x);
-        int y1 = max(grid_.origin().y, magnet->system()->grid().origin().y);
-        int x2 = min(grid_.origin().x + grid_.size().x, magnet->system()->grid().origin().x + magnet->system()->grid().size().x);
-        int y2 = min(grid_.origin().y + grid_.size().y, magnet->system()->grid().origin().y + magnet->system()->grid().size().y);
-        if ((x2 - x1) > 0 && (y2 - y1) > 0) {
-            // check if the height of the magnet intersects with the tip
-            if (grid_.origin().z * magnet->world()->cellsize().z + lift - 1e-9 <= (magnet->grid().origin().z + magnet->grid().size().z) * magnet->world()->cellsize().z - magnet->world()->cellsize().z /2) {
-                throw std::invalid_argument("Tip crashed into the sample. increase"
-                                            "the lift or the origin of the MFM grid.");
-            }
-        }
-    }
 }
