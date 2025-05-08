@@ -1,0 +1,57 @@
+"""In this example we create 2 magnets and visualize them using
+   magnetic force microscopy."""
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from mumaxplus import Antiferromagnet, Ferromagnet, Grid, World
+import mumaxplus.util.config as config
+import mumaxplus.util.mfm as mfm
+
+# define parameters
+msat = 566e3
+aex = 2.48e-12
+
+# Create a simulation world
+world = World(cellsize=(2e-9,2e-9,1e-9))
+
+# Add a ferromagnet
+magnet1 = Ferromagnet(world, Grid((50, 50, 1)))
+magnet1.magnetization = config.vortex(magnet1.center, diameter=800e-9, circulation=1, polarization=1)
+magnet1.msat = msat
+magnet1.aex = aex
+
+print("Relaxing magnet 1...")
+magnet1.relax()
+
+# Add an antiferromagnet
+magnet2 = Ferromagnet(world, Grid((50, 50, 1), origin=(60,60,0)))
+magnet2.magnetization = (1,0,0)
+magnet2.msat = msat
+magnet2.aex = aex
+
+print("Relaxing magnet 2...")
+magnet2.relax()
+
+print("Running a bit...")
+world.timesolver.run(1e-10)
+
+print("Creating MFM images...")
+
+# Create an MFM instance for the enitre world
+grid_world = Grid((120, 120, 1), origin=(0,0,0))
+mfm_world= mfm.MFM(world, grid_world)
+
+mfm_world.lift = 10e-9
+world_image = mfm_world.eval()
+plt.imshow(world_image[0,0,...], cmap="gray", origin="lower")
+plt.show()
+
+# We can also only look at one magnet
+grid_magnet = Grid((120, 120, 1), origin=(0,0,0))
+mfm_magnet = mfm.MFM(magnet2, grid_magnet)
+mfm_magnet.lift = 20e-9
+
+magnet_image = mfm_magnet.eval()
+plt.imshow(magnet_image[0,0,...], cmap="gray", origin="lower")
+plt.show()
