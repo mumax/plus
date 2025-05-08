@@ -41,12 +41,20 @@ real TimeSolver::sensibleTimeStep() const {
   for (auto eq : eqs_)
     if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > globalMaxNorm)
       globalMaxNorm = maxNorm;
+  if (globalMaxNorm == 0) // Sensible timestep cannot be calculated if torque is zero
+    return sensibleTimestepDefault_;
   return sensibleFactor_ / globalMaxNorm;
 }
 
 void TimeSolver::setEquations(std::vector<DynamicEquation> eqs) {
   eqs_ = eqs;
   if (!fixedTimeStep_) timestep_ = sensibleTimeStep();
+}
+
+void TimeSolver::setSensibleTimestepDefault(real dt) {
+  if (dt < 0)
+    throw std::runtime_error("The sensible timestep should be larger than zero.");
+  sensibleTimestepDefault_ = dt;
 }
 
 void TimeSolver::adaptTimeStep(real correctionFactor) {
@@ -68,10 +76,9 @@ void TimeSolver::adaptTimeStep(real correctionFactor) {
 
 void TimeSolver::step() {
   if (timestep_ <= 0)
-    std::runtime_error(
+    throw std::runtime_error(
         "Timesolver can not make a step because the timestep is smaller than "
         "or equal to zero.");
-
   stepper_->step();
 }
 

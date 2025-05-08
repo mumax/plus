@@ -80,7 +80,6 @@ def simulations(openBC):
     return  magnet, magnet_AFM
 
 
-@pytest.mark.mumax3
 @pytest.mark.slow
 class TestDMI3D:
     """Compare the results of the simulations by comparing the magnetizations.

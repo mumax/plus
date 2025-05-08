@@ -26,8 +26,8 @@ VoronoiTessellator::VoronoiTessellator(real grainsize,
 real3 VoronoiTessellator::getTileSize(real3 griddims) {
     if (!pbc_)
         return real3{2 * grainsize_, 2 * grainsize_ , 0};
-    return griddims / real3{std::max(1.0f, std::ceil(griddims.x / (2 * grainsize_))),
-                            std::max(1.0f, std::ceil(griddims.y / (2 * grainsize_))),
+    return griddims / real3{std::max(real(1), std::ceil(griddims.x / (2 * grainsize_))),
+                            std::max(real(1), std::ceil(griddims.y / (2 * grainsize_))),
                             0};
 }
 

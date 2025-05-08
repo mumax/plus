@@ -53,6 +53,7 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
       appliedPotential(system(), std::nanf("0"), name + ":applied_potential", "V"),
       conductivity(system(), 0.0, name + ":conductivity", "S/m"),
       amrRatio(system(), 0.0, name + ":amr_ratio", ""),
+      frozenSpins(system(), 0.0, name + ":frozen_spins", ""),
       RelaxTorqueThreshold(-1.0),
       poissonSystem(this), 
       // magnetoelasticity

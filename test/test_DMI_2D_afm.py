@@ -3,7 +3,6 @@
    It compares the final magnetization of both sublattices in an antiferromagnet
    with that of a ferromagnet. All AFM exchanges are set to 0 for this test."""
 
-import pytest
 import numpy as np
 from mumaxplus import Antiferromagnet, Ferromagnet, Grid, World
 from mumaxplus.util.shape import Cylinder
@@ -80,7 +79,6 @@ def simulations(openBC):
     return  magnet, magnet_AFM
 
 
-@pytest.mark.mumax3
 class TestDMI2D:
     """Compare the results of the simulations by comparing the magnetizations.
     """
