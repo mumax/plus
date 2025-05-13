@@ -21,7 +21,8 @@ __global__ void k_calculateShiftDirection(int* result, CuField f) {
     }
 }
 
-__global__ void k_shift_field(CuField field,
+__global__ void k_shift_field(CuField result,
+                              CuField field,
                               int dir,
                               real3 leftValue,
                               real3 rightValue) {
@@ -38,27 +39,29 @@ __global__ void k_shift_field(CuField field,
     if (src.x >= 0 && src.x < grid.size().x && field.cellInGeometry(grid.coord2index(src)))
         val = field.vectorAt(src);
     else
-        val = (dir == 1) ? leftValue : rightValue;
-    field.setVectorInCell(idx, val);
+        val = (dir == 1) ? rightValue : leftValue;
+    result.setVectorInCell(idx, val);
 }
 
 template <typename T>
-__global__ void k_shift_buffer(T* data, int ncells, int dir, T leftValue, T rightValue) {
+__global__ void k_shift_buffer(T* result, T* data, int ncells, int Nx, int Ny, int dir, T leftValue, T rightValue) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= ncells) { return; }
+    if (idx >= Nx * Ny) return;
 
-    T val;
-    int srcIdx = idx + dir;
+    int row = idx / Nx;
+    int col = idx % Nx;
 
-    if (srcIdx >= 0 && srcIdx < ncells)
-        val = data[srcIdx];
+    int srcCol = col + dir;
+    int srcIdx = row * Nx + srcCol;
+    int dstIdx = row * Nx + col;
+
+    if (srcCol >= 0 && srcCol < Nx)
+        result[dstIdx] = data[srcIdx];
     else
-        val = (dir == 1) ? leftValue : rightValue;
-    data[idx] = val;
+        result[dstIdx] = (dir == 1) ? leftValue : rightValue;
 }
 
 int calculateShiftDirection(const Field& field, int comp) {
-    // TODO: this function only works properly if initial DW is centered.
     real av = field.average()[comp];
     real tolerance = 4.0 / field.grid().size().x;
     if (abs(av) > tolerance) {
@@ -68,23 +71,27 @@ int calculateShiftDirection(const Field& field, int comp) {
         int result;
         checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(int),
                                     cudaMemcpyDeviceToHost, getCudaStream()));
-        if (av > tolerance) { return result * (-1); }
+        if (av < tolerance) { return result * (-1); }
         return result;
     }
     return 0;
 }
 
 Field shift(const Field& field, int dir, int comp, real3 leftValue, real3 rightValue) {
-    cudaLaunch(field.grid().ncells(), k_shift_field, field.cu(), dir, leftValue, rightValue);
-    return field;
+    Field result(field.system(), 3);
+    cudaLaunch(field.grid().ncells(), k_shift_field, result.cu(), field.cu(), dir, leftValue, rightValue);
+    return result;
 }
 
 template <typename T>
-GpuBuffer<T> shift(const GpuBuffer<T>& data, int direction, int ncells, T left, T right) {
-    cudaLaunch(ncells, k_shift_buffer, data.get(), ncells, direction, left, right);   
-    return data;
+GpuBuffer<T> shift(const GpuBuffer<T>& data, int direction, int ncells, int nx, int ny, T left, T right) {
+    GpuBuffer<T> result(data.size());
+    cudaLaunch(ncells, k_shift_buffer, result.get(), data.get(), ncells, nx, ny, direction, left, right);
+    cudaStreamSynchronize(getCudaStream());
+
+    return result;
 }
 
 // Explicit instantiations
-template GpuBuffer<bool> shift<bool>(const GpuBuffer<bool>&, int, int, bool, bool);
-template GpuBuffer<unsigned int> shift<unsigned int>(const GpuBuffer<unsigned int>&, int, int, unsigned int, unsigned int);
+template GpuBuffer<bool> shift<bool>(const GpuBuffer<bool>&, int, int, int, int, bool, bool);
+template GpuBuffer<unsigned int> shift<unsigned int>(const GpuBuffer<unsigned int>&, int, int, int, int, unsigned int, unsigned int);

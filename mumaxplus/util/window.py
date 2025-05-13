@@ -28,7 +28,8 @@ class Window:
         value : tuple of 3 floats
             Magnetization vector (x, y, z)
         """
-        self._impl.setMagValue(boundary, value)
+        self._check_boundary(boundary)
+        self._impl.insert_magnetization(boundary, value)
 
     def insert_geometry(self, boundary, value):
         """
@@ -40,7 +41,8 @@ class Window:
             Boundary index: 0 = Left, 1 = Right, 2 = Top, 3 = Bottom
         value : bool
         """
-        self._impl.setGeoValue(boundary, value)
+        self._check_boundary(boundary)
+        self._impl.insert_geometry(boundary, value)
 
     def insert_region_index(self, boundary, value):
         """
@@ -52,4 +54,15 @@ class Window:
             Boundary index: 0 = Left, 1 = Right, 2 = Top, 3 = Bottom
         value : int
         """
-        self._impl.setRegValue(boundary, value)
+        self._check_boundary(boundary)
+        self._impl.insert_region_index(boundary, value)
+
+    @property
+    def total_shift(self):
+        """Returns the total amount shifted by the simulation window."""
+        return self._impl.total_shift
+
+    @property
+    def velocity(self):
+        """Returns the velocity of the simulation window."""
+        return self._impl.velocity

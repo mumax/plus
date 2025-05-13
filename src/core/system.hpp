@@ -45,12 +45,12 @@ class System {
   /** Get the geometry of the system. */
   const GpuBuffer<bool>& geometry() const;
   /** Set the geometry of the system. */
-  void setGeometry(GpuBuffer<bool> geometry) const { geometry_ = geometry; }
+  void setGeometry(GpuBuffer<bool>& geometry) const { geometry_ = geometry; }
 
   /** Get the regions of the system. */
   const GpuBuffer<unsigned int>& regions() const;
   /** Set the regions of the system. */
-  void setRegions(GpuBuffer<unsigned int> regions) const { regions_ = regions; }
+  void setRegions(GpuBuffer<unsigned int>& regions) const { regions_ = regions; }
 
   /** Check if a certain region index is defined. */
   void checkIdxInRegions(int idx) const;

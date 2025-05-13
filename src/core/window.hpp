@@ -26,9 +26,16 @@ class Window {
    void setRegValue(Boundary side, unsigned int value) { regValues_[idx(side)] = value; }
  
    template <typename T>
-   GpuBuffer<T> centerOnExcitation(const GpuBuffer<T>& data, int dir, int ncells) const;
-   Field centerOnExcitation(const Field& field, int dir, int comp=0) const;
+   GpuBuffer<T> centerOnExcitation(const GpuBuffer<T>& data, int dir, int ncells, int nx, int ny) const;
+   Field centerOnExcitation(const Field& field, int dir, int comp=0);
 
+   // Get DW position
+   real getDWPositionX(const Field& field) const;
+
+
+   // Get total amount shifted
+   real GetTotalShift() const { return -ext_pos_; }
+   real velocity() const { return ext_vel_; }
 
   private:
    // Values to insert at the boundaries

@@ -338,12 +338,17 @@ void MumaxWorld::unsetPBC() {
 
 // Moving simulation window
 void MumaxWorld::centerDomainWall(int comp) {
-
+  if (magnets_.size() > 1)
+    throw std::runtime_error("Moving the simulation window is only possible when only one "
+                             "magnet lives in the world.");
   for (const auto& m : ferromagnets_) {
     Ferromagnet* magnet = m.second.get();
     timesolver_->setPostStepFunction([this, magnet, comp]() {
+
       auto mag = magnet->magnetization()->field();
       int dir = calculateShiftDirection(mag, comp);
+      int3 size = magnet->grid().size();
+
       if (dir != 0) {
         // Shift magnetization
         auto shifted = window_->centerOnExcitation(mag, dir, comp);
@@ -352,12 +357,12 @@ void MumaxWorld::centerDomainWall(int comp) {
         int ncells = magnet->system()->grid().ncells();
         // Shift geometry
         if (magnet->system()->geometry().size() != 0) {
-          auto shifted = window_->centerOnExcitation(magnet->system()->geometry(), dir, ncells);
+          auto shifted = window_->centerOnExcitation(magnet->system()->geometry(), dir, ncells, size.x, size.y);
           magnet->system()->setGeometry(shifted);
         }
         // Shift regions
         if (magnet->system()->regions().size() != 0) {
-          auto shifted = window_->centerOnExcitation(magnet->system()->regions(), dir, ncells);
+          auto shifted = window_->centerOnExcitation(magnet->system()->regions(), dir, ncells, size.x, size.y);
           magnet->system()->setRegions(shifted);
         }
       }
