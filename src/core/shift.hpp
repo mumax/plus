@@ -5,7 +5,7 @@
 
 class Field;
 
-int calculateShiftDirection(const Field& field, int comp);
+int calculateShiftDirection(const Field& field, real3 leftValue, real3 rightValue, int comp);
 Field shift(const Field& field, int dir, int comp, real3 leftValue, real3 RightValue);
 
 template <typename T>

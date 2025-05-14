@@ -11,8 +11,6 @@ Window::Window() {
       }
 
 
-
-
 template <typename T>
 GpuBuffer<T> Window::centerOnExcitation(const GpuBuffer<T>& data, int dir, int ncells, int nx, int ny) const {
     // Determine boundaries based on dir

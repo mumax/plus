@@ -24,6 +24,11 @@ class Window {
    void setMagValue(Boundary side, real3 value) { magValues_[idx(side)] = value; }
    void setGeoValue(Boundary side, bool value) { geoValues_[idx(side)] = value; }
    void setRegValue(Boundary side, unsigned int value) { regValues_[idx(side)] = value; }
+
+   // Get values to be inserted at the boundaries
+   std::array<real3, 4> getMagValues() { return magValues_; }
+   std::array<bool, 4> getGeoValues() { return geoValues_; }
+   std::array<unsigned int, 4> getRegValues() { return regValues_; }
  
    template <typename T>
    GpuBuffer<T> centerOnExcitation(const GpuBuffer<T>& data, int dir, int ncells, int nx, int ny) const;
@@ -51,4 +56,4 @@ class Window {
    real total_dist_;
 
    static constexpr size_t idx(Boundary b) { return static_cast<size_t>(b); }
-};
+};j

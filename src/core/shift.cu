@@ -10,11 +10,9 @@ __global__ void k_calculateShiftDirection(int* result, CuField f) {
 
     if (idx == 0) {
         Grid grid = f.system.grid;
-        int3 center_idx = {
-            grid.size().x / 2,
+        int3 center_idx = {0,
             grid.size().y / 2,
-            grid.size().z / 2
-        };
+            grid.size().z / 2};
         real3 centerValue = f.vectorAt(center_idx);
         int dir = (centerValue.x < 0) ? -1 : 1;
         *result = dir;
@@ -34,12 +32,12 @@ __global__ void k_shift_field(CuField result,
     int3 src = grid.index2coord(idx);
 
     real3 val;
-    src.x += dir;
+    src.x -= dir;
 
     if (src.x >= 0 && src.x < grid.size().x && field.cellInGeometry(grid.coord2index(src)))
         val = field.vectorAt(src);
     else
-        val = (dir == 1) ? rightValue : leftValue;
+        val = (dir == 1) ? leftValue : rightValue;
     result.setVectorInCell(idx, val);
 }
 
@@ -61,20 +59,29 @@ __global__ void k_shift_buffer(T* result, T* data, int ncells, int Nx, int Ny, i
         result[dstIdx] = (dir == 1) ? leftValue : rightValue;
 }
 
-int calculateShiftDirection(const Field& field, int comp) {
+int calculateShiftDirection(const Field& field, real3 leftValue, real3 rightValue, int comp) {
     real av = field.average()[comp];
     real tolerance = 4.0 / field.grid().size().x;
-    if (abs(av) > tolerance) {
+
+    int result = 0;
+    if (leftValue == real3{0,0,0} || rightValue == real3{0,0,0}) {
         GpuBuffer<int> d_result(1);
         cudaLaunchReductionKernel(k_calculateShiftDirection, d_result.get(), field.cu());
 
         int result;
         checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(int),
                                     cudaMemcpyDeviceToHost, getCudaStream()));
-        if (av < tolerance) { return result * (-1); }
-        return result;
+        leftValue.x = real(result);
+        rightValue.x = -real(result);
     }
-    return 0;
+    result = leftValue.x > 0.1 ? 1 : -1;
+
+    if (av < -tolerance)
+        return result;
+    else if (av > tolerance)
+        return -result;
+    else
+        return 0;
 }
 
 Field shift(const Field& field, int dir, int comp, real3 leftValue, real3 rightValue) {
