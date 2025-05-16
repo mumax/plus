@@ -68,6 +68,11 @@ class Ferromagnet(Magnet):
         self.magnetization.set(value)
 
     @property
+    def is_sublattice(self):
+        """Returns True if the ferromagnet is a sublattice of a host magnet."""
+        return self._impl.is_sublattice
+
+    @property
     def enable_demag(self):
         """Enable/disable demagnetization switch.
         
@@ -592,6 +597,16 @@ class Ferromagnet(Magnet):
     def amr_ratio(self, value):
         self.amr_ratio.set(value)
 
+    @property
+    def frozen_spins(self):
+        """Defines spins that should be fixed by setting torque to (0, 0, 0)
+        wherever frozen_spins is not 0."""
+        return Parameter(self._impl.frozen_spins)
+    
+    @frozen_spins.setter
+    def frozen_spins(self, value):
+        self.frozen_spins.set(value)
+
     # --- magnetoelasticity ---
 
     @property
@@ -690,16 +705,6 @@ class Ferromagnet(Magnet):
         """The maximum value of the torque over all cells (rad/s)."""
         return ScalarQuantity(_cpp.max_torque(self._impl))
     
-    @property
-    def demag_field(self):
-        """Demagnetization field (T).
-        
-        See Also
-        --------
-        demag_energy_density, demage_energy
-        """
-        return FieldQuantity(_cpp.demag_field(self._impl))
-
     @property
     def demag_energy_density(self):
         """Energy density related to the demag field (J/m³).
@@ -951,7 +956,7 @@ class Ferromagnet(Magnet):
 
     @property
     def inhomogeneous_exchange_field(self):
-        """Effective field of the inhomogeneous exchange interaction (J).
+        """Effective field of the inhomogeneous exchange interaction (T).
         This field is related to the antiferromagnetic exchange interaction
         between neighbouring cells.
         
@@ -963,7 +968,7 @@ class Ferromagnet(Magnet):
     
     @property
     def homogeneous_exchange_field(self):
-        """Effective field of the homogeneous exchange interaction (J).
+        """Effective field of the homogeneous exchange interaction (T).
         This field is related to the antiferromagnetic exchange interaction
         between spins in a single simulation cell.
         
@@ -975,7 +980,7 @@ class Ferromagnet(Magnet):
     
     @property
     def inhomogeneous_exchange_energy_density(self):
-        """Energy density related to the inhomogeneous exchange interaction (J).
+        """Energy density related to the inhomogeneous exchange interaction (J/m³).
         This energy density is related to the antiferromagnetic exchange interaction
         between neighbouring cells.
         
@@ -987,7 +992,7 @@ class Ferromagnet(Magnet):
     
     @property
     def homogeneous_exchange_energy_density(self):
-        """Energy density related to the homogeneous exchange interaction (J).
+        """Energy density related to the homogeneous exchange interaction (J/m³).
         This energy density is related to the antiferromagnetic exchange interaction
         between spins in a single simulation cell.
         

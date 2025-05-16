@@ -97,9 +97,11 @@ __global__ void k_strainTensor(CuField strain,
 
 
 Field evalStrainTensor(const Magnet* magnet) {
-  Field strain(magnet->system(), 6, 0.0);
-
-  if (strainTensorAssuredZero(magnet)) return strain;
+  Field strain(magnet->system(), 6);
+  if (strainTensorAssuredZero(magnet)) {
+    strain.makeZero();
+    return strain;
+  }
 
   int ncells = strain.grid().ncells();
   CuField u = magnet->elasticDisplacement()->field().cu();

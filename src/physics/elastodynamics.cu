@@ -21,10 +21,8 @@ bool elasticityAssuredZero(const Magnet* magnet) {
 // ========== Effective Body Force ==========
 
 Field evalEffectiveBodyForce(const Magnet* magnet) {
-  Field fField(magnet->system(), 3, 0.0);
+  Field fField = evalElasticForce(magnet);  // safely 0 if assuredZero
 
-  if (!elasticityAssuredZero(magnet))
-    fField += evalElasticForce(magnet);
   if (!magnet->externalBodyForce.assuredZero())
     fField += magnet->externalBodyForce;
 

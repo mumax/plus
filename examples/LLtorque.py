@@ -15,7 +15,7 @@ length, width, thickness = 1e-9, 1e-9, 1e-9
 nx, ny, nz = 1, 1, 1  # single cell
 world = World(cellsize=(length / nx, width / ny, thickness / nz))
 
-magnet = Ferromagnet(world, Grid((nx, ny, nz)), 3)
+magnet = Ferromagnet(world, Grid((nx, ny, nz)))
 magnet.msat = 800e3
 
 magnet.magnetization = (1, 0, 0)

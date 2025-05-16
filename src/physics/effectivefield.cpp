@@ -13,8 +13,8 @@
 #include "zeeman.hpp"
 
 Field evalEffectiveField(const Ferromagnet* magnet) {
-  Field h(magnet->system(), 3, 0.0);
-  if (!exchangeAssuredZero(magnet)) {h += evalExchangeField(magnet);}
+  // there will probably be exchange, otherwise safely initialized as 0
+  Field h = evalExchangeField(magnet);
   if (!anisotropyAssuredZero(magnet)) {h += evalAnisotropyField(magnet);}
   if (!externalFieldAssuredZero(magnet)) {h += evalExternalField(magnet);}
   if (!dmiAssuredZero(magnet)) {h += evalDmiField(magnet);}
