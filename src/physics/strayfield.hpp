@@ -57,7 +57,9 @@ class StrayFieldExecutor {
   /** Return the order of the executor. */
   virtual int order() const = 0;
 
-  /** Return epsilon. */
+  /** Return epsilon. The parameter used to determine the analytical error
+   * using epsilon * R³/V
+   */
   virtual double eps() const = 0;
 
   /** Return the switching radius of the executor. */

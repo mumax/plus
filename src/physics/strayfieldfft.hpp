@@ -37,7 +37,9 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
   /** Return the asymptotic computation order. */
   int order() const { return kernel_.order(); }
 
-  /** Return epsilon. */
+  /** Return epsilon. The parameter used to determine the analytical error
+   * using epsilon * R³/V
+   */
   double eps() const { return kernel_.eps(); }
 
   /** Return the switching radius. */
