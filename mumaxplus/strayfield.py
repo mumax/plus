@@ -43,6 +43,13 @@ class StrayField(FieldQuantity):
         assert isinstance(order, int), "The order should be an integer."
         self._impl.set_order(order)
 
+    def set_epsilon(self, eps):
+        """Set epsilon to calculate the analytical error. The error is defined
+        as epsilon * R³ / V.
+        The default value is 5e-10
+        """
+        self._impl.set_epsilon(eps)
+
     def set_switch_radius(self, R=-1):
         """Set the radius from which the asymptotic expantion should be used.
         Default is -1, then the OOMMF method is used:
@@ -50,7 +57,7 @@ class StrayField(FieldQuantity):
         E_analytic = eps R³/V
         E_asymptotic = V R²/(5(R²-dmax²)) dmax^(n-3)/R^(n)
         Here V is dx*dy*dz, dmax = max(dx,dy,dz), n is the order of asymptote
-        and eps = 5e-10 is a constant determined by trial and error.
+        and eps is a constant.
         Use the analytical model when
         E_analytic / E_asymptotic < 1
         """

@@ -11,14 +11,14 @@
 #include "system.hpp"
 #include "world.hpp"
 
-StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order, double switchingradius)
-    : order_(order), switchingradius_(switchingradius) {
+StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order, double eps, double switchingradius)
+    : order_(order), eps_(eps), switchingradius_(switchingradius) {
   kernel_ = std::make_unique<Field>(std::make_shared<System>(world, grid), 6);
   compute();
 }
 
-StrayFieldKernel::StrayFieldKernel(Grid dst, Grid src, const World* world, int order, double switchingradius)
-    : StrayFieldKernel(kernelGrid(dst, src), world, order, switchingradius) {}
+StrayFieldKernel::StrayFieldKernel(Grid dst, Grid src, const World* world, int order, double eps, double switchingradius)
+    : StrayFieldKernel(kernelGrid(dst, src), world, order, eps, switchingradius) {}
 
 StrayFieldKernel::~StrayFieldKernel() {}
 
@@ -30,7 +30,8 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
                                    const int3 pbcRepetitions,
                                    int* expansionNxxptr, size_t sizeNxx,
                                    int* expansionNxyptr, size_t sizeNxy,
-                                   int order, double switchingradius) {
+                                   int order, double eps,
+                                   double switchingradius) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!kernel.cellInGrid(idx))
     return;
@@ -51,7 +52,7 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
         E_analytic = eps R³/V
         E_asymptotic = V R²/(5(R²-dmax²)) dmax^(n-3)/R^(n)
         Here V is dx*dy*dz, dmax = max(dx,dy,dz), n is the order of asymptote
-        and eps = 5e-10 is a constant determined by trial and error.
+        and eps is a constant.
         Use the analytical model when
         E_analytic / E_asymptotic < 1
         */
@@ -66,7 +67,7 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
         double h = fmax(cellsize.x,fmax(cellsize.y,cellsize.z));
         
         if (switchingradius == -1) {
-          if (5e-10 * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
+          if (eps * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
             Nxx += calcNewellNxx(coo_, cellsize);
             Nyy += calcNewellNyy(coo_, cellsize);
             Nzz += calcNewellNzz(coo_, cellsize);
@@ -117,7 +118,7 @@ void StrayFieldKernel::compute() {
   GpuBuffer<int> expansionNxy(upToOrder(order_-3, initialNxy));
   cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(),
              mastergrid(), pbcRepetitions(), expansionNxx.get(), expansionNxx.size(),
-             expansionNxy.get(), expansionNxy.size(), order_, switchingradius_);
+             expansionNxy.get(), expansionNxy.size(), order_, eps_, switchingradius_);
 }
 
 Grid StrayFieldKernel::grid() const {
@@ -134,6 +135,9 @@ const int3 StrayFieldKernel::pbcRepetitions() const {
 }
 int StrayFieldKernel::order() const {
   return order_;
+}
+double StrayFieldKernel::eps() const {
+  return eps_;
 }
 double StrayFieldKernel::switchingradius() const {
   return switchingradius_;
