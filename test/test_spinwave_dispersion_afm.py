@@ -1,8 +1,8 @@
 """Antiferromagnetic spinwave dispersion relation
-This test copies the example and automatically tests the difference between the analytical and simulation results within the valid range.
+This test copies the example and automatically tests the difference between the
+analytical and simulation results within the valid range.
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import Antiferromagnet, Grid, World
@@ -60,7 +60,7 @@ def test_spinwave_dispersion_afm():
 
     magnet.sub1.magnetization = (0, 0, 1)
     magnet.sub2.magnetization = (0, 0, -1)
-    #magnet.minimize()  # TODO: put back in
+    magnet.minimize()
 
     nt = 1 + int(T / dt)
     timepoints = np.linspace(0, T, nt)

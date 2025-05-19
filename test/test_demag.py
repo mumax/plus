@@ -1,3 +1,5 @@
+import pytest
+
 import numpy as np
 import json
 from mumaxplus import Ferromagnet, Grid, World, _cpp
@@ -34,7 +36,7 @@ def demag_field_py(magnet):
         (h.shape[3] - mag.shape[3]) :,
     ]
 
-
+@pytest.mark.slow
 class TestDemag:
     def test_demagfield(self):
         world = World((1e-9, 1e-9, 1e-9))
@@ -42,7 +44,7 @@ class TestDemag:
         wanted = demag_field_py(magnet)
         result = magnet.demag_field.eval()
         err = np.max(np.abs((wanted - result) / result))
-        assert err < 2e-3
+        assert err < 2e-4
 
     # Compare the demagkernel with high accurate json files. These were made
     # with the BigFloat package with an accuracy of 1024 bits

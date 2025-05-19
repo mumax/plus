@@ -9,8 +9,6 @@ All stiffness constants are uniform in these tests for simplicity!
 import numpy as np
 import math
 
-import matplotlib.pyplot as plt
-
 from mumaxplus import Grid, World, Ferromagnet
 
 
