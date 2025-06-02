@@ -116,3 +116,6 @@ class FieldQuantity:
             self._impl.exec()
         stop = time.time()
         return (stop - start) / ntimes
+    
+    def write_ovf(self, file_name):
+        self._impl.write_ovf(file_name)

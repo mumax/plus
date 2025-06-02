@@ -12,6 +12,7 @@ void wrap_fieldquantity(py::module& m) {
       .def_property_readonly("ncomp", &FieldQuantity::ncomp)
       .def_property_readonly("grid", &FieldQuantity::grid)
       .def_property_readonly("system", &FieldQuantity::system)
+      .def("write_ovf", &FieldQuantity::writeOvf)
       .def("eval",
            [](const FieldQuantity* q) { return fieldToArray(q->eval()); })
       // exec does the same as eval but without returning the result (useful for

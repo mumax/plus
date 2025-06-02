@@ -60,6 +60,8 @@ class FieldQuantity {
   /// Return the world in which the quantity lives.
   /// Return nullptr if the system is not attached to a World.
   const World* world() const;
+
+  void writeOvf(const std::string& filename) const;
 };
 
 inline bool sameFieldDimensions(const FieldQuantity& q1,
