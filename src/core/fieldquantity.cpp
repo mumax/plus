@@ -68,7 +68,7 @@ void FieldQuantity::writeOvf(const std::string& filename) const {
     else if (ncomp() == 3) {
       out << "# valuelabels: " << name() << "_x " << name() << "_y " << name() << "_z\n";
     }
-    if (unit() == "") {out << "# valueunit: 1";}
+    if (unit() == "") {out << "# valueunit: 1\n";}
     else {out << "# valueunit: " << unit() << "\n";}
     out << "# Desc: Total simulation time: " << system()->world()->time() << " s\n";
     out << "# xbase: " << cellSize.x/2 << "\n";
