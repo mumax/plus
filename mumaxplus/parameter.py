@@ -212,3 +212,7 @@ class Parameter(FieldQuantity):
             self._impl.set((0, 0, 0))
 
         self.remove_time_terms()
+
+    def load_file(self, file):
+        """Use an .ovf file to create the parameter"""
+        self._impl.load_file(file)

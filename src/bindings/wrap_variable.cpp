@@ -12,5 +12,6 @@ void wrap_variable(py::module& m) {
         Field tmp(v->system(), v->ncomp());
         setArrayInField(tmp, data);
         v->set(std::move(tmp));
-      });
+      })
+      .def("load_file", &Variable::loadFile);
 }

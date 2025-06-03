@@ -16,10 +16,12 @@
 using real = float;
 using real3 = float3;
 using complex = cuComplex;
+inline float stor(const std::string& s) { return std::stof(s); }
 #elif FP_PRECISION == DOUBLE
 using real = double;
 using real3 = double3;
 using complex = cuDoubleComplex;
+inline double stor(const std::string& s) { return std::stod(s); }
 #else
 #error FP_PRECISION should be SINGLE or DOUBLE
 #endif

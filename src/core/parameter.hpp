@@ -37,6 +37,8 @@ class Parameter : public FieldQuantity, public DynamicParameter<real> {
   /** Send parameter data to the device. */
   CuParameter cu() const;
 
+  void loadFile(std::string file);
+
  private:
   std::shared_ptr<const System> system_;
   real uniformValue_;
@@ -133,6 +135,8 @@ class VectorParameter : public FieldQuantity, public DynamicParameter<real3> {
   real3 getUniformValue() const;
 
   CuVectorParameter cu() const;
+
+  void loadFile(std::string file);
 
  private:
   std::shared_ptr<const System> system_;

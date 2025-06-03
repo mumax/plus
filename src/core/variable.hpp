@@ -32,6 +32,7 @@ class Variable : public FieldQuantity {
   void operator=(const Field& f) const { set(f); }
   void operator=(real val) const { set(val); }
   void operator=(real3 val) const { set(val); }
+  void loadFile(std::string);
 
  protected:
   Field* field_;
