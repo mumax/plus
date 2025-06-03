@@ -213,6 +213,6 @@ class Parameter(FieldQuantity):
 
         self.remove_time_terms()
 
-    def load_file(self, file):
+    def read_ovf(self, file):
         """Use an .ovf file to create the parameter"""
-        self._impl.load_file(file)
+        self._impl.read_ovf(file)

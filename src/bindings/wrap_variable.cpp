@@ -13,5 +13,5 @@ void wrap_variable(py::module& m) {
         setArrayInField(tmp, data);
         v->set(std::move(tmp));
       })
-      .def("load_file", &Variable::loadFile);
+      .def("read_ovf", &Variable::loadFile);
 }

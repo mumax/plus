@@ -188,7 +188,9 @@ void Parameter::loadFile(std::string file) {
       }
     }
   }
-  staticField_->setData(data);
+  Field staticField = Field(system(), ncomp());
+  staticField.setData(data);
+  set(staticField);
 }
 
 VectorParameter::VectorParameter(std::shared_ptr<const System> system,
@@ -367,7 +369,9 @@ void VectorParameter::loadFile(std::string file) {
       }
     }
   }
-  staticField_->setData(data);
+  Field staticField = Field(system(), ncomp());
+  staticField.setData(data);
+  set(staticField);
 }
 
 CuVectorParameter VectorParameter::cu() const {

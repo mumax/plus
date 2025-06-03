@@ -37,7 +37,7 @@ void wrap_parameter(py::module& m) {
       .def("set_in_region", [](Parameter* p, unsigned int regionIdx, real value)
                                 { p->setInRegion(regionIdx, value);
       })
-      .def("load_file", &Parameter::loadFile);
+      .def("read_ovf", &Parameter::loadFile);
 
   // ===== VectorParameter =====
   py::class_<VectorParameter, FieldQuantity>(m, "VectorParameter")
@@ -106,7 +106,7 @@ void wrap_parameter(py::module& m) {
       .def("set_in_region", [](VectorParameter* p, unsigned int regionIdx, real3 value)
                                 { p->setInRegion(regionIdx, value);
       })
-      .def("load_file", &VectorParameter::loadFile);
+      .def("read_ovf", &VectorParameter::loadFile);
 
   // ===== InterParameter =====
   py::class_<InterParameter>(m, "InterParameter")

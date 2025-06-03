@@ -36,6 +36,6 @@ class Variable(FieldQuantity):
         """Get the variable value."""
         return self._impl.get()
     
-    def load_file(self, file):
+    def read_ovf(self, file):
         """Use an .ovf file to create the variable"""
-        self._impl.load_file(file)
+        self._impl.read_ovf(file)
