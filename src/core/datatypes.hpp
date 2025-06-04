@@ -16,11 +16,13 @@
 using real = float;
 using real3 = float3;
 using complex = cuComplex;
+constexpr float realControlnumber = 1234567.0;
 inline float stor(const std::string& s) { return std::stof(s); }
 #elif FP_PRECISION == DOUBLE
 using real = double;
 using real3 = double3;
 using complex = cuDoubleComplex;
+constexpr double realControlnumber = 123456789012345.0;
 inline double stor(const std::string& s) { return std::stod(s); }
 #else
 #error FP_PRECISION should be SINGLE or DOUBLE

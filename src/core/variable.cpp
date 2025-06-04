@@ -80,7 +80,6 @@ void Variable::loadFile(std::string file) {
   bool inHeader = false;
   bool firstLine = true;
   real controlnumber;
-  real realControlnumber = 1234567.0;
 
   while (std::getline(in, line)) {
     // Skip comment lines

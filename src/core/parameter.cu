@@ -113,7 +113,6 @@ void Parameter::loadFile(std::string file) {
   std::string line;
   bool inHeader = false;
   real controlnumber;
-  real realControlnumber = 1234567.0;
 
   while (std::getline(in, line)) {
     // Skip comment lines
@@ -294,7 +293,6 @@ void VectorParameter::loadFile(std::string file) {
   std::string line;
   bool inHeader = false;
   real controlnumber;
-  real realControlnumber = 1234567.0;
 
   while (std::getline(in, line)) {
     // Skip comment lines

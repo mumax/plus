@@ -87,8 +87,7 @@ void FieldQuantity::writeOvf(const std::string& filename) const {
     std::vector<real> data = eval().getData();
 
     // Write data
-    real controlnumber = 1234567.0; // ovf control number
-    out.write(reinterpret_cast<const char*>(&controlnumber), sizeof(real));
+    out.write(reinterpret_cast<const char*>(&realControlnumber), sizeof(real));
     int i = 0;
     for (real val : data) {
       out.write(reinterpret_cast<const char*>(&val), sizeof(real));
