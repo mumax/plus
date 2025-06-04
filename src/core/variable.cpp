@@ -71,15 +71,16 @@ void Variable::set(real3 value) const {
 }
 
 void Variable::loadFile(std::string file) {
-  std::ifstream in(file);
+  std::ifstream in(file, std::ios::binary);
   if (!in.is_open()) {
       throw std::runtime_error("Cannot open file " + file);
   }
 
   std::string line;
   bool inHeader = false;
-  bool inData = false;
-  std::vector<real> data;
+  bool firstLine = true;
+  real controlnumber;
+  real realControlnumber = 1234567.0;
 
   while (std::getline(in, line)) {
     // Skip comment lines
@@ -90,9 +91,7 @@ void Variable::loadFile(std::string file) {
     } else if (line.find("# End: Header") != std::string::npos) {
       inHeader = false;
     } else if (line.find("# Begin: Data Text") != std::string::npos) {
-      inData = true;
-    } else if (line.find("# End: Data Text") != std::string::npos) {
-      inData = false;
+      break;
     } else if (inHeader) {
       std::istringstream ss(line);
       std::string tag;
@@ -146,14 +145,15 @@ void Variable::loadFile(std::string file) {
           throw std::invalid_argument("The cell size z-values don't match.");
         }
       }
-    } else if (inData) {
-      std::istringstream ss(line);
-      real value;
-      while (ss >> value) {
-        data.push_back(value);
-      }
     }
   }
+  size_t totalValues = system()->grid().size().x * system()->grid().size().y * system()->grid().size().z * ncomp();
+  std::vector<real> data(totalValues);
+  in.read(reinterpret_cast<char*>(&controlnumber), sizeof(real));
+  if (controlnumber != realControlnumber) {
+    throw std::runtime_error("Unexpected control number: " + std::to_string(controlnumber));
+  }
+  in.read(reinterpret_cast<char*>(data.data()), totalValues * sizeof(real));
   field_->setData(data);
 }
 
