@@ -214,5 +214,11 @@ class Parameter(FieldQuantity):
         self.remove_time_terms()
 
     def read_ovf(self, file):
-        """Use an .ovf file to create the parameter"""
+        """Use an .ovf file to create the parameter. It must be an ovf2 file
+        containing binary data.
+        
+        Parameters
+        ----------
+        file : string
+            the name of the input file."""
         self._impl.read_ovf(file)

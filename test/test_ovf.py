@@ -1,4 +1,4 @@
-"""This file tests the reading and writing of OVF 2.0 text files
+"""This file tests the reading and writing of OVF 2.0 binary files
 """
 
 import numpy as np

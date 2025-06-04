@@ -37,5 +37,11 @@ class Variable(FieldQuantity):
         return self._impl.get()
     
     def read_ovf(self, file):
-        """Use an .ovf file to create the variable"""
+        """Use an .ovf file to create the variable. It must be an ovf2 file
+        containing binary data.
+        
+        Parameters
+        ----------
+        file : string
+            the name of the input file."""
         self._impl.read_ovf(file)

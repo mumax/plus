@@ -70,6 +70,7 @@ void Variable::set(real3 value) const {
   field_->setUniformComponent(2, value.z);
 }
 
+// Read ovf2 binary file
 void Variable::loadFile(std::string file) {
   std::ifstream in(file, std::ios::binary);
   if (!in.is_open()) {
@@ -81,6 +82,7 @@ void Variable::loadFile(std::string file) {
   bool firstLine = true;
   real controlnumber;
 
+  // Check the file and make sure it is compatible
   while (std::getline(in, line)) {
     // Skip comment lines
     if (line.empty()) continue;
@@ -100,7 +102,7 @@ void Variable::loadFile(std::string file) {
       if (tag == "Title:") {
         std::getline(ss, tag);
         tag = tag.substr(1); // remove leading space
-        // TODO: change name
+        // TODO: change name?
       } else if (tag == "valuedim:") {
         ss >> tag;
         if (ncomp() != stoi(tag)) {
@@ -146,6 +148,8 @@ void Variable::loadFile(std::string file) {
       }
     }
   }
+
+  // Read the actual data
   size_t totalValues = system()->grid().size().x * system()->grid().size().y * system()->grid().size().z * ncomp();
   std::vector<real> data(totalValues);
   in.read(reinterpret_cast<char*>(&controlnumber), sizeof(real));

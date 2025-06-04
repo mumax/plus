@@ -104,6 +104,7 @@ CuParameter Parameter::cu() const {
   return CuParameter(this);
 }
 
+// Read ovf2 binary file
 void Parameter::loadFile(std::string file) {
   std::ifstream in(file);
   if (!in.is_open()) {
@@ -114,6 +115,7 @@ void Parameter::loadFile(std::string file) {
   bool inHeader = false;
   real controlnumber;
 
+  // Check the file and make sure it is compatible
   while (std::getline(in, line)) {
     // Skip comment lines
     if (line.empty()) continue;
@@ -133,7 +135,7 @@ void Parameter::loadFile(std::string file) {
       if (tag == "Title:") {
         std::getline(ss, tag);
         tag = tag.substr(1); // remove leading space
-        // TODO: change name
+        // TODO: change name?
       } else if (tag == "valuedim:") {
         ss >> tag;
         if (ncomp() != stoi(tag)) {
@@ -179,6 +181,8 @@ void Parameter::loadFile(std::string file) {
       }
     }
   }
+
+  // Read the actual data
   size_t totalValues = system()->grid().size().x * system()->grid().size().y * system()->grid().size().z * ncomp();
   std::vector<real> data(totalValues);
   in.read(reinterpret_cast<char*>(&controlnumber), sizeof(real));
@@ -284,6 +288,7 @@ real3 VectorParameter::getUniformValue() const {
   return uniformValue_;
 }
 
+// Read ovf2 binary file
 void VectorParameter::loadFile(std::string file) {
   std::ifstream in(file);
   if (!in.is_open()) {
@@ -294,6 +299,7 @@ void VectorParameter::loadFile(std::string file) {
   bool inHeader = false;
   real controlnumber;
 
+  // Check the file and make sure it is compatible
   while (std::getline(in, line)) {
     // Skip comment lines
     if (line.empty()) continue;
@@ -313,7 +319,7 @@ void VectorParameter::loadFile(std::string file) {
       if (tag == "Title:") {
         std::getline(ss, tag);
         tag = tag.substr(1); // remove leading space
-        // TODO: change name
+        // TODO: change name?
       } else if (tag == "valuedim:") {
         ss >> tag;
         if (ncomp() != stoi(tag)) {
@@ -359,6 +365,8 @@ void VectorParameter::loadFile(std::string file) {
       }
     }
   }
+
+  // Read the actual data
   size_t totalValues = system()->grid().size().x * system()->grid().size().y * system()->grid().size().z * ncomp();
   std::vector<real> data(totalValues);
   in.read(reinterpret_cast<char*>(&controlnumber), sizeof(real));

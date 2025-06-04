@@ -39,7 +39,7 @@ const World* FieldQuantity::world() const {
   return nullptr;
 }
 
-// Create an ovf2 text file
+// Create an ovf2 binary file
 void FieldQuantity::writeOvf(const std::string& filename) const {
     std::ofstream out(filename);
     if (!out.is_open()) {

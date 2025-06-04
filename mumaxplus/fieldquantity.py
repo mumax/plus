@@ -118,4 +118,12 @@ class FieldQuantity:
         return (stop - start) / ntimes
     
     def write_ovf(self, file_name):
+        """Write the data to a .ovf file. It will be an ovf2 file containing
+        binary data. binary 4 if using SINGLE precision, binary 8 if using
+        DOUBLE precision.
+        
+        Parameters
+        ----------
+        file : string
+            the name of the output file."""
         self._impl.write_ovf(file_name)
