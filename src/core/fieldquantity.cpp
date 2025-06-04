@@ -92,7 +92,7 @@ void FieldQuantity::writeOvf(const std::string& filename) const {
     for (real val : data) {
       out.write(reinterpret_cast<const char*>(&val), sizeof(real));
     }
-
+    out << "\n";
     out << "# End: Data Text\n";
     out << "# End: Segment\n";
 
