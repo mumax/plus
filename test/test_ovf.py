@@ -6,7 +6,7 @@ import os
 
 from mumaxplus import Grid, World, Ferromagnet
 
-ATOL = 2e-7
+ATOL = 0
 
 def max_absolute_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
@@ -36,7 +36,7 @@ class TestOvf:
         magnet.magnetization.read_ovf("test_m.ovf")
         os.remove("test_m.ovf")
         
-        assert max_absolute_error(magnet.magnetization.eval(), self.magnet.magnetization.eval()) < ATOL
+        assert max_absolute_error(magnet.magnetization.eval(), self.magnet.magnetization.eval()) <= ATOL
     
     def test_read_ku1(self):
         world = World((1e-9, 3e-9, 4e-9))
@@ -44,7 +44,7 @@ class TestOvf:
         magnet.ku1.read_ovf("test_ku1.ovf")
         os.remove("test_ku1.ovf")
         
-        assert max_absolute_error(magnet.ku1.eval(), self.magnet.ku1.eval()) < ATOL
+        assert max_absolute_error(magnet.ku1.eval(), self.magnet.ku1.eval()) <= ATOL
     
     def test_read_anisU(self):
         world = World((1e-9, 3e-9, 4e-9))
@@ -52,4 +52,4 @@ class TestOvf:
         magnet.anisU.read_ovf("test_anisU.ovf")
         os.remove("test_anisU.ovf")
         
-        assert max_absolute_error(magnet.anisU.eval(), self.magnet.anisU.eval()) < ATOL
+        assert max_absolute_error(magnet.anisU.eval(), self.magnet.anisU.eval()) <= ATOL
