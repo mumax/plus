@@ -2,6 +2,7 @@
 #include "cudalaunch.hpp"
 #include "datatypes.hpp"
 #include "fullmag.hpp"
+#include "gpubuffer.hpp"
 #include "mfm.hpp"
 #include "system.hpp"
 #include <map>
@@ -16,18 +17,17 @@
   * Source: The design and verification of MuMax3.
   */
 
-__device__ int crashed = 0;  // global variable that changes in the kernel
-
 __global__ void k_magneticForceMicroscopy(CuField kernel,
                                           CuField magnetization,
                                           const Grid mastergrid,
                                           const int3 pbcRepetitions,
                                           real lift,
                                           real tipsize,
-                                          const real V) {
+                                          const real V,
+                                          bool* crashedResult) {
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (!kernel.cellInGrid(idx) or &crashed)  // If the tip already crashed, stop
+    if (!kernel.cellInGrid(idx))
         return;
 
     real pi = 3.1415926535897931;
@@ -42,9 +42,9 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
     real prefactor = 1/(4*pi*MU0);  // charge at the tip is 1/µ0
     real delta = 1e-9;  // tip oscillation, take 2nd derivative over this distance
     // Size of the magnet's grid
-    int xmax = magnetization.system.grid.size().x;
-    int ymax = magnetization.system.grid.size().y;
-    int zmax = magnetization.system.grid.size().z;
+    int xmax = magnetization.system.grid.size().x + magnetization.system.grid.origin().x;
+    int ymax = magnetization.system.grid.size().y + magnetization.system.grid.origin().y;
+    int zmax = magnetization.system.grid.size().z + magnetization.system.grid.origin().z;
 
     real dFdz = 0.;
     // Loop over valid pbc
@@ -54,21 +54,22 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
             real xpbc = Nx * mastergrid.size().x;            
 
             // Loop over cells in the magnet
-            for (int iz = 0; iz < zmax; iz++) {
-                real z = (iz + magnetization.system.grid.origin().z) * cellsize.z;
-                for (int iy = 0; iy < ymax; iy++) {
-                    real y = (iy + magnetization.system.grid.origin().y + ypbc) * cellsize.y;
-                    for (int ix = 0; ix < xmax; ix++) {
-                        if (!magnetization.cellInGrid({ix,iy,iz}))
-                            return;
-                        
-                        if (coo.y == iy + magnetization.system.grid.origin().y &&
-                            coo.x == ix + magnetization.system.grid.origin().x &&
-                            z0 + lift + delta < z) {atomicExch(&crashed,1); return;}
+            for (int iz = magnetization.system.grid.origin().z; iz < zmax; iz++) {
+                real z = (iz) * cellsize.z;
+                for (int iy = magnetization.system.grid.origin().y; iy < ymax; iy++) {
+                    real y = (iy + ypbc) * cellsize.y;
+                    for (int ix = magnetization.system.grid.origin().x; ix < xmax; ix++) {
+                        if (!magnetization.cellInGeometry({ix,iy,iz}))
+                            continue;
 
-                        real x = (ix + magnetization.system.grid.origin().x + xpbc) * cellsize.x;
+                        if (coo.x == ix &&
+                            coo.y == iy &&
+                            z0 + lift - delta <= z + 0.5 * cellsize.z) {
+                                *crashedResult = true; return;}
 
-                        real3 m = magnetization.vectorAt(int3{ix + magnetization.system.grid.origin().x, iy + magnetization.system.grid.origin().y, iz + magnetization.system.grid.origin().z});
+                        real x = (ix + xpbc) * cellsize.x;
+
+                        real3 m = magnetization.vectorAt(int3{ix, iy, iz});
                         real E[3];  // Energy of 3 tip positions
 
                         // Get 3 different tip heights
@@ -107,12 +108,12 @@ MFM::MFM(Magnet* magnet,
       tipsize(1e-3) {
     magnets_[magnet->name()] = magnet;
     if (grid_.size().z > 1) {
-        throw std::invalid_argument("MFM should scan a 2D surface. Reduce"
+        throw std::invalid_argument("MFM should scan a 2D surface. Reduce "
                                     "the number of z-cells to 1.");
     }
 
     if (magnet->world()->pbcRepetitions().z > 0) {
-        throw std::invalid_argument("Cannot take MFM picture of PBC in the"
+        throw std::invalid_argument("Cannot take MFM picture of PBC in the "
                                     "z-direction.");
     }
 
@@ -126,20 +127,24 @@ MFM::MFM(const MumaxWorld* world,
       lift(10e-9),
       tipsize(1e-3) {   
     if (grid_.size().z > 1) {
-        throw std::invalid_argument("MFM should scan a 2D surface. Reduce the"
+        throw std::invalid_argument("MFM should scan a 2D surface. Reduce the "
                                     "number of cells in the z direction to 1.");
     }
 
     if (world->pbcRepetitions().z > 0) {
-        throw std::invalid_argument("MFM picture cannot be taken if PBC are"
+        throw std::invalid_argument("MFM picture cannot be taken if PBC are "
                                     "enabled in the z-direction");
     }
 
 }
 
 Field MFM::eval() const {
+    GpuBuffer<bool> crashed(1);  // Parameter to check if the tip hit the sample
+    bool init = false;
+    checkCudaError(cudaMemcpyAsync(crashed.get(), &init, sizeof(bool),
+                                   cudaMemcpyHostToDevice, getCudaStream()));
     Field mfmTotal(system_, 1, 0.0);
-    
+
     // loop over all magnets
     for (const auto& pair : magnets_) {
         Magnet* magnet = pair.second;
@@ -150,20 +155,24 @@ Field MFM::eval() const {
         const real V = magnet->world()->cellVolume();
         int ncells = grid_.ncells();
         Field magnetization;
+
         if (const Ferromagnet* mag = magnet->asFM()) {
             magnetization = fullMagnetizationQuantity(mag).eval();
         } else if (const Antiferromagnet* mag = magnet->asAFM()) {
             magnetization = fullMagnetizationQuantity(mag).eval();
         } else {
-            throw std::invalid_argument("Cannot calculate MFM of instance which"
+            throw std::invalid_argument("Cannot calculate MFM of instance which "
                                         "is no Ferromagnet or Antiferromagnet.");
         }
 
-        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift, tipsize, V);
-        std::cout << &crashed << std::endl;
-        if (&crashed) {
-            throw std::invalid_argument("Tip crashed into the sample. increase"
-                                        "the lift or the z component of the"
+        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift, tipsize, V, crashed.get());
+        
+        bool crashedResult;
+        checkCudaError(cudaMemcpyAsync(&crashedResult, crashed.get(), sizeof(bool), cudaMemcpyDeviceToHost, getCudaStream()));
+
+        if (crashedResult) {
+            throw std::invalid_argument("Tip crashed into the sample. increase "
+                                        "the lift or the z component of the "
                                         "origin of the MFM grid.");
         }
         mfmTotal += mfm;
