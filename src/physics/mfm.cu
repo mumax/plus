@@ -42,9 +42,7 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
     real prefactor = 1/(4*pi*MU0);  // charge at the tip is 1/µ0
     real delta = 1e-9;  // tip oscillation, take 2nd derivative over this distance
     // Size of the magnet's grid
-    int xmax = magnetization.system.grid.size().x + magnetization.system.grid.origin().x;
-    int ymax = magnetization.system.grid.size().y + magnetization.system.grid.origin().y;
-    int zmax = magnetization.system.grid.size().z + magnetization.system.grid.origin().z;
+    int magnetNCells = magnetization.system.grid.ncells();
 
     real dFdz = 0.;
     // Loop over valid pbc
@@ -54,46 +52,47 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
             real xpbc = Nx * mastergrid.size().x;            
 
             // Loop over cells in the magnet
-            for (int iz = magnetization.system.grid.origin().z; iz < zmax; iz++) {
+            for (int n = 0; n < magnetNCells; n++) {
+                if (!magnetization.cellInGeometry(n))
+                    continue;
+
+                int3 magnetCoo = magnetization.system.grid.index2coord(n);
+                int ix = magnetCoo.x;
+                int iy = magnetCoo.y;
+                int iz = magnetCoo.z;
+
+                real x = (ix + xpbc) * cellsize.x;
+                real y = (iy + ypbc) * cellsize.y;
                 real z = (iz) * cellsize.z;
-                for (int iy = magnetization.system.grid.origin().y; iy < ymax; iy++) {
-                    real y = (iy + ypbc) * cellsize.y;
-                    for (int ix = magnetization.system.grid.origin().x; ix < xmax; ix++) {
-                        if (!magnetization.cellInGeometry({ix,iy,iz}))
-                            continue;
 
-                        if (coo.x == ix &&
-                            coo.y == iy &&
-                            z0 + lift - delta <= z + 0.5 * cellsize.z) {
-                                *crashedResult = true; return;}
+                if (coo.x == ix &&
+                    coo.y == iy &&
+                    z0 + lift - delta <= z + 0.5 * cellsize.z) {
+                        *crashedResult = true; return;}
 
-                        real x = (ix + xpbc) * cellsize.x;
+                real3 m = magnetization.vectorAt(int3{ix, iy, iz});
+                real E[3];  // Energy of 3 tip positions
 
-                        real3 m = magnetization.vectorAt(int3{ix, iy, iz});
-                        real E[3];  // Energy of 3 tip positions
-
-                        // Get 3 different tip heights
-                        for (int i = -1; i <= 1; i++) {
-                            // First pole position and field
-                            real3 R = {x0-x,
-                                       y0-y,
-                                       z0 - z + (lift + i*delta)};
-                            real r = norm(R);
-                            real3 B = R * prefactor/(r*r*r);
-                            
-                            // Second pole position and field
-                            R.z += tipsize;
-                            r = norm(R);
-                            B -= R * prefactor/(r*r*r);
-                            
-                            // Energy (B.M) * V
-                            E[i + 1] = dot(B, m) * V;
-                        }
-
-                        // dF/dz = d²E/dz²
-                        dFdz += ((E[0] - E[1]) + (E[2] - E[1])) / (delta*delta);
-                    }
+                // Get 3 different tip heights
+                for (int i = -1; i <= 1; i++) {
+                    // First pole position and field
+                    real3 R = {x0-x,
+                                y0-y,
+                                z0 - z + (lift + i*delta)};
+                    real r = norm(R);
+                    real3 B = R * prefactor/(r*r*r);
+                    
+                    // Second pole position and field
+                    R.z += tipsize;
+                    r = norm(R);
+                    B -= R * prefactor/(r*r*r);
+                    
+                    // Energy (B.M) * V
+                    E[i + 1] = dot(B, m) * V;
                 }
+
+                // dF/dz = d²E/dz²
+                dFdz += ((E[0] - E[1]) + (E[2] - E[1])) / (delta*delta);
             }
         }
     }
