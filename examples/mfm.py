@@ -23,9 +23,6 @@ magnet1.msat = msat
 magnet1.aex = aex
 magnet1.alpha = alpha
 
-print("Relaxing magnet 1...")
-magnet1.relax()
-
 # Add another ferromagnet
 magnet2 = Ferromagnet(world, Grid((50, 50, 1), origin=(60,60,0)))
 magnet2.magnetization = (1,0,0)
@@ -33,8 +30,8 @@ magnet2.msat = msat
 magnet2.aex = aex
 magnet2.alpha = alpha
 
-print("Relaxing magnet 2...")
-magnet2.relax()
+print("Relaxing magnets...")
+world.relax()
 
 print("Running a bit...")
 world.timesolver.run(1e-10)
@@ -57,5 +54,4 @@ mfm_magnet.lift = 20e-9
 
 magnet_image = mfm_magnet.eval()
 plt.imshow(magnet_image[0,0,...], cmap="gray", origin="lower")
-plt.title("single")
 plt.show()

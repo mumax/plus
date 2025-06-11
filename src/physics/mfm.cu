@@ -6,8 +6,6 @@
 #include "mfm.hpp"
 #include "system.hpp"
 #include <map>
-#include <iostream>
-#include <stdio.h>
 
 /** This code calculates an MFM kernel
   * Need to calculate dF/dz = sum M . d²B/dz²
@@ -27,8 +25,9 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                                           bool* crashedResult) {
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (!kernel.cellInGrid(idx))
+    if (!kernel.cellInGrid(idx)) {
         return;
+    }
 
     real pi = 3.1415926535897931;
     
@@ -53,8 +52,9 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
 
             // Loop over cells in the magnet
             for (int n = 0; n < magnetNCells; n++) {
-                if (!magnetization.cellInGeometry(n))
+                if (!magnetization.cellInGeometry(n)) {
                     continue;
+                }
 
                 int3 magnetCoo = magnetization.system.grid.index2coord(n);
                 int ix = magnetCoo.x;
@@ -68,7 +68,9 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                 if (coo.x == ix &&
                     coo.y == iy &&
                     z0 + lift - delta <= z + 0.5 * cellsize.z) {
-                        *crashedResult = true; return;}
+                        *crashedResult = true;
+                        return;
+                    }
 
                 real3 m = magnetization.vectorAt(int3{ix, iy, iz});
                 real E[3];  // Energy of 3 tip positions
@@ -115,7 +117,6 @@ MFM::MFM(Magnet* magnet,
         throw std::invalid_argument("Cannot take MFM picture of PBC in the "
                                     "z-direction.");
     }
-
 }
 
 MFM::MFM(const MumaxWorld* world,
@@ -142,13 +143,14 @@ Field MFM::eval() const {
     bool init = false;
     checkCudaError(cudaMemcpyAsync(crashed.get(), &init, sizeof(bool),
                                    cudaMemcpyHostToDevice, getCudaStream()));
+
     Field mfmTotal(system_, 1, 0.0);
 
     // loop over all magnets
     for (const auto& pair : magnets_) {
         Magnet* magnet = pair.second;
 
-        Field mfm(system_, 1, 0.0);
+        Field mfm(system_, 1);
         Grid mastergrid = magnet->world()->mastergrid();
         int3 pbcRepetitions = magnet->world()->pbcRepetitions();
         const real V = magnet->world()->cellVolume();
