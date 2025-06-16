@@ -120,12 +120,15 @@ class StrayField : public FieldQuantity {
   void setMethod(StrayFieldExecutor::Method);
 
   /** Set the order for the asymptotic computation of the stray field. */
+  int order() const {return executor_->order();}
   void setOrder(int);
 
   /** Set epsilon to determine the error of the analytical method. */
+  double eps() const {return executor_->eps();}
   void setEps(double);
 
   /** Set the radius from which the asymptotic expansion should be used. */
+  double switchingradius() const {return executor_->switchingradius();}
   void setSwitchingradius(double);
 
   /** Recreate the StrayFieldExecutor. */

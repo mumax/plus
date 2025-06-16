@@ -35,30 +35,65 @@ class StrayField(FieldQuantity):
         """
         self._impl.set_method(method)
 
-    def set_order(self, order):
-        """Set the order of 1/R, where R is the distance between cells, in the
+    @property
+    def order(self):
+        """Set the maximum order of 1/R, where R is the distance between cells, in the
         asymptotic expansion of the demag kernel.
-        The default value is 11.
-        """
-        assert isinstance(order, int), "The order should be an integer."
-        self._impl.set_order(order)
 
-    def set_epsilon(self, eps):
+        The default value is 11.
+
+        See Also
+        --------
+        epsilon, switch_radius
+        """
+        return self._impl.order
+
+    @order.setter
+    def order(self, value):
+        assert isinstance(value, int), "The order should be an integer."
+        assert value <= 14, "The order should be lower than 1/R⁻¹⁵."
+        self._impl.order = value
+
+    @property
+    def epsilon(self):
         """Set epsilon to calculate the analytical error. The error is defined
         as epsilon * R³ / V.
-        The default value is 5e-10
-        """
-        self._impl.set_epsilon(eps)
 
-    def set_switch_radius(self, R=-1):
-        """Set the radius from which the asymptotic expantion should be used.
-        Default is -1, then the OOMMF method is used:
+        The default value is 5e-10.
+
+        See Also
+        --------
+        order, switch_radius
+        """
+        return self._impl.epsilon
+
+    @epsilon.setter
+    def epsilon(self, value):
+        self._impl.epsilon = value
+
+    @property
+    def switch_radius(self):
+        """Set the radius, in m, from which the asymptotic expantion should be used.
+        Default is -1, then the OOMMF error estimations are used:
+
         Assume the following errors on the analytical and asymptotic result
+
         E_analytic = eps R³/V
+
         E_asymptotic = V R²/(5(R²-dmax²)) dmax^(n-3)/R^(n)
+
         Here V is dx*dy*dz, dmax = max(dx,dy,dz), n is the order of asymptote
         and eps is a constant.
         Use the analytical model when
+
         E_analytic / E_asymptotic < 1
+
+        See Also
+        --------
+        set_order, set_epsilon
         """
-        self._impl.set_switching_radius(R)
+        return self._impl.switching_radius
+
+    @switch_radius.setter
+    def switch_radius(self, value=-1):
+        self._impl.switching_radius = value

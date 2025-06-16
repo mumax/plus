@@ -6,7 +6,8 @@
 #include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "newell.hpp"
-#include "demagasymptotic.hpp"
+#include "newellasymptotic.cpp"
+#include "newellasymptotic.hpp"
 #include "strayfieldkernel.hpp"
 #include "system.hpp"
 #include "world.hpp"
@@ -114,8 +115,8 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
 void StrayFieldKernel::compute() {
   std::vector<std::vector<int>> initialNxx = {{2,2,0,0,5,0,0,0}, {-1,0,2,0,5,0,0,0}, {-1,0,0,2,5,0,0,0}};
   std::vector<std::vector<int>> initialNxy = {{3,1,1,0,5,0,0,0}};
-  GpuBuffer<int> expansionNxx(upToOrder(order_-3, initialNxx));
-  GpuBuffer<int> expansionNxy(upToOrder(order_-3, initialNxy));
+  GpuBuffer<int> expansionNxx(deriveUpToOrder(order_-3, initialNxx));
+  GpuBuffer<int> expansionNxy(deriveUpToOrder(order_-3, initialNxy));
   cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(),
              mastergrid(), pbcRepetitions(), expansionNxx.get(), expansionNxx.size(),
              expansionNxy.get(), expansionNxy.size(), order_, eps_, switchingradius_);

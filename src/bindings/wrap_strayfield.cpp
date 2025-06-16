@@ -22,10 +22,7 @@ void wrap_strayfield(py::module& m) {
           throw std::invalid_argument("Method should be \"fft\" or \"brute\"");
         }
       })
-      .def("set_order", &StrayField::setOrder, py::arg("order"),
-           "Set the order of 1/R in the asymptotic expansion of the demag kernel.")
-      .def("set_epsilon", &StrayField::setEps, py::arg("epsilon"),
-           "Set epsilon to determine the analytical error as: epsilon * R³/V.")
-      .def("set_switching_radius", &StrayField::setSwitchingradius, py::arg("switching radius"),
-           "Set the radius from which the asymptotic expansion should be used.");
+      .def_property("order", &StrayField::order, &StrayField::setOrder)
+      .def_property("epsilon", &StrayField::eps, &StrayField::setEps)
+      .def_property("switching_radius", &StrayField::switchingradius, &StrayField::setSwitchingradius);
 }
