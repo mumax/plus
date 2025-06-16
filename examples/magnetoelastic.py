@@ -64,9 +64,6 @@ fig, ax = plt.subplots()
 u_scale = 1e5  # amplification of displacement
 u_skip  = 10  # don't show every displacement
 
-world.timesolver.adaptive_timestep = False
-world.timesolver.timestep = 1e-12
-
 frames = 400
 steps_per_frame = 2
 

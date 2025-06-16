@@ -10,6 +10,7 @@
 
 class Stepper;
 enum class RKmethod;
+enum class MaxError;
 
 class TimeSolver {
   //------------- CONSTRUCTORS -------------------------------------------------
@@ -32,7 +33,10 @@ class TimeSolver {
   RKmethod getRungeKuttaMethod();
   real headroom() const { return headroom_; }
   real lowerBound() const { return lowerBound_; }
-  real maxError() const { return maxError_; }
+  real magnetizationMaxError() const { return magnetizationMaxError_; }
+  real displacementMaxError() const { return displacementMaxError_; }
+  real velocityMaxError() const { return velocityMaxError_; }
+  real getMaxError(MaxError) const;  // get approprate max error, given enum of Variable
   real sensibleFactor() const { return sensibleFactor_; }
   real sensibleTimestepDefault() const { return sensibleTimestepDefault_; }
   real time() const { return time_; }
@@ -47,7 +51,9 @@ class TimeSolver {
   void setEquations(std::vector<DynamicEquation> eq);
   void setHeadroom(real headroom) { headroom_ = headroom; }
   void setLowerBound(real lowerBound) { lowerBound_ = lowerBound; }
-  void setMaxError(real maxError) { maxError_ = maxError; }
+  void setMagnetizationMaxError(real maxError) { magnetizationMaxError_ = maxError; }
+  void setDisplacementMaxError(real maxError) { displacementMaxError_ = maxError; }
+  void setVelocityMaxError(real maxError) { velocityMaxError_ = maxError; }
   void setSensibleFactor(real factor) { sensibleFactor_ = factor; }
   void setSensibleTimestepDefault(real dt);
   void setTime(real time) { time_ = time; }
@@ -65,6 +71,7 @@ class TimeSolver {
 
   //------------- HELPER FUNCTIONS FOR ADAPTIVE TIMESTEPPING -------------------
 
+  // TODO: take a look at sensible timestep
   real sensibleTimeStep() const; /** Computes a sensible timestep */
   void adaptTimeStep(real corr);
 
@@ -73,7 +80,9 @@ class TimeSolver {
 
   real headroom_ = 0.8;
   real lowerBound_ = 0.5;
-  real maxError_ = 1e-5;
+  real magnetizationMaxError_ = 1e-5;
+  real displacementMaxError_ = 1e-18;  // TODO: may need to change default value
+  real velocityMaxError_ = 1e-7;  // TODO: may need to change default value
   real sensibleFactor_ = 0.01;
   real sensibleTimestepDefault_ = 1e-14;
   real time_ = 0.0;

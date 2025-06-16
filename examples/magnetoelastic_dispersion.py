@@ -81,10 +81,6 @@ def simulation(theta):
     magnet.alpha = 0
     magnet.eta = 0
 
-    # time stepping
-    world.timesolver.adaptive_timestep = False
-    world.timesolver.timestep = 1e-13
-
     # parameters to save
     m = np.zeros(shape=(nt, 3, nz, ny, nx))
     u = np.zeros(shape=(nt, 3, nz, ny, nx))

@@ -183,23 +183,65 @@ class TimeSolver:
         self._impl.time = time
 
     @property
-    def max_error(self):
-        """Return the maximum error per step the solver can tollerate.
+    def magnetization_max_error(self):
+        """Return the maximum error per step the solver can tollerate for the
+        magnetization-torque equations of motion (rad).
         
         The default value is 1e-5.
 
         See Also
         --------
         headroom, lower_bound, sensible_factor, sensible_timestep_default, upper_bound
+        displacement_max_error, velocity_max_error
         """
 
-        return self._impl.max_error
+        return self._impl.torque_max_error
 
-    @max_error.setter
-    def max_error(self, error):
+    @magnetization_max_error.setter
+    def magnetization_max_error(self, error):
         assert error > 0, "The maximum error should be bigger than 0."
-        self._impl.max_error = error
+        self._impl.magnetization_max_error = error
     
+    @property
+    def displacement_max_error(self):
+        """Return the maximum error per step the solver can tollerate for the
+        displacement-velocity equations of motion (m).
+        
+        The default value is 1e-18.
+
+        See Also
+        --------
+        headroom, lower_bound, sensible_factor, upper_bound
+        magnetization_max_error, velocity_max_error
+        """
+
+        return self._impl.displacement_max_error
+
+    @displacement_max_error.setter
+    def displacement_max_error(self, error):
+        assert error > 0, "The maximum error should be bigger than 0."
+        self._impl.displacement_max_error = error
+
+    @property
+    def velocity_max_error(self):
+        """Return the maximum error per step the solver can tollerate for the
+        velocity-acceleration equations of motion (m/s).
+        
+        The default value is 1e-7.
+
+        See Also
+        --------
+        headroom, lower_bound, sensible_factor, upper_bound
+        displacement_max_error, magnetization_max_error
+        """
+
+        return self._impl.velocity_max_error
+
+    @velocity_max_error.setter
+    def velocity_max_error(self, error):
+        assert error > 0, "The maximum error should be bigger than 0."
+        self._impl.velocity_max_error = error
+
     @property
     def headroom(self):
         """Return the solver headroom.
@@ -209,6 +251,7 @@ class TimeSolver:
         See Also
         --------
         lower_bound, max_error, sensible_factor, sensible_timestep_default, upper_bound
+        displacement_max_error, magnetization_max_error, velocity_max_error
         """
         return self._impl.headroom
 
@@ -227,6 +270,7 @@ class TimeSolver:
         See Also
         --------
         headroom, max_error, sensible_factor, sensible_timestep_default, upper_bound
+        displacement_max_error, magnetization_max_error, velocity_max_error
         """
         return self._impl.lower_bound
 
@@ -245,6 +289,7 @@ class TimeSolver:
         See Also
         --------
         headroom, lower_bound, max_error, sensible_factor, sensible_timestep_default
+        displacement_max_error, magnetization_max_error, velocity_max_error
         """
         return self._impl.upper_bound
 
@@ -263,6 +308,7 @@ class TimeSolver:
         See Also
         --------
         headroom, lower_bound, max_error, sensible_timestep_default, upper_bound
+        displacement_max_error, magnetization_max_error, velocity_max_error
         """
         return self._impl.sensible_factor
 
