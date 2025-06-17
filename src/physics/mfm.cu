@@ -17,6 +17,7 @@
 
 __global__ void k_magneticForceMicroscopy(CuField kernel,
                                           CuField magnetization,
+                                          const int magnetNCells,
                                           const Grid mastergrid,
                                           const int3 pbcRepetitions,
                                           real lift,
@@ -40,8 +41,6 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
 
     real prefactor = 1/(4*pi*MU0);  // charge at the tip is 1/µ0
     real delta = 1e-9;  // tip oscillation, take 2nd derivative over this distance
-    // Size of the magnet's grid
-    int magnetNCells = magnetization.system.grid.ncells();
 
     real dFdz = 0.;
     // Loop over valid pbc
@@ -65,9 +64,10 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                 real y = (iy + ypbc) * cellsize.y;
                 real z = (iz) * cellsize.z;
 
-                if (coo.x == ix &&
-                    coo.y == iy &&
-                    z0 + lift - delta <= z + 0.5 * cellsize.z) {
+                if ((coo.x == ix &&
+                    coo.y == iy) &&
+                    !(z0 + lift - delta > z + 0.5 * cellsize.z ||
+                      z0 + lift + delta < z - 0.5 * cellsize.z)) {
                         *crashedResult = true;
                         return;
                     }
@@ -76,11 +76,12 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                 real E[3];  // Energy of 3 tip positions
 
                 // Get 3 different tip heights
+                #pragma unroll
                 for (int i = -1; i <= 1; i++) {
                     // First pole position and field
                     real3 R = {x0-x,
-                                y0-y,
-                                z0 - z + (lift + i*delta)};
+                               y0-y,
+                               z0 - z + (lift + i*delta)};
                     real r = norm(R);
                     real3 B = R * prefactor/(r*r*r);
                     
@@ -102,31 +103,33 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
 }
 
 MFM::MFM(Magnet* magnet,
-         const Grid grid)
-    : grid_(grid),
-      system_(std::make_shared<System>(magnet->world(), grid_)),
+         const Grid grid,
+         std::string name)
+    : name_(name),
+      system_(std::make_shared<System>(magnet->world(), grid)),
       lift(10e-9),
       tipsize(1e-3) {
-    magnets_[magnet->name()] = magnet;
-    if (grid_.size().z > 1) {
+    if (system_->grid().size().z > 1) {
         throw std::invalid_argument("MFM should scan a 2D surface. Reduce "
                                     "the number of z-cells to 1.");
     }
 
     if (magnet->world()->pbcRepetitions().z > 0) {
-        throw std::invalid_argument("Cannot take MFM picture of PBC in the "
-                                    "z-direction.");
+        throw std::invalid_argument("Cannot take MFM picture when periodic "
+                                    "boundaries are enabled in the z-direction.");
     }
+    magnets_[magnet->name()] = magnet;
 }
 
 MFM::MFM(const MumaxWorld* world,
-         const Grid grid)
+         const Grid grid,
+         std::string name)
     : magnets_(world->magnets()),
-      grid_(grid),
-      system_(std::make_shared<System>(world, grid_)),
+      name_(name),
+      system_(std::make_shared<System>(world, grid)),
       lift(10e-9),
       tipsize(1e-3) {   
-    if (grid_.size().z > 1) {
+    if (system_->grid().size().z > 1) {
         throw std::invalid_argument("MFM should scan a 2D surface. Reduce the "
                                     "number of cells in the z direction to 1.");
     }
@@ -144,17 +147,19 @@ Field MFM::eval() const {
     checkCudaError(cudaMemcpyAsync(crashed.get(), &init, sizeof(bool),
                                    cudaMemcpyHostToDevice, getCudaStream()));
 
-    Field mfmTotal(system_, 1, 0.0);
+    Field mfmTotal(system_, 1);
 
     // loop over all magnets
+    int i = 0;
     for (const auto& pair : magnets_) {
         Magnet* magnet = pair.second;
 
         Field mfm(system_, 1);
         Grid mastergrid = magnet->world()->mastergrid();
         int3 pbcRepetitions = magnet->world()->pbcRepetitions();
+        int magnetNCells = magnet->system()->grid().ncells();
         const real V = magnet->world()->cellVolume();
-        int ncells = grid_.ncells();
+        int ncells = system_->grid().ncells();
         Field magnetization;
 
         if (const Ferromagnet* mag = magnet->asFM()) {
@@ -166,7 +171,7 @@ Field MFM::eval() const {
                                         "is no Ferromagnet or Antiferromagnet.");
         }
 
-        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), mastergrid, pbcRepetitions, lift, tipsize, V, crashed.get());
+        cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), magnetNCells, mastergrid, pbcRepetitions, lift, tipsize, V, crashed.get());
         
         bool crashedResult;
         checkCudaError(cudaMemcpyAsync(&crashedResult, crashed.get(), sizeof(bool), cudaMemcpyDeviceToHost, getCudaStream()));
@@ -176,7 +181,9 @@ Field MFM::eval() const {
                                         "the lift or the z component of the "
                                         "origin of the MFM grid.");
         }
-        mfmTotal += mfm;
+        if (i==0) {mfmTotal = mfm;}
+        else {mfmTotal += mfm;}
+        i++;
     }
     return mfmTotal;
 }

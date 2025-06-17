@@ -19,5 +19,6 @@ __all__ = [
     "show_layer",
     "show_magnet_geometry",
     "show_field_3D",
-    "VoronoiTessellator"
+    "VoronoiTessellator",
+    "MFM",
 ]

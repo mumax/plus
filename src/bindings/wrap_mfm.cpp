@@ -9,6 +9,8 @@
 void wrap_mfm(py::module& m) {
 
     py::class_<MFM, FieldQuantity>(m, "MFM")
+        .def_property_readonly("name", &MFM::name)
+        .def_property_readonly("unit", &MFM::unit)
 
         .def(py::init<Magnet*, const Grid>(),
              py::arg("magnet"),

@@ -1,6 +1,5 @@
 import _mumaxpluscpp as _cpp
 from mumaxplus import FieldQuantity
-import matplotlib.pyplot as plt
 
 class MFM(FieldQuantity):
 
@@ -9,9 +8,9 @@ class MFM(FieldQuantity):
         
         This class is used to create a magnetic force microscopy image. The
         needle is simulated as a pair of monopoles with a charge of 1/µ0 at a
-        distance `tipsize` from one another. The height of the needle is
-        determined by the origin of the input `grid` and the `lift` of the
-        needle.
+        distance `tipsize` from one another. Here µ0 = 1.256637062E-6F.
+        The height of the needle is determined by the origin of the input `grid`
+        and the `lift` of the needle.
 
         When the `eval` function is called for this instance, it returns a numpy
         array of the same size as the input `grid` which contains the potential
@@ -25,11 +24,22 @@ class MFM(FieldQuantity):
         grid : this is a Grid instance used as a scanning surface.
                Physically, this is the plane on which the MFM needle moves."""
         self._impl = _cpp.MFM(input._impl, grid._impl)
+
+    @property
+    def name(self):
+        """The name of the MFM instance"""
+        return self._impl.name
+    
+    @property
+    def unit(self):
+        """The unit of the MFM instance. This is always J."""
+        return self._impl.name
     
     @property
     def lift(self):
         """The height of the needle above the z component of the origin of the
         input `grid`.
+
         default = 10e-9 m."""
         return self._impl.lift
     
@@ -40,6 +50,7 @@ class MFM(FieldQuantity):
     @property
     def tipsize(self):
         """The distance between the two monopoles in the needle.
+        
         default = 1e-3 m."""
         return self._impl.tipsize
     

@@ -2,7 +2,6 @@
    magnetic force microscopy."""
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 import mumaxplus.util.config as config
@@ -39,19 +38,25 @@ world.timesolver.run(1e-10)
 print("Creating MFM images...")
 
 # Create an MFM instance for the enitre world
-grid_world = Grid((120, 120, 1), origin=(0,0,0))
+grid_world = Grid((120, 120, 1))
 mfm_world= mfm.MFM(world, grid_world)
 
 mfm_world.lift = 5e-9
 world_image = mfm_world.eval()
 plt.imshow(world_image[0,0,...], cmap="gray", origin="lower")
+plt.xlabel("x (m)")
+plt.xlabel("y (m)")
+plt.title("MFM image of everything in the world")
 plt.show()
 
 # We can also only look at one magnet
-grid_magnet = Grid((120, 120, 1), origin=(0,0,0))
+grid_magnet = Grid((70, 70, 1), origin=(50, 50, 0))
 mfm_magnet = mfm.MFM(magnet2, grid_magnet)
 mfm_magnet.lift = 20e-9
 
 magnet_image = mfm_magnet.eval()
 plt.imshow(magnet_image[0,0,...], cmap="gray", origin="lower")
+plt.xlabel("x (m)")
+plt.xlabel("y (m)")
+plt.title("MFM image of only one magnet")
 plt.show()
