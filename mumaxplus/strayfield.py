@@ -51,7 +51,7 @@ class StrayField(FieldQuantity):
     @order.setter
     def order(self, value):
         assert isinstance(value, int), "The order should be an integer."
-        assert value <= 14, "The order should be lower than 1/R⁻¹⁵."
+        assert 3 <= value <= 14, "The order should be between 1/R⁻³ and 1/R⁻¹⁵."
         self._impl.order = value
 
     @property

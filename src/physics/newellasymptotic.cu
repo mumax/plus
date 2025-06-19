@@ -26,6 +26,8 @@ __host__ __device__ real calcAsymptoticNxx(int3 idx, real3 cellsize, int order) 
   
   double result = 0;
 
+  if (!(order % 2)) {order -= 1;}
+
   switch(order) {
     case 13:
       result += (13352169600./1916006400. * pow(x,2)*pow(z,10)*pow(hz,10)
@@ -1198,6 +1200,8 @@ __host__ __device__ real calcAsymptoticNxy(int3 idx, real3 cellsize, int order) 
   
   double result = 0;
 
+  if (!(order % 2)) {order -= 1;}
+  
   switch(order) {
     case 13:
       result += (10897286400./1916006400. * x*y*pow(z,10)*pow(hz,10)
