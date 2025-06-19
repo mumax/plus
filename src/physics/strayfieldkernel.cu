@@ -6,7 +6,6 @@
 #include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "newell.hpp"
-#include "newellasymptotic.cpp"
 #include "newellasymptotic.hpp"
 #include "strayfieldkernel.hpp"
 #include "system.hpp"
@@ -29,8 +28,6 @@ std::shared_ptr<const System> StrayFieldKernel::kernelSystem() const {
 
 __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
                                    const int3 pbcRepetitions,
-                                   int* expansionNxxptr, size_t sizeNxx,
-                                   int* expansionNxyptr, size_t sizeNxy,
                                    int order, double eps,
                                    double switchingradius) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -113,13 +110,8 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
 }
 
 void StrayFieldKernel::compute() {
-  std::vector<std::vector<int>> initialNxx = {{2,2,0,0,5,0,0,0}, {-1,0,2,0,5,0,0,0}, {-1,0,0,2,5,0,0,0}};
-  std::vector<std::vector<int>> initialNxy = {{3,1,1,0,5,0,0,0}};
-  GpuBuffer<int> expansionNxx(deriveUpToOrder(order_-3, initialNxx));
-  GpuBuffer<int> expansionNxy(deriveUpToOrder(order_-3, initialNxy));
   cudaLaunch(grid().ncells(), k_strayFieldKernel, kernel_->cu(),
-             mastergrid(), pbcRepetitions(), expansionNxx.get(), expansionNxx.size(),
-             expansionNxy.get(), expansionNxy.size(), order_, eps_, switchingradius_);
+             mastergrid(), pbcRepetitions(), order_, eps_, switchingradius_);
 }
 
 Grid StrayFieldKernel::grid() const {
