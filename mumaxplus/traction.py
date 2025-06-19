@@ -3,18 +3,21 @@
 from .parameter import Parameter
 
 class BoundaryTraction:
-    """Contains the traction parameters of a Magnet at each of the 6 sides of
-    rectangular cells. The traction is applied as a boundary condition of the
-    stress tensor σ during calculation of the internal force.
+    """Contains the traction parameters of a Magnet's boundary at each of the 6
+    sides of rectangular cells. The traction is applied as a boundary condition
+    of the stress tensor σ during calculation of the internal force.
     
     t = σ·n = n·σ
 
-    Where t is the applied traction vector at the boundary with normal vector n,
-    with n is equal to ± e_x, ± e_y or ± e_z, represented by :attr:`pos_x_side`,
+    Here t is the applied traction vector at the boundary with normal vector n,
+    with n equal to ± e_x, ± e_y or ± e_z, represented by :attr:`pos_x_side`,
     :attr:`neg_x_side`, :attr:`pos_y_side`, :attr:`neg_y_side`,
     :attr:`pos_z_side` and :attr:`neg_z_side`.
 
-    The traction set in any cell without a relevant boundary is thus ignored.
+    The traction set in any cell without a relevant boundary (e.g. in bulk
+    cells) is thus ignored.
+
+    BoundaryTraction should not be initialized by the end user.
     """
 
     def __init__(self, impl):
@@ -22,13 +25,13 @@ class BoundaryTraction:
 
         warning
         -------
-            The end user should not create BoundaryTraction instances. Each Magnet
-            already has BoundaryTraction as an attribute which can be used to set
-            the traction parameters. See :func:`Magnet.boundary_traction`.
+        The end user should not create BoundaryTraction instances. Each Magnet
+        already has BoundaryTraction as an attribute which can be used to set
+        the traction parameters. See :func:`Magnet.boundary_traction`.
 
         Parameters
         ----------
-        impl: _mumaxpluscpp.boundary_traction
+        impl: _mumaxpluscpp.BoundaryTraction
         """
         self._impl = impl
 

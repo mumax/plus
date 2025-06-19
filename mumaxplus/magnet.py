@@ -474,7 +474,7 @@ class Magnet(ABC):
 
     @property
     def boundary_traction(self) -> BoundaryTraction:
-        """Get the boundary traction of this Magnet.
+        """Get the boundary traction of this Magnet (Pa).
         
         See Also
         --------
@@ -577,7 +577,7 @@ class Magnet(ABC):
         f = ∇·σ
 
         The boundary conditions of this force density are determined by the
-        applied :attr:`boundary_traction`.
+        applied :attr:`boundary_traction` (traction-free by default).
         
         See Also
         --------

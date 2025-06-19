@@ -64,7 +64,7 @@ Magnet::Magnet(Magnet&& other) noexcept
       rho(other.rho),
       rigidNormStrain(other.rigidNormStrain),
       rigidShearStrain(other.rigidShearStrain),
-      boundaryTraction(boundaryTraction) {
+      boundaryTraction(other.boundaryTraction) {
   other.system_ = nullptr;
   other.name_ = "";
 }

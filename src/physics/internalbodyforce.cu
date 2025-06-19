@@ -20,14 +20,14 @@ __device__ int3 tensorRowComps(int row) {
  * Numerical divergence of stress with central five-point stencil in bulk material.
  * Lower order accuracy (three-point stencil) central difference is used in bulk
  * 1 cell away from boundary.
- * At the boundary, traction(-free) boundary conditions are implemented, using a
- * custom second-order-accurate three-point stencil.
+ * The traction is applied at the boundary, implemented using a custom
+ * second-order-accurate three-point stencil.
 */
 __global__ void k_internalBodyForce(CuField fField,
-                               const CuField stressTensor,
-                               const CuBoundaryTraction traction,
-                               const real3 w,  // 1 / cellsize
-                               const Grid mastergrid) {
+                                    const CuField stressTensor,
+                                    const CuBoundaryTraction traction,
+                                    const real3 w,  // 1 / cellsize
+                                    const Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = fField.system;
   const Grid grid = system.grid;
@@ -72,17 +72,19 @@ __global__ void k_internalBodyForce(CuField fField,
     if (!im1_inGeo && !ip1_inGeo) {
       // --1-- central difference of boundary stress, ε ~ h^2
       f += ws[i] * (traction.getSide(i, 1).vectorAt(idx)
-                    + traction.getSide(i, -1).vectorAt(idx));  // -1 * -1
+                    // -1 from stencil * -1 from normal vector
+                    + traction.getSide(i, -1).vectorAt(idx));
     } else if (!im1_inGeo) {
-      // --11- left boundary, custom difference + traction free BC,  ε ~ h^2
+      // --11- left boundary, custom difference + traction BC,  ε ~ h^2
       f += ws[i] * (
         // stress row at coo_i-1/2 = boundary traction * negative sense of normal vector
-        4./3. * traction.getSide(i, -1).vectorAt(idx)  // -1 * -1
+        // -1 from stencil * -1 from normal vector
+        4./3. * traction.getSide(i, -1).vectorAt(idx)
         + stressTensor.vectorAt(idx, stressRow)  // +3/3 weight
         + 1./3. * stressTensor.vectorAt(coo_ip1, stressRow)
       );
     } else if (!ip1_inGeo) {
-      // -11-- right boundary, custom difference + traction free BC,  ε ~ h^2
+      // -11-- right boundary, custom difference + traction BC,  ε ~ h^2
       f += ws[i] * (
         - 1./3. * stressTensor.vectorAt(coo_im1, stressRow)
         - stressTensor.vectorAt(idx, stressRow)  // -3/3 weight

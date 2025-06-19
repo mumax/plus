@@ -14,10 +14,10 @@ struct BoundaryTraction {
   VectorParameter posZside;
   VectorParameter negZside;
 
-  /** Construct the DMI tensor for a given system */
+  /** Construct the boundary traction for a given system */
   explicit BoundaryTraction(std::shared_ptr<const System> system, std::string name = "");
 
-  /** Return CuDmiTensor */
+  /** Return CuBoundaryTraction */
   CuBoundaryTraction cu() const;
 
   /** Returns true if all 6 VectorParameters are equal to zero. */
@@ -37,17 +37,9 @@ struct CuBoundaryTraction {
 };
 
 
-// TODO: can this be more efficient?
 __device__ inline const CuVectorParameter& CuBoundaryTraction::getSide(int orientation, int sense) const {
   // no safety measures
-  if (orientation == 0) {  // x
-    if (sense == 1) { return posXside; }
-    else { return negXside; }
-  } else if (orientation == 1) {  // y
-    if (sense == 1) { return posYside; }
-    else { return negYside; }
-  } else {  // z
-    if (sense == 1) { return posZside; }
-    else { return negZside; }
-  }
+  if (orientation == 0) return (sense == 1) ? posXside : negXside;
+  if (orientation == 1) return (sense == 1) ? posYside : negYside;
+  return (sense == 1) ? posZside : negZside;
 }
