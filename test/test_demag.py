@@ -42,7 +42,6 @@ def demag_field_py(magnet):
         (h.shape[3] - mag.shape[3]) :,
     ]
 
-@pytest.mark.slow
 class TestDemag:
     def setup_class(self):
         """Readout all exact values from the .json files and create the needed
