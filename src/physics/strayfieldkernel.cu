@@ -76,12 +76,12 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
             Nxz += calcNewellNxz(coo_, cellsize);
             Nyz += calcNewellNyz(coo_, cellsize);
           } else {
-            Nxx += calcAsymptoticNxx(coo_, cellsize, expansionNxxptr, sizeNxx);
-            Nyy += calcAsymptoticNyy(coo_, cellsize, expansionNxxptr, sizeNxx);
-            Nzz += calcAsymptoticNzz(coo_, cellsize, expansionNxxptr, sizeNxx);
-            Nxy += calcAsymptoticNxy(coo_, cellsize, expansionNxyptr, sizeNxy);
-            Nxz += calcAsymptoticNxz(coo_, cellsize, expansionNxyptr, sizeNxy);
-            Nyz += calcAsymptoticNyz(coo_, cellsize, expansionNxyptr, sizeNxy);
+            Nxx += calcAsymptoticNxx(coo_, cellsize, order);
+            Nyy += calcAsymptoticNyy(coo_, cellsize, order);
+            Nzz += calcAsymptoticNzz(coo_, cellsize, order);
+            Nxy += calcAsymptoticNxy(coo_, cellsize, order);
+            Nxz += calcAsymptoticNxz(coo_, cellsize, order);
+            Nyz += calcAsymptoticNyz(coo_, cellsize, order);
           }
         }
         else {
@@ -93,12 +93,12 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
             Nxz += calcNewellNxz(coo_, cellsize);
             Nyz += calcNewellNyz(coo_, cellsize);
           } else {
-            Nxx += calcAsymptoticNxx(coo_, cellsize, expansionNxxptr, sizeNxx);
-            Nyy += calcAsymptoticNyy(coo_, cellsize, expansionNxxptr, sizeNxx);
-            Nzz += calcAsymptoticNzz(coo_, cellsize, expansionNxxptr, sizeNxx);
-            Nxy += calcAsymptoticNxy(coo_, cellsize, expansionNxyptr, sizeNxy);
-            Nxz += calcAsymptoticNxz(coo_, cellsize, expansionNxyptr, sizeNxy);
-            Nyz += calcAsymptoticNyz(coo_, cellsize, expansionNxyptr, sizeNxy);
+            Nxx += calcAsymptoticNxx(coo_, cellsize, order);
+            Nyy += calcAsymptoticNyy(coo_, cellsize, order);
+            Nzz += calcAsymptoticNzz(coo_, cellsize, order);
+            Nxy += calcAsymptoticNxy(coo_, cellsize, order);
+            Nxz += calcAsymptoticNxz(coo_, cellsize, order);
+            Nyz += calcAsymptoticNyz(coo_, cellsize, order);
           }
         }
       }
