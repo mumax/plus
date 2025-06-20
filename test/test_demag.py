@@ -57,17 +57,13 @@ class TestDemag:
         self.kernel_aspect = _cpp._demag_kernel(magnet._impl, order, eps, R)
 
         # open all files
-        f = open("exact_Nxx_3D.json", "r")
-        self.exact_Nxx = np.array(json.loads(f.read()), dtype=float)
+        self.exact_Nxx = np.load("exact_Nxx_3D.npy")
 
-        f = open("exact_Nxy_3D.json", "r")
-        self.exact_Nxy = np.array(json.loads(f.read()), dtype=float)[:,1:,1:]
+        self.exact_Nxy = np.load("exact_Nxy_3D.npy")[:,1:,1:]
 
-        f = open("exact_Nxx_aspect.json", "r")
-        self.exact_aspect_Nxx = np.array(json.loads(f.read()), dtype=float)
+        self.exact_aspect_Nxx = np.load("exact_Nxx_aspect.npy")
 
-        f = open("exact_Nxy_aspect.json", "r")
-        self.exact_aspect_Nxy = np.array(json.loads(f.read()), dtype=float)[:,1:,1:]
+        self.exact_aspect_Nxy = np.load("exact_Nxy_aspect.npy")[:,1:,1:]
 
     def test_demagfield(self):
         world = World((1e-9, 1e-9, 1e-9))
