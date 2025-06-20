@@ -1,5 +1,3 @@
-import pytest
-
 import numpy as np
 import json
 from mumaxplus import Ferromagnet, Grid, World, _cpp

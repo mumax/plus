@@ -40,6 +40,9 @@ class StrayField(FieldQuantity):
         """Set the maximum order of 1/R, where R is the distance between cells, in the
         asymptotic expansion of the demag kernel.
 
+        This value should be an integer and 3 <= order <= 12. Choosing an even
+        order gives the same result as that order minus 1.
+
         The default value is 11.
 
         See Also
@@ -51,7 +54,6 @@ class StrayField(FieldQuantity):
     @order.setter
     def order(self, value):
         assert isinstance(value, int), "The order should be an integer."
-        assert 3 <= value <= 14, "The order should be between 1/R⁻³ and 1/R⁻¹⁵."
         self._impl.order = value
 
     @property

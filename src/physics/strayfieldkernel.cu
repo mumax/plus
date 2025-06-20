@@ -13,6 +13,9 @@
 
 StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order, double eps, double switchingradius)
     : order_(order), eps_(eps), switchingradius_(switchingradius) {
+  if (order < 3 || order > 12) {
+    throw std::invalid_argument("The order should be between 1/R⁻³ and 1/R⁻¹².");
+  }
   kernel_ = std::make_unique<Field>(std::make_shared<System>(world, grid), 6);
   compute();
 }
@@ -64,7 +67,7 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
         double V = cellsize.x * cellsize.y * cellsize.z;
         double h = fmax(cellsize.x,fmax(cellsize.y,cellsize.z));
         
-        if (switchingradius == -1) {
+        if (switchingradius < 0) {
           if (eps * (R*R - h*h)/(V*V) * pow(R,order+1)/pow(h,order-3) < 1) {
             Nxx += calcNewellNxx(coo_, cellsize);
             Nyy += calcNewellNyy(coo_, cellsize);
@@ -101,7 +104,7 @@ __global__ void k_strayFieldKernel(CuField kernel, const Grid mastergrid,
       }
     }
   }
-  kernel.setValueInCell(idx, 0, Nxx);
+  kernel.setValueInCell(idx, 0, Nxx); 
   kernel.setValueInCell(idx, 1, Nyy);
   kernel.setValueInCell(idx, 2, Nzz);
   kernel.setValueInCell(idx, 3, Nxy);
