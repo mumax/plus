@@ -1,5 +1,4 @@
 import numpy as np
-import json
 from mumaxplus import Ferromagnet, Grid, World, _cpp
 
 nx, ny, nz = 126, 64, 8
