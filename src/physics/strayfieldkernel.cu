@@ -14,7 +14,7 @@
 StrayFieldKernel::StrayFieldKernel(Grid grid, const World* world, int order, double eps, double switchingradius)
     : order_(order), eps_(eps), switchingradius_(switchingradius) {
   if (order < 3 || order > 12) {
-    throw std::invalid_argument("The order should be between 1/R⁻³ and 1/R⁻¹².");
+    throw std::invalid_argument("The order should be between 3 and 12.");
   }
   kernel_ = std::make_unique<Field>(std::make_shared<System>(world, grid), 6);
   compute();

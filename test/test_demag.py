@@ -41,7 +41,7 @@ def demag_field_py(magnet):
 
 class TestDemag:
     def setup_class(self):
-        """Readout all exact values from the .json files and create the needed
+        """Readout all exact values from the .npy files and create the needed
            kernels. These kernels will be sliced in the tests in order to get
            the correct components and only 1/4th of the kernel that contains all
            information."""
@@ -73,7 +73,7 @@ class TestDemag:
         assert err < 2e-3
 
     def test_Nxx_radius(self):
-        """ Compare the demagkernel with high accurate json files. These were made
+        """ Compare the demagkernel with high accurate .npy files. These were made
             with the BigFloat package with an accuracy of 1024 bits
             and the analytical method."""
         
@@ -91,7 +91,7 @@ class TestDemag:
         assert err < 2e-4
     
     def test_Nxx(self):
-        """ Compare the demagkernel with high accurate json files. These were made
+        """ Compare the demagkernel with high accurate .npy files. These were made
             with the BigFloat package with an accuracy of 1024 bits
             and the analytical method."""
         
@@ -105,7 +105,7 @@ class TestDemag:
         assert err < 1e-4
 
     def test_Nxy(self):
-        """ Compare the demagkernel with high accurate json files. These were made
+        """ Compare the demagkernel with high accurate .npy files. These were made
             with the BigFloat package with an accuracy of 1024 bits
             and the analytical method."""
         
@@ -115,7 +115,7 @@ class TestDemag:
         assert err < 1e-4
 
     def test_Nxx_aspect(self):
-        """ Compare the demagkernel with high accurate json files. These were made
+        """ Compare the demagkernel with high accurate .npy files. These were made
             with the BigFloat package with an accuracy of 1024 bits
             and the analytical method."""
         
@@ -125,7 +125,7 @@ class TestDemag:
         assert err < 1e-2
 
     def test_Nxy_aspect(self):
-        """ Compare the demagkernel with high accurate json files. These were made
+        """ Compare the demagkernel with high accurate .npy files. These were made
             with the BigFloat package with an accuracy of 1024 bits
             and the analytical method."""
             

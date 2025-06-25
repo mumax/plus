@@ -75,7 +75,8 @@ class StrayField(FieldQuantity):
 
     @property
     def switch_radius(self):
-        """Set the radius, in m, from which the asymptotic expantion should be used.
+        """Set the radius R, in meters, from which point the asymptotic expantion
+        should be used.
         Default is -1, then the OOMMF error estimations are used:
 
         Assume the following errors on the analytical and asymptotic result
