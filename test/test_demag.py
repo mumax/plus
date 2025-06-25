@@ -121,8 +121,12 @@ class TestDemag:
         
         mumaxplus_result = self.kernel_aspect[0,:,ny_aspect:, nx_aspect:] # Nxx component
 
-        err = np.max(relative_error(mumaxplus_result, self.exact_aspect_Nxx))
-        assert err < 1e-2
+        # avoid fake errors when both values are super small
+        mask = ~((np.abs(self.exact_aspect_Nxx) < 3e-12) & (np.abs(mumaxplus_result) < 3e-12))
+
+        rel_err = relative_error(mumaxplus_result, self.exact_aspect_Nxx)
+        err = np.nanmax(rel_err[mask])
+        assert err < 1e-4
 
     def test_Nxy_aspect(self):
         """ Compare the demagkernel with high accurate .npy files. These were made
