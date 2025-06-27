@@ -40,7 +40,6 @@ print("Creating MFM images...")
 # Create an MFM instance for the enitre world
 grid_world = Grid((120, 120, 1))
 mfm_world= MFM(world, grid_world)
-print(mfm_world.name)
 
 mfm_world.lift = 5e-9
 world_image = mfm_world.eval()
