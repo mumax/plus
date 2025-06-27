@@ -283,3 +283,21 @@ def show_field_3D(quantity, cmap="mumax3", quiver=True):
     plotter.show()
     _pv.global_theme = _pv.themes.Theme()  # reset theme
 
+def show_regions(regionsarray, layer=0):
+    """Plot the boundaries between regions."""
+    assert regionsarray.ndim == 3, f"Expected 3D array, got {regionsarray.ndim}D"
+
+    regions = regionsarray[layer]
+    boundaries = _np.zeros_like(regions, dtype=bool)
+
+    boundaries[1:, :] |= regions[1:, :] != regions[:-1, :]   # up
+    boundaries[:-1, :] |= regions[:-1, :] != regions[1:, :]  # down
+    boundaries[:, 1:] |= regions[:, 1:] != regions[:, :-1]   # left
+    boundaries[:, :-1] |= regions[:, :-1] != regions[:, 1:]  # right
+
+    _plt.figure()
+    _plt.imshow(~boundaries, cmap='gray', origin="lower")
+    _plt.xlabel("$x$ (m)")
+    _plt.ylabel("$y$ (m)")
+    _plt.title("Region Boundaries")
+    _plt.show()
