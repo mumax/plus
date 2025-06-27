@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from mumaxplus import Ferromagnet, Grid, World
 import mumaxplus.util.config as config
-import mumaxplus.util.mfm as mfm
+from mumaxplus.util import MFM
 
 # define parameters
 msat = 566e3
@@ -39,7 +39,8 @@ print("Creating MFM images...")
 
 # Create an MFM instance for the enitre world
 grid_world = Grid((120, 120, 1))
-mfm_world= mfm.MFM(world, grid_world)
+mfm_world= MFM(world, grid_world)
+print(mfm_world.name)
 
 mfm_world.lift = 5e-9
 world_image = mfm_world.eval()
@@ -51,7 +52,7 @@ plt.show()
 
 # We can also only look at one magnet
 grid_magnet = Grid((70, 70, 1), origin=(50, 50, 0))
-mfm_magnet = mfm.MFM(magnet2, grid_magnet)
+mfm_magnet = MFM(magnet2, grid_magnet)
 mfm_magnet.lift = 20e-9
 
 magnet_image = mfm_magnet.eval()

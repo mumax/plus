@@ -99,7 +99,8 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
             }
         }
     }
-    kernel.setValueInCell(idx, 0, dFdz);
+    real current = kernel.valueAt(idx);
+    kernel.setValueInCell(idx, 0, current + dFdz);
 }
 
 MFM::MFM(Magnet* magnet,
@@ -109,6 +110,10 @@ MFM::MFM(Magnet* magnet,
       system_(std::make_shared<System>(magnet->world(), grid)),
       lift(10e-9),
       tipsize(1e-3) {
+    if (name.length() == 0) {
+        name_ = "MFM_" + magnet->name();
+    }
+
     if (system_->grid().size().z > 1) {
         throw std::invalid_argument("MFM should scan a 2D surface. Reduce "
                                     "the number of z-cells to 1.");
@@ -128,7 +133,11 @@ MFM::MFM(const MumaxWorld* world,
       name_(name),
       system_(std::make_shared<System>(world, grid)),
       lift(10e-9),
-      tipsize(1e-3) {   
+      tipsize(1e-3) {  
+    if (name.length() == 0) {
+        name_ = "MFM_World";
+    }
+
     if (system_->grid().size().z > 1) {
         throw std::invalid_argument("MFM should scan a 2D surface. Reduce the "
                                     "number of cells in the z direction to 1.");
@@ -147,14 +156,12 @@ Field MFM::eval() const {
     checkCudaError(cudaMemcpyAsync(crashed.get(), &init, sizeof(bool),
                                    cudaMemcpyHostToDevice, getCudaStream()));
 
-    Field mfmTotal(system_, 1);
+    Field mfm(system_, 1, 0);
 
     // loop over all magnets
-    int i = 0;
     for (const auto& pair : magnets_) {
         Magnet* magnet = pair.second;
 
-        Field mfm(system_, 1);
         Grid mastergrid = magnet->world()->mastergrid();
         int3 pbcRepetitions = magnet->world()->pbcRepetitions();
         int magnetNCells = magnet->system()->grid().ncells();
@@ -181,11 +188,8 @@ Field MFM::eval() const {
                                         "the lift or the z component of the "
                                         "origin of the MFM grid.");
         }
-        if (i==0) {mfmTotal = mfm;}
-        else {mfmTotal += mfm;}
-        i++;
     }
-    return mfmTotal;
+    return mfm;
 }
 
 int MFM::ncomp() const {

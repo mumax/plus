@@ -8,7 +8,7 @@ class MFM(FieldQuantity):
         
         This class is used to create a magnetic force microscopy image. The
         needle is simulated as a pair of monopoles with a charge of 1/µ0 at a
-        distance `tipsize` from one another. Here µ0 = 1.256637062E-6F.
+        distance `tipsize` from one another. Here µ0 is the vacuum permeability.
         The height of the needle is determined by the origin of the input `grid`
         and the `lift` of the needle.
 
