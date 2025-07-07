@@ -1,5 +1,5 @@
 #include "elastodynamics.hpp"
-#include "elasticforce.hpp"
+#include "internalbodyforce.hpp"
 #include "cudalaunch.hpp"
 #include "magnet.hpp"
 #include "field.hpp"
@@ -22,7 +22,7 @@ __device__ int3 tensorRowComps(int row) {
  * At the boundary, traction-free boundary conditions are implemented, using a
  * custom second-order-accurate three-point stencil.
 */
-__global__ void k_elasticForce(CuField fField,
+__global__ void k_internalBodyForce(CuField fField,
                                const CuField stressTensor,
                                const real3 w,  // 1 / cellsize
                                const Grid mastergrid) {
@@ -101,10 +101,10 @@ __global__ void k_elasticForce(CuField fField,
 }
 
 
-Field evalElasticForce(const Magnet* magnet) {
+Field evalInternalBodyForce(const Magnet* magnet) {
 
   Field fField(magnet->system(), 3);
-  if (elasticityAssuredZero(magnet)) {
+  if (stressTensorAssuredZero(magnet)) {
     fField.makeZero();
     return fField;
   }
@@ -114,11 +114,11 @@ Field evalElasticForce(const Magnet* magnet) {
   real3 w = 1. / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
 
-  cudaLaunch(ncells, k_elasticForce, fField.cu(), stressTensor.cu(), w, mastergrid);
+  cudaLaunch(ncells, k_internalBodyForce, fField.cu(), stressTensor.cu(), w, mastergrid);
 
   return fField;
 }
 
-M_FieldQuantity elasticForceQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalElasticForce, 3, "elastic_force", "N/m3");
+M_FieldQuantity internalBodyForceQuantity(const Magnet* magnet) {
+  return M_FieldQuantity(magnet, evalInternalBodyForce, 3, "internal_body_force", "N/m3");
 }

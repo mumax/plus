@@ -5,6 +5,7 @@
 #include "fieldops.hpp"
 #include "minimizer.hpp"
 #include "mumaxworld.hpp"
+#include "ncafm.hpp"
 #include "reduce.hpp"
 #include "torque.hpp"
 
@@ -15,15 +16,15 @@ Minimizer::Minimizer(const Ferromagnet* magnet,
       torques_({relaxTorqueQuantity(magnet)}),
       nMagDiffSamples_(nMagDiffSamples),
       stopMaxMagDiff_(stopMaxMagDiff),
-      t0(magnets_.size()),
-      t1(magnets_.size()),
-      m0(magnets_.size()),
-      m1(magnets_.size()) {
+      t0(1),
+      t1(1),
+      m0(1),
+      m1(1) {
   stepsizes_ = {1e-14};  // TODO: figure out how to make descent guess
   // TODO: check if input arguments are sane
 }
 
-Minimizer::Minimizer(const Antiferromagnet* magnet,
+Minimizer::Minimizer(const HostMagnet* magnet,
                      real stopMaxMagDiff,
                      int nMagDiffSamples)
     : magnets_(magnet->sublattices()),
@@ -33,11 +34,9 @@ Minimizer::Minimizer(const Antiferromagnet* magnet,
       t1(magnets_.size()),
       m0(magnets_.size()),
       m1(magnets_.size()) {
-  stepsizes_ = {1e-14, 1e-14};
-  for (size_t i = 0; i < magnet->sublattices().size(); i++) {
-    torques_.push_back(relaxTorqueQuantity(magnet->sublattices()[i]));
-  }
-  // TODO: check if input arguments are sane
+  stepsizes_.assign(magnets_.size(), 1e-14);
+  for (auto sub : magnets_)
+    torques_.push_back(relaxTorqueQuantity(sub));
 }
 
 Minimizer::Minimizer(const MumaxWorld* world,
@@ -55,9 +54,9 @@ Minimizer::Minimizer(const MumaxWorld* world,
   m1.resize(N);
 
   for (const auto pair : world->magnets()) {
-    if (const Antiferromagnet* mag = pair.second->asAFM()) {
-      magnets_.push_back(mag->sub1());
-      magnets_.push_back(mag->sub2());
+    if (auto host = pair.second->asHost()) {
+      for (auto sub : host->sublattices())
+        magnets_.push_back(sub);
     }
     else if (const Ferromagnet* mag = pair.second->asFM())
       magnets_.push_back(mag);

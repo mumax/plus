@@ -310,7 +310,7 @@ class Antiferromagnet(Magnet):
         
         See Also
         --------
-        DmiTensor, dmi_tensors
+        DmiTensor, dmi_tensors, dmi_vector
         """
         return DmiTensor(self._impl.dmi_tensor)
 
@@ -331,9 +331,25 @@ class Antiferromagnet(Magnet):
 
         See Also
         --------
-        DmiTensor, dmi_tensor
+        DmiTensor, dmi_tensor, dmi_vector
         """
         return DmiTensorGroup([self.dmi_tensor, self.sub1.dmi_tensor, self.sub2.dmi_tensor])
+
+    @property
+    def dmi_vector(self):
+        """ DMI vector D (J/m³) associated with the homogeneous DMI (in a single simulation cell),
+         defined by the energy density ε = D . (m1 x m2) with m1 and m2 being the sublattice
+         magnetizations.
+
+        See Also
+        --------
+        DmiTensor, dmi_tensor, dmi_tensors
+         """
+        return Parameter(self._impl.dmi_vector)
+
+    @dmi_vector.setter
+    def dmi_vector(self, value):
+        self.dmi_vector.set(value)
 
     # ----- QUANTITIES ----------------------
 

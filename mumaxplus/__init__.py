@@ -7,6 +7,7 @@ from .dmitensor import DmiTensor
 from .ferromagnet import Ferromagnet
 from .fieldquantity import FieldQuantity
 from .grid import Grid
+from .ncafm import NcAfm
 from .parameter import Parameter
 from .poissonsystem import PoissonSystem
 from .scalarquantity import ScalarQuantity

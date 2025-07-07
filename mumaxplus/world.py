@@ -6,6 +6,7 @@ from .timesolver import TimeSolver
 from .grid import Grid
 from .ferromagnet import Ferromagnet
 from .antiferromagnet import Antiferromagnet
+from .ncafm import NcAfm
 
 import warnings
 
@@ -80,6 +81,14 @@ class World:
             raise KeyError(f"No magnet named {name}")
         return Antiferromagnet._from_impl(magnet_impl)
 
+    def get_ncafm(self, name):
+        """Get a non-collinear antiferromagnet by its name.
+        Raises KeyError if there is no magnet with the given name."""
+        magnet_impl = self._impl.get_ncafm(name)
+        if magnet_impl is None:
+            raise KeyError(f"No magnet named {name}")
+        return NcAfm._from_impl(magnet_impl)
+
     @property
     def ferromagnets(self):
         """Get a dictionairy of ferromagnets by name."""
@@ -91,6 +100,12 @@ class World:
         """Get a dictionairy of antiferromagnets by name."""
         return {key: Antiferromagnet._from_impl(impl) for key, impl in
                 self._impl.antiferromagnets.items()}
+
+    @property
+    def ncafms(self):
+        """Get a dictionairy of non-collinear antiferromagnets by name."""
+        return {key: NcAfm._from_impl(impl) for key, impl in
+                self._impl.ncafms.items()}
     
     def minimize(self, tol=1e-6, nsamples=10):
         """Minimize the total energy.

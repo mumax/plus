@@ -8,10 +8,10 @@
 #include <cfloat>
 #include <stdexcept>
 
-#include "antiferromagnet.hpp"
 #include "ferromagnet.hpp"
 #include "fieldquantity.hpp"
 #include "gpubuffer.hpp"
+#include "hostmagnet.hpp"
 #include "mumaxworld.hpp"
 #include "relaxer.hpp"
 #include "strayfield.hpp"
@@ -29,6 +29,11 @@ Magnet::Magnet(std::shared_ptr<System> system_ptr,
       C12(system(), 0.0, name + ":C12", "N/m2"),
       C44(system(), 0.0, name + ":C44", "N/m2"),
       eta(system(), 0.0, name + ":eta", "kg/m3s"),
+      // Damping ratio of 5% at 1 THz
+      stiffnessDamping(system(), 5e-14 / 3.1415926535897931, name + ":stiffness_damping", "s"),
+      eta11(system(), 0.0, name + ":eta11", "Pa s"),
+      eta12(system(), 0.0, name + ":eta12", "Pa s"),
+      eta44(system(), 0.0, name + ":eta44", "Pa s"),
       rho(system(), 1.0, name + ":rho", "kg/m3"),
       rigidNormStrain(system(), {0.0, 0.0, 0.0}, name + ":rigid_norm_strain", ""),
       rigidShearStrain(system(), {0.0, 0.0, 0.0}, name + ":rigid_shear_strain", "") {
@@ -53,7 +58,10 @@ Magnet::Magnet(Magnet&& other) noexcept
       
       externalBodyForce(other.externalBodyForce),
       C11(other.C11), C12(other.C12), C44(other.C44),
-      eta(other.eta), rho(other.rho), rigidNormStrain(other.rigidNormStrain),
+      eta(other.eta), eta11(other.eta11), eta12(other.eta12), eta44(other.eta44),
+      stiffnessDamping(other.stiffnessDamping),
+      rho(other.rho),
+      rigidNormStrain(other.rigidNormStrain),
       rigidShearStrain(other.rigidShearStrain) {
   other.system_ = nullptr;
   other.name_ = "";
@@ -74,6 +82,10 @@ Magnet& Magnet::operator=(Magnet&& other) noexcept {
         C12 = other.C12;
         C44 = other.C44;
         eta = other.eta;
+        stiffnessDamping = other.stiffnessDamping;
+        eta11 = other.eta11;
+        eta12 = other.eta12;
+        eta44 = other.eta44;
         rho = other.rho;
       }
       return *this;
@@ -112,8 +124,16 @@ const Ferromagnet* Magnet::asFM() const {
   return dynamic_cast<const Ferromagnet*>(this);
 }
 
+const HostMagnet* Magnet::asHost() const {
+  return dynamic_cast<const HostMagnet*>(this);
+}
+
 const Antiferromagnet* Magnet::asAFM() const {
   return dynamic_cast<const Antiferromagnet*>(this);
+}
+
+const NcAfm* Magnet::asNcAfm() const {
+  return dynamic_cast<const NcAfm*>(this);
 }
 
 const StrayField* Magnet::getStrayField(const Magnet* magnet) const {

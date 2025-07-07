@@ -7,6 +7,7 @@
 #include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "mumaxworld.hpp"
+#include "ncafm.hpp"
 #include "system.hpp"
 #include "timesolver.hpp"
 #include "wrappers.hpp"
@@ -76,6 +77,19 @@ void wrap_world(py::module& m) {
           py::arg("regions_array")=py::none(), py::arg("name") = std::string(""),
           py::return_value_policy::reference_internal)
 
+     .def("add_ncafm",
+          [](MumaxWorld* world, Grid grid, py::object geometryArray=py::none(),
+               py::object regionsArray=py::none(), std::string name="") {
+               return add_magnet(world, grid,
+                                 geometryArray,
+                                 regionsArray,
+                                 name,
+                                 &MumaxWorld::addNcAfm);
+          },
+          py::arg("grid"), py::arg("geometry_array")=py::none(),
+          py::arg("regions_array")=py::none(), py::arg("name") = std::string(""),
+          py::return_value_policy::reference_internal)
+
       .def("get_ferromagnet", &MumaxWorld::getFerromagnet, py::arg("name"),
            "get a reference to a ferromagnet by name",
            py::return_value_policy::reference)
@@ -84,11 +98,18 @@ void wrap_world(py::module& m) {
            "get a reference to an antiferromagnet by name",
            py::return_value_policy::reference)
 
+      .def("get_ncafm", &MumaxWorld::getNcAfm, py::arg("name"),
+           "get a reference to a non-collinear antiferromagnet by name",
+           py::return_value_policy::reference)
+
       .def_property_readonly("ferromagnets", &MumaxWorld::ferromagnets,
            "get a map of all ferromagnets in this world")
 
       .def_property_readonly("antiferromagnets", &MumaxWorld::antiferromagnets,
            "get a map of all antiferromagnets in this world")
+
+     .def_property_readonly("ncafms", &MumaxWorld::ncafms,
+           "get a map of all non-collinear antiferromagnets in this world")
 
       .def_property_readonly("timesolver", &MumaxWorld::timesolver,
                              py::return_value_policy::reference)

@@ -10,7 +10,7 @@ class StrayField(FieldQuantity):
 
     Parameters
     ----------
-    magnet : mumaxplus.Ferromagnet
+    magnet : mumaxplus.Magnet
         Magnet instance which is the field source.
     grid : mumaxplus.Grid
         Grid instance on which the stray field will be computed.

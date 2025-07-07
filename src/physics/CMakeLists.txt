@@ -24,8 +24,6 @@ add_library(physics STATIC
     elasticdamping.hpp
     elasticenergies.cu
     elasticenergies.hpp
-    elasticforce.cu
-    elasticforce.hpp
     elastodynamics.cu
     elastodynamics.hpp
     electricalpotential.hpp
@@ -37,7 +35,13 @@ add_library(physics STATIC
     ferromagnet.cpp 
     ferromagnet.hpp 
     fullmag.cu
-    fullmag.hpp 
+    fullmag.hpp
+    hostmagnet.cpp
+    hostmagnet.hpp
+    internalbodyforce.cu
+    internalbodyforce.hpp
+    local_dmi.cu
+    local_dmi.hpp
     magnet.cpp
     magnet.hpp 
     magnetoelasticfield.cu
@@ -48,10 +52,16 @@ add_library(physics STATIC
     minimizer.hpp
     mumaxworld.cpp
     mumaxworld.hpp
+    ncafm.cpp
+    ncafm.hpp
+    ncafmangle.cu
+    ncafmangle.hpp
     neel.cu
     neel.hpp
     newell.cu
     newell.hpp
+    octupole.cu
+    octupole.hpp
     poissonsystem.hpp
     poissonsystem.cu
     poyntingvector.cu

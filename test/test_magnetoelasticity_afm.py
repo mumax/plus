@@ -74,7 +74,7 @@ class TestMelAfm:
         """Tests total effective body force to make sure it contains
         contributions of both sublattices.
         """
-        force = self.magnet.elastic_force.eval() + \
+        force = self.magnet.internal_body_force.eval() + \
                 self.magnet.sub1.magnetoelastic_force.eval() + \
                 self.magnet.sub2.magnetoelastic_force.eval()
         assert max_semirelative_error(self.magnet.effective_body_force.eval(), force) < SRTOL

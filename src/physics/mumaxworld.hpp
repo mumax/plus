@@ -16,6 +16,7 @@
 class Antiferromagnet;
 class Ferromagnet;
 class Magnet;
+class NcAfm;
 class TimeSolver;
 
 typedef std::function<FM_FieldQuantity(const Ferromagnet*)> FM_Field;
@@ -49,6 +50,11 @@ class MumaxWorld : public World {
                                       GpuBuffer<unsigned int> regions,
                                       std::string name = "");
 
+  /** Add a non-collinear antiferromagnet to the world. */
+  NcAfm* addNcAfm(Grid grid,
+                  GpuBuffer<bool> geometry,
+                  GpuBuffer<unsigned int> regions,
+                  std::string name = "");
     
   /**Add the magnetic field of the other magnets in the new magnet, and vice versa. */
   void handleNewStrayfield(Magnet* newMagnet);
@@ -62,7 +68,9 @@ class MumaxWorld : public World {
   /** Get an antiferromagnet by its name.
    *  Return a nullptr if there is no antiferromagnet with specified name. */
   Antiferromagnet* getAntiferromagnet(std::string name) const;
-
+  /** Get a non-collinear antiferromagnet by its name.
+   *  Return a nullptr if there is no non-collinear antiferromagnet with specified name. */
+  NcAfm* getNcAfm(std::string name) const;
 
   /** Get map of all Magnets in this world. */
   const std::map<std::string, Magnet*> magnets() const;
@@ -70,6 +78,8 @@ class MumaxWorld : public World {
   const std::map<std::string, Ferromagnet*> ferromagnets() const;
   /** Get map of all Antiferromagnets in this world. */
   const std::map<std::string, Antiferromagnet*> antiferromagnets() const;
+  /** Get map of all non-collinear antiferromagnets in this world. */
+  const std::map<std::string, NcAfm*> ncafms() const;
 
   /** Minimize the current energy state of the world with every magnet in it. */
   void minimize(real tol = 1e-6, int nSamples = 10);
@@ -193,4 +203,5 @@ class MumaxWorld : public World {
   std::map<std::string, Magnet*> magnets_;
   std::map<std::string, std::unique_ptr<Ferromagnet>> ferromagnets_;
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
+  std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
 };
