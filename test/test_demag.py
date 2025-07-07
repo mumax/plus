@@ -1,5 +1,6 @@
 import numpy as np
 from mumaxplus import Ferromagnet, Grid, World, _cpp
+from mumaxplus.util import MU0
 
 nx, ny, nz = 126, 64, 8
 nx_aspect, ny_aspect, nz_aspect = 100, 100, 1
@@ -30,8 +31,7 @@ def demag_field_py(magnet):
     hz = np.fft.ifftn(m[0] * kxz + m[1] * kyz + m[2] * kzz)
 
     # return the real part
-    mu0 = 4 * np.pi * 1e-7
-    h = -mu0 * np.array([hx, hy, hz]).real
+    h = -MU0 * np.array([hx, hy, hz]).real
     return h[
         :,
         (h.shape[1] - mag.shape[1]) :,
@@ -69,8 +69,7 @@ class TestDemag:
         magnet = Ferromagnet(world, Grid((16, 4, 3)))
         wanted = demag_field_py(magnet)
         result = magnet.demag_field.eval()
-        err = np.max(relative_error(result, wanted))
-        assert err < 2e-3
+        assert np.allclose(result, wanted)
 
     def test_Nxx_radius(self):
         """ Compare the demagkernel with high accurate .npy files. These were made
