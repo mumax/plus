@@ -53,6 +53,7 @@ __global__ void k_magneticForceMicroscopy(CuField mfm,
         int ix = magnetCoo.x;
         int iy = magnetCoo.y;
         int iz = magnetCoo.z;
+        real3 m = magnetization.vectorAt(int3{ix, iy, iz});
 
         // Loop over valid pbc
         for (int Ny = -pbcRepetitions.y; Ny <= pbcRepetitions.y; Ny++) {
@@ -72,7 +73,6 @@ __global__ void k_magneticForceMicroscopy(CuField mfm,
                         return;
                     }
 
-                real3 m = magnetization.vectorAt(int3{ix, iy, iz});
                 real E[3];  // Energy of 3 tip positions
 
                 // Get 3 different tip heights
