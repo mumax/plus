@@ -9,8 +9,9 @@ class MFM(FieldQuantity):
         This class is used to create a magnetic force microscopy image. The
         needle is simulated as a pair of monopoles with a charge of 1/µ0 at a
         distance `tipsize` from one another. Here µ0 is the vacuum permeability.
-        The height of the needle is determined by the origin of the input `grid`
-        and the `lift` of the needle.
+        The height of the needle is determined by the origin of the input `grid`,
+        which gets multiplied by the cellsize of the world, and the `lift` of
+        the needle.
 
         When the `eval` function is called for this instance, it returns a numpy
         array of the same size as the input `grid` which contains the potential
@@ -20,7 +21,7 @@ class MFM(FieldQuantity):
         ----------
         input : can be either a World or Magnet instance. If it is a
                 World, all magnets in that world will be used to calculate
-                the potential energy of the magnet.
+                the potential energy at the tip.
         grid : this is a Grid instance used as a scanning surface.
                Physically, this is the plane on which the MFM needle moves."""
         self._impl = _cpp.MFM(input._impl, grid._impl)
@@ -33,12 +34,12 @@ class MFM(FieldQuantity):
     @property
     def unit(self):
         """The unit of the MFM instance. This is always J."""
-        return self._impl.name
+        return self._impl.unit
     
     @property
     def lift(self):
-        """The height of the needle above the z component of the origin of the
-        input `grid`.
+        """The height of tip of the needle above the z component of the origin
+        of the input `grid`.
 
         default = 10e-9 m."""
         return self._impl.lift

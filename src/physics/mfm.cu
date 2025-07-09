@@ -7,7 +7,7 @@
 #include "system.hpp"
 #include <map>
 
-/** This code calculates an MFM kernel
+/** This code calculates an MFM grid
   * Need to calculate dF/dz = sum M . d²B/dz²
   * The sum runs over each cell in a magnet.
   * M is the magnetization in that cell.
@@ -15,7 +15,7 @@
   * Source: The design and verification of MuMax3.
   */
 
-__global__ void k_magneticForceMicroscopy(CuField kernel,
+__global__ void k_magneticForceMicroscopy(CuField mfm,
                                           CuField magnetization,
                                           const int magnetNCells,
                                           const Grid mastergrid,
@@ -26,15 +26,15 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
                                           bool* crashedResult) {
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (!kernel.cellInGrid(idx)) {
+    if (!mfm.cellInGrid(idx)) {
         return;
     }
 
     real pi = 3.1415926535897931;
     
     // The cell-coordinate of the tip (without lift)
-    const real3 cellsize = kernel.system.cellsize;
-    int3 coo = kernel.system.grid.index2coord(idx);
+    const real3 cellsize = mfm.system.cellsize;
+    int3 coo = mfm.system.grid.index2coord(idx);
     real x0 = coo.x * cellsize.x;
     real y0 = coo.y * cellsize.y;
     real z0 = coo.z * cellsize.z;
@@ -43,22 +43,22 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
     real delta = 1e-9;  // tip oscillation, take 2nd derivative over this distance
 
     real dFdz = 0.;
-    // Loop over valid pbc
-    for (int Ny = -pbcRepetitions.y; Ny <= pbcRepetitions.y; Ny++) {
-        real ypbc = Ny * mastergrid.size().y;
-        for (int Nx = -pbcRepetitions.x; Nx <= pbcRepetitions.x; Nx++) {
-            real xpbc = Nx * mastergrid.size().x;            
+    // Loop over cells in the magnet
+    for (int n = 0; n < magnetNCells; n++) {
+        if (!magnetization.cellInGeometry(n)) {
+            continue;
+        }
 
-            // Loop over cells in the magnet
-            for (int n = 0; n < magnetNCells; n++) {
-                if (!magnetization.cellInGeometry(n)) {
-                    continue;
-                }
+        int3 magnetCoo = magnetization.system.grid.index2coord(n);
+        int ix = magnetCoo.x;
+        int iy = magnetCoo.y;
+        int iz = magnetCoo.z;
 
-                int3 magnetCoo = magnetization.system.grid.index2coord(n);
-                int ix = magnetCoo.x;
-                int iy = magnetCoo.y;
-                int iz = magnetCoo.z;
+        // Loop over valid pbc
+        for (int Ny = -pbcRepetitions.y; Ny <= pbcRepetitions.y; Ny++) {
+            int ypbc = Ny * mastergrid.size().y;
+            for (int Nx = -pbcRepetitions.x; Nx <= pbcRepetitions.x; Nx++) {
+                int xpbc = Nx * mastergrid.size().x;            
 
                 real x = (ix + xpbc) * cellsize.x;
                 real y = (iy + ypbc) * cellsize.y;
@@ -99,8 +99,8 @@ __global__ void k_magneticForceMicroscopy(CuField kernel,
             }
         }
     }
-    real current = kernel.valueAt(idx);
-    kernel.setValueInCell(idx, 0, current + dFdz);
+    real current = mfm.valueAt(idx);
+    mfm.setValueInCell(idx, 0, current + dFdz);
 }
 
 MFM::MFM(Magnet* magnet,
@@ -170,12 +170,12 @@ Field MFM::eval() const {
         Field magnetization;
 
         if (const Ferromagnet* mag = magnet->asFM()) {
-            magnetization = fullMagnetizationQuantity(mag).eval();
-        } else if (const Antiferromagnet* mag = magnet->asAFM()) {
-            magnetization = fullMagnetizationQuantity(mag).eval();
+            magnetization = evalFMFullMag(mag);
+        } else if (const HostMagnet* mag = magnet->asHost()) {
+            magnetization = evalHMFullMag(mag);
         } else {
             throw std::invalid_argument("Cannot calculate MFM of instance which "
-                                        "is no Ferromagnet or Antiferromagnet.");
+                                        "is no Ferromagnet or HostMagnet.");
         }
 
         cudaLaunch(ncells, k_magneticForceMicroscopy, mfm.cu(), magnetization.cu(), magnetNCells, mastergrid, pbcRepetitions, lift, tipsize, V, crashed.get());

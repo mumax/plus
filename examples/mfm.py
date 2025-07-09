@@ -32,9 +32,6 @@ magnet2.alpha = alpha
 print("Relaxing magnets...")
 world.relax()
 
-print("Running a bit...")
-world.timesolver.run(1e-10)
-
 print("Creating MFM images...")
 
 # Create an MFM instance for the enitre world
