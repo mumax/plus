@@ -1,10 +1,11 @@
 """
 This script generates and plots the data from Fig. 3 of the paper
-'mumax+: extensible GPU-accelerated micromagnetics and beyond' (https://arxiv.org/abs/2411.18194).
+'mumax+: extensible GPU-accelerated micromagnetics and beyond' (https://arxiv.org/abs/2411.18194)
+and uses the mumax+ version v1.1.0.
 
 The output will differ slightly due to a different random starting configuration.
 
-Simulation takes about 5 minutes to complete.
+This simulation takes about 5 minutes to complete (depending on your machine).
 """
 import numpy as np
 import matplotlib.pyplot as plt
