@@ -37,7 +37,7 @@ class StrayFieldExecutor {
   static std::unique_ptr<StrayFieldExecutor> create(
       const Magnet* magnet,
       std::shared_ptr<const System> system,
-      Method method);
+      Method method, int order, double eps, double switchingradius);
 
  protected:
   /** Constructor only to be used in constructor of derived classes. */
@@ -53,6 +53,17 @@ class StrayFieldExecutor {
 
   /** Return the method of the executor. */
   virtual Method method() const = 0;
+
+  /** Return the order of the executor. */
+  virtual int order() const = 0;
+
+  /** Return epsilon. The parameter used to determine the analytical error
+   * using epsilon * R³/V
+   */
+  virtual double eps() const = 0;
+
+  /** Return the switching radius of the executor. */
+  virtual double switchingradius() const = 0;
 
  protected:
   /** Source of the stray field*/
@@ -81,7 +92,10 @@ class StrayField : public FieldQuantity {
    */
   StrayField(const Magnet* magnet,
              std::shared_ptr<const System> system,
-             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
+             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO,
+             int order = 11,
+             double eps = 5e-10,
+             double switchingradius = -1);
 
   /**
    * Constructor of a StrayField on a specified grid.
@@ -94,13 +108,28 @@ class StrayField : public FieldQuantity {
    */
   StrayField(const Magnet* magnet,
              Grid grid,
-             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO);
+             StrayFieldExecutor::Method = StrayFieldExecutor::METHOD_AUTO,
+             int order = 11,
+             double eps = 5e-10,
+             double switchingradius = -1);
 
   /** Destructor. */
   ~StrayField();
 
   /** Set the method for the computation of the stray field. */
   void setMethod(StrayFieldExecutor::Method);
+
+  /** Set the order for the asymptotic computation of the stray field. */
+  int order() const {return executor_->order();}
+  void setOrder(int);
+
+  /** Set epsilon to determine the error of the analytical method. */
+  double eps() const {return executor_->eps();}
+  void setEps(double);
+
+  /** Set the radius from which the asymptotic expansion should be used. */
+  double switchingradius() const {return executor_->switchingradius();}
+  void setSwitchingradius(double);
 
   /** Recreate the StrayFieldExecutor. */
   void recreateStrayFieldExecutor();

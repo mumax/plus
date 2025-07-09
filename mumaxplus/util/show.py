@@ -283,3 +283,20 @@ def show_field_3D(quantity, cmap="mumax3", quiver=True):
     plotter.show()
     _pv.global_theme = _pv.themes.Theme()  # reset theme
 
+def show_regions(magnet, layer=0):
+    """Plot the boundaries between regions of the given magnet."""
+    regions_array = magnet.regions
+    assert regions_array.ndim == 3, f"Expected 3D array, got {regions_array.ndim}D"
+
+    regions = regions_array[layer]
+    boundaries = _np.zeros_like(regions, dtype=bool)
+
+    boundaries[1:, :] |= regions[1:, :] != regions[:-1, :]   # up
+    boundaries[:, 1:] |= regions[:, 1:] != regions[:, :-1]   # left
+
+    _plt.figure()
+    _plt.imshow(~boundaries, cmap='gray', origin="lower", extent=_quantity_img_xy_extent(magnet))
+    _plt.xlabel("$x$ (m)")
+    _plt.ylabel("$y$ (m)")
+    _plt.title(magnet.name + ":region_boundaries")
+    _plt.show()

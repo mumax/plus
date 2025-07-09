@@ -31,6 +31,11 @@ System::System(const World* world, Grid grid, GpuBuffer<bool> geometry, GpuBuffe
     std::set<unsigned int> uni(regionsVec.begin(), regionsVec.end()); // The order is of no importance
     uniqueRegions = std::vector<unsigned int>(uni.begin(), uni.end());
   }
+  if (geometry.size() != 0) {
+    std::vector<bool> v = geometry_.getData();
+    cellsInGeo_ = grid_.ncells() - std::count(v.begin(), v.end(), false);
+  }
+  else { cellsInGeo_ = grid_.ncells(); }
 }
 
 const World* System::world() const {
@@ -77,9 +82,8 @@ void System::checkIdxInRegions(int idx) const {
   }
 }
 
-int System::cellsingeo() const {
-  std::vector<bool> v = geometry_.getData();
-  return grid_.ncells() - std::count(v.begin(), v.end(), false);
+int System::cellsInGeo() const {
+  return cellsInGeo_;
 }
 
 CuSystem System::cu() const {

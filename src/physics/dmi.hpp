@@ -9,7 +9,7 @@
  *
  * with:
  *   -  i,j,k summation indices over x, y, and z.
- *   -  DMI tensor D_ijk, which is assymetric on j and k (D_ijk = - D_ikj)
+ *   -  DMI tensor D_ijk, which is antisymmetric on j and k (D_ijk = - D_ikj)
  *   -  spatial derivative d_i(..) along direction i
  *
  * Neumann boundary conditions are assumed, unless specified otherwise (i.e. open
@@ -30,7 +30,7 @@ class Field;
  *  DMI field and energy(density) are assured to be zero if the ferromagnet's
  *  DMI tensor or saturation magnetization (msat) can assured to be zero.
  */
-bool dmiAssuredZero(const Ferromagnet*);
+bool inhomoDmiAssuredZero(const Ferromagnet*);
 
 /** Evaluate the effective magnetic field related to DMI. */
 Field evalDmiField(const Ferromagnet*);
@@ -66,4 +66,11 @@ __device__ static inline real3 getGamma(const CuDmiTensor dmiTensor,
         -Dxxy*n.x*m.y - Dxxz*n.x*m.z - Dyxz*n.y*m.z - Dzxy*n.z*m.y - Dyxy*n.y*m.y - Dzxz*n.z*m.z,
          Dxxy*n.x*m.x - Dzyz*n.z*m.z + Dyxy*n.y*m.x - Dxyz*n.x*m.z + Dzxy*n.z*m.x - Dyyz*n.y*m.z,
          Dxxz*n.x*m.x + Dyyz*n.y*m.y + Dxyz*n.x*m.y + Dyxz*n.y*m.x + Dzxz*n.z*m.x + Dzyz*n.z*m.y};
+}
+
+// returns exchange stiffness constant, taking grain boundaries into account
+// (not really DMI-related, but is also used in Neumann BC calculation, along with getGamma)
+__device__ static inline real getExchangeStiffness(real inter, real scale, real a, real a_) {
+  real Aex = (inter != 0) ? inter : harmonicMean(a, a_);
+  return Aex * scale;
 }

@@ -7,16 +7,17 @@
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "inter_parameter.hpp"
+#include "ncafm.hpp"
 #include "parameter.hpp"
 #include "reduce.hpp"
 #include "world.hpp"
 
 bool exchangeAssuredZero(const Ferromagnet* magnet) {
   return ((magnet->aex.assuredZero() && magnet->interExch.assuredZero())
-        || magnet->scaleExch.assuredZero()
         || magnet->msat.assuredZero());
 }
 
+// Independent FM lattice
 __global__ void k_exchangeField(CuField hField,
                                 const CuField mField,
                                 const CuParameter aex,
@@ -95,19 +96,18 @@ __global__ void k_exchangeField(CuField hField,
         a_ = a;
       }
 
-      Aex = (inter != 0) ? inter : harmonicMean(a, a_);
-      Aex *= scale;
+      Aex = getExchangeStiffness(inter, scale, a, a_);
       h += 2 * Aex * dot(normal, w) * (m_ - m);
     }
   }
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
 }
 
+// FM sublattice
 __global__ void k_exchangeField(CuField hField,
                                 const CuField m1Field,
                                 const CuField m2Field,
                                 const CuParameter aex,
-                                const CuParameter afmex_nn,
                                 const CuParameter msat,
                                 const real3 w,  // w = 1/cellsize^2
                                 Grid mastergrid,
@@ -137,7 +137,6 @@ __global__ void k_exchangeField(CuField hField,
   const int3 coo = grid.index2coord(idx);
   const real3 m = m1Field.vectorAt(idx);
   const real a = aex.valueAt(idx);
-  const real an = afmex_nn.valueAt(idx);
   
   // accumulate exchange field in h for cell at idx, divide by msat at the end
   real3 h{0, 0, 0};
@@ -163,10 +162,8 @@ __global__ void k_exchangeField(CuField hField,
 
       m_ = m1Field.vectorAt(idx_);
       a_ = aex.valueAt(idx_);
-
       unsigned int ridx = system.getRegionIdx(idx);
       unsigned int ridx_ = system.getRegionIdx(idx_);
-
       if (ridx != ridx_) {
         scale = scaleEx.valueBetween(ridx, ridx_);
         inter = interEx.valueBetween(ridx, ridx_);
@@ -182,23 +179,77 @@ __global__ void k_exchangeField(CuField hField,
       real delta = dot(rel_coo, system.cellsize);
 
       real3 d_m2{0, 0, 0};
-      int3 other_neighbor_coo = mastergrid.wrap(coo - rel_coo);
-      if(hField.cellInGeometry(other_neighbor_coo)) {
+      int3 coo__ = mastergrid.wrap(coo - rel_coo);
+      if(hField.cellInGeometry(coo__)) {
         // Approximate normal derivative of sister sublattice by taking
         // the bulk derivative closest to the edge.
-        real3 m2__ = m2Field.vectorAt(other_neighbor_coo);
+        real3 m2__ = m2Field.vectorAt(coo__);
         d_m2 = (m2 - m2__) / delta;
       }
-
-      m_ = m + (an * cross(cross(d_m2, m), m) + Gamma1) * delta / (2*a);
+      m_ = m + (cross(cross(d_m2, m), m) + Gamma1) * delta / (2*a);
       a_ = a;
     }
 
-    Aex = (inter != 0) ? inter : harmonicMean(a, a_);
-    Aex *= scale;
+    Aex = getExchangeStiffness(inter, scale, a, a_);
     h += 2 * Aex * dot(normal, w) * (m_ - m);
   }
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
+}
+
+__global__ void k_effectiveSublattice(CuField netSub,
+                                      const CuField mField,
+                                      const CuParameter msat,
+                                      const CuParameter afmex_nn,
+                                      const CuInterParameter inter_nn,
+                                      const CuInterParameter scale_nn,
+                                      Grid mastergrid) {
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const auto system = netSub.system;
+
+  if (!netSub.cellInGeometry(idx) || msat.valueAt(idx) == 0)
+    return;
+
+  const Grid grid = mField.system.grid;
+  const int3 coo = grid.index2coord(idx);
+  const real3 m = mField.vectorAt(idx);
+  const real ann = afmex_nn.valueAt(idx);
+  const unsigned int ridx = system.getRegionIdx(idx);
+
+  real3 result = netSub.vectorAt(idx);
+
+#pragma unroll
+  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0},
+                       int3{0, 1, 0}, int3{0, 0, -1}, int3{0, 0, 1}}) {
+    const int3 coo_ = mastergrid.wrap(coo - rel_coo);
+    if(!netSub.cellInGeometry(coo_))
+      continue;
+    const int idx_ = grid.coord2index(coo_);
+    const unsigned int ridx_ = system.getRegionIdx(idx_);
+
+    real A = getExchangeStiffness(inter_nn.valueBetween(ridx, ridx_),
+                                  scale_nn.valueBetween(ridx, ridx_),
+                                  ann, afmex_nn.valueAt(idx_));
+    result += (m * A);
+  }
+  netSub.setVectorInCell(idx, result);
+}
+
+Field evalEffectiveSublattice(const Ferromagnet* magnet) {
+  // Calculate effective sublattice term in Neumann BC
+  Field netSub(magnet->system(), 3, real3{0, 0, 0});
+
+  auto host = magnet->hostMagnet();
+  auto inter = host->interAfmExchNN.cu();
+  auto scale = host->scaleAfmExchNN.cu();
+  auto Ann = host->afmex_nn.cu();
+
+  for (auto sub : host->getOtherSublattices(magnet)) {
+    auto m = sub->magnetization()->field().cu();
+    auto msat = sub->msat.cu();
+    cudaLaunch(netSub.grid().ncells(), k_effectiveSublattice, netSub.cu(), m, msat,
+               Ann, inter, scale, magnet->world()->mastergrid());
+  }
+  return netSub;
 }
 
 Field evalExchangeField(const Ferromagnet* magnet) {
@@ -223,17 +274,14 @@ Field evalExchangeField(const Ferromagnet* magnet) {
   auto scaleEx = magnet->scaleExch.cu();
 
   if (!magnet->isSublattice() || magnet->enableOpenBC)
-    cudaLaunch(ncells, k_exchangeField, hField.cu(), mag,
-              aex, msat, w, grid, magnet->enableOpenBC, dmiTensor,
-              interEx, scaleEx);
+    cudaLaunch(ncells, k_exchangeField, hField.cu(), mag, aex, msat, w, grid,
+               magnet->enableOpenBC, dmiTensor, interEx, scaleEx);
   else {
-    // In case `magnet` is a sublattice, it's sister sublattice affects
+    // In case `magnet` is a sublattice, it's sister sublattice(s) affect(s)
     // the Neumann BC. There are no open boundaries when in this scope.
-    auto mag2 = magnet->hostMagnet()->getOtherSublattice(magnet)->magnetization()->field().cu();
-    auto afmex_nn = magnet->hostMagnet()->afmex_nn.cu();
-    cudaLaunch(ncells, k_exchangeField, hField.cu(), mag,
-              mag2, aex, afmex_nn, msat, w, grid, dmiTensor,
-              interEx, scaleEx);
+    auto sister = evalEffectiveSublattice(magnet);
+    cudaLaunch(ncells, k_exchangeField, hField.cu(), mag, sister.cu(), aex,
+              msat, w, grid, dmiTensor, interEx, scaleEx);
   }
   return hField;
 }
@@ -247,12 +295,9 @@ Field evalExchangeEnergyDensity(const Ferromagnet* magnet) {
 real evalExchangeEnergy(const Ferromagnet* magnet) {
   if (exchangeAssuredZero(magnet))
     return 0;
-    
-  real edens = exchangeEnergyDensityQuantity(magnet).average()[0];
 
-  int ncells = magnet->grid().ncells();
-  real cellVolume = magnet->world()->cellVolume();
-  return ncells * edens * cellVolume;
+  real edens = exchangeEnergyDensityQuantity(magnet).average()[0];
+  return energyFromEnergyDensity(magnet, edens);
 }
 
 FM_FieldQuantity exchangeFieldQuantity(const Ferromagnet* magnet) {

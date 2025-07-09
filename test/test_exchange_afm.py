@@ -90,7 +90,6 @@ class TestAfmExchange:
 
             relative_error = np.abs(result - wanted) / np.abs(wanted)
             max_relative_error = np.max(relative_error)
-
             assert max_relative_error < 1e-3
 
     def test_inhomo_exchange(self):

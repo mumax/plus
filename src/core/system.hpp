@@ -52,7 +52,7 @@ class System {
   void checkIdxInRegions(int idx) const;
 
   /** Return the number of cells which lie within the geometry. */
-  int cellsingeo() const;
+  int cellsInGeo() const;
 
   /** Return a CuSystem which can be copied to the gpu and be used in cuda
    * kernels. */
@@ -66,6 +66,7 @@ class System {
   Grid grid_;
   GpuBuffer<bool> geometry_;
   GpuBuffer<unsigned int> regions_;
+  int cellsInGeo_;
 
   friend CuSystem;
 };

@@ -18,3 +18,4 @@ API Reference
     ScalarQuantity
     StrayField
     DmiTensor
+    BoundaryTraction

@@ -1,10 +1,11 @@
 #include "elastodynamics.hpp"
-#include "elasticforce.hpp"
+#include "internalbodyforce.hpp"
 #include "cudalaunch.hpp"
 #include "magnet.hpp"
 #include "field.hpp"
 #include "parameter.hpp"
 #include "stresstensor.hpp"
+#include "traction.hpp"
 
 
 __device__ int tensorComp(int row, int col) {
@@ -19,13 +20,14 @@ __device__ int3 tensorRowComps(int row) {
  * Numerical divergence of stress with central five-point stencil in bulk material.
  * Lower order accuracy (three-point stencil) central difference is used in bulk
  * 1 cell away from boundary.
- * At the boundary, traction-free boundary conditions are implemented, using a
- * custom second-order-accurate three-point stencil.
+ * The traction is applied at the boundary, implemented using a custom
+ * second-order-accurate three-point stencil.
 */
-__global__ void k_elasticForce(CuField fField,
-                               const CuField stressTensor,
-                               const real3 w,  // 1 / cellsize
-                               const Grid mastergrid) {
+__global__ void k_internalBodyForce(CuField fField,
+                                    const CuField stressTensor,
+                                    const CuBoundaryTraction traction,
+                                    const real3 w,  // 1 / cellsize
+                                    const Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = fField.system;
   const Grid grid = system.grid;
@@ -68,21 +70,26 @@ __global__ void k_elasticForce(CuField fField,
     bool ip2_inGeo = system.inGeometry(coo_ip2);
 
     if (!im1_inGeo && !ip1_inGeo) {
-      // --1-- zero
-      continue;
+      // --1-- central difference of boundary stress, ε ~ h^2
+      f += ws[i] * (traction.getSide(i, 1).vectorAt(idx)
+                    // -1 from stencil * -1 from normal vector
+                    + traction.getSide(i, -1).vectorAt(idx));
     } else if (!im1_inGeo) {
-      // --11- left boundary, custom difference + traction free BC,  ε ~ h^2
+      // --11- left boundary, custom difference + traction BC,  ε ~ h^2
       f += ws[i] * (
-        // - 4./3. * real3{0, 0, 0}  // stress at coo_i-1/2 = boundary
-        stressTensor.vectorAt(idx, stressRow)  // +3/3 weight
+        // stress row at coo_i-1/2 = boundary traction * negative sense of normal vector
+        // -1 from stencil * -1 from normal vector
+        4./3. * traction.getSide(i, -1).vectorAt(idx)
+        + stressTensor.vectorAt(idx, stressRow)  // +3/3 weight
         + 1./3. * stressTensor.vectorAt(coo_ip1, stressRow)
       );
     } else if (!ip1_inGeo) {
-      // -11-- right boundary, custom difference + traction free BC,  ε ~ h^2
+      // -11-- right boundary, custom difference + traction BC,  ε ~ h^2
       f += ws[i] * (
         - 1./3. * stressTensor.vectorAt(coo_im1, stressRow)
         - stressTensor.vectorAt(idx, stressRow)  // -3/3 weight
-        // + 4./3. * real3{0, 0, 0}  // stress at coo_i+1/2 = boundary
+        // stress row at coo_i+1/2 = boundary traction * positive sense of normal vector
+        + 4./3. * traction.getSide(i, 1).vectorAt(idx)
       );
     } else if (!im2_inGeo || !ip2_inGeo) {
       // -111-, 1111-, -1111 central difference,  ε ~ h^2
@@ -101,24 +108,26 @@ __global__ void k_elasticForce(CuField fField,
 }
 
 
-Field evalElasticForce(const Magnet* magnet) {
+Field evalInternalBodyForce(const Magnet* magnet) {
 
   Field fField(magnet->system(), 3);
-  if (elasticityAssuredZero(magnet)) {
+  if (stressTensorAssuredZero(magnet)) {
     fField.makeZero();
     return fField;
   }
 
   int ncells = fField.grid().ncells();
   Field stressTensor = evalStressTensor(magnet);
+  CuBoundaryTraction traction = magnet->boundaryTraction.cu();
   real3 w = 1. / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
 
-  cudaLaunch(ncells, k_elasticForce, fField.cu(), stressTensor.cu(), w, mastergrid);
+  cudaLaunch(ncells, k_internalBodyForce, fField.cu(), stressTensor.cu(),
+             traction, w, mastergrid);
 
   return fField;
 }
 
-M_FieldQuantity elasticForceQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalElasticForce, 3, "elastic_force", "N/m3");
+M_FieldQuantity internalBodyForceQuantity(const Magnet* magnet) {
+  return M_FieldQuantity(magnet, evalInternalBodyForce, 3, "internal_body_force", "N/m3");
 }

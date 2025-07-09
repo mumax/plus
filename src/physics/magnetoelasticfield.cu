@@ -160,9 +160,7 @@ real evalMagnetoelasticEnergy(const Ferromagnet* magnet) {
     return 0.0;
 
   real edens = magnetoelasticEnergyDensityQuantity(magnet).average()[0];
-  int ncells = magnet->grid().ncells();
-  real cellVolume = magnet->world()->cellVolume();
-  return ncells * edens * cellVolume;
+  return energyFromEnergyDensity(magnet, edens);
 }
 
 FM_FieldQuantity magnetoelasticFieldQuantity(const Ferromagnet* magnet) {

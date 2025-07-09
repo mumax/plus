@@ -1,8 +1,4 @@
-import pytest
 import numpy as np
-import math
-
-import matplotlib.pyplot as plt
 
 from mumaxplus import Grid, World, Ferromagnet
 
@@ -50,20 +46,19 @@ class TestForces:
         self.magnet.B1 = B1
         self.magnet.B2 = B2
 
-        def displacement_func(x, y, z):
-            return tuple(np.random.rand(3) * 1e-15)
-
-        def velocity_func(x, y, z):
-            return (np.random.rand(), np.random.rand(), np.random.rand())
-        
-        self.magnet.elastic_displacement = displacement_func
-        self.magnet.elastic_velocity = velocity_func
+        self.magnet.elastic_displacement = 1e-15 * np.random.rand(3, nz,ny,nx)
+        self.magnet.elastic_velocity = 1e-2 * np.random.rand(3, nz,ny,nx)
 
         self.magnet.external_body_force = np.random.rand(3, nz,ny,nx)
 
+    def test_stress_tensor(self):
+        """Check if the stress tensor is the sum of the other stresses."""
+        stress = self.magnet.elastic_stress.eval() + self.magnet.viscous_stress.eval()
+        assert max_semirelative_error(self.magnet.stress_tensor.eval(), stress) < SRTOL
+
     def test_effective_force(self):
         """Check if the effective body force is the sum of the other forces."""
-        force = self.magnet.elastic_force.eval() + self.magnet.external_body_force.eval() + self.magnet.magnetoelastic_force.eval()
+        force = self.magnet.internal_body_force.eval() + self.magnet.external_body_force.eval() + self.magnet.magnetoelastic_force.eval()
         assert max_semirelative_error(self.magnet.effective_body_force.eval(), force) < SRTOL
 
     def test_damping_calc(self):
@@ -77,3 +72,7 @@ class TestForces:
         forces = self.magnet.effective_body_force.eval()
         rho = self.magnet.rho.eval()
         assert max_semirelative_error(rho*self.magnet.elastic_acceleration.eval(), (forces + damping)) < SRTOL
+
+    def test_default_damping(self):
+        """Check that there is viscous damping, even if viscosity tensor has not been set."""
+        assert np.any(self.magnet.elastic_damping.eval() != 0)

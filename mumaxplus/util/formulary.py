@@ -157,3 +157,107 @@ def magnetic_hardness(K1, msat):
         Magnetic hardness parameter (dimensionless).
     """
     return _np.sqrt(abs(K1)/(MU0 * msat**2))
+
+
+def bulk_modulus(C11, C44):
+    """For isotropic materials, the bulk modulus is given by
+    K = C11 - 4/3 C44 = C12 + 2/3 C44.
+    https://en.wikipedia.org/wiki/Hooke%27s_law
+    
+    Parameters
+    ----------
+    C11 : float
+        Stiffness constant C11 (Pa).
+    C44 : float
+        Stiffness constant C44 (Pa).
+
+    Returns
+    -------
+    float
+        Bulk modulus (Pa).
+    """
+    return C11 - 4/3 * C44
+
+
+def Rayleigh_damping_coefficients(frequency_1, damping_ratio_1, frequency_2, damping_ratio_2):
+    """Rayleigh damping mass coefficient α and stiffness coefficient β
+    calculated by providing damping ratios ζ₁,₂ at specified frequencies f₁,₂.
+
+    α = 4π f₁ f₂ * (ζ₁f₂ - ζ₂f₁) / (f₂² - f₁²)
+
+    β = 1/π * (ζ₂f₂ - ζ₁f₁) / (f₂² - f₁²)
+
+    with f₁/f₂ <= ζ₂/ζ₁ <= f₂/f₁
+
+    Based on https://www.comsol.com/blogs/how-to-model-different-types-of-damping-in-comsol-multiphysics
+    and https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html.
+    
+    Parameters
+    ----------
+    frequency_1 : float
+        Low frequency f₁ (Hz) at which damping_ratio_1 is expected.
+        This should be smaller than frequency_2.
+    damping_ratio_1 : float
+        Positive damping ratio ζ₁ (dimensionless) expected at frequency_1.
+    frequency_2 : float
+        High frequency f₂ (Hz) at which damping_ratio_2 is expected.
+        This should be larger than frequency_1.
+    damping_ratio_2 : float
+        Positive damping ratio ζ₂ (dimensionless) expected at frequency_2.
+
+    Returns
+    -------
+    tuple[float] of size 2
+        Rayleigh damping mass coefficient α (1/s) and stiffness coefficient β (s).
+
+    See Also
+    --------
+    Rayleigh_damping_stiffness_coefficient
+    """
+    assert damping_ratio_1 > 0 and damping_ratio_2 >= 0
+    assert frequency_1 >= 0 and frequency_2 >= 0 and frequency_2 > frequency_1
+    assert frequency_1 / frequency_2 <= damping_ratio_2 / damping_ratio_1 and \
+           damping_ratio_2 / damping_ratio_1 <= frequency_2 / frequency_1
+
+    denom = (frequency_2*frequency_2 - frequency_1*frequency_1)
+
+    mass_coef =  4 * _np.pi * frequency_1 * frequency_2 \
+        * (damping_ratio_1 * frequency_2 - damping_ratio_2 * frequency_1) \
+        / denom
+    stiffness_coef = 1 / _np.pi \
+        * (damping_ratio_2 * frequency_2 - damping_ratio_1 * frequency_1) \
+        / denom
+
+    return (mass_coef, stiffness_coef)
+
+def Rayleigh_damping_stiffness_coefficient(frequency, damping_ratio):
+    """Rayleigh damping stiffness coefficient β, assuming a mass coefficient of
+    zero, calculated by providing a damping ratio ζ at a specified frequency f.
+
+    β = ζ/(πf)
+
+    This is useful to obtain a damping that increases linearly with frequency,
+    by only setting the viscosity tensor, but not the phenomenological elastic
+    damping constant.
+
+    Based on https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html.
+    
+    Parameters
+    ----------
+    frequency : float
+        Frequency f (Hz) at which the damping_ratio is expected.
+    damping_ratio : float
+        Positive damping ratio ζ (dimensionless) expected at the frequency.
+
+    Returns
+    -------
+    float
+        Rayleigh damping stiffness coefficient β (s).
+
+    See Also
+    --------
+    Rayleigh_damping_coefficients
+    """
+    assert damping_ratio >= 0 and frequency > 0
+
+    return damping_ratio / (_np.pi * frequency)

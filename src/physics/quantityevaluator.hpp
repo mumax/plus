@@ -9,13 +9,14 @@
 #include "field.hpp"
 #include "fieldquantity.hpp"
 #include "magnet.hpp"
+#include "ncafm.hpp"
 #include "scalarquantity.hpp"
 #include "system.hpp"
 
 
 // ========== FieldQuantityEvaluator ==========
 
-template <class T>  // meant to be Magnet, Ferromagnet or Antiferromagnet
+template <class T>  // meant to be Magnet, Ferromagnet, Antiferromagnet or NcAfm
 class FieldQuantityEvaluator : public FieldQuantity {
  public:
   FieldQuantityEvaluator(const T* ptr,
@@ -51,7 +52,7 @@ class FieldQuantityEvaluator : public FieldQuantity {
   bool assuredZero() const { return assuredZeroFunc_(ptr_); }
 
  private:
-  const T* ptr_;  // meant to be Magnet, Ferromagnet or Antiferromagnet
+  const T* ptr_;  // meant to be Magnet, Ferromagnet, Antiferromagnet or NcAfm
   int ncomp_;
   std::string name_;
   std::string unit_;
@@ -62,6 +63,7 @@ class FieldQuantityEvaluator : public FieldQuantity {
 using AFM_FieldQuantity = FieldQuantityEvaluator<Antiferromagnet>;
 using FM_FieldQuantity = FieldQuantityEvaluator<Ferromagnet>;
 using M_FieldQuantity = FieldQuantityEvaluator<Magnet>;
+using NcAfm_FieldQuantity = FieldQuantityEvaluator<NcAfm>;
 
 
 // ========== ScalarQuantityEvaluator ==========
@@ -102,3 +104,4 @@ class ScalarQuantityEvaluator : public ScalarQuantity {
 using AFM_ScalarQuantity = ScalarQuantityEvaluator<Antiferromagnet>;
 using FM_ScalarQuantity = ScalarQuantityEvaluator<Ferromagnet>;
 using M_ScalarQuantity = ScalarQuantityEvaluator<Magnet>;
+using NcAfm_ScalarQuantity = ScalarQuantityEvaluator<NcAfm>;

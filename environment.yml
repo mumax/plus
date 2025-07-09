@@ -29,6 +29,8 @@ dependencies:
   - pyvista
   - pillow  # should be contained in matplotlib
   - pandas
+  - pip:
+      - pyovf
 
   # documentation generation
   - sphinx
