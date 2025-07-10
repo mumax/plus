@@ -1,0 +1,1255 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>shape &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d4b325e0" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_api/util/mumaxplus.util.shape';</script>
+    <link rel="icon" href="../../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="show" href="mumaxplus.util.show.html" />
+    <link rel="prev" title="formulary" href="mumaxplus.util.formulary.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <script>document.write(`<img src="../../_static/nimble-plus.png" class="logo__image only-dark" alt="mumax⁺ - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://arxiv.org/abs/2411.18194" title="Paper on arXiv" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper on arXiv</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../api.html">API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../util.html">util</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>shape</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape"><code class="docutils literal notranslate"><span class="pre">Shape</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.transform4"><code class="docutils literal notranslate"><span class="pre">transform4()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.transform3"><code class="docutils literal notranslate"><span class="pre">transform3()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.rotate_x"><code class="docutils literal notranslate"><span class="pre">rotate_x()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.rotate_y"><code class="docutils literal notranslate"><span class="pre">rotate_y()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.rotate_z"><code class="docutils literal notranslate"><span class="pre">rotate_z()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate"><code class="docutils literal notranslate"><span class="pre">translate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate_x"><code class="docutils literal notranslate"><span class="pre">translate_x()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate_y"><code class="docutils literal notranslate"><span class="pre">translate_y()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate_z"><code class="docutils literal notranslate"><span class="pre">translate_z()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.scale"><code class="docutils literal notranslate"><span class="pre">scale()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.mirror_xy"><code class="docutils literal notranslate"><span class="pre">mirror_xy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.mirror_yz"><code class="docutils literal notranslate"><span class="pre">mirror_yz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.mirror_zx"><code class="docutils literal notranslate"><span class="pre">mirror_zx()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.invert"><code class="docutils literal notranslate"><span class="pre">invert()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.repeat"><code class="docutils literal notranslate"><span class="pre">repeat()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.copy"><code class="docutils literal notranslate"><span class="pre">copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.add"><code class="docutils literal notranslate"><span class="pre">add()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.sub"><code class="docutils literal notranslate"><span class="pre">sub()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.intersect"><code class="docutils literal notranslate"><span class="pre">intersect()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.xor"><code class="docutils literal notranslate"><span class="pre">xor()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Empty"><code class="docutils literal notranslate"><span class="pre">Empty</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Empty.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Universe"><code class="docutils literal notranslate"><span class="pre">Universe</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Universe.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipsoid"><code class="docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipsoid.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Sphere.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipse"><code class="docutils literal notranslate"><span class="pre">Ellipse</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipse.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Circle"><code class="docutils literal notranslate"><span class="pre">Circle</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Circle.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cone"><code class="docutils literal notranslate"><span class="pre">Cone</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cone.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cylinder"><code class="docutils literal notranslate"><span class="pre">Cylinder</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cylinder.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cuboid"><code class="docutils literal notranslate"><span class="pre">Cuboid</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cuboid.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cube"><code class="docutils literal notranslate"><span class="pre">Cube</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cube.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Rectangle"><code class="docutils literal notranslate"><span class="pre">Rectangle</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Rectangle.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Square"><code class="docutils literal notranslate"><span class="pre">Square</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Square.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.XRange"><code class="docutils literal notranslate"><span class="pre">XRange</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.XRange.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.YRange"><code class="docutils literal notranslate"><span class="pre">YRange</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.YRange.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ZRange"><code class="docutils literal notranslate"><span class="pre">ZRange</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ZRange.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus"><code class="docutils literal notranslate"><span class="pre">Torus</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull"><code class="docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Tetrahedron"><code class="docutils literal notranslate"><span class="pre">Tetrahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Tetrahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Octahedron"><code class="docutils literal notranslate"><span class="pre">Octahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Octahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Dodecahedron"><code class="docutils literal notranslate"><span class="pre">Dodecahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Dodecahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosahedron"><code class="docutils literal notranslate"><span class="pre">Icosahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosidodecahedron"><code class="docutils literal notranslate"><span class="pre">Icosidodecahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosidodecahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Polygon"><code class="docutils literal notranslate"><span class="pre">Polygon</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Polygon.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.RegularPolygon"><code class="docutils literal notranslate"><span class="pre">RegularPolygon</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.RegularPolygon.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ImageShape"><code class="docutils literal notranslate"><span class="pre">ImageShape</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ImageShape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mumaxplus.util.shape">
+<span id="shape"></span><h1>shape<a class="headerlink" href="#module-mumaxplus.util.shape" title="Link to this heading">#</a></h1>
+<p>Classes for common shapes and their manipulation.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Shape</span></span><a class="headerlink" href="#mumaxplus.util.shape.Shape" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape_func=&lt;function</span> <span class="pre">Shape.&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Base class for all shapes using constructive solid geometry (CSG).
+This mutable class holds and manipulates a given shape function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shape_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>x</em><em>,</em><em>y</em><em>,</em><em>z</em><em>]</em><em>, </em><em>bool</em><em>]</em>) – Function returning True if (x,y,z) is within this shape.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.transform4">
+<span class="sig-name descname"><span class="pre">transform4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.transform4" title="Link to this definition">#</a></dt>
+<dd><p>Transform this shape according to a given 4x4 matrix,
+which can represent any affine transformation (rotate, scale, shear,
+translate). It is usually of the form [[R, T], [0, 1]], with R a
+3x3 rotation matrix and T a 3x1 translation vector.
+Returns transformed self.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.transform3">
+<span class="sig-name descname"><span class="pre">transform3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.transform3" title="Link to this definition">#</a></dt>
+<dd><p>Transform this shape according to a given 3x3 matrix (rotate, scale,
+shear).
+Returns transformed self.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.transform" title="Link to this definition">#</a></dt>
+<dd><p>Transform this shape according to a given 3x3 matrix (rotate, scale,
+shear) or 4x4 matrix (like 3x3 plus translations). It is usually of the
+form [[R, T], [0, 1]], with R a 3x3 rotation matrix and T a 3x1
+translation vector.
+Returns transformed self.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.rotate_x">
+<span class="sig-name descname"><span class="pre">rotate_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.rotate_x" title="Link to this definition">#</a></dt>
+<dd><p>Rotate this shape theta radians counter-clockwise around the x-axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.rotate_y">
+<span class="sig-name descname"><span class="pre">rotate_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.rotate_y" title="Link to this definition">#</a></dt>
+<dd><p>Rotate this shape theta radians counter-clockwise around the y-axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.rotate_z">
+<span class="sig-name descname"><span class="pre">rotate_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.rotate_z" title="Link to this definition">#</a></dt>
+<dd><p>Rotate this shape theta radians counter-clockwise around the z-axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.translate">
+<span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.translate" title="Link to this definition">#</a></dt>
+<dd><p>Translate this shape by the vector (dx,dy,dz).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.translate_x">
+<span class="sig-name descname"><span class="pre">translate_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.translate_x" title="Link to this definition">#</a></dt>
+<dd><p>Translate this shape by dx along the x-axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.translate_y">
+<span class="sig-name descname"><span class="pre">translate_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.translate_y" title="Link to this definition">#</a></dt>
+<dd><p>Translate this shape by dy along the y-axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.translate_z">
+<span class="sig-name descname"><span class="pre">translate_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.translate_z" title="Link to this definition">#</a></dt>
+<dd><p>Translate this shape by dz along the z-axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.scale" title="Link to this definition">#</a></dt>
+<dd><p>Scale this shape, using (0,0,0) as the origin.
+Takes 1, 2 or 3 arguments:</p>
+<ol class="arabic simple">
+<li><p>(s): scale by s in all directions.</p></li>
+<li><p>(sx, sy): scale by sx and sy in the xy-plane, but do not scale z.</p></li>
+<li><p>(sx, sy, sz): scale by sx, sy and sz in the x-, y- and
+z-direction respectively.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.mirror_xy">
+<span class="sig-name descname"><span class="pre">mirror_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.mirror_xy" title="Link to this definition">#</a></dt>
+<dd><p>Mirror this shape with respect to the xy-plane.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.mirror_yz">
+<span class="sig-name descname"><span class="pre">mirror_yz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.mirror_yz" title="Link to this definition">#</a></dt>
+<dd><p>Mirror this shape with respect to the yz-plane.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.mirror_zx">
+<span class="sig-name descname"><span class="pre">mirror_zx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.mirror_zx" title="Link to this definition">#</a></dt>
+<dd><p>Mirror this shape with respect to the zx-plane.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.invert">
+<span class="sig-name descname"><span class="pre">invert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.invert" title="Link to this definition">#</a></dt>
+<dd><p>Invert this shape (logical NOT).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.repeat">
+<span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_point</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.repeat" title="Link to this definition">#</a></dt>
+<dd><p>Infinitely repeat everything from this shape enclosed in a bounding
+box defined by the given minimum and maximum points, while everything
+outside this box is ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_point</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Smallest x, y and z coordinates of the bounding box (inclusive).</p></li>
+<li><p><strong>max_point</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Largest x, y and z coordinates of the bounding box (exclusive).</p></li>
+<li><p><strong>direction.</strong> (<em>Setting any coordinate to None will not repeat the shape in this</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.copy" title="Link to this definition">#</a></dt>
+<dd><p>Returns a new shape which is a copy of this shape.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.add" title="Link to this definition">#</a></dt>
+<dd><p>Add given shape to this shape (logical OR).
+Calling <code class="docutils literal notranslate"><span class="pre">a.add(b)</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+=</span> <span class="pre">b</span></code> or <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">|=</span> <span class="pre">b</span></code> is the same.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><em>Shape</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.sub">
+<span class="sig-name descname"><span class="pre">sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.sub" title="Link to this definition">#</a></dt>
+<dd><p>Subtract given shape from this shape (logical AND NOT).
+Calling <code class="docutils literal notranslate"><span class="pre">a.sub(b)</span></code> or <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">-=</span> <span class="pre">b</span></code> is the same.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><em>Shape</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.intersect">
+<span class="sig-name descname"><span class="pre">intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.intersect" title="Link to this definition">#</a></dt>
+<dd><p>Intersect given shape with this shape (logical AND).
+Calling <code class="docutils literal notranslate"><span class="pre">a.intersect(b)</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&amp;=</span> <span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">/=</span> <span class="pre">b</span></code> are the same.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><em>Shape</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.xor">
+<span class="sig-name descname"><span class="pre">xor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.xor" title="Link to this definition">#</a></dt>
+<dd><p>Keep everything from this shape and the given shape, except the
+intersection (logical XOR).
+Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</span></code> or <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">^=</span> <span class="pre">b</span></code> is the same.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><em>Shape</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Empty">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Empty</span></span><a class="headerlink" href="#mumaxplus.util.shape.Empty" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Empty.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Empty.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Empty space.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Universe">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Universe</span></span><a class="headerlink" href="#mumaxplus.util.shape.Universe" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Universe.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Universe.__init__" title="Link to this definition">#</a></dt>
+<dd><p>All of space.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipsoid">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ellipsoid</span></span><a class="headerlink" href="#mumaxplus.util.shape.Ellipsoid" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipsoid.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diamx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diamy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diamz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Ellipsoid.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Ellipsoid with given diameters diamx, diamy, diamz.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Sphere">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sphere</span></span><a class="headerlink" href="#mumaxplus.util.shape.Sphere" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Ellipsoid" title="mumaxplus.util.shape.Ellipsoid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Sphere.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Sphere.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Sphere with given diameter or radius.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipse">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ellipse</span></span><a class="headerlink" href="#mumaxplus.util.shape.Ellipse" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipse.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diamx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diamy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Ellipse.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Ellipse in the xy-plane with given diameters diamx and diamy.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Circle">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Circle</span></span><a class="headerlink" href="#mumaxplus.util.shape.Circle" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Ellipse" title="mumaxplus.util.shape.Ellipse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ellipse</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Circle.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Circle.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Circle in the xy-plane with given diameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cone">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cone</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cone" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cone.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Cone.__init__" title="Link to this definition">#</a></dt>
+<dd><p>3D cone with the vertex down. It has a given diameter at a given height.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cylinder">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cylinder</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cylinder" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cylinder.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Cylinder.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Cylinder along z with given diameter and height.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cuboid">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cuboid</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cuboid" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cuboid.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sidex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sidey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sidez</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Cuboid.__init__" title="Link to this definition">#</a></dt>
+<dd><p>3D rectangular slab with given sides, including minimum, excluding maximum.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cube">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cube</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cube" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Cuboid" title="mumaxplus.util.shape.Cuboid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cuboid</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Cube.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">side</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Cube.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Cube with given side length.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Rectangle">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Rectangle</span></span><a class="headerlink" href="#mumaxplus.util.shape.Rectangle" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Rectangle.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sidex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sidey</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Rectangle.__init__" title="Link to this definition">#</a></dt>
+<dd><p>2D Rectangle in the xy-plane with given sides.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Square">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Square</span></span><a class="headerlink" href="#mumaxplus.util.shape.Square" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Rectangle" title="mumaxplus.util.shape.Rectangle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectangle</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Square.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">side</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Square.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Square with given side length.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.XRange">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">XRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.XRange" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.XRange.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.XRange.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Range of x-values: xmin &lt;= x &lt; xmax</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.YRange">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">YRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.YRange" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.YRange.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ymin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.YRange.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Range of y-values: ymin &lt;= y &lt; ymax</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.ZRange">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ZRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.ZRange" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.ZRange.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.ZRange.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Range of z-values: zmin &lt;= z &lt; zmax</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Torus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Torus</span></span><a class="headerlink" href="#mumaxplus.util.shape.Torus" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Torus.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">major_diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor_diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Torus.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Torus with given major and minor diameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>major_diam</strong> (<em>float</em>) – Distance between opposite centers of the tube.</p></li>
+<li><p><strong>minor_diam</strong> (<em>When major_diam =</em>) – Diameter of the tube.</p></li>
+<li><p><strong>high.</strong> (<em>The torus is major_diam + minor_diam wide and minor_diam</em>)</p></li>
+<li><p><strong>minor_diam</strong></p></li>
+<li><p><strong>hole.</strong> (<em>there will be no</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.DelaunayHull">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DelaunayHull</span></span><a class="headerlink" href="#mumaxplus.util.shape.DelaunayHull" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.DelaunayHull.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.DelaunayHull.__init__" title="Link to this definition">#</a></dt>
+<dd><p>The Delaunay hull of a list of 3D points. These points can serve as the
+vertices of a convex polyhedron.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>points</strong> (<em>ndarray</em><em> of </em><em>double</em><em>, </em><em>shape</em><em> (</em><em>npoints</em><em>, </em><em>3</em><em>)</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Tetrahedron">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tetrahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Tetrahedron" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Tetrahedron.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Tetrahedron.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Tetrahedron (4-faced platonic solid) where all vertices lie on a sphere
+with the given diameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Octahedron">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Octahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Octahedron" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Octahedron.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Octahedron.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Octahedron (8-faced platonic solid) where all vertices lie on a sphere
+with the given diameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Dodecahedron">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Dodecahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Dodecahedron" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Dodecahedron.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Dodecahedron.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Dodecahedron (12-faced platonic solid) where all vertices lie on a sphere
+with the given diameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Icosahedron">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Icosahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Icosahedron" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Icosahedron.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Icosahedron.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Dodecahedron (20-faced platonic solid) where all vertices lie on a sphere
+with the given diameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Icosidodecahedron">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Icosidodecahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Icosidodecahedron" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Icosidodecahedron.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Icosidodecahedron.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Icosidodecahedron  where all vertices lie on a sphere with the given
+diameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Polygon">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Polygon</span></span><a class="headerlink" href="#mumaxplus.util.shape.Polygon" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Polygon.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Polygon.__init__" title="Link to this definition">#</a></dt>
+<dd><p>A polygon in the xy-plane, with a given list of vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertices</strong> (<em>float ndarray</em><em> of </em><em>size</em><em> (</em><em>N</em><em>, </em><em>2</em><em>) or </em><em>(</em><em>N</em><em>, </em><em>3</em><em>)</em>) – If the size is (N, 3), the z-values are simply ignored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.RegularPolygon">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegularPolygon</span></span><a class="headerlink" href="#mumaxplus.util.shape.RegularPolygon" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Polygon" title="mumaxplus.util.shape.Polygon"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polygon</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.RegularPolygon.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.RegularPolygon.__init__" title="Link to this definition">#</a></dt>
+<dd><p>A regular polygon in the xy-plane with N vertices which lie on a circle
+with given diameter. One point is located at (diam/2, 0).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.ImageShape">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ImageShape</span></span><a class="headerlink" href="#mumaxplus.util.shape.ImageShape" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.ImageShape.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_point</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.ImageShape.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Use a black and white image as a shape in the xy-plane. The given image
+file is stretched to the given coordinates. Black is inside the shape
+(True), white outside (False). Coordinates inside the stretched image assume
+the value of the nearest pixel. Coordinate outside the edges of the
+stretched image are treated as outside of the shape (False).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<em>string</em>) – Filename of the image to use.</p></li>
+<li><p><strong>min_point</strong> (<em>tuple</em><em> of </em><em>length 2</em><em> or </em><em>3</em>) – x and y world coordinates to be mapped to the center of the bottom left
+pixel of the image. z-coordinate can be given but is ignored.</p></li>
+<li><p><strong>max_point</strong> (<em>tuple</em><em> of </em><em>length 2</em><em> or </em><em>3</em>) – x and y world coordinates to be mapped to the center of the top right
+pixel of the image. z-coordinate can be given but is ignored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mumaxplus.util.formulary.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">formulary</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mumaxplus.util.show.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">show</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape"><code class="docutils literal notranslate"><span class="pre">Shape</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.transform4"><code class="docutils literal notranslate"><span class="pre">transform4()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.transform3"><code class="docutils literal notranslate"><span class="pre">transform3()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.rotate_x"><code class="docutils literal notranslate"><span class="pre">rotate_x()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.rotate_y"><code class="docutils literal notranslate"><span class="pre">rotate_y()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.rotate_z"><code class="docutils literal notranslate"><span class="pre">rotate_z()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate"><code class="docutils literal notranslate"><span class="pre">translate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate_x"><code class="docutils literal notranslate"><span class="pre">translate_x()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate_y"><code class="docutils literal notranslate"><span class="pre">translate_y()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.translate_z"><code class="docutils literal notranslate"><span class="pre">translate_z()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.scale"><code class="docutils literal notranslate"><span class="pre">scale()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.mirror_xy"><code class="docutils literal notranslate"><span class="pre">mirror_xy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.mirror_yz"><code class="docutils literal notranslate"><span class="pre">mirror_yz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.mirror_zx"><code class="docutils literal notranslate"><span class="pre">mirror_zx()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.invert"><code class="docutils literal notranslate"><span class="pre">invert()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.repeat"><code class="docutils literal notranslate"><span class="pre">repeat()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.copy"><code class="docutils literal notranslate"><span class="pre">copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.add"><code class="docutils literal notranslate"><span class="pre">add()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.sub"><code class="docutils literal notranslate"><span class="pre">sub()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.intersect"><code class="docutils literal notranslate"><span class="pre">intersect()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.xor"><code class="docutils literal notranslate"><span class="pre">xor()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Empty"><code class="docutils literal notranslate"><span class="pre">Empty</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Empty.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Universe"><code class="docutils literal notranslate"><span class="pre">Universe</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Universe.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipsoid"><code class="docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipsoid.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Sphere.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipse"><code class="docutils literal notranslate"><span class="pre">Ellipse</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Ellipse.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Circle"><code class="docutils literal notranslate"><span class="pre">Circle</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Circle.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cone"><code class="docutils literal notranslate"><span class="pre">Cone</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cone.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cylinder"><code class="docutils literal notranslate"><span class="pre">Cylinder</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cylinder.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cuboid"><code class="docutils literal notranslate"><span class="pre">Cuboid</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cuboid.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cube"><code class="docutils literal notranslate"><span class="pre">Cube</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Cube.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Rectangle"><code class="docutils literal notranslate"><span class="pre">Rectangle</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Rectangle.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Square"><code class="docutils literal notranslate"><span class="pre">Square</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Square.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.XRange"><code class="docutils literal notranslate"><span class="pre">XRange</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.XRange.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.YRange"><code class="docutils literal notranslate"><span class="pre">YRange</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.YRange.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ZRange"><code class="docutils literal notranslate"><span class="pre">ZRange</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ZRange.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus"><code class="docutils literal notranslate"><span class="pre">Torus</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull"><code class="docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Tetrahedron"><code class="docutils literal notranslate"><span class="pre">Tetrahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Tetrahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Octahedron"><code class="docutils literal notranslate"><span class="pre">Octahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Octahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Dodecahedron"><code class="docutils literal notranslate"><span class="pre">Dodecahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Dodecahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosahedron"><code class="docutils literal notranslate"><span class="pre">Icosahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosidodecahedron"><code class="docutils literal notranslate"><span class="pre">Icosidodecahedron</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Icosidodecahedron.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Polygon"><code class="docutils literal notranslate"><span class="pre">Polygon</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Polygon.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.RegularPolygon"><code class="docutils literal notranslate"><span class="pre">RegularPolygon</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.RegularPolygon.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ImageShape"><code class="docutils literal notranslate"><span class="pre">ImageShape</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ImageShape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2025-07-10, v1.1.0.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
