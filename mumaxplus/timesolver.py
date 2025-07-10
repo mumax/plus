@@ -5,18 +5,17 @@ import os as _os
 from tqdm import tqdm as _tqdm
 
 class TimeSolverOutput:
-    """Collect values of a list of quantities on specified timepoints.
-
-    Parameters
-    ----------
-    quantity_dict : dict
-        Quantities to collect.
-    file_name : str, optional
-        Optional name of an output file, in which the data is also written as
-        tab-separated values.
-    """
-
     def __init__(self, quantity_dict, file_name=None):
+        """Collect values of a list of quantities on specified timepoints.
+
+        Parameters
+        ----------
+        quantity_dict : dict
+            Quantities to collect.
+        file_name : str, optional
+            Optional name of an output file, in which the data is also written as
+            tab-separated values.
+        """
         self._quantities = quantity_dict
         self._data = {"time": []}
         for key in self._quantities.keys():
@@ -73,11 +72,12 @@ class TimeSolver:
         """Set the Runga Kutta method used by the time solver.
 
         Implemented methods are:
-          'Heun'
-          'BogackiShampine'
-          'CashKarp'
-          'Fehlberg'
-          'DormandPrince'
+        
+        * 'Heun'
+        * 'BogackiShampine'
+        * 'CashKarp'
+        * 'Fehlberg'
+        * 'DormandPrince'
 
         The default and recommended Runge Kutta method is 'Fehlberg'.
         """
@@ -111,7 +111,7 @@ class TimeSolver:
         self._assure_sensible_timestep()
         self._impl.run(duration)
 
-    def solve(self, timepoints, quantity_dict, file_name=None, tqdm=False) -> "TimeSolverOutput":
+    def solve(self, timepoints, quantity_dict, file_name=None, tqdm=False) -> TimeSolverOutput:
         """Solve the differential equation.
 
         The functions collects values of a list of specified quantities
@@ -152,7 +152,7 @@ class TimeSolver:
         return output
 
     @property
-    def timestep(self):
+    def timestep(self) -> float:
         """Return the timestep value."""
         return self._impl.timestep
 
@@ -161,7 +161,7 @@ class TimeSolver:
         self._impl.timestep = timestep
 
     @property
-    def adaptive_timestep(self):
+    def adaptive_timestep(self) -> bool:
         """Return the adaptive_timestep value.
 
         True if an adaptive time step is used, False otherwise.
@@ -174,7 +174,7 @@ class TimeSolver:
         self._impl.adaptive_timestep = adaptive
 
     @property
-    def time(self):
+    def time(self) -> float:
         """Return the time value."""
         return self._impl.time
 
@@ -183,7 +183,7 @@ class TimeSolver:
         self._impl.time = time
 
     @property
-    def max_error(self):
+    def max_error(self) -> float:
         """Return the maximum error per step the solver can tollerate.
         
         The default value is 1e-5.
@@ -201,7 +201,7 @@ class TimeSolver:
         self._impl.max_error = error
     
     @property
-    def headroom(self):
+    def headroom(self) -> float:
         """Return the solver headroom.
         
         The default value is 0.8.
@@ -218,7 +218,7 @@ class TimeSolver:
         self._impl.headroom = headr
     
     @property
-    def lower_bound(self):
+    def lower_bound(self) -> float:
         """Return the lower bound which is used to cap the scaling of the time step
         from below.
         
@@ -236,7 +236,7 @@ class TimeSolver:
         self._impl.lower_bound = lower
     
     @property
-    def upper_bound(self):
+    def upper_bound(self) -> float:
         """Return the upper bound which is used to cap the scaling of the time step
         from the top.
         
@@ -254,7 +254,7 @@ class TimeSolver:
         self._impl.upper_bound = upper
     
     @property
-    def sensible_factor(self):
+    def sensible_factor(self) -> float:
         """Return the sensible time step factor which is used as a scaling factor
         when determining a sensible timestep.
         
@@ -272,7 +272,7 @@ class TimeSolver:
         self._impl.sensible_factor = fact
 
     @property
-    def sensible_timestep_default(self):
+    def sensible_timestep_default(self) -> float:
         """Return the time step which is used if no sensible time step
         can be calculated (e.g. when the total torque is zero).
 

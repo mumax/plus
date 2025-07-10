@@ -7,7 +7,6 @@ from .fieldquantity import FieldQuantity
 
 class Variable(FieldQuantity):
     """Represent a physical variable field, e.g. magnetization."""
-
     def __init__(self, impl):
         super().__init__(impl)
 

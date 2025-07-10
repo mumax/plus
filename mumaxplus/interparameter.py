@@ -9,7 +9,7 @@ class InterParameter():
     """
 
     def __init__(self, impl):
-        """Initialize a python InterParameter from a c++ InterParameter instance.
+        """Initialize a python InterParameter from a C++ InterParameter instance.
 
         InterParameters should only have to be initialized within the mumax⁺
         module and not by the end user.
@@ -50,33 +50,33 @@ class InterParameter():
         return self.eval()
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return instance's name."""
         return self._impl.name
 
     @property
-    def unit(self):
+    def unit(self) -> str:
         """Return unit of the quantity."""
         return self._impl.unit
 
     @property
-    def ncomp(self):
+    def ncomp(self) -> int:
         """Return the number of components of the quantity."""
         return self._impl.ncomp
 
     @property
-    def number_of_regions(self):
+    def number_of_regions(self) -> int:
         """Return the number of regions between which the quantity
         is active."""
         return self._impl.number_of_regions
 
     @property
-    def region_indices(self):
+    def region_indices(self) -> list[int]:
         """Return list of unique region indices."""
         return self._impl.unique_regions
 
     @property
-    def is_uniform(self):
+    def is_uniform(self) -> bool:
         """Return True if an InterParameter instance is uniform, otherwise False.
         
         See Also
@@ -86,7 +86,7 @@ class InterParameter():
         return self._impl.is_uniform
 
     @property
-    def uniform_value(self):
+    def uniform_value(self) -> float:
         """Return the uniform value of the InterParameter instance if it exists.
         
         See Also
@@ -130,7 +130,7 @@ class InterParameter():
         """
         self._impl.set_between(i, j, value)
 
-    def get_between(self, i, j):
+    def get_between(self, i, j) -> float:
         """Get the InterParameter value between regions i and j.
         
         See Also

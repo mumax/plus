@@ -18,40 +18,41 @@ import warnings
 
 
 class Ferromagnet(Magnet):
-    """Create a ferromagnet instance.
-
-    Parameters
-    ----------
-    world : mumaxplus.World
-        World in which the ferromagnet lives.
-    grid : mumaxplus.Grid
-        The number of cells in x, y, z the ferromagnet should be divided into.
-    geometry : None, ndarray, or callable (default=None)
-        The geometry of the ferromagnet can be set in three ways.
-
-        1. If the geometry contains all cells in the grid, then use None (the default)
-        2. Use an ndarray which specifies for each cell wheter or not it is in the
-           geometry.
-        3. Use a function which takes x, y, and z coordinates as arguments and returns
-           true if this position is inside the geometry and false otherwise.
-
-    regions : None, ndarray, or callable (default=None)
-        The regional structure of a ferromagnet can be set in the same three ways
-        as the geometry. This parameter indexes each grid cell to a certain region.
-
-        !Important note! The values of `InterParameters` which act between
-        different regions are stored in an array with a size that scales with the
-        square of the maximal index value. Therefore, if possible, it's good
-        practice to keep each region index as close to zero as possible.
-        E.g. defining two regions with indices 1 and 500 will work, but occupies more
-        memory and will pay in performance than giving them the values 0 and 1.
-
-    name : str (default="")
-        The ferromagnet's identifier. If the name is empty (the default), a name for the
-        ferromagnet will be created.
-    """
-
+    """Create a ferromagnet instance."""
     def __init__(self, world, grid, name="", geometry=None, regions=None):
+        """
+        Parameters
+        ----------
+        world : World
+            World in which the ferromagnet lives.
+        grid : Grid
+            The number of cells in x, y, z the ferromagnet should be divided into.
+        geometry : None, ndarray, or callable (default=None)
+            The geometry of the ferromagnet can be set in three ways.
+
+            1. If the geometry contains all cells in the grid, then use None (the default)
+            2. Use an ndarray which specifies for each cell wheter or not it is in the
+               geometry.
+            3. Use a function which takes x, y, and z coordinates as arguments and returns
+               true if this position is inside the geometry and false otherwise.
+
+        regions : None, ndarray, or callable (default=None)
+            The regional structure of a ferromagnet can be set in the same three ways
+            as the geometry. This parameter indexes each grid cell to a certain region.
+
+            Note
+            ----
+                The values of `InterParameters` which act between
+                different regions are stored in an array with a size that scales with the
+                square of the maximal index value. Therefore, if possible, it's good
+                practice to keep each region index as close to zero as possible.
+                E.g. defining two regions with indices 1 and 500 will work, but occupies more
+                memory and will pay in performance than giving them the values 0 and 1.
+
+        name : str (default="")
+            The ferromagnet's identifier. If the name is empty (the default), a name for the
+            ferromagnet will be created.
+        """
         super().__init__(world._impl.add_ferromagnet, world, grid, name, geometry, regions)
 
     def __repr__(self):
@@ -59,7 +60,7 @@ class Ferromagnet(Magnet):
         return f"Ferromagnet(grid={self.grid}, name='{self.name}')"
 
     @property
-    def magnetization(self):
+    def magnetization(self) -> Variable:
         """Direction of the magnetization (normalized)."""
         return Variable(self._impl.magnetization)
 
@@ -68,12 +69,12 @@ class Ferromagnet(Magnet):
         self.magnetization.set(value)
 
     @property
-    def is_sublattice(self):
+    def is_sublattice(self) -> bool:
         """Returns True if the ferromagnet is a sublattice of a host magnet."""
         return self._impl.is_sublattice
 
     @property
-    def enable_demag(self):
+    def enable_demag(self) -> bool:
         """Enable/disable demagnetization switch.
         
         Default = True.
@@ -85,7 +86,7 @@ class Ferromagnet(Magnet):
         self._impl.enable_demag = value
 
     @property
-    def enable_openbc(self):
+    def enable_openbc(self) -> bool:
         """Enable/disable open boundary conditions.
         
         When set to False (default), Neumann boundary conditions are applied.
@@ -98,7 +99,7 @@ class Ferromagnet(Magnet):
         self._impl.enable_openbc = value
 
     @property
-    def enable_zhang_li_torque(self):
+    def enable_zhang_li_torque(self) -> bool:
         """Enable/disable Zhang-Li spin transfer torque.
         
         Default = True.
@@ -114,7 +115,7 @@ class Ferromagnet(Magnet):
         self._impl.enable_zhang_li_torque = value
 
     @property
-    def enable_slonczewski_torque(self):
+    def enable_slonczewski_torque(self) -> bool:
         """Enable/disable Slonczewski spin transfer torue.
         
         Default = True.
@@ -130,7 +131,7 @@ class Ferromagnet(Magnet):
         self._impl.enable_slonczewski_torque = value
 
     @property
-    def bias_magnetic_field(self):
+    def bias_magnetic_field(self) -> Parameter:
         """Uniform bias magnetic field which will affect a ferromagnet.
         
         The value should be specifed in Teslas.
@@ -144,7 +145,7 @@ class Ferromagnet(Magnet):
     def minimize(self, tol=1e-6, nsamples=10):
         """Minimize the total energy.
 
-        Fast energy minimization, but less robust than `relax`
+        Fast energy minimization, but less robust than :func:`relax`
         when starting from a high energy state.
 
         Parameters
@@ -171,7 +172,7 @@ class Ferromagnet(Magnet):
         Hereafter, relaxation keeps on going until the maximum torque is
         minimized.
 
-        Compared to `minimize`, this function takes a longer time to execute,
+        Compared to :func:`minimize`, this function takes a longer time to execute,
         but is more robust when starting from a high energy state (i.e. random).
 
         Parameters
@@ -192,7 +193,7 @@ class Ferromagnet(Magnet):
         self._impl.relax(tol)
 
     @property
-    def RelaxTorqueThreshold(self):
+    def RelaxTorqueThreshold(self) -> float:
         """Threshold torque used for relaxing the system (default = -1).
         
         If set to a negative value (default behaviour),
@@ -216,7 +217,7 @@ class Ferromagnet(Magnet):
     # ----- MATERIAL PARAMETERS -----------
 
     @property
-    def msat(self):
+    def msat(self) -> Parameter:
         """Saturation magnetization (A/m).
         
         Default = 1.0 A/m
@@ -228,7 +229,7 @@ class Ferromagnet(Magnet):
         self.msat.set(value)
 
     @property
-    def alpha(self):
+    def alpha(self) -> Parameter:
         """LLG damping parameter."""
         return Parameter(self._impl.alpha)
 
@@ -237,7 +238,7 @@ class Ferromagnet(Magnet):
         self.alpha.set(value)
 
     @property
-    def aex(self):
+    def aex(self) -> Parameter:
         """Exchange constant (J/m)."""
         return Parameter(self._impl.aex)
 
@@ -246,7 +247,7 @@ class Ferromagnet(Magnet):
         self.aex.set(value)
 
     @property
-    def inter_exchange(self):
+    def inter_exchange(self) -> InterParameter:
         """Exchange constant (J/m) between different regions.
         If set to zero (default), then the harmonic mean of
         the exchange constants of the two regions are used.
@@ -255,6 +256,7 @@ class Ferromagnet(Magnet):
         is wanted, set `scale_exchange` to zero.
 
         This parameter should be set with
+        
         >>> magnet.inter_exchange.set_between(region1, region2, value)
         >>> magnet.inter_exchange = value # uniform value
 
@@ -272,11 +274,12 @@ class Ferromagnet(Magnet):
         self.inter_exchange.set(value)
 
     @property
-    def scale_exchange(self):
+    def scale_exchange(self) -> InterParameter:
         """Scaling of the exchange constant between different
         regions.
 
         This parameter can be set with
+
         >>> magnet.scale_exchange.set_between(region1, region2, value)
         >>> magnet.scale_exchange = value # uniform value
 
@@ -294,7 +297,7 @@ class Ferromagnet(Magnet):
         self.scale_exchange.set(value)
 
     @property
-    def ku1(self):
+    def ku1(self) -> Parameter:
         """Uniaxial anisotropy parameter Ku1 (J/m³).
         
         See Also
@@ -308,7 +311,7 @@ class Ferromagnet(Magnet):
         self.ku1.set(value)
 
     @property
-    def ku2(self):
+    def ku2(self) -> Parameter:
         """Uniaxial anisotropy parameter Ku2 (J/m³).
         
         See Also
@@ -322,7 +325,7 @@ class Ferromagnet(Magnet):
         self.ku2.set(value)
 
     @property
-    def anisU(self):
+    def anisU(self) -> Parameter:
         """Uniaxial anisotropy direction (the easy axis).
         
         See Also
@@ -336,7 +339,7 @@ class Ferromagnet(Magnet):
         self.anisU.set(value)
 
     @property
-    def kc1(self):
+    def kc1(self) -> Parameter:
         """Cubic anisotropy parameter Kc1 (J/m³).
         
         See Also
@@ -350,7 +353,7 @@ class Ferromagnet(Magnet):
         self.kc1.set(value)
 
     @property
-    def kc2(self):
+    def kc2(self) -> Parameter:
         """Cubic anisotropy parameter Kc2 (J/m³).
 
         See Also
@@ -364,7 +367,7 @@ class Ferromagnet(Magnet):
         self.kc2.set(value)
         
     @property
-    def kc3(self):
+    def kc3(self) -> Parameter:
         """Cubic anisotropy parameter Kc3 (J/m³).
         
         See Also
@@ -378,7 +381,7 @@ class Ferromagnet(Magnet):
         self.kc3.set(value)
 
     @property
-    def anisC1(self):
+    def anisC1(self) -> Parameter:
         """First cubic anisotropy direction.
         
         See Also
@@ -392,7 +395,7 @@ class Ferromagnet(Magnet):
         self.anisC1.set(value)
 
     @property
-    def anisC2(self):
+    def anisC2(self) -> Parameter:
         """Second cubic anisotropy direction.
         
         See Also
@@ -406,7 +409,7 @@ class Ferromagnet(Magnet):
         self.anisC2.set(value)
 
     @property
-    def Lambda(self):
+    def Lambda(self) -> Parameter:
         """Slonczewski Λ parameter.
         
         See Also
@@ -420,7 +423,7 @@ class Ferromagnet(Magnet):
         self.Lambda.set(value)
     
     @property
-    def free_layer_thickness(self):
+    def free_layer_thickness(self) -> Parameter:
         """Slonczewski free layer thickness (m). If set to zero (default),
         then the thickness will be deduced from the mesh size.
         
@@ -435,7 +438,7 @@ class Ferromagnet(Magnet):
         self.free_layer_thickness.set(value)
     
     @property
-    def fixed_layer_on_top(self):
+    def fixed_layer_on_top(self) -> bool:
         """The position of the fixed layer. If set to True (default),
         then the layer will be at the top. Otherwise it will be at the bottom.
         
@@ -452,7 +455,7 @@ class Ferromagnet(Magnet):
         self._impl.fixed_layer_on_top = value
 
     @property
-    def epsilon_prime(self):
+    def epsilon_prime(self) -> Parameter:
         """Slonczewski secondary STT term ε'.
         
         See Also
@@ -466,7 +469,7 @@ class Ferromagnet(Magnet):
         self.epsilon_prime.set(value)
 
     @property
-    def fixed_layer(self):
+    def fixed_layer(self) -> Parameter:
         """Slonczewski fixed layer polarization.
         
         See Also
@@ -481,7 +484,7 @@ class Ferromagnet(Magnet):
 
 
     @property
-    def xi(self):
+    def xi(self) -> Parameter:
         """Non-adiabaticity of the Zhang-Li spin-transfer torque.
         
         See Also
@@ -495,7 +498,7 @@ class Ferromagnet(Magnet):
         self.xi.set(value)
 
     @property
-    def pol(self):
+    def pol(self) -> Parameter:
         """Electrical current polarization.
         
         See Also
@@ -509,7 +512,7 @@ class Ferromagnet(Magnet):
         self.pol.set(value)
 
     @property
-    def jcur(self):
+    def jcur(self) -> Parameter:
         """Electrical current density (A/m²).
 
         See Also
@@ -523,7 +526,7 @@ class Ferromagnet(Magnet):
         self.jcur.set(value)
 
     @property
-    def temperature(self):
+    def temperature(self) -> Parameter:
         """Temperature (K).
         
         See Also
@@ -542,7 +545,7 @@ class Ferromagnet(Magnet):
         self.temperature.set(value)
 
     @property
-    def dmi_tensor(self):
+    def dmi_tensor(self) -> DmiTensor:
         """Get the DMI tensor of this Ferromagnet.
 
         See Also
@@ -557,7 +560,7 @@ class Ferromagnet(Magnet):
         return DmiTensor(self._impl.dmi_tensor)
 
     @property
-    def applied_potential(self):
+    def applied_potential(self) -> Parameter:
         """The applied electrical potential (V).
 
         Cells with Nan values do not have an applied potential.
@@ -574,7 +577,7 @@ class Ferromagnet(Magnet):
         self.applied_potential.set(value)
 
     @property
-    def conductivity(self):
+    def conductivity(self) -> Parameter:
         """Conductivity without considering anisotropic magneto resistance (S/m).
         
         See Also
@@ -589,7 +592,7 @@ class Ferromagnet(Magnet):
         self.conductivity.set(value)
 
     @property
-    def amr_ratio(self):
+    def amr_ratio(self) -> Parameter:
         """Anisotropic magneto resistance ratio."""
         return Parameter(self._impl.amr_ratio)
 
@@ -598,7 +601,7 @@ class Ferromagnet(Magnet):
         self.amr_ratio.set(value)
 
     @property
-    def frozen_spins(self):
+    def frozen_spins(self) -> Parameter:
         """Defines spins that should be fixed by setting torque to (0, 0, 0)
         wherever frozen_spins is not 0."""
         return Parameter(self._impl.frozen_spins)
@@ -610,7 +613,7 @@ class Ferromagnet(Magnet):
     # --- magnetoelasticity ---
 
     @property
-    def B1(self):
+    def B1(self) -> Parameter:
         """First magnetoelastic coupling constant (J/m³).
         
         See Also
@@ -635,7 +638,7 @@ class Ferromagnet(Magnet):
                           + " Make sure this is intentional!", UserWarning)
 
     @property
-    def B2(self):
+    def B2(self) -> Parameter:
         """Second magnetoelastic coupling constant (J/m³).
         
         See Also
@@ -662,12 +665,12 @@ class Ferromagnet(Magnet):
     # ----- POISSON SYSTEM ----------------------
 
     @property
-    def poisson_system(self):
+    def poisson_system(self) -> PoissonSystem:
         """Get the poisson solver which computes the electric potential.
         
         See Also
         --------
-        electric_potential
+        electrical_potential
         applied_potential, conductivity, conductivity_tensor
         """
         return PoissonSystem(self._impl.poisson_system)
@@ -675,17 +678,17 @@ class Ferromagnet(Magnet):
     # ----- QUANTITIES ----------------------
 
     @property
-    def torque(self):
+    def torque(self) -> FieldQuantity:
         """Total torque on the magnetization (rad/s)."""
         return FieldQuantity(_cpp.torque(self._impl))
 
     @property
-    def llg_torque(self):
+    def llg_torque(self) -> FieldQuantity:
         """Torque on the magnetization exerted by the total effective field (rad/s)."""
         return FieldQuantity(_cpp.llg_torque(self._impl))
 
     @property
-    def damping_torque(self):
+    def damping_torque(self) -> FieldQuantity:
         """Torque used by the relax function (rad/s). This is the term in the
         Landau-Liftshitz-Gilbert torque with the damping factor α.
         
@@ -696,37 +699,37 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.damping_torque(self._impl))
 
     @property
-    def spin_transfer_torque(self):
+    def spin_transfer_torque(self) -> FieldQuantity:
         """Spin transfer torque exerted on the magnetization (rad/s)."""
         return FieldQuantity(_cpp.spin_transfer_torque(self._impl))
     
     @property
-    def max_torque(self):
+    def max_torque(self) -> ScalarQuantity:
         """The maximum value of the torque over all cells (rad/s)."""
         return ScalarQuantity(_cpp.max_torque(self._impl))
     
     @property
-    def demag_energy_density(self):
+    def demag_energy_density(self) -> FieldQuantity:
         """Energy density related to the demag field (J/m³).
         
         See Also
         --------
-        demag_energy, demag_field
+        demag_energy, Magnet.demag_field
         """
         return FieldQuantity(_cpp.demag_energy_density(self._impl))
 
     @property
-    def demag_energy(self):
+    def demag_energy(self) -> ScalarQuantity:
         """Energy related to the demag field (J).
         
         See Also
         --------
-        demag_energy_density, demag_field
+        demag_energy_density, Magnet.demag_field
         """
         return ScalarQuantity(_cpp.demag_energy(self._impl))
 
     @property
-    def anisotropy_field(self):
+    def anisotropy_field(self) -> FieldQuantity:
         """Anisotropic effective field term (T).
         
         See Also
@@ -736,7 +739,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.anisotropy_field(self._impl))
 
     @property
-    def anisotropy_energy_density(self):
+    def anisotropy_energy_density(self) -> FieldQuantity:
         """Energy density related to the magnetic anisotropy (J/m³).
         
         See Also
@@ -746,7 +749,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.anisotropy_energy_density(self._impl))
 
     @property
-    def anisotropy_energy(self):
+    def anisotropy_energy(self) -> ScalarQuantity:
         """Energy related to the magnetic anisotropy (J).
         
         See Also
@@ -756,7 +759,7 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.anisotropy_energy(self._impl))
 
     @property
-    def exchange_field(self):
+    def exchange_field(self) -> FieldQuantity:
         """Effective field of the exchange interaction (T).
         
         See Also
@@ -766,7 +769,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.exchange_field(self._impl))
 
     @property
-    def exchange_energy_density(self):
+    def exchange_energy_density(self) -> FieldQuantity:
         """Energy density related to the exchange interaction (J/m³).
         
         See Also
@@ -776,7 +779,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.exchange_energy_density(self._impl))
 
     @property
-    def exchange_energy(self):
+    def exchange_energy(self) -> ScalarQuantity:
         """Energy related to the exchange interaction (J).
 
         See Also
@@ -786,13 +789,13 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.exchange_energy(self._impl))
 
     @property
-    def max_angle(self):
+    def max_angle(self) -> ScalarQuantity:
         """Maximal angle difference of the magnetization between exchange\
          coupled cells (rad)."""
         return ScalarQuantity(_cpp.max_angle(self._impl))
 
     @property
-    def dmi_field(self):
+    def dmi_field(self) -> FieldQuantity:
         """Effective field of the Dzyaloshinskii-Moriya interaction (T).
 
         Returns a FieldQuantity which evaluates the effective field corresponding to the
@@ -810,7 +813,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.dmi_field(self._impl))
 
     @property
-    def dmi_energy_density(self):
+    def dmi_energy_density(self) -> FieldQuantity:
         r"""Energy density related to the Dzyaloshinskii-Moriya interaction (J/m³).
 
         Returns a FieldQuantity which evaluates the Dzyaloshinskii-Moriya energy
@@ -831,12 +834,12 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.dmi_energy_density(self._impl))
 
     @property
-    def dmi_energy(self):
+    def dmi_energy(self) -> ScalarQuantity:
         """Energy related to the Dzyaloshinskii-Moriya interaction (J).
 
         Returns
         -------
-        dmi_energy_density : float
+        dmi_energy_density : ScalarQuantity
 
         See Also
         --------
@@ -846,7 +849,7 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.dmi_energy(self._impl))
     
     @property
-    def external_field(self):
+    def external_field(self) -> FieldQuantity:
         """Sum of external fields (T).
         
         See Also
@@ -856,7 +859,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.external_field(self._impl))
 
     @property
-    def zeeman_energy_density(self):
+    def zeeman_energy_density(self) -> FieldQuantity:
         """Energy density related to external fields (J/m³).
         
         See Also
@@ -866,7 +869,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.zeeman_energy_density(self._impl))
 
     @property
-    def zeeman_energy(self):
+    def zeeman_energy(self) -> ScalarQuantity:
         """Energy related to external fields (J).
         
         See Also
@@ -876,7 +879,7 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.zeeman_energy(self._impl))
 
     @property
-    def effective_field(self):
+    def effective_field(self) -> FieldQuantity:
         """Sum of all effective field terms (T)."""
         return FieldQuantity(_cpp.effective_field(self._impl))
 
@@ -891,7 +894,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.total_energy_density(self._impl))
 
     @property
-    def total_energy(self):
+    def total_energy(self) -> ScalarQuantity:
         """Energy related to the total effective field (J).
 
         See Also
@@ -901,7 +904,7 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.total_energy(self._impl))
 
     @property
-    def electrical_potential(self):
+    def electrical_potential(self) -> FieldQuantity:
         """Electrical potential (V).
 
         Calculates the electrical potential with a Poisson solver, using the
@@ -915,15 +918,18 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.electrical_potential(self._impl))
 
     @property
-    def conductivity_tensor(self):
-        """Conductivity tensor taking into account AMR (S/m).
+    def conductivity_tensor(self) -> FieldQuantity:
+        r"""Conductivity tensor taking into account AMR (S/m).
 
         This quantity has six components (Cxx, Cyy, Czz, Cxy, Cxz, Cyz)
-        which forms the symmetric conductivity tensor::
+        which forms the symmetric conductivity tensor:
 
-               Cxx Cxy Cxz
-               Cxy Cyy Cyz
-               Cxz Cyz Czz
+        .. math:: 
+            \begin{bmatrix}
+            Cxx & Cxy & Cxz \\
+            Cxy & Cyy & Cyz \\
+            Cxz & Cyz & Czz
+            \end{bmatrix}
 
         See Also
         --------
@@ -933,7 +939,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.conductivity_tensor(self._impl))
 
     @property
-    def thermal_noise(self):
+    def thermal_noise(self) -> FieldQuantity:
         """Thermal noise on the magnetization.
         
         See Also
@@ -943,7 +949,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.thermal_noise(self._impl))
 
     @property
-    def full_magnetization(self):
+    def full_magnetization(self) -> FieldQuantity:
         """Unnormalized magnetization (A/m).
         
         See Also
@@ -955,19 +961,19 @@ class Ferromagnet(Magnet):
     # ----- SUBLATTICE QUANTITIES -----------
 
     @property
-    def inhomogeneous_exchange_field(self):
+    def inhomogeneous_exchange_field(self) -> FieldQuantity:
         """Effective field of the inhomogeneous exchange interaction (T).
         This field is related to the antiferromagnetic exchange interaction
         between neighbouring cells.
         
         See Also
         --------
-        inhomogeneous_energy_exchange_density, inhomogeneous_exchange_energy
+        inhomogeneous_exchange_energy_density, inhomogeneous_exchange_energy
         """
         return FieldQuantity(_cpp.inhomogeneous_exchange_field(self._impl))
     
     @property
-    def homogeneous_exchange_field(self):
+    def homogeneous_exchange_field(self) -> FieldQuantity:
         """Effective field of the homogeneous exchange interaction (T).
         This field is related to the antiferromagnetic exchange interaction
         between spins in a single simulation cell.
@@ -979,7 +985,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.homogeneous_exchange_field(self._impl))
     
     @property
-    def inhomogeneous_exchange_energy_density(self):
+    def inhomogeneous_exchange_energy_density(self) -> FieldQuantity:
         """Energy density related to the inhomogeneous exchange interaction (J/m³).
         This energy density is related to the antiferromagnetic exchange interaction
         between neighbouring cells.
@@ -991,7 +997,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.inhomogeneous_exchange_energy_density(self._impl))
     
     @property
-    def homogeneous_exchange_energy_density(self):
+    def homogeneous_exchange_energy_density(self) -> FieldQuantity:
         """Energy density related to the homogeneous exchange interaction (J/m³).
         This energy density is related to the antiferromagnetic exchange interaction
         between spins in a single simulation cell.
@@ -1003,7 +1009,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.homogeneous_exchange_energy_density(self._impl))
 
     @property
-    def inhomogeneous_exchange_energy(self):
+    def inhomogeneous_exchange_energy(self) -> ScalarQuantity:
         """Energy related to the inhomogeneous exchange interaction (J).
         This energy is related to the antiferromagnetic exchange interaction
         between neighbouring cells.
@@ -1015,7 +1021,7 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.inhomogeneous_exchange_energy(self._impl))
     
     @property
-    def homogeneous_exchange_energy(self):
+    def homogeneous_exchange_energy(self) -> ScalarQuantity:
         """Energy related to the homogeneous exchange interaction (J).
         This energy is related to the antiferromagnetic exchange interaction
         between spins in a single simulation cell.
@@ -1045,20 +1051,20 @@ class Ferromagnet(Magnet):
     # all elasticity is found in the Magnet parent
 
     @property
-    def magnetoelastic_field(self):
+    def magnetoelastic_field(self) -> FieldQuantity:
         """Magnetoelastic effective field due to effects of inverse
         magnetostriction (T).
 
         See Also
         --------
         B1, B2
-        strain_tensor, rigid_norm_strain, rigid_shear_strain
+        Magnet.strain_tensor, Magnet.rigid_norm_strain, Magnet.rigid_shear_strain
         magnetoelastic_force
         """
         return FieldQuantity(_cpp.magnetoelastic_field(self._impl))
     
     @property
-    def magnetoelastic_energy_density(self):
+    def magnetoelastic_energy_density(self) -> FieldQuantity:
         """Energy density related to magnetoelastic field (J/m³).
 
         See Also
@@ -1068,7 +1074,7 @@ class Ferromagnet(Magnet):
         return FieldQuantity(_cpp.magnetoelastic_energy_density(self._impl))
     
     @property
-    def magnetoelastic_energy(self):
+    def magnetoelastic_energy(self) -> ScalarQuantity:
         """Energy related to magnetoelastic field (J).
 
         See Also
@@ -1078,12 +1084,12 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.magnetoelastic_energy(self._impl))
 
     @property
-    def magnetoelastic_force(self):
+    def magnetoelastic_force(self) -> FieldQuantity:
         """Magnetoelastic body force density due to magnetostriction effect (N/m³).
 
         See Also
         --------
         B1, B2
-        effective_body_force, magnetoelastic_field
+        Magnet.effective_body_force, magnetoelastic_field
         """
         return FieldQuantity(_cpp.magnetoelastic_force(self._impl))

@@ -9,25 +9,25 @@ from PIL import Image as _Image
 # Parent Shape class
 
 class Shape:
-    """Base class for all shapes using constructive solid geometry (CSG).
-    This mutable class holds and manipulates a given shape function.
-
-    Parameters
-    ----------
-    shape_func : Callable[[x,y,z], bool]
-        Function returning True if (x,y,z) is within this shape.
-    """
     def __init__(self, shape_func=(lambda x,y,z: False)):
+        """Base class for all shapes using constructive solid geometry (CSG).
+        This mutable class holds and manipulates a given shape function.
+
+        Parameters
+        ----------
+        shape_func : Callable[[x,y,z], bool]
+            Function returning True if (x,y,z) is within this shape.
+        """
         self.shape_func = shape_func
 
     def __call__(self, x, y, z):
         """Returns True if (x,y,z) is within this shape.
-        Calling shape.shape_func(x,y,z) or shape(x,y,z) is the same."""
+        ``Calling shape.shape_func(x,y,z)`` or ``shape(x,y,z)`` is the same."""
         return self.shape_func(x, y, z)
 
     def __contains__(self, coord):
         """Returns true if the given coordinate is within this shape.
-        Calling shape.shape_func(x,y,z) or shape(x,y,z) is the same.
+        Calling ``shape.shape_func(x,y,z)`` or ``shape(x,y,z)`` is the same.
 
         Parameters
         ----------
@@ -118,10 +118,11 @@ class Shape:
     def scale(self, sx, sy=None, sz=1):
         """Scale this shape, using (0,0,0) as the origin.
         Takes 1, 2 or 3 arguments:
-            1. (s): scale by s in all directions.
-            2. (sx, sy): scale by sx and sy in the xy-plane, but do not scale z.
-            3. (sx, sy, sz): scale by sx, sy and sz in the x-, y- and
-            z-direction respectively.
+
+        1. (s): scale by s in all directions.
+        2. (sx, sy): scale by sx and sy in the xy-plane, but do not scale z.
+        3. (sx, sy, sz): scale by sx, sy and sz in the x-, y- and
+           z-direction respectively.
         """
         if sy is None:
             sy = sz = sx
@@ -208,54 +209,54 @@ class Shape:
     
     def add(self, other: "Shape"):
         """Add given shape to this shape (logical OR).
-        Calling a.add(b), a+=b or a|=b is the same."""
+        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same."""
         old_func = self.shape_func  # copy old version of self
         self.shape_func = lambda x, y, z: old_func(x, y, z) | other(x, y, z)
         return self
 
     def __iadd__(self, other: "Shape"):
         """Add given shape to this shape (logical OR).
-        Calling a.add(b), a+=b or a|=b is the same."""
+        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same."""
         return self.add(other)
 
     def __ior__(self, other: "Shape"):
         """Add given shape to this shape (logical OR).
-        Calling a.add(b), a+=b or a|=b is the same."""
+        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same."""
         return self.add(other)
 
     def sub(self, other: "Shape"):
         """Subtract given shape from this shape (logical AND NOT).
-        Calling a.sub(b) or a-=b is the same."""
+        Calling ``a.sub(b)`` or ``a -= b`` is the same."""
         old_func = self.shape_func  # copy old version of self
         self.shape_func = lambda x,y,z: old_func(x,y,z) & _np.logical_not(other(x,y,z))
         return self
     
     def __isub__(self, other: "Shape"):
         """Subtract given shape from this shape (logical AND NOT).
-        Calling a.sub(b) or a-=b is the same."""
+        Calling ``a.sub(b)`` or ``a -= b`` is the same."""
         return self.sub(other)
 
     def intersect(self, other: "Shape"):
         """Intersect given shape with this shape (logical AND).
-        Calling a.intersect(b), a&=b and a/=b are the same."""
+        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same."""
         old_func = self.shape_func  # copy old version of self
         self.shape_func = lambda x,y,z: old_func(x,y,z) & other(x,y,z)
         return self
     
     def __iand__(self, other: "Shape"):
         """Intersect given shape with this shape (logical AND).
-        Calling a.intersect(b), a&=b and a/=b are the same."""
+        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same."""
         return self.intersect(other)
 
     def __itruediv__(self, other: "Shape"):
         """Intersect given shape with this shape (logical AND).
-        Calling a.intersect(b), a&=b and a/=b are the same."""
+        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same."""
         return self.intersect(other)
 
     def xor(self, other: "Shape"):
         """Keep everything from this shape and the given shape, except the
         intersection (logical XOR).
-        Calling a.xor(b) or a^=b is the same."""
+        Calling ``a.xor(b)`` or ``a ^= b`` is the same."""
         old_func = self.shape_func  # copy old version of self
         self.shape_func = lambda x, y, z: old_func(x, y, z) ^ other(x, y, z)
         return self
@@ -263,7 +264,7 @@ class Shape:
     def __ixor__(self, other: "Shape"):
         """Keep everything from this shape and the given shape, except the
         intersection (logical XOR).
-        Calling a.xor(b) or a^=b is the same."""
+        Calling ``a.xor(b)`` or ``a ^= b`` is the same."""
         return self.xor(other)
     
     # -------------------------
@@ -271,12 +272,12 @@ class Shape:
 
     def __add__(self, other: "Shape"):
         """Returns new shape as union of given shapes (logical OR).
-        Calling a+b or a|b is the same."""
+        Calling ``a + b`` or ``a | b`` is the same."""
         return Shape(lambda x, y, z: self(x, y, z) | other(x, y, z))
 
     def __or__(self, other: "Shape"):
         """Returns new shape as union of given shapes (logical OR).
-        Calling a+b or a|b is the same."""
+        Calling ``a + b`` or ``a | b`` is the same."""
         return self + other
 
     def __sub__(self, other: "Shape"):
@@ -286,12 +287,12 @@ class Shape:
 
     def __and__(self, other: "Shape"):
         """Returns new shape as intersection of given shapes (logical AND).
-        Calling a&b or a/b is the same."""
+        Calling ``a & b`` or ``a / b`` is the same."""
         return Shape(lambda x, y, z: self(x, y, z) & other(x, y, z))
 
     def __truediv__(self, other: "Shape"):
         """Returns new shape as intersection of given shapes (logical AND).
-        Calling a&b or a/b is the same."""
+        Calling ``a & b`` or ``a / b`` is the same."""
         return self & other
 
     def __xor__(self, other: "Shape"):
@@ -304,112 +305,112 @@ class Shape:
 # Child shapes
 
 class Empty(Shape):
-    """Empty space."""
     def __init__(self):
+        """Empty space."""
         super().__init__(lambda x,y,z: False)
 
 class Universe(Shape):
-    """All of space."""
     def __init__(self):
+        """All of space."""
         super().__init__(lambda x,y,z: True)
 
 class Ellipsoid(Shape):
-    """Ellipsoid with given diameters diamx, diamy, diamz."""
     def __init__(self, diamx, diamy, diamz):
+        """Ellipsoid with given diameters diamx, diamy, diamz."""
         def shape_func(x, y, z):
             return (x/diamx)**2 + (y/diamy)**2 + (z/diamz)**2 <= 0.25
         super().__init__(shape_func)
 
 class Sphere(Ellipsoid):
-    """Sphere with given diameter or radius."""
     def __init__(self, diam=None, radius=None):
+        """Sphere with given diameter or radius."""
         if radius is not None:
             diam = radius
         super().__init__(diam, diam, diam)
 
 class Ellipse(Shape):
-    """Ellipse in the xy-plane with given diameters diamx and diamy."""
     def __init__(self, diamx, diamy):
+        """Ellipse in the xy-plane with given diameters diamx and diamy."""
         def shape_func(x, y, z):
             return (x/diamx)**2 + (y/diamy)**2 <= 0.25
         super().__init__(shape_func)
 
 class Circle(Ellipse):
-    """Circle in the xy-plane with given diameter."""
     def __init__(self, diam):
+        """Circle in the xy-plane with given diameter."""
         super().__init__(diam, diam)
 
 class Cone(Shape):
-    """3D cone with the vertex down. It has a given diameter at a given height."""
     def __init__(self, diam, height):
+        """3D cone with the vertex down. It has a given diameter at a given height."""
         def shape_func(x, y, z):
             return (z >= 0) & ((x/diam)**2 + (y/diam)**2 <= 0.25*(z/height)**2)
         super().__init__(shape_func)
 
 class Cylinder(Shape):
-    """Cylinder along z with given diameter and height."""
     def __init__(self, diam, height):
+        """Cylinder along z with given diameter and height."""
         def shape_func(x, y, z):
             return (z <= 0.5*height) & (z >= -0.5*height) & \
                    ((x/diam)**2+(y/diam)**2<=0.25)
         super().__init__(shape_func)
 
 class Cuboid(Shape):
-    """3D rectangular slab with given sides, including minimum, excluding maximum."""
     def __init__(self, sidex, sidey, sidez):
+        """3D rectangular slab with given sides, including minimum, excluding maximum."""
         def shape_func(x, y, z):
             rx, ry, rz = 0.5*sidex, 0.5*sidey, 0.5*sidez
             return (-rx <= x)&(x < rx) & (-ry <= y)&(y < ry) & (-rz <= z)&(z < rz)
         super().__init__(shape_func)
 
 class Cube(Cuboid):
-    """Cube with given side length."""
     def __init__(self, side):
+        """Cube with given side length."""
         super().__init__(side, side, side)
 
 class Rectangle(Shape):
-    """2D Rectangle in the xy-plane with given sides."""
     def __init__(self, sidex, sidey):
+        """2D Rectangle in the xy-plane with given sides."""
         def shape_func(x, y, z):
             rx, ry = 0.5*sidex, 0.5*sidey
             return (-rx <= x)&(x < rx) & (-ry <= y)&(y < ry)
         super().__init__(shape_func)
 
 class Square(Rectangle):
-    """Square with given side length."""
     def __init__(self, side):
+        """Square with given side length."""
         super().__init__(side, side)
 
 
 class XRange(Shape):
-    """Range of x-values: xmin <= x < xmax"""
     def __init__(self, xmin, xmax):
+        """Range of x-values: xmin <= x < xmax"""
         super().__init__(lambda x,y,z: (xmin <= x) & (x < xmax))
 
 class YRange(Shape):
-    """Range of y-values: ymin <= y < ymax"""
     def __init__(self, ymin, ymax):
+        """Range of y-values: ymin <= y < ymax"""
         super().__init__(lambda x,y,z: (ymin <= y) & (y < ymax))
 
 class ZRange(Shape):
-    """Range of z-values: zmin <= z < zmax"""
     def __init__(self, zmin, zmax):
+        """Range of z-values: zmin <= z < zmax"""
         super().__init__(lambda x,y,z: (zmin <= z) & (z < zmax))
 
 class Torus(Shape):
-    """Torus with given major and minor diameters.
-    
-    Parameters
-    ----------
-    major_diam : float
-        Distance between opposite centers of the tube.
-    minor_diam : float
-        Diameter of the tube.
-
-    The torus is major_diam + minor_diam wide and minor_diam high.
-    When major_diam = minor_diam, there will be no hole.
-    """
     def __init__(self, major_diam, minor_diam):
+        """Torus with given major and minor diameters.
+    
+        Parameters
+        ----------
+        major_diam : float
+            Distance between opposite centers of the tube.
+        minor_diam : float
+            Diameter of the tube.
+
+        The torus is major_diam + minor_diam wide and minor_diam high.
+        When major_diam = minor_diam, there will be no hole.
+        """
         D, d = major_diam, minor_diam
         def shape_func(x, y, z):
             return (x**2 + y**2 + z**2 + 0.25*D**2 - 0.25*d**2)**2 <= D**2*(x**2 + y**2)
@@ -419,23 +420,23 @@ class Torus(Shape):
 # Convex polyhedra
 
 class DelaunayHull(Shape):
-    """The Delaunay hull of a list of 3D points. These points can serve as the
-    vertices of a convex polyhedron.
-    
-    Parameters
-    ----------
-    points : ndarray of double, shape (npoints, 3)
-    """
     def __init__(self, points):
+        """The Delaunay hull of a list of 3D points. These points can serve as the
+        vertices of a convex polyhedron.
+        
+        Parameters
+        ----------
+        points : ndarray of double, shape (npoints, 3)
+        """
         hull = _Delaunay(points)
         def shape_func(x, y, z):
             return hull.find_simplex(_np.stack([x,y,z], axis=-1)) >= 0
         super().__init__(shape_func)
 
 class Tetrahedron(DelaunayHull):
-    """Tetrahedron (4-faced platonic solid) where all vertices lie on a sphere
-    with the given diameter."""
     def __init__(self, diam):
+        """Tetrahedron (4-faced platonic solid) where all vertices lie on a sphere
+        with the given diameter."""
         d_circumsphere = 2
         vertices = diam*_np.asarray([[2*_np.sqrt(2)/3, 0, -1/3],
                                     [-_np.sqrt(2)/3, _np.sqrt(2/3), -1/3],
@@ -444,15 +445,15 @@ class Tetrahedron(DelaunayHull):
         super().__init__(vertices/d_circumsphere)
 
 class Octahedron(Shape):  # Shape, not DelauneyHull, as there is a simple formula
-    """Octahedron (8-faced platonic solid) where all vertices lie on a sphere
-    with the given diameter."""
     def __init__(self, diam):
+        """Octahedron (8-faced platonic solid) where all vertices lie on a sphere
+        with the given diameter."""
         super().__init__(lambda x,y,z: _np.abs(x)+_np.abs(y)+_np.abs(z) <= 0.5*diam)
 
 class Dodecahedron(DelaunayHull):
-    """Dodecahedron (12-faced platonic solid) where all vertices lie on a sphere
-    with the given diameter."""
     def __init__(self, diam):
+        """Dodecahedron (12-faced platonic solid) where all vertices lie on a sphere
+        with the given diameter."""
         phi = (1 + _np.sqrt(5))/2
         d_circumsphere = 2*_np.sqrt(3)
         vertices = diam*_np.asarray([[1, 1, 1], [1, 1, -1], [1, -1, 1],
@@ -467,9 +468,9 @@ class Dodecahedron(DelaunayHull):
         super().__init__(vertices/d_circumsphere)
 
 class Icosahedron(DelaunayHull):
-    """Dodecahedron (20-faced platonic solid) where all vertices lie on a sphere
-    with the given diameter."""
     def __init__(self, diam):
+        """Dodecahedron (20-faced platonic solid) where all vertices lie on a sphere
+        with the given diameter."""
         phi = (1 + _np.sqrt(5))/2
         d_circumsphere = 2*_np.sqrt(phi**2 + 1)
         vertices = diam*_np.asarray([[0, 1, phi], [0, 1, -phi], [0, -1, phi],
@@ -479,9 +480,9 @@ class Icosahedron(DelaunayHull):
         super().__init__(vertices/d_circumsphere)
 
 class Icosidodecahedron(DelaunayHull):
-    """Icosidodecahedron  where all vertices lie on a sphere with the given
-    diameter."""
     def __init__(self, diam):
+        """Icosidodecahedron  where all vertices lie on a sphere with the given
+        diameter."""
         phi = (1 + _np.sqrt(5))/2
         phiSq = phi*phi
         a = 1
@@ -495,14 +496,14 @@ class Icosidodecahedron(DelaunayHull):
 # Polygons
 
 class Polygon(Shape):
-    """A polygon in the xy-plane, with a given list of vertices.
-
-    Parameters
-    ----------
-    vertices : float ndarray of size (N, 2) or (N, 3)
-        If the size is (N, 3), the z-values are simply ignored.
-    """
     def __init__(self, vertices):
+        """A polygon in the xy-plane, with a given list of vertices.
+
+        Parameters
+        ----------
+        vertices : float ndarray of size (N, 2) or (N, 3)
+            If the size is (N, 3), the z-values are simply ignored.
+        """
         vertices = _np.asarray(vertices)
         if vertices.shape[1] == 3:
             vertices = vertices[:][:2]  # ignore z-values
@@ -517,9 +518,9 @@ class Polygon(Shape):
         super().__init__(shape_func)
 
 class RegularPolygon(Polygon):
-    """A regular polygon in the xy-plane with N vertices which lie on a circle
-    with given diameter. One point is located at (diam/2, 0)."""
     def __init__(self, N, diam):
+        """A regular polygon in the xy-plane with N vertices which lie on a circle
+        with given diameter. One point is located at (diam/2, 0)."""
         vertices = [(diam/2*_np.cos(i/N*2*_np.pi), diam/2*_np.sin(i/N*2*_np.pi))
                     for i in range(N)]
         super().__init__(vertices)
@@ -528,24 +529,24 @@ class RegularPolygon(Polygon):
 # ImageShape
 
 class ImageShape(Shape):
-    """Use a black and white image as a shape in the xy-plane. The given image
-    file is stretched to the given coordinates. Black is inside the shape
-    (True), white outside (False). Coordinates inside the stretched image assume
-    the value of the nearest pixel. Coordinate outside the edges of the
-    stretched image are treated as outside of the shape (False).
-
-    Parameters
-    ----------
-    fname : string
-        Filename of the image to use.
-    min_point : tuple of length 2 or 3
-        x and y world coordinates to be mapped to the center of the bottom left
-        pixel of the image. z-coordinate can be given but is ignored.
-    max_point : tuple of length 2 or 3
-        x and y world coordinates to be mapped to the center of the top right
-        pixel of the image. z-coordinate can be given but is ignored.
-    """
     def __init__(self, fname: str, min_point: tuple, max_point: tuple):
+        """Use a black and white image as a shape in the xy-plane. The given image
+        file is stretched to the given coordinates. Black is inside the shape
+        (True), white outside (False). Coordinates inside the stretched image assume
+        the value of the nearest pixel. Coordinate outside the edges of the
+        stretched image are treated as outside of the shape (False).
+
+        Parameters
+        ----------
+        fname : string
+            Filename of the image to use.
+        min_point : tuple of length 2 or 3
+            x and y world coordinates to be mapped to the center of the bottom left
+            pixel of the image. z-coordinate can be given but is ignored.
+        max_point : tuple of length 2 or 3
+            x and y world coordinates to be mapped to the center of the top right
+            pixel of the image. z-coordinate can be given but is ignored.
+        """
         img = _Image.open(fname).convert("RGBA")
         img_arr = _np.array(img)  # like matrix: [row, col, rgba]
         # pretty opaque and pretty dark

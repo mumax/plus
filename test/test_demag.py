@@ -1,6 +1,7 @@
 import numpy as np
 from mumaxplus import Ferromagnet, Grid, World, _cpp
 from mumaxplus.util import MU0
+from pathlib import Path
 
 nx, ny, nz = 126, 64, 8
 nx_aspect, ny_aspect, nz_aspect = 100, 100, 1
@@ -56,13 +57,14 @@ class TestDemag:
         self.kernel_aspect = _cpp._demag_kernel(magnet._impl, order, eps, R)
 
         # open all files
-        self.exact_Nxx = np.load("exact_Nxx_3D.npy")
+        script_dir = Path(__file__).resolve().parent
+        self.exact_Nxx = np.load(script_dir/"exact_Nxx_3D.npy")
 
-        self.exact_Nxy = np.load("exact_Nxy_3D.npy")[:,1:,1:]
+        self.exact_Nxy = np.load(script_dir/"exact_Nxy_3D.npy")[:,1:,1:]
 
-        self.exact_aspect_Nxx = np.load("exact_Nxx_aspect.npy")
+        self.exact_aspect_Nxx = np.load(script_dir/"exact_Nxx_aspect.npy")
 
-        self.exact_aspect_Nxy = np.load("exact_Nxy_aspect.npy")[:,1:,1:]
+        self.exact_aspect_Nxy = np.load(script_dir/"exact_Nxy_aspect.npy")[:,1:,1:]
 
     def test_demagfield(self):
         world = World((1e-9, 1e-9, 1e-9))

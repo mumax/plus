@@ -1,0 +1,1107 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Magnet &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d4b325e0" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_api/mumaxplus/mumaxplus.Magnet';</script>
+    <link rel="icon" href="../../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Ferromagnet" href="mumaxplus.Ferromagnet.html" />
+    <link rel="prev" title="Grid" href="mumaxplus.Grid.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <script>document.write(`<img src="../../_static/nimble-plus.png" class="logo__image only-dark" alt="mumax⁺ - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://arxiv.org/abs/2411.18194" title="Paper on arXiv" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper on arXiv</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../api.html">API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Magnet</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet"><code class="docutils literal notranslate"><span class="pre">Magnet</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.grid"><code class="docutils literal notranslate"><span class="pre">grid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.cellsize"><code class="docutils literal notranslate"><span class="pre">cellsize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.geometry"><code class="docutils literal notranslate"><span class="pre">geometry</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.regions"><code class="docutils literal notranslate"><span class="pre">regions</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.origin"><code class="docutils literal notranslate"><span class="pre">origin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.center"><code class="docutils literal notranslate"><span class="pre">center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.world"><code class="docutils literal notranslate"><span class="pre">world</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.meshgrid"><code class="docutils literal notranslate"><span class="pre">meshgrid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.enable_as_stray_field_source"><code class="docutils literal notranslate"><span class="pre">enable_as_stray_field_source</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.enable_as_stray_field_destination"><code class="docutils literal notranslate"><span class="pre">enable_as_stray_field_destination</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_displacement"><code class="docutils literal notranslate"><span class="pre">elastic_displacement</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_velocity"><code class="docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.enable_elastodynamics"><code class="docutils literal notranslate"><span class="pre">enable_elastodynamics</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.external_body_force"><code class="docutils literal notranslate"><span class="pre">external_body_force</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.C11"><code class="docutils literal notranslate"><span class="pre">C11</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.C12"><code class="docutils literal notranslate"><span class="pre">C12</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.C44"><code class="docutils literal notranslate"><span class="pre">C44</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta"><code class="docutils literal notranslate"><span class="pre">eta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.stiffness_damping"><code class="docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta11"><code class="docutils literal notranslate"><span class="pre">eta11</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta12"><code class="docutils literal notranslate"><span class="pre">eta12</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta44"><code class="docutils literal notranslate"><span class="pre">eta44</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.rho"><code class="docutils literal notranslate"><span class="pre">rho</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.rigid_norm_strain"><code class="docutils literal notranslate"><span class="pre">rigid_norm_strain</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.rigid_shear_strain"><code class="docutils literal notranslate"><span class="pre">rigid_shear_strain</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.boundary_traction"><code class="docutils literal notranslate"><span class="pre">boundary_traction</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.strain_tensor"><code class="docutils literal notranslate"><span class="pre">strain_tensor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.strain_rate"><code class="docutils literal notranslate"><span class="pre">strain_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_stress"><code class="docutils literal notranslate"><span class="pre">elastic_stress</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.viscous_stress"><code class="docutils literal notranslate"><span class="pre">viscous_stress</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.stress_tensor"><code class="docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.internal_body_force"><code class="docutils literal notranslate"><span class="pre">internal_body_force</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.effective_body_force"><code class="docutils literal notranslate"><span class="pre">effective_body_force</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_damping"><code class="docutils literal notranslate"><span class="pre">elastic_damping</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_acceleration"><code class="docutils literal notranslate"><span class="pre">elastic_acceleration</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.kinetic_energy_density"><code class="docutils literal notranslate"><span class="pre">kinetic_energy_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.kinetic_energy"><code class="docutils literal notranslate"><span class="pre">kinetic_energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_energy_density"><code class="docutils literal notranslate"><span class="pre">elastic_energy_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_energy"><code class="docutils literal notranslate"><span class="pre">elastic_energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.poynting_vector"><code class="docutils literal notranslate"><span class="pre">poynting_vector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.stray_field_from_magnet"><code class="docutils literal notranslate"><span class="pre">stray_field_from_magnet()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.demag_field"><code class="docutils literal notranslate"><span class="pre">demag_field</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="magnet">
+<h1>Magnet<a class="headerlink" href="#magnet" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.Magnet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Magnet</span></span><a class="headerlink" href="#mumaxplus.Magnet" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>A Magnet should never be initialized by the user. It contains no physics.
+Use <a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.Ferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ferromagnet</span></code></a> or <a class="reference internal" href="mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet" title="mumaxplus.Antiferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Antiferromagnet</span></code></a> instead.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.__init__">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_impl_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.Magnet.__init__" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_impl_function</strong> (<em>callable</em>) – The appropriate <cite>world._impl</cite> method of the child magnet, for example
+<cite>world._impl.add_ferromagnet</cite> or <cite>world._impl.add_antiferromagnet</cite>.</p></li>
+<li><p><strong>world</strong> (<a class="reference internal" href="mumaxplus.World.html#mumaxplus.World" title="mumaxplus.World"><em>World</em></a>) – World in which the magnet lives.</p></li>
+<li><p><strong>grid</strong> (<a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.Grid"><em>Grid</em></a>) – The number of cells in x, y, z the magnet should be divided into.</p></li>
+<li><p><strong>geometry</strong> (<em>None</em><em>, </em><em>ndarray</em><em>, or </em><em>callable</em><em> (</em><em>default=None</em><em>)</em>) – <p>The geometry of the magnet can be set in three ways.</p>
+<ol class="arabic simple">
+<li><p>If the geometry contains all cells in the grid, then use None (the default)</p></li>
+<li><p>Use an ndarray which specifies for each cell wheter or not it is in the
+geometry.</p></li>
+<li><p>Use a function which takes x, y, and z coordinates as arguments and returns
+true if this position is inside the geometry and false otherwise.</p></li>
+</ol>
+</p></li>
+<li><p><strong>regions</strong> (<em>None</em><em>, </em><em>ndarray</em><em>, or </em><em>callable</em><em> (</em><em>default=None</em><em>)</em>) – The regional structure of a magnet can be set in the same three ways
+as the geometry. This parameter indexes each grid cell to a certain region.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em> (</em><em>default=&quot;&quot;</em><em>)</em>) – The magnet’s identifier. If the name is empty (the default), a name for the
+magnet will be created.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.name">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mumaxplus.Magnet.name" title="Link to this definition">#</a></dt>
+<dd><p>Name of the magnet.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.grid">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.grid.Grid"><span class="pre">Grid</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.grid" title="Link to this definition">#</a></dt>
+<dd><p>Return the underlying grid of the magnet.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.cellsize">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cellsize</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.Magnet.cellsize" title="Link to this definition">#</a></dt>
+<dd><p>Dimensions of the cell.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.geometry">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">geometry</span></span><a class="headerlink" href="#mumaxplus.Magnet.geometry" title="Link to this definition">#</a></dt>
+<dd><p>Geometry of the magnet.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.regions">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">regions</span></span><a class="headerlink" href="#mumaxplus.Magnet.regions" title="Link to this definition">#</a></dt>
+<dd><p>Regions of the magnet.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.origin">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">origin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.Magnet.origin" title="Link to this definition">#</a></dt>
+<dd><p>Origin of the magnet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>origin</strong> – xyz coordinate of the origin of the magnet.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float] of size 3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.center">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">center</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.Magnet.center" title="Link to this definition">#</a></dt>
+<dd><p>Center of the magnet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>center</strong> – xyz coordinate of the center of the magnet.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float] of size 3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.world">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">world</span></span><a class="headerlink" href="#mumaxplus.Magnet.world" title="Link to this definition">#</a></dt>
+<dd><p>Return the World of which the magnet is a part.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.meshgrid">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">meshgrid</span></span><a class="headerlink" href="#mumaxplus.Magnet.meshgrid" title="Link to this definition">#</a></dt>
+<dd><p>Return a numpy meshgrid with the x, y, and z coordinate of each cell.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.enable_as_stray_field_source">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_as_stray_field_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Magnet.enable_as_stray_field_source" title="Link to this definition">#</a></dt>
+<dd><p>Enable/disable this magnet (self) as the source of stray fields felt
+by other magnets. This does not influence demagnetization.</p>
+<p>Default = True.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.enable_as_stray_field_destination" title="mumaxplus.Magnet.enable_as_stray_field_destination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enable_as_stray_field_destination</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.enable_as_stray_field_destination">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_as_stray_field_destination</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Magnet.enable_as_stray_field_destination" title="Link to this definition">#</a></dt>
+<dd><p>Enable/disable whether this magnet (self) is influenced by the stray
+fields of other magnets. This does not influence demagnetization.</p>
+<p>Default = True.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.enable_as_stray_field_source" title="mumaxplus.Magnet.enable_as_stray_field_source"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enable_as_stray_field_source</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.elastic_displacement">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic_displacement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Variable.html#mumaxplus.Variable" title="mumaxplus.variable.Variable"><span class="pre">Variable</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.elastic_displacement" title="Link to this definition">#</a></dt>
+<dd><p>Elastic displacement vector (m).</p>
+<p>The elastic displacement is uninitialized (does not exist) if the
+elastodynamics are disabled.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_velocity" title="mumaxplus.Magnet.elastic_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.enable_elastodynamics" title="mumaxplus.Magnet.enable_elastodynamics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enable_elastodynamics</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.elastic_velocity">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic_velocity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Variable.html#mumaxplus.Variable" title="mumaxplus.variable.Variable"><span class="pre">Variable</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.elastic_velocity" title="Link to this definition">#</a></dt>
+<dd><p>Elastic velocity vector (m/s).</p>
+<p>The elastic velocity is uninitialized (does not exist) if the
+elastodynamics are disabled.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_displacement" title="mumaxplus.Magnet.elastic_displacement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_displacement</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.enable_elastodynamics" title="mumaxplus.Magnet.enable_elastodynamics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enable_elastodynamics</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.enable_elastodynamics">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_elastodynamics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Magnet.enable_elastodynamics" title="Link to this definition">#</a></dt>
+<dd><p>Enable/disable elastodynamic time evolution.</p>
+<p>If elastodynamics are disabled (default), the elastic displacement and
+velocity are uninitialized to save memory.</p>
+<p>Elastodynamics can not be used together with rigid normal and shear
+strain, where strain is set by the user instead.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.rigid_norm_strain" title="mumaxplus.Magnet.rigid_norm_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid_norm_strain</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.rigid_shear_strain" title="mumaxplus.Magnet.rigid_shear_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid_shear_strain</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.external_body_force">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">external_body_force</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.external_body_force" title="Link to this definition">#</a></dt>
+<dd><p>External body force density f_ext that is added to the effective body
+force density (N/m³).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.effective_body_force" title="mumaxplus.Magnet.effective_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effective_body_force</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.C11">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">C11</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.C11" title="Link to this definition">#</a></dt>
+<dd><p>Stiffness constant C11 = C22 = C33 of the stiffness tensor (N/m²).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.C12" title="mumaxplus.Magnet.C12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C44" title="mumaxplus.Magnet.C44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.C12">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">C12</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.C12" title="Link to this definition">#</a></dt>
+<dd><p>Stiffness constant C12 = C13 = C23 of the stiffness tensor (N/m²).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.C11" title="mumaxplus.Magnet.C11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C44" title="mumaxplus.Magnet.C44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.C44">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">C44</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.C44" title="Link to this definition">#</a></dt>
+<dd><p>Stiffness constant C44 = C55 = C66 of the stiffness tensor (N/m²).</p>
+<p>For isotropic materials, this is equal to the shear modulus.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.C11" title="mumaxplus.Magnet.C11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C12" title="mumaxplus.Magnet.C12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.eta">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.eta" title="Link to this definition">#</a></dt>
+<dd><p>Phenomenological elastic damping constant (kg/m³s).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.stiffness_damping">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stiffness_damping</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.stiffness_damping" title="Link to this definition">#</a></dt>
+<dd><p>Rayleigh damping stiffness coefficient β (s).</p>
+<p>Default = 0.05 / (1e12 * pi) s.</p>
+<p>This corresponds to a damping ratio of 5% at a frequency of 1 THz.
+This is meant to stabilize the high frequency modes, with a typical
+wavelength of only a few cellsizes in length.</p>
+<p>The viscosity tensor η is assumed to be proportional to the stiffness
+tensor C, with this coefficient β as the proportionality constant.</p>
+<p>η = β * C</p>
+<p>This parameter is completely <strong>ignored</strong> when any component of the viscosity
+tensor (<a class="reference internal" href="#mumaxplus.Magnet.eta11" title="mumaxplus.Magnet.eta11"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eta11</span></code></a>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">et12</span></code> or <a class="reference internal" href="#mumaxplus.Magnet.eta44" title="mumaxplus.Magnet.eta44"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eta44</span></code></a>) has been set.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.eta11" title="mumaxplus.Magnet.eta11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.eta12" title="mumaxplus.Magnet.eta12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.eta44" title="mumaxplus.Magnet.eta44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C11" title="mumaxplus.Magnet.C11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C12" title="mumaxplus.Magnet.C12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C44" title="mumaxplus.Magnet.C44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_rate" title="mumaxplus.Magnet.strain_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_rate</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.viscous_stress" title="mumaxplus.Magnet.viscous_stress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viscous_stress</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.eta11">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eta11</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.eta11" title="Link to this definition">#</a></dt>
+<dd><p>Viscosity constant eta11 = eta22 = eta33 of the viscosity tensor (Pa s)
+in Voigt notation, which connects strain rate to viscous stress via
+σ = η : dε/dt.</p>
+<p>When set, this parameter overrules the <a class="reference internal" href="#mumaxplus.Magnet.stiffness_damping" title="mumaxplus.Magnet.stiffness_damping"><code class="xref py py-attr docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.eta12" title="mumaxplus.Magnet.eta12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.eta44" title="mumaxplus.Magnet.eta44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stiffness_damping" title="mumaxplus.Magnet.stiffness_damping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_rate" title="mumaxplus.Magnet.strain_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_rate</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.viscous_stress" title="mumaxplus.Magnet.viscous_stress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viscous_stress</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.eta12">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eta12</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.eta12" title="Link to this definition">#</a></dt>
+<dd><p>Viscosity constant eta12 = eta13 = eta23 of the viscosity tensor (Pa s)
+in Voigt notation, which connects strain rate to viscous stress via
+σ = η : dε/dt.</p>
+<p>When set, this parameter overrules the <a class="reference internal" href="#mumaxplus.Magnet.stiffness_damping" title="mumaxplus.Magnet.stiffness_damping"><code class="xref py py-attr docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.eta11" title="mumaxplus.Magnet.eta11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.eta44" title="mumaxplus.Magnet.eta44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stiffness_damping" title="mumaxplus.Magnet.stiffness_damping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_rate" title="mumaxplus.Magnet.strain_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_rate</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.viscous_stress" title="mumaxplus.Magnet.viscous_stress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viscous_stress</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.eta44">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eta44</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.eta44" title="Link to this definition">#</a></dt>
+<dd><p>Viscosity constant eta44 = eta55 = eta66 of the viscosity tensor (Pa s)
+in Voigt notation, which connects strain rate to viscous stress via
+σ = η : dε/dt.</p>
+<p>For isotropic materials, this is equal to the shear viscosity.</p>
+<p>When set, this parameter overrules the <a class="reference internal" href="#mumaxplus.Magnet.stiffness_damping" title="mumaxplus.Magnet.stiffness_damping"><code class="xref py py-attr docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.eta11" title="mumaxplus.Magnet.eta11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.eta12" title="mumaxplus.Magnet.eta12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stiffness_damping" title="mumaxplus.Magnet.stiffness_damping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_rate" title="mumaxplus.Magnet.strain_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_rate</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">visocus_stress</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.rho">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rho</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.rho" title="Link to this definition">#</a></dt>
+<dd><p>Mass density (kg/m³).</p>
+<p>Default = 1.0 kg/m³</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.rigid_norm_strain">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rigid_norm_strain</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.rigid_norm_strain" title="Link to this definition">#</a></dt>
+<dd><p>The applied normal strain (m/m).</p>
+<p>This quantity has three components (εxx, εyy, εzz),
+which forms the diagonal of the symmetric strain tensor:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+\varepsilon_{xx} &amp; 0 &amp; 0 \\
+0 &amp; \varepsilon_{yy} &amp; 0 \\
+0 &amp; 0 &amp; \varepsilon_{zz}
+\end{bmatrix}\end{split}\]</div>
+<p>The rigid strain can not be used together with elastodynamics.
+Here the strain is set by the user as a parameter for the magnetoelastic
+field, instead of calculated dynamically (strain_tensor).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.rigid_shear_strain" title="mumaxplus.Magnet.rigid_shear_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid_shear_strain</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.enable_elastodynamics" title="mumaxplus.Magnet.enable_elastodynamics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enable_elastodynamics</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.rigid_shear_strain">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rigid_shear_strain</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.rigid_shear_strain" title="Link to this definition">#</a></dt>
+<dd><p>The applied shear strain (m/m).</p>
+<p>This quantity has three components (εxy, εxz, εyz),
+which forms the off-diagonal of the symmetric strain tensor:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+0 &amp; \varepsilon_{xy} &amp; \varepsilon_{xz} \\
+\varepsilon_{xy} &amp; 0 &amp; \varepsilon_{yz} \\
+\varepsilon_{xz} &amp; \varepsilon_{yz} &amp; 0
+\end{bmatrix}\end{split}\]</div>
+<p>The rigid strain can not be used together with elastodynamics.
+Here the strain is set by the user as a parameter for the magnetoelastic
+field, instead of calculated dynamically (strain_tensor).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.rigid_norm_strain" title="mumaxplus.Magnet.rigid_norm_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid_norm_strain</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.enable_elastodynamics" title="mumaxplus.Magnet.enable_elastodynamics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enable_elastodynamics</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.boundary_traction">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boundary_traction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.BoundaryTraction.html#mumaxplus.BoundaryTraction" title="mumaxplus.traction.BoundaryTraction"><span class="pre">BoundaryTraction</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.boundary_traction" title="Link to this definition">#</a></dt>
+<dd><p>Get the boundary traction of this Magnet (Pa).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.internal_body_force" title="mumaxplus.Magnet.internal_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">internal_body_force</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.strain_tensor">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strain_tensor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.strain_tensor" title="Link to this definition">#</a></dt>
+<dd><p>Strain tensor (m/m), calculated according to ε = 1/2 (∇u + (∇u)^T),
+with u the elastic displacement.</p>
+<p>This quantity has six components (εxx, εyy, εzz, εxy, εxz, εyz),
+which forms the symmetric strain tensor:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+\varepsilon_{xx} &amp; \varepsilon_{xy} &amp; \varepsilon_{xz} \\
+\varepsilon_{xy} &amp; \varepsilon_{yy} &amp; \varepsilon_{yz} \\
+\varepsilon_{xz} &amp; \varepsilon_{yz} &amp; \varepsilon_{zz}
+\end{bmatrix}\end{split}\]</div>
+<p>Note that the strain corresponds to the real strain and not the
+engineering strain, which would be (εxx, εyy, εzz, 2*εxy, 2*εxz, 2*εyz).</p>
+<p>If you want to set the strain as a parameter yourself, use rigid normal
+and shear strain.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_energy" title="mumaxplus.Magnet.elastic_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_energy</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.elastic_energy_density" title="mumaxplus.Magnet.elastic_energy_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_energy_density</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.elastic_displacement" title="mumaxplus.Magnet.elastic_displacement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_displacement</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.rigid_norm_strain" title="mumaxplus.Magnet.rigid_norm_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid_norm_strain</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.rigid_shear_strain" title="mumaxplus.Magnet.rigid_shear_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid_shear_strain</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.strain_rate">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strain_rate</span></span><a class="headerlink" href="#mumaxplus.Magnet.strain_rate" title="Link to this definition">#</a></dt>
+<dd><p>Time derivative of the strain tensor (1/s), calculated according to
+dε/dt = 1/2 (∇v + (∇v)^T), with v the elastic velocity.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_tensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.elastic_velocity" title="mumaxplus.Magnet.elastic_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.elastic_stress">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic_stress</span></span><a class="headerlink" href="#mumaxplus.Magnet.elastic_stress" title="Link to this definition">#</a></dt>
+<dd><p>Elastic stress tensor (N/m²), calculated according to Hooke’s law
+σ = c:ε.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.C11" title="mumaxplus.Magnet.C11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C12" title="mumaxplus.Magnet.C12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.C44" title="mumaxplus.Magnet.C44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_tensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.viscous_stress">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viscous_stress</span></span><a class="headerlink" href="#mumaxplus.Magnet.viscous_stress" title="Link to this definition">#</a></dt>
+<dd><p>Viscous stress tensor (N/m²) due to isotropic viscous damping,
+calculated according to</p>
+<p>σ = η : dε/dt</p>
+<p>with η the viscosity tensor and dε/dt the strain rate tensor.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.eta11" title="mumaxplus.Magnet.eta11"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta11</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.eta12" title="mumaxplus.Magnet.eta12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta12</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.eta44" title="mumaxplus.Magnet.eta44"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta44</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stiffness_damping" title="mumaxplus.Magnet.stiffness_damping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_rate" title="mumaxplus.Magnet.strain_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_rate</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.stress_tensor">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stress_tensor</span></span><a class="headerlink" href="#mumaxplus.Magnet.stress_tensor" title="Link to this definition">#</a></dt>
+<dd><p>Total stress tensor (N/m²), including elastic stress and viscous stress.</p>
+<p>This quantity has six components (σxx, σyy, σzz, σxy, σxz, σyz),
+which forms the symmetric stress tensor:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+\sigma_{xx} &amp; \sigma_{xy} &amp; \sigma_{xz} \\
+\sigma_{xy} &amp; \sigma_{yy} &amp; \sigma_{yz} \\
+\sigma_{xz} &amp; \sigma_{yz} &amp; \sigma_{zz}
+\end{bmatrix}\end{split}\]</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_stress" title="mumaxplus.Magnet.elastic_stress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_stress</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.viscous_stress" title="mumaxplus.Magnet.viscous_stress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viscous_stress</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.internal_body_force" title="mumaxplus.Magnet.internal_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">internal_body_force</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.internal_body_force">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">internal_body_force</span></span><a class="headerlink" href="#mumaxplus.Magnet.internal_body_force" title="Link to this definition">#</a></dt>
+<dd><p>Internal body force density due to stress divergence (N/m³).</p>
+<p>f = ∇·σ</p>
+<p>The boundary conditions of this force density are determined by the
+applied <a class="reference internal" href="#mumaxplus.Magnet.boundary_traction" title="mumaxplus.Magnet.boundary_traction"><code class="xref py py-attr docutils literal notranslate"><span class="pre">boundary_traction</span></code></a> (traction-free by default).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.effective_body_force" title="mumaxplus.Magnet.effective_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effective_body_force</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.boundary_traction" title="mumaxplus.Magnet.boundary_traction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">boundary_traction</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.effective_body_force">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">effective_body_force</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.effective_body_force" title="Link to this definition">#</a></dt>
+<dd><p>Elastic effective body force density is the sum of elastic,
+magnetoelastic and external body force densities (N/m³).
+Elastic damping is not included.</p>
+<p>f_eff = f_int + f_mel + f_ext</p>
+<p>In the case of this Magnet being a host (antiferromagnet),
+f_mel is the sum of all magnetoelastic body forces of all sublattices.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.external_body_force" title="mumaxplus.Magnet.external_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">external_body_force</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.internal_body_force" title="mumaxplus.Magnet.internal_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">internal_body_force</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">magnetoelastic_force</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.elastic_damping">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic_damping</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.elastic_damping" title="Link to this definition">#</a></dt>
+<dd><p>Elastic damping body force density proportional to η and velocity</p>
+<p>-ηv (N/m³).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.eta" title="mumaxplus.Magnet.eta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.elastic_velocity" title="mumaxplus.Magnet.elastic_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.elastic_acceleration">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic_acceleration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.elastic_acceleration" title="Link to this definition">#</a></dt>
+<dd><p>Elastic acceleration includes all effects that influence the elastic
+velocity including elastic, magnetoelastic and external body force
+densities, and elastic damping (m/s²).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.rho" title="mumaxplus.Magnet.rho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rho</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.effective_body_force" title="mumaxplus.Magnet.effective_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effective_body_force</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.elastic_damping" title="mumaxplus.Magnet.elastic_damping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_damping</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.kinetic_energy_density">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kinetic_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.kinetic_energy_density" title="Link to this definition">#</a></dt>
+<dd><p>Kinetic energy density related to the elastic velocity (J/m³).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_velocity" title="mumaxplus.Magnet.elastic_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.kinetic_energy" title="mumaxplus.Magnet.kinetic_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kinetic_energy</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.rho" title="mumaxplus.Magnet.rho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rho</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.kinetic_energy">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kinetic_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.kinetic_energy" title="Link to this definition">#</a></dt>
+<dd><p>Kinetic energy related to the elastic velocity (J/m³).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_velocity" title="mumaxplus.Magnet.elastic_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.kinetic_energy_density" title="mumaxplus.Magnet.kinetic_energy_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kinetic_energy_density</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.rho" title="mumaxplus.Magnet.rho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rho</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.elastic_energy_density">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.elastic_energy_density" title="Link to this definition">#</a></dt>
+<dd><p>Potential energy density related to elastics (J/m³).
+This is given by 1/2 σ:ε</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_energy" title="mumaxplus.Magnet.elastic_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_energy</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_tensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.elastic_energy">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.elastic_energy" title="Link to this definition">#</a></dt>
+<dd><p>Potential energy related to elastics (J).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_energy_density" title="mumaxplus.Magnet.elastic_energy_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_energy_density</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_tensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.poynting_vector">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poynting_vector</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.poynting_vector" title="Link to this definition">#</a></dt>
+<dd><p>Poynting vector (W/m2).
+This is given by P = - σv</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.elastic_velocity" title="mumaxplus.Magnet.elastic_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a>, <a class="reference internal" href="#mumaxplus.Magnet.stress_tensor" title="mumaxplus.Magnet.stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.stray_field_from_magnet">
+<span class="sig-name descname"><span class="pre">stray_field_from_magnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_magnet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.Magnet.stray_field_from_magnet" title="Link to this definition">#</a></dt>
+<dd><p>Return the magnetic field created by the given input <cite>source_magnet</cite>,
+felt by this magnet (<cite>self</cite>). This raises an error if there exists no
+<cite>StrayField</cite> instance between these two magnets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source_magnet</strong> (<a class="reference internal" href="#mumaxplus.Magnet" title="mumaxplus.Magnet"><em>Magnet</em></a>) – The magnet acting as the source of the requested stray field.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stray_field</strong> – StrayField with the given <cite>source_magnet</cite> as source and the Grid of
+this magnet (<cite>self</cite>) as destination.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="mumaxplus.StrayField.html#mumaxplus.StrayField" title="mumaxplus.StrayField">StrayField</a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="mumaxplus.StrayField.html#mumaxplus.StrayField" title="mumaxplus.StrayField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StrayField</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Magnet.demag_field">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">demag_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.StrayField.html#mumaxplus.StrayField" title="mumaxplus.strayfield.StrayField"><span class="pre">StrayField</span></a></em><a class="headerlink" href="#mumaxplus.Magnet.demag_field" title="Link to this definition">#</a></dt>
+<dd><p>Demagnetization field (T).</p>
+<p>Ferromagnetic sublattices of other host magnets don’t have a demag field.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Magnet.stray_field_from_magnet" title="mumaxplus.Magnet.stray_field_from_magnet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stray_field_from_magnet</span></code></a>, <a class="reference internal" href="mumaxplus.StrayField.html#mumaxplus.StrayField" title="mumaxplus.StrayField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StrayField</span></code></a></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mumaxplus.Grid.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Grid</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mumaxplus.Ferromagnet.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Ferromagnet</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet"><code class="docutils literal notranslate"><span class="pre">Magnet</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.grid"><code class="docutils literal notranslate"><span class="pre">grid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.cellsize"><code class="docutils literal notranslate"><span class="pre">cellsize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.geometry"><code class="docutils literal notranslate"><span class="pre">geometry</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.regions"><code class="docutils literal notranslate"><span class="pre">regions</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.origin"><code class="docutils literal notranslate"><span class="pre">origin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.center"><code class="docutils literal notranslate"><span class="pre">center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.world"><code class="docutils literal notranslate"><span class="pre">world</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.meshgrid"><code class="docutils literal notranslate"><span class="pre">meshgrid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.enable_as_stray_field_source"><code class="docutils literal notranslate"><span class="pre">enable_as_stray_field_source</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.enable_as_stray_field_destination"><code class="docutils literal notranslate"><span class="pre">enable_as_stray_field_destination</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_displacement"><code class="docutils literal notranslate"><span class="pre">elastic_displacement</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_velocity"><code class="docutils literal notranslate"><span class="pre">elastic_velocity</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.enable_elastodynamics"><code class="docutils literal notranslate"><span class="pre">enable_elastodynamics</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.external_body_force"><code class="docutils literal notranslate"><span class="pre">external_body_force</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.C11"><code class="docutils literal notranslate"><span class="pre">C11</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.C12"><code class="docutils literal notranslate"><span class="pre">C12</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.C44"><code class="docutils literal notranslate"><span class="pre">C44</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta"><code class="docutils literal notranslate"><span class="pre">eta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.stiffness_damping"><code class="docutils literal notranslate"><span class="pre">stiffness_damping</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta11"><code class="docutils literal notranslate"><span class="pre">eta11</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta12"><code class="docutils literal notranslate"><span class="pre">eta12</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.eta44"><code class="docutils literal notranslate"><span class="pre">eta44</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.rho"><code class="docutils literal notranslate"><span class="pre">rho</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.rigid_norm_strain"><code class="docutils literal notranslate"><span class="pre">rigid_norm_strain</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.rigid_shear_strain"><code class="docutils literal notranslate"><span class="pre">rigid_shear_strain</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.boundary_traction"><code class="docutils literal notranslate"><span class="pre">boundary_traction</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.strain_tensor"><code class="docutils literal notranslate"><span class="pre">strain_tensor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.strain_rate"><code class="docutils literal notranslate"><span class="pre">strain_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_stress"><code class="docutils literal notranslate"><span class="pre">elastic_stress</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.viscous_stress"><code class="docutils literal notranslate"><span class="pre">viscous_stress</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.stress_tensor"><code class="docutils literal notranslate"><span class="pre">stress_tensor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.internal_body_force"><code class="docutils literal notranslate"><span class="pre">internal_body_force</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.effective_body_force"><code class="docutils literal notranslate"><span class="pre">effective_body_force</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_damping"><code class="docutils literal notranslate"><span class="pre">elastic_damping</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_acceleration"><code class="docutils literal notranslate"><span class="pre">elastic_acceleration</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.kinetic_energy_density"><code class="docutils literal notranslate"><span class="pre">kinetic_energy_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.kinetic_energy"><code class="docutils literal notranslate"><span class="pre">kinetic_energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_energy_density"><code class="docutils literal notranslate"><span class="pre">elastic_energy_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.elastic_energy"><code class="docutils literal notranslate"><span class="pre">elastic_energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.poynting_vector"><code class="docutils literal notranslate"><span class="pre">poynting_vector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.stray_field_from_magnet"><code class="docutils literal notranslate"><span class="pre">stray_field_from_magnet()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Magnet.demag_field"><code class="docutils literal notranslate"><span class="pre">demag_field</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2025-07-10, v1.1.0.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

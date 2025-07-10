@@ -106,4 +106,5 @@ if calculate_coercivity:
     ax.set_ylabel(r"$H_C/M_{\rm sat}$")
     ax.legend()
 
+plt.tight_layout()
 plt.show()

@@ -34,5 +34,7 @@ dependencies:
 
   # documentation generation
   - sphinx
-  - sphinx_rtd_theme
+  - sphinx-book-theme
   - numpydoc
+  - sphinxcontrib-video
+  - sphinx-copybutton

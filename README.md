@@ -10,6 +10,7 @@ mumax⁺ is described in the following paper:
 https://arxiv.org/abs/2411.18194
 
 Please cite this paper if you would like to cite mumax⁺.
+All demonstrations in the paper were simulated using version [v1.1.0](https://github.com/mumax/plus/tree/v1.1.0) of the code. The scripts used to generate the data can be found in the [paper2025 directory](https://github.com/mumax/plus/tree/paper2025/paper2025) under the [paper2025 tag](https://github.com/mumax/plus/tree/paper2025).
 
 ## Dependencies
 You should install these yourself
@@ -32,7 +33,7 @@ These will be installed automatically within the conda environment
 
 Make sure that the following applications and build tools are installed:
 * C++ compiler which supports c++17, such as GCC
-* CPython *(version 3.8 recommended)* and pip 
+* CPython *(version ≥ 3.8 recommended)* and pip 
 * CUDA Toolkit *(version 10.0 or later)*
 * git
 * miniconda or anaconda
@@ -56,9 +57,11 @@ conda activate mumaxplus
 ```
 Then build and install mumax⁺ using pip.
 ```bash
-pip install -ve .
+pip install -v .
 ```
-If changes are made to the C++ code, then `pip install -ve .` can be used to rebuild mumax⁺.
+If changes are made to the code, then ``pip install -v .`` can be used to
+rebuild mumax⁺. If you want to change the Python code without needing
+to reinstall, you can use ``pip install -ve .``.
 
 You could also compile the source code with double precision, by changing `FP_PRECISION` in `CMakeLists.txt` from `SINGLE` to `DOUBLE` before rebuilding.
 ```cmake
@@ -92,9 +95,10 @@ conda activate mumaxplus
 conda develop -b .
 ```
 
-## Building the documentation
+## Documentation
 
-Documentation for mumax⁺ follows the [NumPy style guide](https://numpydoc.readthedocs.io/en/latest/format.html) and can be generated using [Sphinx](https://www.sphinx-doc.org). Run the following command in the `docs/` directory to let Sphinx build the HTML documentation pages:
+Documentation for mumax⁺ can be found at http://mumax.github.io/plus.
+It follows the [NumPy style guide](https://numpydoc.readthedocs.io/en/latest/format.html) and is generated using [Sphinx](https://www.sphinx-doc.org). You can build it yourself by running the following command in the `docs/` directory:
 ```bash
 make html
 ```

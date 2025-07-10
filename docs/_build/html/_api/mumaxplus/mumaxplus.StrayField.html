@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>StrayField &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d4b325e0" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_api/mumaxplus/mumaxplus.StrayField';</script>
+    <link rel="icon" href="../../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="PoissonSystem" href="mumaxplus.PoissonSystem.html" />
+    <link rel="prev" title="InterParameter" href="mumaxplus.InterParameter.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <script>document.write(`<img src="../../_static/nimble-plus.png" class="logo__image only-dark" alt="mumax⁺ - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://arxiv.org/abs/2411.18194" title="Paper on arXiv" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper on arXiv</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../api.html">API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>StrayField</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField"><code class="docutils literal notranslate"><span class="pre">StrayField</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.set_method"><code class="docutils literal notranslate"><span class="pre">set_method()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.order"><code class="docutils literal notranslate"><span class="pre">order</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.epsilon"><code class="docutils literal notranslate"><span class="pre">epsilon</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.switch_radius"><code class="docutils literal notranslate"><span class="pre">switch_radius</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="strayfield">
+<h1>StrayField<a class="headerlink" href="#strayfield" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.StrayField">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StrayField</span></span><a class="headerlink" href="#mumaxplus.StrayField" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldQuantity</span></code></a></p>
+<p>Represent a stray field of a magnet in a specific grid.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.StrayField.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.StrayField.__init__" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>magnet</strong> (<a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet" title="mumaxplus.Magnet"><em>Magnet</em></a>) – Magnet instance which is the field source.</p></li>
+<li><p><strong>grid</strong> (<a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.Grid"><em>Grid</em></a>) – Grid instance on which the stray field will be computed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.StrayField.set_method">
+<span class="sig-name descname"><span class="pre">set_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.StrayField.set_method" title="Link to this definition">#</a></dt>
+<dd><p>Set the computation method for the stray field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>{&quot;brute&quot;</em><em>, </em><em>&quot;fft&quot;}</em><em>, </em><em>optional</em>) – The default value is “fft”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.StrayField.order">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#mumaxplus.StrayField.order" title="Link to this definition">#</a></dt>
+<dd><p>Set the maximum order of 1/R, where R is the distance between cells, in the
+asymptotic expansion of the demag kernel.</p>
+<p>This value should be an integer and 3 &lt;= order &lt;= 12. Choosing an even
+order gives the same result as that order minus 1.</p>
+<p>The default value is 11.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.StrayField.epsilon" title="mumaxplus.StrayField.epsilon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">epsilon</span></code></a>, <a class="reference internal" href="#mumaxplus.StrayField.switch_radius" title="mumaxplus.StrayField.switch_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">switch_radius</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.StrayField.epsilon">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epsilon</span></span><a class="headerlink" href="#mumaxplus.StrayField.epsilon" title="Link to this definition">#</a></dt>
+<dd><p>Set epsilon to calculate the analytical error. The error is defined
+as epsilon * R³ / V.</p>
+<p>The default value is 5e-10.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.StrayField.order" title="mumaxplus.StrayField.order"><code class="xref py py-obj docutils literal notranslate"><span class="pre">order</span></code></a>, <a class="reference internal" href="#mumaxplus.StrayField.switch_radius" title="mumaxplus.StrayField.switch_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">switch_radius</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.StrayField.switch_radius">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">switch_radius</span></span><a class="headerlink" href="#mumaxplus.StrayField.switch_radius" title="Link to this definition">#</a></dt>
+<dd><p>Set the radius R, in meters, from which point the asymptotic expantion
+should be used.
+Default is -1, then the OOMMF error estimations are used:</p>
+<p>Assume the following errors on the analytical and asymptotic result</p>
+<p>E_analytic = eps R³/V</p>
+<p>E_asymptotic = V R²/(5(R²-dmax²)) dmax^(n-3)/R^(n)</p>
+<p>Here V is dx*dy*dz, dmax = max(dx,dy,dz), n is the order of asymptote
+and eps is a constant.
+Use the analytical model when</p>
+<p>E_analytic / E_asymptotic &lt; 1</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_order</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_epsilon</span></code></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mumaxplus.InterParameter.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">InterParameter</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mumaxplus.PoissonSystem.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">PoissonSystem</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField"><code class="docutils literal notranslate"><span class="pre">StrayField</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.set_method"><code class="docutils literal notranslate"><span class="pre">set_method()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.order"><code class="docutils literal notranslate"><span class="pre">order</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.epsilon"><code class="docutils literal notranslate"><span class="pre">epsilon</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.StrayField.switch_radius"><code class="docutils literal notranslate"><span class="pre">switch_radius</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2025-07-10, v1.1.0.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

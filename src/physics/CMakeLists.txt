@@ -48,6 +48,8 @@ add_library(physics STATIC
     magnetoelasticfield.hpp
     magnetoelasticforce.cu
     magnetoelasticforce.hpp
+    mfm.cu
+    mfm.hpp
     minimizer.cu
     minimizer.hpp
     mumaxworld.cpp

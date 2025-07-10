@@ -95,7 +95,6 @@ class Magnet {
   Parameter eta44;
   Parameter rho;  // Mass density
 
-
   // Delete copy constructor and copy assignment operator to prevent shallow copies
   Magnet(const Magnet&) = delete;
   Magnet& operator=(const Magnet&) = delete;
