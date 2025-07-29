@@ -42,6 +42,10 @@ class System {
   /** Return the position of the center of this system in the world. */
   real3 center() const;
 
+  /** Return the positions of the edges of this system in the world.
+   *  {xmin, xmax, ymin, ymax, zmin, zmax} */
+  std::array<real, 6> extent() const;
+
   /** Get the geometry of the system. */
   const GpuBuffer<bool>& geometry() const;
 

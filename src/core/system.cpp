@@ -67,6 +67,12 @@ real3 System::center() const {
   return (corner2 + corner1) / 2;
 }
 
+std::array<real, 6> System::extent() const {
+  real3 minEdge = origin() - 0.5 * cellsize();
+  real3 maxEdge = minEdge + int3_to_real3(grid().size()) * cellsize();
+  return {minEdge.x, maxEdge.x, minEdge.y, maxEdge.y, minEdge.z, maxEdge.z};
+}
+
 const GpuBuffer<bool>& System::geometry() const {
   return geometry_;
 }

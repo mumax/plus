@@ -44,6 +44,10 @@ void wrap_system(py::module& m) {
       .def("cell_position", &System::cellPosition)
       .def_property_readonly("origin", &System::origin)
       .def_property_readonly("center", &System::center)
+      .def_property_readonly("extent", [](const System* system) {
+          std::array<real, 6> e = system->extent();
+          // return tuple, not list
+          return py::make_tuple(e[0], e[1], e[2], e[3], e[4], e[5]); })
       .def_property_readonly("geometry", [](const System* system) {
           return get_data<bool>(system, &System::geometry, true); })
       .def_property_readonly("regions", [](const System* system) {
