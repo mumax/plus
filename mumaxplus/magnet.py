@@ -135,6 +135,17 @@ class Magnet(ABC):
         return self._impl.system.center
 
     @property
+    def extent(self) ->tuple[float]:
+        """Extent of the magnet.
+
+        Returns
+        -------
+        extent: tuple[float] of size 6
+           Positions of the edges of the magnet: (xmin, xmax, ymin, ymax, zmin, zmax).
+        """
+        return self._impl.system.extent
+
+    @property
     def world(self):
         """Return the World of which the magnet is a part."""
         from .world import World  # imported here to avoid circular imports
