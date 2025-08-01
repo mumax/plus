@@ -325,7 +325,7 @@ class Sphere(Ellipsoid):
     def __init__(self, diam=None, radius=None):
         """Sphere with given diameter or radius."""
         if radius is not None:
-            diam = radius
+            diam = 2 * radius
         super().__init__(diam, diam, diam)
 
 class Ellipse(Shape):
