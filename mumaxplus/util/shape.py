@@ -416,6 +416,35 @@ class Torus(Shape):
             return (x**2 + y**2 + z**2 + 0.25*D**2 - 0.25*d**2)**2 <= D**2*(x**2 + y**2)
         super().__init__(shape_func)
 
+class Superball(Shape):
+    def __init__(self, diam, p):
+        """Superball with given diameter and shape parameter `p`.
+
+        A superball is defined by the inequality:
+
+        .. math:: |x/r|^{2p} + |y/r|^{2p} + |z/r|^{2p} ≤ 1
+
+        where r is the radius (not diameter) and p controls the shape:
+
+        - p > 1 gives a rounded cube
+        - p = 1 gives a sphere
+        - p = 0.5 gives an octahedron
+        - p <= 0 gives empty space
+
+        For consistency with other shapes, diameter (2r) is used as parameter
+        instead of radius.
+        """
+        if p <= 0:  # Yields empty shape
+            super().__init__(lambda x,y,z: False)
+        else:
+            r = diam / 2
+            def shape_func(x, y, z):
+                norm = pow(abs(x/r), 2*p) + \
+                       pow(abs(y/r), 2*p) + \
+                       pow(abs(z/r), 2*p)
+                return norm <= 1
+            super().__init__(shape_func)
+
 # =========================
 # Convex polyhedra
 
@@ -618,7 +647,7 @@ if __name__=="__main__":
         plt.show()
 
 
-    shape = Tetrahedron(1)
+    shape = Superball(1, 4)
     shape.mirror_xy()
 
     res = 201
