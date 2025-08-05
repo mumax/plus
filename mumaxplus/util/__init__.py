@@ -5,7 +5,7 @@ from .config import twodomain, antivortex, blochskyrmion, neelskyrmion, vortex
 from .config import gaussian_spherical_OoP, gaussian_spherical_IP, gaussian_uniform_IP
 from .formulary import *
 from .mfm import MFM
-from .show import show_field, show_layer, show_magnet_geometry, show_field_3D, show_regions
+from .show import show_field, plot_vector_field, show_layer, show_magnet_geometry, show_field_3D, show_regions
 from .shape import *
 from .voronoi import VoronoiTessellator
 
@@ -22,6 +22,7 @@ __all__ = [
     "Rayleigh_damping_coefficients", "Rayleigh_damping_stiffness_coefficient",
     # show
     "show_field",
+    "plot_vector_field",
     "show_layer",
     "show_magnet_geometry",
     "show_field_3D",

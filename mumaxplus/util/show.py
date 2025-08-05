@@ -1,8 +1,15 @@
 """Plotting helper functions."""
 
 import matplotlib.pyplot as _plt
+import matplotlib as _matplotlib
 import numpy as _np
+import math as _math
+from itertools import product as _product
 import pyvista as _pv
+
+from numbers import Integral
+from typing import Optional, Literal
+from matplotlib.axes import Axes
 
 import mumaxplus as _mxp
 
@@ -116,6 +123,452 @@ def plotter(quantity, rgba, name=""):
     ax.set_ylabel("$y$ (m)")
     _plt.show()
 
+
+
+def _get_axis_components(out_of_plane_axis: Literal['x', 'y', 'z']) -> tuple[int, int, int]:
+    """Translates out of plane axis string to a right handed coordinate system
+    (x:0, y:1, z:2), where the out of plane axis is last."""
+
+    if out_of_plane_axis == 'x':
+        return 1, 2, 0
+    if out_of_plane_axis == 'y':
+        return 2, 0, 1
+    if out_of_plane_axis == 'z':
+        return 0, 1, 2
+    
+    raise ValueError(f"Unknown axis \'{out_of_plane_axis}\', use \'x\', \'y\' or \'z\' instead.")
+
+def _quantity_2D_extent(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
+                        hor_axis_idx: int = 0, vert_axis_idx: int = 1) \
+                            -> Optional[tuple[int, int, int, int]]:
+    """If the given fieldquantity has an extent, the two dimensional extent is
+    given as (left, right, bottom, top), with chosen indices for the horizontal
+    and vertical axes. Returns None if the extent can't be determined.
+    """
+    if isinstance(fieldquantity, _mxp.FieldQuantity):
+        qty_extent = fieldquantity._impl.system.extent
+        left, right = qty_extent[2*hor_axis_idx], qty_extent[2*hor_axis_idx + 1]
+        bottom, top = qty_extent[2*vert_axis_idx], qty_extent[2*vert_axis_idx + 1]
+        return (left, right, bottom, top)
+    if isinstance(fieldquantity, _np.ndarray):
+        left, right = -0.5, fieldquantity.shape[3 - hor_axis_idx] - 0.5
+        bottom, top = -0.5, fieldquantity.shape[3 - vert_axis_idx] - 0.5
+        return (left, right, bottom, top)
+    return None
+
+# TODO: better name
+# TODO: docstring
+# TODO: vectorize?
+def _get_fraction(o_i: int, n_i: int, r: float) -> float:
+    # old index, new index, old-new shape ratio
+    n_l, n_r = n_i * r, (n_i + 1) * r  # left and right boundaries of new cell
+
+    if n_l <= o_i and o_i + 1 <= n_r:  # fully inside new cell
+        return 1.
+    if n_l <= o_i < n_r:  # only left side inside new cell
+        return n_r - o_i
+    if n_l < o_i + 1 <= n_r:  # only right side inside new cell
+        return o_i + 1 - n_l
+    return 0.  # not inside
+
+
+def _get_downsampled_meshgrid(old_size: tuple[int, int], new_size: tuple[int, int],
+                              quantity: Optional[_mxp.FieldQuantity] = None,
+                              hor_axis_idx: int = 0, vert_axis_idx: int = 1) \
+                                -> tuple[_np.ndarray, _np.ndarray]:
+    # TODO: docstring
+    nx_old, ny_old = old_size
+    nx_new, ny_new = new_size
+
+    # align edges of first cells, but use new spacing
+    x = _np.arange(0, nx_new) * nx_old/nx_new - 0.5 + nx_old/nx_new / 2
+    y = _np.arange(0, ny_new) * ny_old/ny_new - 0.5 + ny_old/ny_new / 2
+
+    if quantity is not None:
+        origin = quantity.grid.origin
+        cellsize = quantity._impl.system.cellsize
+        
+        cx_old, cy_old = cellsize[hor_axis_idx], cellsize[vert_axis_idx]
+        ox_old, oy_old = origin[hor_axis_idx], origin[vert_axis_idx]
+
+        # translate to origin
+        x += ox_old
+        y += oy_old
+
+        # transform to units (meters)
+        x *= cx_old
+        y *= cy_old
+
+    return _np.meshgrid(x, y, indexing='xy')  # [y, x] indexing like mumax fields
+
+def downsample(field: _np.ndarray, new_size: tuple, intrinsic: bool = True) -> _np.ndarray:
+    """Placeholder docstring so I don't forget
+    field is an array with shape (ncomp, nz, ny, nx)
+    new_size is the grid size that should be used for the result as (nx, ny, nz) (other way!)
+    The edges are lined-up, old small cells are divided between the new large
+    cells according to the fraction of the area/volume inside each of the
+    covering large cells.
+    Intrinsic means we take the average. If False, extrinsic, so everything is summed up but not divided.
+    """
+    # TODO: better docstring
+    # TODO: explain "downsampling"
+    # TODO: field is assumed ndarray. Should it also accept FieldQuantities?
+    # TODO: explain the difference between intrinsic and extrinsic quantities...
+    # The use will almost always be for intrinsic quantities, which need to be divided in the end (averaging)
+    # TODO: can (and should) this be CUDA-fied?
+
+    ncomp = field.shape[0]
+    old_shape = field.shape[1:]
+    dim = len(old_shape)
+    new_shape = new_size[::-1]  # TODO: new shape should be (nx, ny, nz)? grid size or field shape?
+    # TODO: check length of new_shape, check positive, check <= old, check integers
+    new_field = _np.zeros((ncomp, *new_shape))
+
+    on_shape_ratio = [old_shape[i] / new_shape[i] for i in range(dim)]
+
+    # TODO: vectorize?
+    for idx_new in _np.ndindex(new_shape):  # loop over all new cells
+        sum = _np.zeros((ncomp))
+        if intrinsic: denom = _np.zeros((ncomp))
+
+        # loop over all old cells that are at least partly inside the new cell 
+        old_ranges = [range(int(i_new * ratio), _math.ceil((i_new + 1) * ratio))
+                      for (i_new, ratio) in zip(idx_new, on_shape_ratio)]
+        for idx_old in _product(*old_ranges):
+
+            # find fraction of the length/area/volume inside
+            frac = 1.0
+            for i in range(dim):
+                frac *= _get_fraction(idx_old[i], idx_new[i], on_shape_ratio[i])
+
+            f = field[:, *idx_old]
+            sum += frac * f
+            if intrinsic: denom += frac
+        
+        new_field[:, *idx_new] = sum / denom if intrinsic else sum
+
+    return new_field
+
+# --------------------------------------------------
+# This code is copied from the Hotspice code written by Jonathan Maes and slightly tweaked.
+# https://github.com/bvwaeyen/Hotspice/blob/main/hotspice/utils.py#L129
+
+SIprefix_to_magnitude = {'q': -30, 'r': -27, 'y': -24, 'z': -21, 'a': -18,
+                         'f': -15, 'p': -12, 'n': -9, 'µ': -6, 'm': -3, 'c': -2, 'd': -1,
+                         '': 0, 'da': 1, 'h': 2, 'k': 3, 'M': 6, 'G': 9, 'T': 12,
+                         'E': 15, 'Z': 18, 'Y': 21, 'R': 24, 'Q': 30}
+
+def SIprefix_to_mul(unit: Literal['f', 'p', 'n', 'µ', 'm', 'c', 'd', '', 'da', 'h', 'k', 'M', 'G', 'T']) -> float:
+    return 10**SIprefix_to_magnitude[unit]
+
+magnitude_to_SIprefix = {v: k for k, v in SIprefix_to_magnitude.items()}
+
+def appropriate_SIprefix(n: float|_np.ndarray,
+                         unit_prefix: Literal['f', 'p', 'n', 'µ', 'm', 'c', 'd', '', 'da', 'h', 'k', 'M', 'G', 'T']='',
+                         only_thousands=True) -> tuple[float, str]:
+    """ Converts `n` (which already has SI prefix `unit_prefix` for whatever unit
+        it is in) to a reasonable number with a new SI prefix. Returns a tuple
+        with (the new scalar values, the new SI prefix).If `only_thousands` is
+        True (default), then centi, deci, deca and hecto are not used.
+        Example: converting 0.0000238 ms would be `appropriate_SIprefix(0.0000238, 'm')` -> `(23.8, 'n')`
+    """
+    # If `n` is an array, the median is usually representative of the scale
+    value = _np.median(n) if isinstance(n, _np.ndarray) else n
+
+    if unit_prefix not in SIprefix_to_magnitude.keys():
+        raise ValueError(f"'{unit_prefix}' is not a supported SI prefix.")
+    
+    offset_magnitude = SIprefix_to_magnitude[unit_prefix]
+    # TODO: I personally think 'floor' looks nicer than 'round'; less decimal numbers
+    nearest_magnitude = (round(_np.log10(abs(value))) if value != 0 else -_np.inf) + offset_magnitude
+    # Make sure it is in the known range
+    nearest_magnitude = _np.clip(nearest_magnitude,
+                                min(SIprefix_to_magnitude.values()),
+                                max(SIprefix_to_magnitude.values()))
+    
+    supported_magnitudes = magnitude_to_SIprefix.keys()
+    if only_thousands: supported_magnitudes = [mag for mag in supported_magnitudes if (mag % 3) == 0]
+    for supported_magnitude in sorted(supported_magnitudes):
+        if supported_magnitude <= nearest_magnitude:
+            used_magnitude = supported_magnitude
+    
+    return (n/10**(used_magnitude - offset_magnitude), magnitude_to_SIprefix[used_magnitude])
+
+# --------------------------------------------------
+
+
+class UnitScalarFormatter(_matplotlib.ticker.ScalarFormatter):
+    """An extension of the ScalarFormatter to take units into account.
+    https://github.com/matplotlib/matplotlib/blob/v3.10.3/lib/matplotlib/ticker.py#L397
+    """
+    def __init__(self, SIprefix: str, unit: str, useOffset=None, useMathText=None,
+                 useLocale=None, usetex=None):
+        self.SIprefix = SIprefix
+        self.SImultiplier = SIprefix_to_mul(SIprefix)
+        self.unit = unit
+        super().__init__(useOffset, useMathText, useLocale, usetex=usetex)
+
+
+    def set_locs(self, locs):
+        """Use rescaled locs according to preferred unit multiplier for all math,
+        then save original locs for proper drawing in data coordinates."""
+        rescaled_locs = [0]*len(locs)
+        for i, loc in enumerate(locs):
+            rescaled_locs[i] = loc / self.SImultiplier
+        super().set_locs(rescaled_locs)  # rescaled processing happens here
+        self.locs = locs  # but keep original locs saved for proper drawing
+
+
+    def __call__(self, value, pos=None):
+        """Format rescaled values on axis"""
+        return super().__call__(value / self.SImultiplier, pos)
+
+    def format_data(self, value):
+        # TODO: figure out the use of this function
+        return super().format_data(value / self.SImultiplier)
+
+    def format_data_short(self, value):
+        """This is exactly the same implementation as with ScalarFormatter.
+        Value is only divided by self.SImultiplier at the end and a unit is added.
+        """
+
+        # docstring inherited
+        if value is _np.ma.masked:
+            return ""
+        if isinstance(value, Integral):
+            fmt = "%d"
+        else:
+            if getattr(self.axis, "__name__", "") in ["xaxis", "yaxis"]:
+                if self.axis.__name__ == "xaxis":
+                    axis_trf = self.axis.axes.get_xaxis_transform()
+                    axis_inv_trf = axis_trf.inverted()
+                    screen_xy = axis_trf.transform((value, 0))
+                    neighbor_values = axis_inv_trf.transform(
+                        screen_xy + [[-1, 0], [+1, 0]])[:, 0]
+                else:  # yaxis:
+                    axis_trf = self.axis.axes.get_yaxis_transform()
+                    axis_inv_trf = axis_trf.inverted()
+                    screen_xy = axis_trf.transform((0, value))
+                    neighbor_values = axis_inv_trf.transform(
+                        screen_xy + [[0, -1], [0, +1]])[:, 1]
+                delta = abs(neighbor_values - value).max()
+            else:
+                # Rough approximation: no more than 1e4 divisions.
+                a, b = self.axis.get_view_interval()
+                delta = (b - a) / 1e4
+            fmt = f"%-#.{_matplotlib.cbook._g_sig_digits(value, delta)}g"
+        
+        fmt += f" {self.SIprefix}{self.unit}"  # add unit
+        value /= self.SImultiplier  # show in preferred unit
+        return self._format_maybe_minus_and_locale(fmt, value)
+
+def dress_axes(ax: Axes, fieldquantity: _mxp.FieldQuantity|_np.ndarray,
+               hor_axis_idx: int = 0, vert_axis_idx: int = 1):
+    # TODO: docstring
+    # TODO: better title using name
+    # TODO: geometry for filter field??
+    # TODO: check validity of axis indices
+    
+    left, right, bottom, top = _quantity_2D_extent(fieldquantity, hor_axis_idx, vert_axis_idx)
+
+    # axis limits
+    ax.set_xlim(left, right)
+    ax.set_ylim(bottom, top)
+
+    # axis labels
+    if isinstance(fieldquantity, _mxp.FieldQuantity):
+        x_maxabs = max(abs(left), abs(right))  # find largest number
+        y_maxabs = max(abs(bottom), abs(top))
+        _, x_prefix = appropriate_SIprefix(x_maxabs)
+        _, y_prefix = appropriate_SIprefix(y_maxabs)
+        ax.set_xlabel(f"${'xyz'[hor_axis_idx]}$ ({x_prefix}m)")
+        ax.set_ylabel(f"${'xyz'[vert_axis_idx]}$ ({y_prefix}m)")
+
+        # axis label ticks with appropriate numbers according to prefix
+        ax.xaxis.set_major_formatter(UnitScalarFormatter(x_prefix, "m"))
+        ax.yaxis.set_major_formatter(UnitScalarFormatter(y_prefix, "m"))
+
+        # set title to fieldquantity name
+        ax.set_title(fieldquantity.name)  # TODO: add slice, component, layer, ...
+    elif isinstance(fieldquantity, _np.ndarray):
+        ax.set_xlabel(f"${'xyz'[hor_axis_idx]}$ (index)")
+        ax.set_ylabel(f"${'xyz'[vert_axis_idx]}$ (index)")
+
+    ax.set_facecolor("gray")  # TODO: is this still relevant?
+    
+    # use "equal" aspect ratio if not too rectangular
+    max_width_over_height_ratio = 6
+    max_height_over_width_ratio = 3  # TODO: tweak?
+    if ((right - left) / (top - bottom) < max_width_over_height_ratio and
+        (top - bottom) / (right - left) < max_height_over_width_ratio):
+        ax.set_aspect("equal")
+    else:
+        ax.set_aspect("auto")
+
+def plot_vector_field(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
+                      out_of_plane_axis: str = 'z', layer: int = 0,
+                      file_name: Optional[str] = None, show: Optional[bool] = None,
+                      ax: Optional[Axes] = None,
+                      imshow_cmap: str = "mumax3", symmetric_clim: bool = True,
+                      quiver: bool = True, arrow_size: float = 16.,
+                      quiver_cmap: Optional[str]= None, **quiver_kwargs) -> Axes:
+    """Plot a :func:`mumaxplus.FieldQuantity` or `numpy.ndarray` with 3
+    components as a vector field using the mumax³ (HSL) colorscheme or a scalar
+    colormap of the out-of-plane component, with optionally added arrows.
+    
+    Parameters
+    ----------
+    fieldquantity : mumaxplus.FieldQuantity or numpy.ndarray
+        The fieldquantity needs to have 4 dimensions with the shape
+        (ncomp, nx, ny, nz) and with ncomp=3.
+        Additional dressing of the Axes is done if given a mumaxplus.FieldQuantity.
+
+    out_of_plane_axis : string, default="z"
+        The axis pointing out of plane: "x", "y" or "z". The other two are plotted according to a right-handed coordinate system.
+
+        - "x": z over y
+        - "y": x over z
+        - "z": y over x
+
+    layer : int, default=0
+        The index to take of the `out_of_plane_axis`.
+
+    file_name : string, optional
+        If given, the resulting figure will be saved with the given file name.
+
+    show : bool, optional
+        Whether to call `matplotlib.pyplot.show` at the end.
+        If None (default), `matplotlib.pyplot.show` will be called only if no
+        `ax` and no `file_name` have been provided.
+
+    ax : matplotlib.axes.Axes, optional
+        The Axes instance to plot onto. If None (default), new Figure and Axes
+        instances will be created.
+
+    imshow_cmap : string, default="mumax3"
+        A colormap to use for the image. By default, the mumax³ (HSL)
+        colorscheme is used. Any matplotlib colormap can also be given to color
+        according to the out-of-plane component.
+
+    symmetric_clim : bool, default=True
+        If a matplotlib colormap is used for the out-of-plane component for
+        either the image or quiver, zero is set as the central color if set to
+        True (default). This is best used with diverging colormaps, like "bwr".
+
+    quiver : bool, default=True
+        Whether to plot the quiver on top of the colored image.
+
+    arrow_size : float, default=16
+        Length of an arrow as a number of cells, so one arrow is designated to
+        an area of `arrow_size` by `arrow_size`.
+        
+    quiver_cmap : string, optional
+        A colormap to use for the quiver. By default, no colormap is used, so
+        the arrows are a solid color. If set to "mumax3", the 3D vector data is
+        used for the mumax³ (HSL) colorscheme. Any matplotlib colormap can also
+        be given to color the arrows according to the out-of-plane component.
+
+    **quiver_kwargs
+        Keyword arguments to pass to `matplotlib.pyplot.quiver`.
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The resulting Axes on which is plotted.
+    """
+
+    # check fieldquantity input
+    if not isinstance(fieldquantity, _mxp.FieldQuantity) and \
+       not isinstance(fieldquantity, _np.ndarray):
+        raise TypeError("The first argument should be a FieldQuantity or an ndarray.")
+    
+    if (fieldquantity.shape[0] != 3):
+        raise ValueError(
+            "Can not create a vector field image because the field quantity "
+            + "does not have 3 components."
+        )
+
+    if len(fieldquantity.shape) != 4:
+        raise ValueError(
+            "The field quantity has the wrong number of dimensions: "
+            + f"{len(fieldquantity.shape)} instead of 4."
+        )
+
+    if show is None:
+        if ax is None and file_name is None:
+            show = True
+        else:
+            show = False
+
+    if ax is None:
+        _, ax = _plt.subplots()
+    
+    hor_axis_idx, vert_axis_idx, OoP_idx = _get_axis_components(out_of_plane_axis)
+
+    # split types to know what we're working with
+    field = fieldquantity.eval() if isinstance(fieldquantity, _mxp.FieldQuantity) \
+            else _np.copy(fieldquantity)
+    quantity = fieldquantity if isinstance(fieldquantity, _mxp.FieldQuantity) else None
+
+    slice_ = [slice(None)]*4
+    slice_[3 - OoP_idx] = layer
+    field_2D = field[tuple(slice_)]
+    if out_of_plane_axis == 'y':
+        field_2D = _np.swapaxes(field_2D, 1, 2)  # (ncomp, nx, nz)  for right-hand axes
+
+    # imshow
+    im_extent = _quantity_2D_extent(quantity, hor_axis_idx, vert_axis_idx)
+    if imshow_cmap == "mumax3":
+        # TODO: update get_rgba
+        im_rgba = get_rgba(field_2D)  # (y_axis, x_axis, rgba)
+        ax.imshow(im_rgba, origin="lower", extent=im_extent)
+    else:  # show out of plane component
+        field_OoP = field_2D[OoP_idx]
+        vmin, vmax = None, None
+        if symmetric_clim:
+            vmax = _np.max(_np.abs(field_OoP))
+            vmin = -vmax
+        ax.imshow(field_OoP, origin="lower", extent=im_extent,
+                  cmap=imshow_cmap, vmin=vmin, vmax=vmax)
+
+    if quiver:
+        _, ny_old, nx_old = field_2D.shape
+        nx_new = max(int(nx_old / arrow_size), 1)
+        ny_new = max(int(ny_old / arrow_size), 1)
+
+        X, Y = _get_downsampled_meshgrid((nx_old, ny_old), (nx_new, ny_new), quantity,
+                                         hor_axis_idx, vert_axis_idx)
+
+        sampled_field = downsample(field_2D, new_size=(nx_new, ny_new))
+        U, V = sampled_field[hor_axis_idx], sampled_field[vert_axis_idx]
+
+        quiver_kwargs_ = quiver_kwargs.copy()  # leave user input alone
+        quiver_kwargs_.setdefault("pivot", "middle")
+        if quiver_cmap == "mumax3":  # HSL with rgb
+            q_rgba = _np.reshape(get_rgba(sampled_field), (nx_new*ny_new, 4))
+            ax.quiver(X, Y, U, V, color=q_rgba, **quiver_kwargs_)
+        elif quiver_cmap == None:  # uniform color
+            quiver_kwargs_.setdefault("alpha", 0.4)
+            ax.quiver(X, Y, U, V, **quiver_kwargs_)
+        else:  # OoP component colored
+            sampled_field_OoP = sampled_field[OoP_idx]
+            vmin, vmax = None, None
+            if symmetric_clim:
+                vmax = _np.max(_np.abs(sampled_field_OoP))
+                vmin = -vmax
+            quiver_kwargs_.setdefault("clim", (vmin, vmax))
+            ax.quiver(X, Y, U, V, sampled_field_OoP, cmap=quiver_cmap, **quiver_kwargs_)
+
+    dress_axes(ax, fieldquantity, hor_axis_idx, vert_axis_idx)
+    # TODO: make a beautiful title
+
+    if file_name is not None:
+        ax.figure.savefig(file_name)
+
+    if show:
+        _plt.show()
+
+    return ax
 
 
 def show_layer(quantity, component=0, layer=0):
