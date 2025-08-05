@@ -49,7 +49,7 @@ for L in tqdm(L_array):
     flower_E_tots.append(magnet.total_energy.eval())
 
     # vortex
-    magnet.magnetization = vortex((L/2, L/2, L/2), L/12, -1, 1)
+    magnet.magnetization = vortex(magnet.center, L/12, -1, 1)
     magnet.minimize()
     vortex_E_tots.append(magnet.total_energy.eval())
 
@@ -80,6 +80,6 @@ if show_states:
     show_field_3D(magnet.magnetization, quiver=quiver)
 
     # vortex
-    magnet.magnetization = vortex((L/2, L/2, L/2), L/12, -1, 1)
+    magnet.magnetization = vortex(magnet.center, L_cross/12, -1, 1)
     magnet.minimize()
     show_field_3D(magnet.magnetization, quiver=quiver)
