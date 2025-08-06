@@ -48,19 +48,6 @@ def vector_to_rgb(x, y, z):
     return hsl_to_rgb(H, S, L)
 
 
-def _quantity_img_xy_extent(quantity):
-    """Return the extent for imshow images of xy cross sections..."""
-    cx, cy, _ = quantity._impl.system.cellsize
-    ox, oy, _ = quantity.grid.origin
-    nx, ny, _ = quantity.grid.size
-    extent = [
-        cx * (ox - 0.5),
-        cx * (ox - 0.5 + nx),
-        cy * (oy - 0.5),
-        cy * (oy - 0.5 + ny),
-    ]
-    return extent
-
 def get_rgba(field, quantity=None, layer=None):
     """Get rgba values of given field.
     There is also a CUDA version of this function which utilizes the GPU.
@@ -94,35 +81,6 @@ def get_rgba(field, quantity=None, layer=None):
         rgba[..., 3] = geom[layer] if layer is not None else geom
 
     return rgba
-
-
-def show_field(quantity, layer=0):
-    """Plot a :func:`mumaxplus.FieldQuantity` with 3 components using the mumax³ colorscheme."""
-    if not isinstance(quantity, _mxp.FieldQuantity):
-        raise TypeError("The first argument should be a FieldQuantity")
-    
-    if (quantity.ncomp != 3):
-        raise ValueError(
-            "Can not create a vector field image because the field quantity "
-            + "does not have 3 components."
-        )
-
-    field = quantity.eval()
-    
-    rgba = [get_rgba(field, quantity, layer)]
-    plotter(quantity, rgba)
-
-
-def plotter(quantity, rgba, name=""):
-    fig = _plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.set_title(quantity.name + name)
-    ax.set_facecolor("gray")
-    ax.imshow(rgba[0], origin="lower", extent=_quantity_img_xy_extent(quantity))
-    ax.set_xlabel("$x$ (m)")
-    ax.set_ylabel("$y$ (m)")
-    _plt.show()
-
 
 
 def _get_axis_components(out_of_plane_axis: Literal['x', 'y', 'z']) -> tuple[int, int, int]:
@@ -590,49 +548,33 @@ def show_layer(quantity, component=0, layer=0):
     ax.set_facecolor("gray")
     ax.set_title(quantity.name + ", component=%d" % component)
     ax.imshow(
-        field, cmap=cmap, origin="lower", extent=_quantity_img_xy_extent(quantity)
+        field, cmap=cmap, origin="lower", extent=_quantity_2D_extent(quantity)
     )
     ax.set_xlabel("$x$ (m)")
     ax.set_ylabel("$y$ (m)")
     _plt.show()
 
-def show_neel_quiver(quantity, title=''):
-    
-    # Still needs some fudging...
-    # Function uses ancient representation of Antiferromagnet.
-    # This does NOT work in the current version of mumax⁺.
 
-    field = quantity.eval()
-    m1, m2 = field[0:3], field[3:6]
-    mx1, my1, mz1 = m1[0][0], m1[1][0], m1[2][0]
-    mx2, my2, mz2 = m2[0][0], m2[1][0], m2[2][0]
+def show_regions(magnet, layer=0):
+    """Plot the boundaries between regions of the given magnet."""
+    regions_array = magnet.regions
+    assert regions_array.ndim == 3, f"Expected 3D array, got {regions_array.ndim}D"
 
-    mx = mx1 + mx2
-    my = my1 + my2
-    mz = mz1 + mz2
+    regions = regions_array[layer]
+    boundaries = _np.zeros_like(regions, dtype=bool)
 
-    # Normalizing to [-1, +1]
-    if mx.max() > 1 or mx.min() < 1:
-        mxx = 2 * (mx - mx.min()) / (mx.max() - mx.min()) - 1
-    if my.max() > 1 or my.min() < 1:
-        myy = 2 * (my - my.min()) / (my.max() - my.min()) - 1
-    if mz.max() > 1 or mz.min() < 1:
-        mzz = 2 * (mz - mz.min()) / (mz.max() - mz.min()) - 1
-    
-    #Plotting
-    cmap = _plt.get_cmap('jet')
-    norm = _plt.Normalize(mzz.min(), mzz.max())
-    fig, ax = _plt.subplots()
-    ax.quiver(mxx, myy)
+    boundaries[1:, :] |= regions[1:, :] != regions[:-1, :]   # up
+    boundaries[:, 1:] |= regions[:, 1:] != regions[:, :-1]   # left
 
-    cax = ax.imshow(mzz, cmap=cmap, interpolation='none')
-    cbar = _plt.colorbar(_plt.cm.ScalarMappable(cmap=cmap, norm=norm), ax=ax)
-
-    cbar.set_label('z-comp')
-    if title:
-        ax.set_title(title)
+    _plt.figure()
+    _plt.imshow(~boundaries, cmap='gray', origin="lower", extent=_quantity_2D_extent(magnet))
+    _plt.xlabel("$x$ (m)")
+    _plt.ylabel("$y$ (m)")
+    _plt.title(magnet.name + ":region_boundaries")
     _plt.show()
 
+
+# ========== 3D pyvista plotting ==========
 
 def show_magnet_geometry(magnet):
     """Show the geometry of a :func:`mumaxplus.Ferromagnet`."""
@@ -735,21 +677,3 @@ def show_field_3D(quantity, cmap="mumax3", quiver=True):
     plotter.set_background((0.3, 0.3, 0.3))  # otherwise black or white is invisible
     plotter.show()
     _pv.global_theme = _pv.themes.Theme()  # reset theme
-
-def show_regions(magnet, layer=0):
-    """Plot the boundaries between regions of the given magnet."""
-    regions_array = magnet.regions
-    assert regions_array.ndim == 3, f"Expected 3D array, got {regions_array.ndim}D"
-
-    regions = regions_array[layer]
-    boundaries = _np.zeros_like(regions, dtype=bool)
-
-    boundaries[1:, :] |= regions[1:, :] != regions[:-1, :]   # up
-    boundaries[:, 1:] |= regions[:, 1:] != regions[:, :-1]   # left
-
-    _plt.figure()
-    _plt.imshow(~boundaries, cmap='gray', origin="lower", extent=_quantity_img_xy_extent(magnet))
-    _plt.xlabel("$x$ (m)")
-    _plt.ylabel("$y$ (m)")
-    _plt.title(magnet.name + ":region_boundaries")
-    _plt.show()
