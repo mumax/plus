@@ -254,7 +254,6 @@ def appropriate_SIprefix(n: float|_np.ndarray,
 
 # --------------------------------------------------
 
-
 class UnitScalarFormatter(_matplotlib.ticker.ScalarFormatter):
     """An extension of the ScalarFormatter to take units into account.
     https://github.com/matplotlib/matplotlib/blob/v3.10.3/lib/matplotlib/ticker.py#L397
@@ -320,48 +319,186 @@ class UnitScalarFormatter(_matplotlib.ticker.ScalarFormatter):
         value /= self.SImultiplier  # show in preferred unit
         return self._format_maybe_minus_and_locale(fmt, value)
 
-def dress_axes(ax: Axes, fieldquantity: _mxp.FieldQuantity|_np.ndarray,
-               hor_axis_idx: int = 0, vert_axis_idx: int = 1):
-    # TODO: docstring
-    # TODO: better title using name
-    # TODO: geometry for filter field??
-    # TODO: check validity of axis indices
+class _Plotter:
+    """This class is intended for organizing the data and parameters of
+    :func:`plot_vector_field`, but not to be instantiated or manipulated by the
+    user.
+    """
+    def __init__(self, fieldquantity, out_of_plane_axis, layer,
+                 file_name, show, ax, imshow_cmap, symmetric_clim,
+                 quiver, arrow_size, quiver_cmap, **quiver_kwargs):
+        """see the docstring of :func:`plot_vector_field`."""
+
+        # check fieldquantity input
+        if not isinstance(fieldquantity, _mxp.FieldQuantity) and \
+           not isinstance(fieldquantity, _np.ndarray):
+            raise TypeError("The first argument should be a FieldQuantity or an ndarray.")
+        
+        if (fieldquantity.shape[0] != 3):
+            raise ValueError(
+                "Can not create a vector field image because the field quantity "
+                + "does not have 3 components."
+            )
+
+        if len(fieldquantity.shape) != 4:
+            raise ValueError(
+                "The field quantity has the wrong number of dimensions: "
+                + f"{len(fieldquantity.shape)} instead of 4."
+            )
+
+        self.out_of_plane_axis, self.layer = out_of_plane_axis, layer
+        self.hor_axis_idx, self.vert_axis_idx, self.OoP_idx = _get_axis_components(out_of_plane_axis)
+
+        self.file_name = file_name
+
+        if show is None:
+            if ax is None and file_name is None:
+                self.show = True
+            else:
+                self.show = False
+
+        if ax is None:
+            _, self.ax = _plt.subplots()
+        else:
+            self.ax = ax
+
+        # split types to know what we're working with
+        if isinstance(fieldquantity, _mxp.FieldQuantity):
+            self.field = fieldquantity.eval()
+            self.quantity = fieldquantity
+        else:
+            self.field = _np.copy(fieldquantity)
+            self.quantity = None
+
+        self.set_field_2D()
+
+        self.imshow_cmap = imshow_cmap
+        self.symmetric_clim = symmetric_clim
+        self.quiver = quiver
+        self.arrow_size = arrow_size
+        self.quiver_cmap = quiver_cmap
+        self.quiver_kwargs = quiver_kwargs.copy()  # leave user input alone
+        self.quiver_kwargs.setdefault("pivot", "middle")
+
+        # TODO: tweak?
+        self.max_width_over_height_ratio = 6
+        self.max_height_over_width_ratio = 3
+
+
+    def set_field_2D(self):
+        # TODO: should be a function, but field_2D should not be a property
+        # make field_2D with (ncomp, vert_axis, hor_axis) shape
+        slice_ = [slice(None)]*4
+        slice_[3 - self.OoP_idx] = self.layer  # slice correct axis at chosen layer
+        self.field_2D = self.field[tuple(slice_)]
+        if self.out_of_plane_axis == 'y':
+            self.field_2D = _np.swapaxes(self.field_2D, 1, 2)  # (ncomp, nx, nz)  for right-hand axes
+
+    def plot_image(self):
+        # imshow
+        im_extent = _quantity_2D_extent(self.quantity, self.hor_axis_idx, self.vert_axis_idx)
+        if self.imshow_cmap == "mumax3":
+            # TODO: update get_rgba
+            im_rgba = get_rgba(self.field_2D)  # (y_axis, x_axis, rgba)
+            self.ax.imshow(im_rgba, origin="lower", extent=im_extent)
+        else:  # show out of plane component
+            field_OoP = self.field_2D[self.OoP_idx]
+            vmin, vmax = None, None
+            if self.symmetric_clim:
+                vmax = _np.max(_np.abs(field_OoP))
+                vmin = -vmax
+            self.ax.imshow(field_OoP, origin="lower", extent=im_extent,
+                    cmap=self.imshow_cmap, vmin=vmin, vmax=vmax)
     
-    left, right, bottom, top = _quantity_2D_extent(fieldquantity, hor_axis_idx, vert_axis_idx)
+    def plot_quiver(self):
+        if self.quiver:
+            _, ny_old, nx_old = self.field_2D.shape
+            nx_new = max(int(nx_old / self.arrow_size), 1)
+            ny_new = max(int(ny_old / self.arrow_size), 1)
 
-    # axis limits
-    ax.set_xlim(left, right)
-    ax.set_ylim(bottom, top)
+            X, Y = _get_downsampled_meshgrid((nx_old, ny_old), (nx_new, ny_new), self.quantity,
+                                            self.hor_axis_idx, self.vert_axis_idx)
 
-    # axis labels
-    if isinstance(fieldquantity, _mxp.FieldQuantity):
-        x_maxabs = max(abs(left), abs(right))  # find largest number
-        y_maxabs = max(abs(bottom), abs(top))
-        _, x_prefix = appropriate_SIprefix(x_maxabs)
-        _, y_prefix = appropriate_SIprefix(y_maxabs)
-        ax.set_xlabel(f"${'xyz'[hor_axis_idx]}$ ({x_prefix}m)")
-        ax.set_ylabel(f"${'xyz'[vert_axis_idx]}$ ({y_prefix}m)")
+            sampled_field = downsample(self.field_2D, new_size=(nx_new, ny_new))
+            U, V = sampled_field[self.hor_axis_idx], sampled_field[self.vert_axis_idx]
 
-        # axis label ticks with appropriate numbers according to prefix
-        ax.xaxis.set_major_formatter(UnitScalarFormatter(x_prefix, "m"))
-        ax.yaxis.set_major_formatter(UnitScalarFormatter(y_prefix, "m"))
+            if self.quiver_cmap == "mumax3":  # HSL with rgb
+                q_rgba = _np.reshape(get_rgba(sampled_field), (nx_new*ny_new, 4))
+                self.ax.quiver(X, Y, U, V, color=q_rgba, **self.quiver_kwargs)
+            elif self.quiver_cmap == None:  # uniform color
+                self.quiver_kwargs.setdefault("alpha", 0.4)
+                self.ax.quiver(X, Y, U, V, **self.quiver_kwargs)
+            else:  # OoP component colored
+                sampled_field_OoP = sampled_field[self.OoP_idx]
+                vmin, vmax = None, None
+                if self.symmetric_clim:
+                    vmax = _np.max(_np.abs(sampled_field_OoP))
+                    vmin = -vmax
+                self.quiver_kwargs.setdefault("clim", (vmin, vmax))
+                self.ax.quiver(X, Y, U, V, sampled_field_OoP, cmap=self.quiver_cmap,
+                               **self.quiver_kwargs)
 
-        # set title to fieldquantity name
-        ax.set_title(fieldquantity.name)  # TODO: add slice, component, layer, ...
-    elif isinstance(fieldquantity, _np.ndarray):
-        ax.set_xlabel(f"${'xyz'[hor_axis_idx]}$ (index)")
-        ax.set_ylabel(f"${'xyz'[vert_axis_idx]}$ (index)")
+    def dress_axes(self):
+        # TODO: docstring
+        # TODO: better title using name
+        # TODO: geometry for filter field??
+        # TODO: check validity of axis indices
+        
+        left, right, bottom, top = _quantity_2D_extent(
+            self.quantity if self.quantity else self.field,
+            self.hor_axis_idx, self.vert_axis_idx)
 
-    ax.set_facecolor("gray")  # TODO: is this still relevant?
-    
-    # use "equal" aspect ratio if not too rectangular
-    max_width_over_height_ratio = 6
-    max_height_over_width_ratio = 3  # TODO: tweak?
-    if ((right - left) / (top - bottom) < max_width_over_height_ratio and
-        (top - bottom) / (right - left) < max_height_over_width_ratio):
-        ax.set_aspect("equal")
-    else:
-        ax.set_aspect("auto")
+        # axis limits
+        self.ax.set_xlim(left, right)
+        self.ax.set_ylim(bottom, top)
+
+        # axis labels
+        if self.quantity:
+            x_maxabs = max(abs(left), abs(right))  # find largest number
+            y_maxabs = max(abs(bottom), abs(top))
+            _, x_prefix = appropriate_SIprefix(x_maxabs)
+            _, y_prefix = appropriate_SIprefix(y_maxabs)
+            self.ax.set_xlabel(f"${'xyz'[self.hor_axis_idx]}$ ({x_prefix}m)")
+            self.ax.set_ylabel(f"${'xyz'[self.vert_axis_idx]}$ ({y_prefix}m)")
+
+            # axis label ticks with appropriate numbers according to prefix
+            self.ax.xaxis.set_major_formatter(UnitScalarFormatter(x_prefix, "m"))
+            self.ax.yaxis.set_major_formatter(UnitScalarFormatter(y_prefix, "m"))
+
+            # set title to fieldquantity name
+            self.ax.set_title(self.quantity.name)  # TODO: add slice, component, layer, ...
+        else:
+            self.ax.set_xlabel(f"${'xyz'[self.hor_axis_idx]}$ (index)")
+            self.ax.set_ylabel(f"${'xyz'[self.vert_axis_idx]}$ (index)")
+
+        self.ax.set_facecolor("gray")  # TODO: is this still relevant?
+        
+        # use "equal" aspect ratio if not too rectangular
+        if ((right - left) / (top - bottom) < self.max_width_over_height_ratio and
+            (top - bottom) / (right - left) < self.max_height_over_width_ratio):
+            self.ax.set_aspect("equal")
+        else:
+            self.ax.set_aspect("auto")
+
+
+    def plot_vector_field(self) -> Axes:
+        # TODO: docstring
+
+        self.plot_image()
+
+        self.plot_quiver()
+
+        self.dress_axes()
+        # TODO: make a beautiful title
+
+        if self.file_name:
+            self.ax.figure.savefig(self.file_name)
+
+        if self.show:
+            _plt.show()
+
+        return self.ax
+
 
 def plot_vector_field(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
                       out_of_plane_axis: str = 'z', layer: int = 0,
@@ -434,99 +571,10 @@ def plot_vector_field(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
     ax : matplotlib.axes.Axes
         The resulting Axes on which is plotted.
     """
-
-    # check fieldquantity input
-    if not isinstance(fieldquantity, _mxp.FieldQuantity) and \
-       not isinstance(fieldquantity, _np.ndarray):
-        raise TypeError("The first argument should be a FieldQuantity or an ndarray.")
-    
-    if (fieldquantity.shape[0] != 3):
-        raise ValueError(
-            "Can not create a vector field image because the field quantity "
-            + "does not have 3 components."
-        )
-
-    if len(fieldquantity.shape) != 4:
-        raise ValueError(
-            "The field quantity has the wrong number of dimensions: "
-            + f"{len(fieldquantity.shape)} instead of 4."
-        )
-
-    if show is None:
-        if ax is None and file_name is None:
-            show = True
-        else:
-            show = False
-
-    if ax is None:
-        _, ax = _plt.subplots()
-    
-    hor_axis_idx, vert_axis_idx, OoP_idx = _get_axis_components(out_of_plane_axis)
-
-    # split types to know what we're working with
-    field = fieldquantity.eval() if isinstance(fieldquantity, _mxp.FieldQuantity) \
-            else _np.copy(fieldquantity)
-    quantity = fieldquantity if isinstance(fieldquantity, _mxp.FieldQuantity) else None
-
-    slice_ = [slice(None)]*4
-    slice_[3 - OoP_idx] = layer
-    field_2D = field[tuple(slice_)]
-    if out_of_plane_axis == 'y':
-        field_2D = _np.swapaxes(field_2D, 1, 2)  # (ncomp, nx, nz)  for right-hand axes
-
-    # imshow
-    im_extent = _quantity_2D_extent(quantity, hor_axis_idx, vert_axis_idx)
-    if imshow_cmap == "mumax3":
-        # TODO: update get_rgba
-        im_rgba = get_rgba(field_2D)  # (y_axis, x_axis, rgba)
-        ax.imshow(im_rgba, origin="lower", extent=im_extent)
-    else:  # show out of plane component
-        field_OoP = field_2D[OoP_idx]
-        vmin, vmax = None, None
-        if symmetric_clim:
-            vmax = _np.max(_np.abs(field_OoP))
-            vmin = -vmax
-        ax.imshow(field_OoP, origin="lower", extent=im_extent,
-                  cmap=imshow_cmap, vmin=vmin, vmax=vmax)
-
-    if quiver:
-        _, ny_old, nx_old = field_2D.shape
-        nx_new = max(int(nx_old / arrow_size), 1)
-        ny_new = max(int(ny_old / arrow_size), 1)
-
-        X, Y = _get_downsampled_meshgrid((nx_old, ny_old), (nx_new, ny_new), quantity,
-                                         hor_axis_idx, vert_axis_idx)
-
-        sampled_field = downsample(field_2D, new_size=(nx_new, ny_new))
-        U, V = sampled_field[hor_axis_idx], sampled_field[vert_axis_idx]
-
-        quiver_kwargs_ = quiver_kwargs.copy()  # leave user input alone
-        quiver_kwargs_.setdefault("pivot", "middle")
-        if quiver_cmap == "mumax3":  # HSL with rgb
-            q_rgba = _np.reshape(get_rgba(sampled_field), (nx_new*ny_new, 4))
-            ax.quiver(X, Y, U, V, color=q_rgba, **quiver_kwargs_)
-        elif quiver_cmap == None:  # uniform color
-            quiver_kwargs_.setdefault("alpha", 0.4)
-            ax.quiver(X, Y, U, V, **quiver_kwargs_)
-        else:  # OoP component colored
-            sampled_field_OoP = sampled_field[OoP_idx]
-            vmin, vmax = None, None
-            if symmetric_clim:
-                vmax = _np.max(_np.abs(sampled_field_OoP))
-                vmin = -vmax
-            quiver_kwargs_.setdefault("clim", (vmin, vmax))
-            ax.quiver(X, Y, U, V, sampled_field_OoP, cmap=quiver_cmap, **quiver_kwargs_)
-
-    dress_axes(ax, fieldquantity, hor_axis_idx, vert_axis_idx)
-    # TODO: make a beautiful title
-
-    if file_name is not None:
-        ax.figure.savefig(file_name)
-
-    if show:
-        _plt.show()
-
-    return ax
+    plotter = _Plotter(fieldquantity, out_of_plane_axis, layer,
+                       file_name, show, ax, imshow_cmap, symmetric_clim,
+                       quiver, arrow_size, quiver_cmap, **quiver_kwargs)
+    return plotter.plot_vector_field()
 
 
 def show_layer(quantity, component=0, layer=0):
