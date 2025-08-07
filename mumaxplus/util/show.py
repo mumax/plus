@@ -96,21 +96,21 @@ def _get_axis_components(out_of_plane_axis: Literal['x', 'y', 'z']) -> tuple[int
     
     raise ValueError(f"Unknown axis \'{out_of_plane_axis}\', use \'x\', \'y\' or \'z\' instead.")
 
-def _quantity_2D_extent(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
+def _quantity_2D_extent(field_quantity: _mxp.FieldQuantity|_np.ndarray,
                         hor_axis_idx: int = 0, vert_axis_idx: int = 1) \
                             -> Optional[tuple[int, int, int, int]]:
-    """If the given fieldquantity has an extent, the two dimensional extent is
+    """If the given field_quantity has an extent, the two dimensional extent is
     given as (left, right, bottom, top), with chosen indices for the horizontal
     and vertical axes. Returns None if the extent can't be determined.
     """
-    if isinstance(fieldquantity, _mxp.FieldQuantity):
-        qty_extent = fieldquantity._impl.system.extent
+    if isinstance(field_quantity, _mxp.FieldQuantity):
+        qty_extent = field_quantity._impl.system.extent
         left, right = qty_extent[2*hor_axis_idx], qty_extent[2*hor_axis_idx + 1]
         bottom, top = qty_extent[2*vert_axis_idx], qty_extent[2*vert_axis_idx + 1]
         return (left, right, bottom, top)
-    if isinstance(fieldquantity, _np.ndarray):
-        left, right = -0.5, fieldquantity.shape[3 - hor_axis_idx] - 0.5
-        bottom, top = -0.5, fieldquantity.shape[3 - vert_axis_idx] - 0.5
+    if isinstance(field_quantity, _np.ndarray):
+        left, right = -0.5, field_quantity.shape[3 - hor_axis_idx] - 0.5
+        bottom, top = -0.5, field_quantity.shape[3 - vert_axis_idx] - 0.5
         return (left, right, bottom, top)
     return None
 
@@ -321,33 +321,44 @@ class UnitScalarFormatter(_matplotlib.ticker.ScalarFormatter):
 
 class _Plotter:
     """This class is intended for organizing the data and parameters of
-    :func:`plot_vector_field`, but not to be instantiated or manipulated by the
+    :func:`plot_field`, but not to be instantiated or manipulated by the
     user.
     """
-    def __init__(self, fieldquantity, out_of_plane_axis, layer,
-                 file_name, show, ax, imshow_cmap, symmetric_clim,
-                 quiver, arrow_size, quiver_cmap, **quiver_kwargs):
-        """see the docstring of :func:`plot_vector_field`."""
+    def __init__(self, field_quantity, out_of_plane_axis, layer, component,
+                 file_name, show, ax, imshow_cmap, imshow_symmetric_clim,
+                 quiver, arrow_size, quiver_cmap, quiver_symmetric_clim,
+                 **quiver_kwargs):
+        """see the docstring of :func:`plot_field`."""
 
-        # check fieldquantity input
-        if not isinstance(fieldquantity, _mxp.FieldQuantity) and \
-           not isinstance(fieldquantity, _np.ndarray):
+        # check field_quantity input
+        if not isinstance(field_quantity, _mxp.FieldQuantity) and \
+           not isinstance(field_quantity, _np.ndarray):
             raise TypeError("The first argument should be a FieldQuantity or an ndarray.")
         
-        if (fieldquantity.shape[0] != 3):
-            raise ValueError(
-                "Can not create a vector field image because the field quantity "
-                + "does not have 3 components."
-            )
-
-        if len(fieldquantity.shape) != 4:
+        if len(field_quantity.shape) != 4:
             raise ValueError(
                 "The field quantity has the wrong number of dimensions: "
-                + f"{len(fieldquantity.shape)} instead of 4."
+                + f"{len(field_quantity.shape)} instead of 4."
             )
 
+        self.ncomp = field_quantity.shape[0]
+
+        if component is not None:
+            if component >= self.ncomp:
+                raise IndexError(f"Component index {component} out of range, "
+                                 + f"must be less than {self.ncomp}.")
+        elif (self.ncomp != 1) and (self.ncomp != 3):
+            raise ValueError(f"Cannot plot field quantity with {self.ncomp} "
+                             + "components without specifying which component "
+                             + "to plot.")
+
+        if component is None and self.ncomp == 1:
+            self.comp = 0  # plot the only component
+        else:
+            self.comp = component
+
         self.out_of_plane_axis, self.layer = out_of_plane_axis, layer
-        self.hor_axis_idx, self.vert_axis_idx, self.OoP_idx = _get_axis_components(out_of_plane_axis)
+        self.hor_axis_idx, self.vert_axis_idx, self.OoP_axis_idx = _get_axis_components(out_of_plane_axis)
 
         self.file_name = file_name
 
@@ -363,22 +374,35 @@ class _Plotter:
             self.ax = ax
 
         # split types to know what we're working with
-        if isinstance(fieldquantity, _mxp.FieldQuantity):
-            self.field = fieldquantity.eval()
-            self.quantity = fieldquantity
+        if isinstance(field_quantity, _mxp.FieldQuantity):
+            self.field = field_quantity.eval()
+            self.quantity = field_quantity
         else:
-            self.field = _np.copy(fieldquantity)
+            self.field = _np.copy(field_quantity)
             self.quantity = None
 
         self.set_field_2D()
 
-        self.imshow_cmap = imshow_cmap
-        self.symmetric_clim = symmetric_clim
-        self.quiver = quiver
-        self.arrow_size = arrow_size
-        self.quiver_cmap = quiver_cmap
-        self.quiver_kwargs = quiver_kwargs.copy()  # leave user input alone
-        self.quiver_kwargs.setdefault("pivot", "middle")
+        # vector image or scalar image?
+        self.vector_image_bool = self.ncomp == 3 and self.comp is None
+        if not self.vector_image_bool:
+            self.imshow_symmetric_clim = imshow_symmetric_clim
+            self.imshow_cmap = "bwr" if imshow_symmetric_clim and imshow_cmap is None else imshow_cmap
+
+        if self.ncomp == 3:  # vector
+            if quiver is not None:  # let user decide
+                self.quiver = quiver
+            else:  # or add arrows if no specific comp given
+                self.quiver = self.comp is None
+        else:  # no quiver possible
+            self.quiver = False
+
+        if self.quiver:
+            self.arrow_size = arrow_size
+            self.quiver_cmap = quiver_cmap
+            self.quiver_symmetric_clim = quiver_symmetric_clim
+            self.quiver_kwargs = quiver_kwargs.copy()  # leave user input alone
+            self.quiver_kwargs.setdefault("pivot", "middle")
 
         # TODO: tweak?
         self.max_width_over_height_ratio = 6
@@ -389,7 +413,7 @@ class _Plotter:
         # TODO: should be a function, but field_2D should not be a property
         # make field_2D with (ncomp, vert_axis, hor_axis) shape
         slice_ = [slice(None)]*4
-        slice_[3 - self.OoP_idx] = self.layer  # slice correct axis at chosen layer
+        slice_[3 - self.OoP_axis_idx] = self.layer  # slice correct axis at chosen layer
         self.field_2D = self.field[tuple(slice_)]
         if self.out_of_plane_axis == 'y':
             self.field_2D = _np.swapaxes(self.field_2D, 1, 2)  # (ncomp, nx, nz)  for right-hand axes
@@ -397,46 +421,52 @@ class _Plotter:
     def plot_image(self):
         # imshow
         im_extent = _quantity_2D_extent(self.quantity, self.hor_axis_idx, self.vert_axis_idx)
-        if self.imshow_cmap == "mumax3":
+        if self.vector_image_bool:  # vector field
             # TODO: update get_rgba
-            im_rgba = get_rgba(self.field_2D)  # (y_axis, x_axis, rgba)
+            im_rgba = get_rgba(self.field_2D)  # (vert_axis, hor_axis, rgba)
             self.ax.imshow(im_rgba, origin="lower", extent=im_extent)
-        else:  # show out of plane component
-            field_OoP = self.field_2D[self.OoP_idx]
+        else:  # show requested component
+            scalar_field = self.field_2D[self.comp]
+
             vmin, vmax = None, None
-            if self.symmetric_clim:
-                vmax = _np.max(_np.abs(field_OoP))
+            if self.imshow_symmetric_clim:
+                vmax = _np.max(_np.abs(scalar_field))
                 vmin = -vmax
-            self.ax.imshow(field_OoP, origin="lower", extent=im_extent,
+
+            self.ax.imshow(scalar_field, origin="lower", extent=im_extent,
                     cmap=self.imshow_cmap, vmin=vmin, vmax=vmax)
+            # TODO: add cbar
     
     def plot_quiver(self):
-        if self.quiver:
-            _, ny_old, nx_old = self.field_2D.shape
-            nx_new = max(int(nx_old / self.arrow_size), 1)
-            ny_new = max(int(ny_old / self.arrow_size), 1)
+        if not self.quiver:
+            return
 
-            X, Y = _get_downsampled_meshgrid((nx_old, ny_old), (nx_new, ny_new), self.quantity,
-                                            self.hor_axis_idx, self.vert_axis_idx)
+        _, ny_old, nx_old = self.field_2D.shape
+        nx_new = max(int(nx_old / self.arrow_size), 1)
+        ny_new = max(int(ny_old / self.arrow_size), 1)
 
-            sampled_field = downsample(self.field_2D, new_size=(nx_new, ny_new))
-            U, V = sampled_field[self.hor_axis_idx], sampled_field[self.vert_axis_idx]
+        X, Y = _get_downsampled_meshgrid((nx_old, ny_old), (nx_new, ny_new), self.quantity,
+                                        self.hor_axis_idx, self.vert_axis_idx)
 
-            if self.quiver_cmap == "mumax3":  # HSL with rgb
-                q_rgba = _np.reshape(get_rgba(sampled_field), (nx_new*ny_new, 4))
-                self.ax.quiver(X, Y, U, V, color=q_rgba, **self.quiver_kwargs)
-            elif self.quiver_cmap == None:  # uniform color
-                self.quiver_kwargs.setdefault("alpha", 0.4)
-                self.ax.quiver(X, Y, U, V, **self.quiver_kwargs)
-            else:  # OoP component colored
-                sampled_field_OoP = sampled_field[self.OoP_idx]
-                vmin, vmax = None, None
-                if self.symmetric_clim:
-                    vmax = _np.max(_np.abs(sampled_field_OoP))
-                    vmin = -vmax
-                self.quiver_kwargs.setdefault("clim", (vmin, vmax))
-                self.ax.quiver(X, Y, U, V, sampled_field_OoP, cmap=self.quiver_cmap,
-                               **self.quiver_kwargs)
+        sampled_field = downsample(self.field_2D, new_size=(nx_new, ny_new))
+        U, V = sampled_field[self.hor_axis_idx], sampled_field[self.vert_axis_idx]
+
+        if self.quiver_cmap == "mumax3":  # HSL with rgb
+            q_rgba = _np.reshape(get_rgba(sampled_field), (nx_new*ny_new, 4))
+            self.ax.quiver(X, Y, U, V, color=q_rgba, **self.quiver_kwargs)
+        elif self.quiver_cmap == None:  # uniform color
+            self.quiver_kwargs.setdefault("alpha", 0.4)
+            self.ax.quiver(X, Y, U, V, **self.quiver_kwargs)
+        else:  # OoP component colored
+            sampled_field_OoP = sampled_field[self.OoP_axis_idx]
+            vmin, vmax = None, None
+            if self.quiver_symmetric_clim:
+                vmax = _np.max(_np.abs(sampled_field_OoP))
+                vmin = -vmax
+            self.quiver_kwargs.setdefault("clim", (vmin, vmax))
+            self.ax.quiver(X, Y, U, V, sampled_field_OoP, cmap=self.quiver_cmap,
+                            **self.quiver_kwargs)
+            # TODO: add cbar
 
     def dress_axes(self):
         # TODO: docstring
@@ -465,7 +495,7 @@ class _Plotter:
             self.ax.xaxis.set_major_formatter(UnitScalarFormatter(x_prefix, "m"))
             self.ax.yaxis.set_major_formatter(UnitScalarFormatter(y_prefix, "m"))
 
-            # set title to fieldquantity name
+            # set title to field_quantity name
             self.ax.set_title(self.quantity.name)  # TODO: add slice, component, layer, ...
         else:
             self.ax.set_xlabel(f"${'xyz'[self.hor_axis_idx]}$ (index)")
@@ -481,7 +511,7 @@ class _Plotter:
             self.ax.set_aspect("auto")
 
 
-    def plot_vector_field(self) -> Axes:
+    def plot(self) -> Axes:
         # TODO: docstring
 
         self.plot_image()
@@ -500,22 +530,25 @@ class _Plotter:
         return self.ax
 
 
-def plot_vector_field(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
-                      out_of_plane_axis: str = 'z', layer: int = 0,
-                      file_name: Optional[str] = None, show: Optional[bool] = None,
-                      ax: Optional[Axes] = None,
-                      imshow_cmap: str = "mumax3", symmetric_clim: bool = True,
-                      quiver: bool = True, arrow_size: float = 16.,
-                      quiver_cmap: Optional[str]= None, **quiver_kwargs) -> Axes:
-    """Plot a :func:`mumaxplus.FieldQuantity` or `numpy.ndarray` with 3
-    components as a vector field using the mumax³ (HSL) colorscheme or a scalar
-    colormap of the out-of-plane component, with optionally added arrows.
+def plot_field(field_quantity: _mxp.FieldQuantity|_np.ndarray,
+               out_of_plane_axis: str = 'z', layer: int = 0,
+               component: Optional[int] = None,
+               file_name: Optional[str] = None, show: Optional[bool] = None,
+               ax: Optional[Axes] = None,
+               imshow_cmap: str = None, imshow_symmetric_clim: bool = False,
+               quiver: bool = None, arrow_size: float = 16.,
+               quiver_cmap: Optional[str]= None, quiver_symmetric_clim: bool = True,
+               **quiver_kwargs) -> Axes:
+    """Plot a :func:`mumaxplus.FieldQuantity` or `numpy.ndarray`
+    with 1 component as a scalar field, with 3 components as a vector field or
+    plot one selected component as a a scalar field.
+    Vector fields are plotted using the mumax³ (HSL) colorscheme, with
+    optionally added arrows.
     
     Parameters
     ----------
-    fieldquantity : mumaxplus.FieldQuantity or numpy.ndarray
-        The fieldquantity needs to have 4 dimensions with the shape
-        (ncomp, nx, ny, nz) and with ncomp=3.
+    field_quantity : mumaxplus.FieldQuantity or numpy.ndarray
+        The field_quantity needs to have 4 dimensions with the shape (ncomp, nx, ny, nz).
         Additional dressing of the Axes is done if given a mumaxplus.FieldQuantity.
 
     out_of_plane_axis : string, default="z"
@@ -527,6 +560,14 @@ def plot_vector_field(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
 
     layer : int, default=0
         The index to take of the `out_of_plane_axis`.
+
+    component: int, optional
+        The component of the field_quantity to plot as an image.
+        If set to an integer, that component is plotted as a scalar field.
+        If None (default), a field_quantity with
+            - 1 component is plotted as a scalar field
+            - 3 components is plotted as a vector field with the mumax3 (HSL) colorscheme.
+            - a different number of components can't be plotted.
 
     file_name : string, optional
         If given, the resulting figure will be saved with the given file name.
@@ -540,41 +581,52 @@ def plot_vector_field(fieldquantity: _mxp.FieldQuantity|_np.ndarray,
         The Axes instance to plot onto. If None (default), new Figure and Axes
         instances will be created.
 
-    imshow_cmap : string, default="mumax3"
-        A colormap to use for the image. By default, the mumax³ (HSL)
-        colorscheme is used. Any matplotlib colormap can also be given to color
-        according to the out-of-plane component.
+    imshow_cmap : string, optional
+        A colormap to use for the image if a scalar field is plotted.
 
-    symmetric_clim : bool, default=True
-        If a matplotlib colormap is used for the out-of-plane component for
-        either the image or quiver, zero is set as the central color if set to
-        True (default). This is best used with diverging colormaps, like "bwr".
+    imshow_symmetric_clim : bool, default=False
+        Whether to set zero as the central color if a scalar field is plotted
+        in the image.
+        This is best used with diverging colormaps, like "bwr".
 
-    quiver : bool, default=True
-        Whether to plot the quiver on top of the colored image.
+    quiver : bool, optional
+        Whether to plot arrows on top of the colored image. If None (default),
+        arrows are only added if no specific component for the image has been
+        given.
+        This is only relevant for fieldquantities with 3 components.
 
     arrow_size : float, default=16
         Length of an arrow as a number of cells, so one arrow is designated to
         an area of `arrow_size` by `arrow_size`.
+        This is only relevant for fieldquantities with 3 components.
         
     quiver_cmap : string, optional
         A colormap to use for the quiver. By default, no colormap is used, so
         the arrows are a solid color. If set to "mumax3", the 3D vector data is
         used for the mumax³ (HSL) colorscheme. Any matplotlib colormap can also
         be given to color the arrows according to the out-of-plane component.
+        This is only relevant for fieldquantities with 3 components.
+
+    quiver_symmetric_clim : bool, default=True
+        Whether to set zero as the central color if the arrows are colored
+        according to the out-of-plane component of the vector field.
+        This is best used with diverging colormaps, like "bwr".
+        This is only relevant for fieldquantities with 3 components.
 
     **quiver_kwargs
         Keyword arguments to pass to `matplotlib.pyplot.quiver`.
+        This is only relevant for fieldquantities with 3 components.
 
     Returns
     -------
     ax : matplotlib.axes.Axes
         The resulting Axes on which is plotted.
     """
-    plotter = _Plotter(fieldquantity, out_of_plane_axis, layer,
-                       file_name, show, ax, imshow_cmap, symmetric_clim,
-                       quiver, arrow_size, quiver_cmap, **quiver_kwargs)
-    return plotter.plot_vector_field()
+    plotter = _Plotter(field_quantity, out_of_plane_axis, layer, component,
+                       file_name, show, ax, imshow_cmap, imshow_symmetric_clim,
+                       quiver, arrow_size, quiver_cmap, quiver_symmetric_clim,
+                       **quiver_kwargs)
+    return plotter.plot()
 
 
 def show_layer(quantity, component=0, layer=0):
