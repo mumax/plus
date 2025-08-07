@@ -324,7 +324,7 @@ class _Plotter:
     :func:`plot_field`, but not to be instantiated or manipulated by the
     user.
     """
-    def __init__(self, field_quantity, out_of_plane_axis, layer, component,
+    def __init__(self, field_quantity, out_of_plane_axis, layer, component, geometry,
                  file_name, show, ax, imshow_cmap, imshow_symmetric_clim,
                  quiver, arrow_size, quiver_cmap, quiver_symmetric_clim,
                  **quiver_kwargs):
@@ -341,8 +341,8 @@ class _Plotter:
                 + f"{len(field_quantity.shape)} instead of 4."
             )
 
+        # components
         self.ncomp = field_quantity.shape[0]
-
         if component is not None:
             if component >= self.ncomp:
                 raise IndexError(f"Component index {component} out of range, "
@@ -360,19 +360,6 @@ class _Plotter:
         self.out_of_plane_axis, self.layer = out_of_plane_axis, layer
         self.hor_axis_idx, self.vert_axis_idx, self.OoP_axis_idx = _get_axis_components(out_of_plane_axis)
 
-        self.file_name = file_name
-
-        if show is None:
-            if ax is None and file_name is None:
-                self.show = True
-            else:
-                self.show = False
-
-        if ax is None:
-            _, self.ax = _plt.subplots()
-        else:
-            self.ax = ax
-
         # split types to know what we're working with
         if isinstance(field_quantity, _mxp.FieldQuantity):
             self.field = field_quantity.eval()
@@ -381,7 +368,38 @@ class _Plotter:
             self.field = _np.copy(field_quantity)
             self.quantity = None
 
-        self.set_field_2D()
+        # only need 2D slice of field
+        # TODO: try to get rid of self.field
+        self.field_2D = self.slice_field(self.field)
+
+        # geometry
+        self.geom_2D = None
+        if geometry is not None:
+            if geometry.shape == field_quantity.shape[1:]:
+                self.geom_2D = self.slice_field(geometry)
+            else:
+                raise ValueError(
+                    f"The shape of the given geometry {geometry.shape} does "
+                    + "not match the spacial shape of the field quantity "
+                    + f"{field_quantity.shape[1:]}")
+        elif self.quantity is not None:
+            self.geom_2D = self.slice_field(self.quantity._impl.system.geometry)
+
+        # file name
+        self.file_name = file_name
+
+        # show (and default)
+        if show is None:
+            if ax is None and file_name is None:
+                self.show = True
+            else:
+                self.show = False
+
+        # ax: use or create
+        if ax is None:
+            _, self.ax = _plt.subplots()
+        else:
+            self.ax = ax
 
         # vector image or scalar image?
         self.vector_image_bool = self.ncomp == 3 and self.comp is None
@@ -389,6 +407,7 @@ class _Plotter:
             self.imshow_symmetric_clim = imshow_symmetric_clim
             self.imshow_cmap = "bwr" if imshow_symmetric_clim and imshow_cmap is None else imshow_cmap
 
+        # with or without quiver?
         if self.ncomp == 3:  # vector
             if quiver is not None:  # let user decide
                 self.quiver = quiver
@@ -397,6 +416,7 @@ class _Plotter:
         else:  # no quiver possible
             self.quiver = False
 
+        # save relevant quiver information if needed
         if self.quiver:
             self.arrow_size = arrow_size
             self.quiver_cmap = quiver_cmap
@@ -409,14 +429,19 @@ class _Plotter:
         self.max_height_over_width_ratio = 3
 
 
-    def set_field_2D(self):
-        # TODO: should be a function, but field_2D should not be a property
-        # make field_2D with (ncomp, vert_axis, hor_axis) shape
-        slice_ = [slice(None)]*4
-        slice_[3 - self.OoP_axis_idx] = self.layer  # slice correct axis at chosen layer
-        self.field_2D = self.field[tuple(slice_)]
+    def slice_field(self, field: _np.ndarray) -> _np.ndarray:
+        """Return a right-handed two dimensional slice of the given field with
+        shape (ncomp, vert_axis, hor_axis) or (vert_axis, hor_axis) by taking
+        the `layer` index of the out-of-plane axis.
+        """
+        slice_ = [slice(None)] * field.ndim
+        slice_[-1 - self.OoP_axis_idx] = self.layer  # slice correct axis at chosen layer
+        field_2D = field[tuple(slice_)]
+
         if self.out_of_plane_axis == 'y':
-            self.field_2D = _np.swapaxes(self.field_2D, 1, 2)  # (ncomp, nx, nz)  for right-hand axes
+            field_2D = _np.swapaxes(field_2D, -1, -2)  # ([ncomp,] nx, nz)  for right-hand axes
+
+        return field_2D
 
     def plot_image(self):
         # imshow
@@ -427,6 +452,8 @@ class _Plotter:
             self.ax.imshow(im_rgba, origin="lower", extent=im_extent)
         else:  # show requested component
             scalar_field = self.field_2D[self.comp]
+            if self.geom_2D is not None:  # mask False geometry
+                scalar_field = _np.ma.array(scalar_field, mask=_np.invert(self.geom_2D))
 
             vmin, vmax = None, None
             if self.imshow_symmetric_clim:
@@ -501,7 +528,7 @@ class _Plotter:
             self.ax.set_xlabel(f"${'xyz'[self.hor_axis_idx]}$ (index)")
             self.ax.set_ylabel(f"${'xyz'[self.vert_axis_idx]}$ (index)")
 
-        self.ax.set_facecolor("gray")  # TODO: is this still relevant?
+        self.ax.set_facecolor("gray")
         
         # use "equal" aspect ratio if not too rectangular
         if ((right - left) / (top - bottom) < self.max_width_over_height_ratio and
@@ -532,7 +559,7 @@ class _Plotter:
 
 def plot_field(field_quantity: _mxp.FieldQuantity|_np.ndarray,
                out_of_plane_axis: str = 'z', layer: int = 0,
-               component: Optional[int] = None,
+               component: Optional[int] = None, geometry: Optional[_np.ndarray] = None,
                file_name: Optional[str] = None, show: Optional[bool] = None,
                ax: Optional[Axes] = None,
                imshow_cmap: str = None, imshow_symmetric_clim: bool = False,
@@ -561,13 +588,17 @@ def plot_field(field_quantity: _mxp.FieldQuantity|_np.ndarray,
     layer : int, default=0
         The index to take of the `out_of_plane_axis`.
 
-    component: int, optional
+    component : int, optional
         The component of the field_quantity to plot as an image.
         If set to an integer, that component is plotted as a scalar field.
         If None (default), a field_quantity with
             - 1 component is plotted as a scalar field
             - 3 components is plotted as a vector field with the mumax3 (HSL) colorscheme.
             - a different number of components can't be plotted.
+
+    geometry : numpy.ndarray, optional
+        The geometry of the field_quantity with shape (nz, ny, nx) to mask
+        scalar field plots where geometry is False.
 
     file_name : string, optional
         If given, the resulting figure will be saved with the given file name.
@@ -622,7 +653,7 @@ def plot_field(field_quantity: _mxp.FieldQuantity|_np.ndarray,
     ax : matplotlib.axes.Axes
         The resulting Axes on which is plotted.
     """
-    plotter = _Plotter(field_quantity, out_of_plane_axis, layer, component,
+    plotter = _Plotter(field_quantity, out_of_plane_axis, layer, component, geometry,
                        file_name, show, ax, imshow_cmap, imshow_symmetric_clim,
                        quiver, arrow_size, quiver_cmap, quiver_symmetric_clim,
                        **quiver_kwargs)
