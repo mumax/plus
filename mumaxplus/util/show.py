@@ -325,7 +325,7 @@ class _Plotter:
     user.
     """
     def __init__(self, field_quantity, out_of_plane_axis, layer, component, geometry,
-                 file_name, show, ax, imshow_cmap, imshow_symmetric_clim,
+                 file_name, show, ax, imshow_cmap, imshow_symmetric_clim, enable_cbar,
                  quiver, arrow_size, quiver_cmap, quiver_symmetric_clim,
                  **quiver_kwargs):
         """see the docstring of :func:`plot_field`."""
@@ -401,6 +401,9 @@ class _Plotter:
         else:
             self.ax = ax
 
+        # enable cbar
+        self.enable_cbar = enable_cbar
+
         # vector image or scalar image?
         self.vector_image_bool = self.ncomp == 3 and self.comp is None
         if not self.vector_image_bool:
@@ -423,10 +426,6 @@ class _Plotter:
             self.quiver_symmetric_clim = quiver_symmetric_clim
             self.quiver_kwargs = quiver_kwargs.copy()  # leave user input alone
             self.quiver_kwargs.setdefault("pivot", "middle")
-
-        # TODO: tweak?
-        self.max_width_over_height_ratio = 6
-        self.max_height_over_width_ratio = 3
 
 
     def slice_field(self, field: _np.ndarray) -> _np.ndarray:
@@ -460,9 +459,18 @@ class _Plotter:
                 vmax = _np.max(_np.abs(scalar_field))
                 vmin = -vmax
 
-            self.ax.imshow(scalar_field, origin="lower", extent=im_extent,
+            im = self.ax.imshow(scalar_field, origin="lower", extent=im_extent,
                     cmap=self.imshow_cmap, vmin=vmin, vmax=vmax)
-            # TODO: add cbar
+            
+            # cbar
+            # Name only the component if relevant. Let title display quantity name, unless empty
+            if self.ncomp > 1:
+                cname = f"component {self.comp}"
+            elif self.quantity and (qname := self.quantity.name):
+                cname = qname
+            else:
+                cname = ""
+            self.add_cbar(im, name=cname)
     
     def plot_quiver(self):
         if not self.quiver:
@@ -491,11 +499,43 @@ class _Plotter:
                 vmax = _np.max(_np.abs(sampled_field_OoP))
                 vmin = -vmax
             self.quiver_kwargs.setdefault("clim", (vmin, vmax))
-            self.ax.quiver(X, Y, U, V, sampled_field_OoP, cmap=self.quiver_cmap,
-                            **self.quiver_kwargs)
-            # TODO: add cbar
+            q = self.ax.quiver(X, Y, U, V, sampled_field_OoP,
+                               cmap=self.quiver_cmap, **self.quiver_kwargs)
+            self.add_cbar(q, name=f"Out-of-plane {self.out_of_plane_axis}-component")
 
-    def dress_axes(self):
+    def add_cbar(self, cp, name: str = ""):
+        """Adds a colorbar associated with the given plot next to `self.ax`, if
+        `self.enable_cbar` is True.
+        Also adds appropriate unit to the label if relevant.
+
+        Parameters
+        ----------
+        cp : matplotlib.cm.ScalarMappable
+            The plot with which the colorbar is associated.
+        
+        name : str, default=""
+            Name of the colorbar, which forms (part of) the label.
+
+        Returns
+        -------
+        Colorbar, optional
+            Returns the colorbar, if created.
+        """
+
+        if not self.enable_cbar:
+            return
+
+        label = name
+        formatter = None
+        if self.quantity and (unit := self.quantity.unit):
+            vmin, vmax = cp.get_clim()
+            _, prefix = appropriate_SIprefix(max(abs(vmin), abs(vmax)))
+            label += f" ({prefix}{unit})"
+            formatter = UnitScalarFormatter(prefix, unit)
+
+        return self.ax.figure.colorbar(cp, ax=self.ax, label=label, format=formatter)
+
+    def dress_axes(self, max_width_over_height_ratio=6., max_height_over_width_ratio=3.):
         # TODO: docstring
         # TODO: better title using name
         # TODO: geometry for filter field??
@@ -531,8 +571,8 @@ class _Plotter:
         self.ax.set_facecolor("gray")
         
         # use "equal" aspect ratio if not too rectangular
-        if ((right - left) / (top - bottom) < self.max_width_over_height_ratio and
-            (top - bottom) / (right - left) < self.max_height_over_width_ratio):
+        if ((right - left) / (top - bottom) < max_width_over_height_ratio and
+            (top - bottom) / (right - left) < max_height_over_width_ratio):
             self.ax.set_aspect("equal")
         else:
             self.ax.set_aspect("auto")
@@ -563,6 +603,7 @@ def plot_field(field_quantity: _mxp.FieldQuantity|_np.ndarray,
                file_name: Optional[str] = None, show: Optional[bool] = None,
                ax: Optional[Axes] = None,
                imshow_cmap: str = None, imshow_symmetric_clim: bool = False,
+               enable_cbar: bool = True,
                quiver: bool = None, arrow_size: float = 16.,
                quiver_cmap: Optional[str]= None, quiver_symmetric_clim: bool = True,
                **quiver_kwargs) -> Axes:
@@ -620,6 +661,9 @@ def plot_field(field_quantity: _mxp.FieldQuantity|_np.ndarray,
         in the image.
         This is best used with diverging colormaps, like "bwr".
 
+    enable_cbar : bool, default=True
+        Whether to automatically add a colorbar to the figure of the Axes when relevant.
+
     quiver : bool, optional
         Whether to plot arrows on top of the colored image. If None (default),
         arrows are only added if no specific component for the image has been
@@ -654,7 +698,7 @@ def plot_field(field_quantity: _mxp.FieldQuantity|_np.ndarray,
         The resulting Axes on which is plotted.
     """
     plotter = _Plotter(field_quantity, out_of_plane_axis, layer, component, geometry,
-                       file_name, show, ax, imshow_cmap, imshow_symmetric_clim,
+                       file_name, show, ax, imshow_cmap, imshow_symmetric_clim, enable_cbar,
                        quiver, arrow_size, quiver_cmap, quiver_symmetric_clim,
                        **quiver_kwargs)
     return plotter.plot()
