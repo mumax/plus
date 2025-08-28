@@ -25,13 +25,14 @@ const std::vector<real> InterParameter::eval() const {
   return valuesBuffer_.getData();
 }
 
-__global__ void k_set(real* values, real value) {
+__global__ void k_set(real* values, real value, size_t N) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < 0 || idx > N) { return; }
   values[idx] = value;
 }
 
 void InterParameter::setBuffer(real value) {
-  cudaLaunch(valuesLimit_, k_set, valuesBuffer_.get(), value);
+  cudaLaunch(valuesLimit_, k_set, valuesBuffer_.get(), value, valuesLimit_);
 }
 
 void InterParameter::set(real value) {
