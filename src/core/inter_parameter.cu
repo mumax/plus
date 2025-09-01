@@ -25,9 +25,9 @@ const std::vector<real> InterParameter::eval() const {
   return valuesBuffer_.getData();
 }
 
-__global__ void k_set(real* values, real value, size_t N) {
+__global__ void k_set(real* values, real value, size_t valuesLimit) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < 0 || idx > N) { return; }
+  if (idx < 0 || idx >= valuesLimit) { return; }
   values[idx] = value;
 }
 
