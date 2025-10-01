@@ -46,12 +46,13 @@ __global__ void k_dynamicMagnetoelasticField(CuField hField,
                                              const CuField strain,
                                              const CuParameter B1,
                                              const CuParameter B2,
-                                             const CuParameter msat) {
+                                             const CuParameter msat,
+                                             const CuParameter rho) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = hField.system;
   const Grid grid = system.grid;
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) || (!rho.valueAt(idx) || !msat.valueAt(idx))) {
     if (grid.cellInGrid(idx)) {
       hField.setVectorInCell(idx, real3{0, 0, 0});
     }
@@ -83,7 +84,7 @@ __global__ void k_rigidMagnetoelasticField(CuField hField,
   const CuSystem system = hField.system;
   const Grid grid = system.grid;
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) || !msat.valueAt(idx)) {
     if (grid.cellInGrid(idx)) {
       hField.setVectorInCell(idx, real3{0, 0, 0});
     }
@@ -142,9 +143,10 @@ Field evalMagnetoelasticField(const Ferromagnet* magnet) {
   } else {  // independent magnet
     strain = evalStrainTensor(magnet);
   }
+  CuParameter rho = magnet->rho.cu();
 
   cudaLaunch(ncells, k_dynamicMagnetoelasticField, hField.cu(), mField,
-            strain.cu(), B1, B2, msat);
+            strain.cu(), B1, B2, msat, rho);
   return hField;
 }
 

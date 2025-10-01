@@ -1,6 +1,7 @@
 #include "system.hpp"
 
 #include <algorithm>
+#include <array>
 #include <stdexcept>
 #include <set>
 

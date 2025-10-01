@@ -21,7 +21,8 @@ __global__ void k_octupolevector(CuField octupole,
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
   // When outside the geometry, set to zero and return early
-  if (!octupole.cellInGeometry(idx)) {
+  if (!octupole.cellInGeometry(idx) ||
+      (!msat1.valueAt(idx) && !msat2.valueAt(idx) && !msat3.valueAt(idx))) {
     if (octupole.cellInGrid(idx)) 
       octupole.setVectorInCell(idx, real3{0, 0, 0});
     return;

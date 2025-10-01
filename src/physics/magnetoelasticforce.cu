@@ -12,12 +12,14 @@ __global__ void k_magnetoelasticForce(CuField fField,
                                       const CuParameter B1,
                                       const CuParameter B2,
                                       const real3 w,  // w = 1/cellsize
-                                      const Grid mastergrid) {
+                                      const Grid mastergrid,
+                                      const CuParameter msat,
+                                      const CuParameter rho) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = fField.system;
   const Grid grid = system.grid;
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) || (!rho.valueAt(idx) || !msat.valueAt(idx))) {
     if (grid.cellInGrid(idx)) {
       fField.setVectorInCell(idx, real3{0, 0, 0});
     }
@@ -106,7 +108,9 @@ Field evalMagnetoelasticForce(const Ferromagnet* magnet) {
   CuParameter B2 = magnet->B2.cu();
   real3 w = 1 / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
-  cudaLaunch(ncells, k_magnetoelasticForce, fField.cu(), m, B1, B2, w, mastergrid);
+  CuParameter msat = magnet->msat.cu();
+  CuParameter rho = magnet->rho.cu();
+  cudaLaunch(ncells, k_magnetoelasticForce, fField.cu(), m, B1, B2, w, mastergrid, msat, rho);
   return fField;
 }
 

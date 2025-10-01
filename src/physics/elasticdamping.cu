@@ -12,12 +12,13 @@ bool elasticDampingAssuredZero(const Magnet* magnet) {
 // Dedicated kernel function for -1 * eta * v; otherwise need two kernel calls.
 __global__ void k_elasticDamping(CuField fField,
                                  const CuField vField,
-                                 const CuParameter eta) {
+                                 const CuParameter eta,
+                                 const CuParameter rho) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = fField.system;
 
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) || !rho.valueAt(idx)) {
     if (system.grid.cellInGrid(idx)) {
       fField.setVectorInCell(idx, real3{0, 0, 0});
     }
@@ -37,8 +38,9 @@ Field evalElasticDamping(const Magnet* magnet) {
     int ncells = fField.grid().ncells();
     CuField vField = magnet->elasticVelocity()->field().cu();
     CuParameter eta = magnet->eta.cu();
+    CuParameter rho = magnet->rho.cu();
 
-    cudaLaunch(ncells, k_elasticDamping, fField.cu(), vField, eta);
+    cudaLaunch(ncells, k_elasticDamping, fField.cu(), vField, eta, rho);
 
     return fField;
 }

@@ -27,13 +27,14 @@ __global__ void k_internalBodyForce(CuField fField,
                                     const CuField stressTensor,
                                     const CuBoundaryTraction traction,
                                     const real3 w,  // 1 / cellsize
-                                    const Grid mastergrid) {
+                                    const Grid mastergrid,
+                                    const CuParameter rho) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = fField.system;
   const Grid grid = system.grid;
 
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) || !rho.valueAt(idx)) {
     if (grid.cellInGrid(idx)) {
       fField.setVectorInCell(idx, real3{0, 0, 0});
     }
@@ -121,9 +122,10 @@ Field evalInternalBodyForce(const Magnet* magnet) {
   CuBoundaryTraction traction = magnet->boundaryTraction.cu();
   real3 w = 1. / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
+  CuParameter rho = magnet->rho.cu();
 
   cudaLaunch(ncells, k_internalBodyForce, fField.cu(), stressTensor.cu(),
-             traction, w, mastergrid);
+             traction, w, mastergrid, rho);
 
   return fField;
 }

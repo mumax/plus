@@ -12,7 +12,7 @@ __global__ void k_neelvector(CuField neel,
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
   // When outside the geometry, set to zero and return early
-  if (!neel.cellInGeometry(idx)) {
+  if (!neel.cellInGeometry(idx) || (!msat1.valueAt(idx) && !msat2.valueAt(idx))) {
     if (neel.cellInGrid(idx)) 
         neel.setVectorInCell(idx, real3{0, 0, 0});
     return;

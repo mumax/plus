@@ -22,7 +22,7 @@ __global__ void k_kineticEnergyDensity(CuField kinField,
   const CuSystem system = kinField.system;
 
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) || !rho.valueAt(idx)) {
     if (system.grid.cellInGrid(idx)) {
       kinField.setValueInCell(idx, 0, 0);
     }
@@ -67,12 +67,13 @@ M_ScalarQuantity kineticEnergyQuantity(const Magnet* magnet) {
 
 __global__ void k_elasticEnergyDensity(CuField elField,
                                   const CuField stress,
-                                  const CuField strain) {
+                                  const CuField strain,
+                                  const CuParameter rho) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = elField.system;
 
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) && rho.valueAt(idx)) {
     if (system.grid.cellInGrid(idx)) {
       elField.setValueInCell(idx, 0, 0);
     }
@@ -98,7 +99,8 @@ Field evalElasticEnergyDensity(const Magnet* magnet) {
   int ncells = elField.grid().ncells();
   Field stress = evalStressTensor(magnet);
   Field strain = evalStrainTensor(magnet);
-  cudaLaunch(ncells, k_elasticEnergyDensity, elField.cu(), stress.cu(), strain.cu());
+  CuParameter rho = magnet->rho.cu();
+  cudaLaunch(ncells, k_elasticEnergyDensity, elField.cu(), stress.cu(), strain.cu(), rho);
   return elField;
 }
 

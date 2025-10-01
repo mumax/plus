@@ -13,13 +13,14 @@ bool strainTensorAssuredZero(const Magnet* magnet) {
 __global__ void k_strainTensor(CuField strain,
                                const CuField u,
                                const real3 w,  // w = 1/cellsize
-                               const Grid mastergrid) {
+                               const Grid mastergrid,
+                               const CuParameter rho) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = strain.system;
   const Grid grid = system.grid;
 
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx)) {
+  if (!system.inGeometry(idx) || !rho.valueAt(idx)) {
     if (grid.cellInGrid(idx)) {
       for (int i = 0; i < strain.ncomp; i++)
         strain.setValueInCell(idx, i, 0);
@@ -107,8 +108,9 @@ Field evalStrainTensor(const Magnet* magnet) {
   CuField u = magnet->elasticDisplacement()->field().cu();
   real3 w = 1 / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
+  CuParameter rho = magnet->rho.cu();
 
-  cudaLaunch(ncells, k_strainTensor, strain.cu(), u, w, mastergrid);
+  cudaLaunch(ncells, k_strainTensor, strain.cu(), u, w, mastergrid, rho);
   return strain;
 }
 
@@ -131,10 +133,11 @@ Field evalStrainRate(const Magnet* magnet) {
   CuField v = magnet->elasticVelocity()->field().cu();
   real3 w = 1/ magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
+  CuParameter rho = magnet->rho.cu();
 
   // The math for strain rate is exactly the same as for strain tensor,
   // but applied to velocity instead of displacement.
-  cudaLaunch(ncells, k_strainTensor, strainRate.cu(), v, w, mastergrid);
+  cudaLaunch(ncells, k_strainTensor, strainRate.cu(), v, w, mastergrid, rho);
 
   return strainRate;
 }
