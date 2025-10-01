@@ -83,8 +83,18 @@ class FieldQuantity:
 
     def get_rgb(self):
         """Evaluate the vector field quantity and return its rgb representation
-        as a numpy ndarray of the same shape (ncomp, nz, ny, nx)."""
-        assert self.ncomp == 3 or self.ncomp == 6, \
+        as a numpy ndarray of the same shape (3, nz, ny, nx).
+        
+        Note
+        ----
+        The final color scheme is different from mumax³. In this case, the
+        saturation does not depend on the z-component anymore, meaning the z=0 plane
+        remains unchanged, but other colors will appear slightly less saturated.
+        This ensures that the color sphere is continuous everywhere, particularly
+        when crossing the xz- or yz-plane with a normalized length less than 1,
+        where the colors will fade through gray.
+        """
+        assert self.ncomp == 3, \
             "The rgb representation can only be calculated for vector fields."
         return self._impl.get_rgb().get()  # Field to ndarray
 

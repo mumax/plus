@@ -38,3 +38,4 @@ dependencies:
   - numpydoc
   - sphinxcontrib-video
   - sphinx-copybutton
+  - sphinx-design

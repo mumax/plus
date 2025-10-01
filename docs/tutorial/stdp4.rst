@@ -8,7 +8,7 @@ The problem specification can be found `here <https://www.ctcms.nist.gov/~rdm/mu
 .. code-block:: python
     
     from mumaxplus import *
-    from mumaxplus.util import show_field
+    from mumaxplus.util import plot_field
 
     import matplotlib.pyplot as plt
     import numpy as np
@@ -29,7 +29,7 @@ problem specification.
     magnet.aex = 13e-12
     magnet.alpha = 0.02
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization, enable_quiver=False)
 
 .. image:: ../images/stdp4_1.png
    :align: center
@@ -42,7 +42,7 @@ Relax the magnetization to an 'S' state in the x-direction.
     magnet.magnetization = (1, 0.1, 0)
     magnet.minimize()
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. image:: ../images/stdp4_2.png
    :align: center
@@ -76,7 +76,7 @@ Run a timesolver to evaluate the table quantities at the given time points.
     
     output = world.timesolver.solve(timepoints, outputquantities)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. image:: ../images/stdp4_3.png
    :align: center

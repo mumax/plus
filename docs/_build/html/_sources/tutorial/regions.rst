@@ -29,7 +29,7 @@ corresponds to region indices. This can be done as follows
 .. code-block:: python
     
     from mumaxplus import Ferromagnet, Grid, World
-    from mumaxplus.util import show_field
+    from mumaxplus.util import plot_field
 
     world = World(cellsize=(1e-9, 1e-9, 1e-9))
     grid = Grid((5, 5, 1))
@@ -54,7 +54,11 @@ region indices 1, 2 and 3 (note that these indices can take on any integer value
 Now one can set parameter values in each region seperately.
 
 .. code-block:: python
-    
+
+    # consistent random configuration
+    np.random.seed(1234567)
+    magnet.magnetization = np.random.normal(size=magnet.magnetization.shape)
+
     # Set parameter values for all regions
     magnet.alpha = 0.1
     magnet.msat = 800e3
@@ -71,11 +75,11 @@ Now one can set parameter values in each region seperately.
     magnet.scale_exchange.set_between(1, 2, 0) # No exchange between first two "strips" of the magnet
     magnet.inter_exchange.set_between(2, 3, 15e-12)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization, arrow_size=1)
 
     world.timesolver.run(.1e-9)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization, arrow_size=1)
 
 .. image:: ../images/regions_1.png
    :width: 45%

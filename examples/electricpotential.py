@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import *
-from mumaxplus.util import *
+from mumaxplus.util import plot_field
 
 length, width, height = 100e-9, 100e-9, 1e-9
 nx, ny, nz = 128, 128, 1
@@ -34,7 +34,7 @@ magnet.conductivity = conductivity
 
 
 # Compute and show the electrical potential
-show_layer(magnet.electrical_potential)
+plot_field(magnet.electrical_potential)
 
 
 

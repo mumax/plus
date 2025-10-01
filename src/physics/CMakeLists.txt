@@ -102,3 +102,21 @@ target_link_libraries(physics PUBLIC core linsolver)
 
 link_directories(${CUDA_LIBRARY_DIR})
 target_link_libraries(physics PRIVATE cufft curand)
+
+
+# On Windows, the cufft and curand DLLs (also required by mumax³) are not found by default.
+# Therefore, we look for them in the installed NVIDIA CUDA Toolkit and copy them next to the .pyd.
+if (WIN32)
+    find_package(CUDAToolkit REQUIRED)
+
+    file(GLOB CUDA_RUNTIME_DLLS
+        "${CUDAToolkit_BIN_DIR}/cufft64_*.dll"
+        "${CUDAToolkit_BIN_DIR}/curand64_*.dll"
+    )
+
+    add_custom_command(TARGET physics POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CUDA_RUNTIME_DLLS}
+            $<TARGET_FILE_DIR:_mumaxpluscpp>
+    )
+endif()

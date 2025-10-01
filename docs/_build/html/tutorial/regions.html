@@ -28,9 +28,10 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d4b325e0" />
   
@@ -39,13 +40,16 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../_static/documentation_options.js?v=bee7790f"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/regions';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
     <link rel="icon" href="../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -53,7 +57,7 @@
     <link rel="prev" title="Shapes" href="shapes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+    <meta name="docbuild:last-update" content="2025-09-30, v1.1.1"/>
   </head>
   
   
@@ -362,7 +366,7 @@ when there’s a certain interaction between these different parts of a magnet, 
 <p>For this reason, mumax⁺ also provides an option to define regions inside a magnetic
 material and set parameter values both in and between (where appropriate) different
 regions.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </pre></div>
 </div>
 <p>Parameters which can be set between different regions, also have an extra scaling
@@ -372,8 +376,8 @@ then the harmonic mean of the parameter values of neighbouring cells is used.</p
 <p>Regions can be set in the same way that one would set the geometry of a magnet,
 one of which is using a numpy array. This array contains integer values which
 corresponds to region indices. This can be done as follows</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mumaxplus</span> <span class="kn">import</span> <span class="n">Ferromagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
-<span class="kn">from</span> <span class="nn">mumaxplus.util</span> <span class="kn">import</span> <span class="n">show_field</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ferromagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_field</span>
 
 <span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">))</span>
 <span class="n">grid</span> <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -396,7 +400,11 @@ corresponds to region indices. This can be done as follows</p>
 <p>Here we have split up our magnet into 3 strips by defining three regions with
 region indices 1, 2 and 3 (note that these indices can take on any integer value).
 Now one can set parameter values in each region seperately.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set parameter values for all regions</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># consistent random configuration</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234567</span><span class="p">)</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Set parameter values for all regions</span>
 <span class="n">magnet</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="n">magnet</span><span class="o">.</span><span class="n">msat</span> <span class="o">=</span> <span class="mf">800e3</span>
 <span class="n">magnet</span><span class="o">.</span><span class="n">enable_demag</span> <span class="o">=</span> <span class="kc">False</span>
@@ -412,11 +420,11 @@ Now one can set parameter values in each region seperately.</p>
 <span class="n">magnet</span><span class="o">.</span><span class="n">scale_exchange</span><span class="o">.</span><span class="n">set_between</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># No exchange between first two &quot;strips&quot; of the magnet</span>
 <span class="n">magnet</span><span class="o">.</span><span class="n">inter_exchange</span><span class="o">.</span><span class="n">set_between</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">15e-12</span><span class="p">)</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mf">.1e-9</span><span class="p">)</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/regions_1.png"><img alt="../_images/regions_1.png" src="../_images/regions_1.png" style="width: 45%;" />
@@ -484,7 +492,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-10, v1.1.0.
+  Last updated on 2025-09-30, v1.1.1.
   <br/>
 </p>
   </div>

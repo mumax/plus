@@ -13,18 +13,18 @@ magnetization configuration:
 #. Setting the magnetization using a numpy array
 
 Let's start by creating a magnet which will be used throughout this notebook.
-When we use the `show_field` function to visualize the magnetization configuration,
+When we use the `plot_field` function to visualize the magnetization configuration,
 we see that the magnetization is initialized with random values.
 
 .. code-block:: python
     
     from mumaxplus import Ferromagnet, Grid, World
-    from mumaxplus.util import show_field
+    from mumaxplus.util import plot_field
 
     world = World(cellsize=(1e-9,1e-9,1e-9))
     magnet = Ferromagnet(world, Grid((200,100,1)))
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization, enable_quiver=False)
 
 .. image:: ../images/random_mag.png
    :align: center
@@ -40,7 +40,7 @@ need to specify the magnetization direction using three floats:
     
     magnet.magnetization = (1.0, 0.0, 1.0)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. image:: ../images/uniform_mag.png
    :align: center
@@ -80,7 +80,7 @@ helical magnetization configuration with a certain wave vector.
 
     magnet.magnetization = helical
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization, arrow_size=4)
 
 .. image:: ../images/function_mag.png
    :align: center
@@ -135,7 +135,7 @@ Vortex
                                          circulation=1,
                                          polarization=1)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. code-block:: console
 
@@ -154,7 +154,7 @@ Antivortex
                                              circulation=1,
                                              polarization=1)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. image:: ../images/antivortex_mag.png
    :align: center
@@ -169,7 +169,7 @@ Neelskyrmion
                                                charge=1,
                                                polarization=1)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. image:: ../images/neelskyrm_mag.png
    :align: center
@@ -184,7 +184,7 @@ Blochskyrmion
                                                 charge=1,
                                                 polarization=1)
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. image:: ../images/blochskyrm_mag.png
    :align: center
@@ -225,7 +225,7 @@ domain state magnetization configuration using basic numpy functionalities:
 
     magnet.magnetization = m
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization)
 
 .. image:: ../images/DW_mag.png
    :align: center
@@ -247,7 +247,7 @@ the snippet below.
 
     magnet.magnetization = m
 
-    show_field(magnet.magnetization)
+    plot_field(magnet.magnetization, arrow_size=4)
 
 .. image:: ../images/rainbow_mag.png
    :align: center

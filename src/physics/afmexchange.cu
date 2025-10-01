@@ -40,6 +40,7 @@ bool homoAfmExchangeAssuredZero(const Ferromagnet* magnet) {
 __global__ void k_afmExchangeFieldSite(CuField hField,
                                 const CuField mField,
                                 const CuParameter msat,
+                                const CuParameter msat2,
                                 const CuParameter afmex_cell,
                                 const CuParameter latcon) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -49,8 +50,11 @@ __global__ void k_afmExchangeFieldSite(CuField hField,
         hField.setVectorInCell(idx, real3{0, 0, 0});
       return;
     }
-    if (msat.valueAt(idx) == 0.) {
+    if (msat.valueAt(idx) == 0.) {  // total field is 0
       hField.setVectorInCell(idx, real3{0, 0, 0});
+      return;
+    }
+    if (msat2.valueAt(idx) == 0.) {  // no addition to the field
       return;
     }
 
@@ -179,8 +183,9 @@ Field evalHomogeneousAfmExchangeField(const Ferromagnet* magnet) {
   for (auto sub : host->getOtherSublattices(magnet)) {
     // Accumulate seperate sublattice contributions
     auto mag2 = sub->magnetization()->field().cu();
+    auto msat2 = sub->msat.cu();
     cudaLaunch(hField.grid().ncells(), k_afmExchangeFieldSite, hField.cu(),
-               mag2, msat, afmex_cell, latcon);
+               mag2, msat, msat2, afmex_cell, latcon);
   }
   return hField;
 }

@@ -1,19 +1,8 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import show_field
-
-
-def vortex(gridsize):
-    """ returns magnetization configuration with a vortex at the center """
-    m = np.zeros((3, gridsize[2], gridsize[1], gridsize[0]))
-    x = np.linspace(-gridsize[0] / 2.0, gridsize[0] / 2.0, gridsize[0])
-    y = np.linspace(-gridsize[1] / 2.0, gridsize[1] / 2.0, gridsize[1])
-    z = np.linspace(-gridsize[2] / 2.0, gridsize[2] / 2.0, gridsize[2])
-    zz, yy, xx = np.meshgrid(z, y, x, indexing="ij")
-    m[0] = -yy / (xx ** 2 + yy ** 2)
-    m[1] = xx / (xx ** 2 + yy ** 2)
-    return m
+from mumaxplus.util import plot_field
 
 
 world = World(cellsize=(3e-9, 3e-9, 3e-9))
@@ -33,5 +22,9 @@ for i in range(n_magnets):
     magnets.append(magnet)
 
 world.timesolver.run(1e-10)
-for magnet in magnets:
-    show_field(magnet.magnetization)
+
+fig, axs = plt.subplots(nrows=1, ncols=n_magnets, figsize=(2.8*n_magnets, 5.3), sharey="all")
+for i, (magnet, ax) in enumerate(zip(magnets, axs)):
+    plot_field(magnet.magnetization, ax=ax, arrow_size=4,
+               ylabel=None if i==0 else "")
+plt.show()

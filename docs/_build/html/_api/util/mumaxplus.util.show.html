@@ -28,9 +28,10 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d4b325e0" />
   
@@ -39,13 +40,16 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../../_static/documentation_options.js?v=bee7790f"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_api/util/mumaxplus.util.show';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../../_static/google-analytics.js?v=27e7bdd4"></script>
     <link rel="icon" href="../../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -53,7 +57,7 @@
     <link rel="prev" title="shape" href="mumaxplus.util.shape.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+    <meta name="docbuild:last-update" content="2025-09-30, v1.1.1"/>
   </head>
   
   
@@ -353,14 +357,24 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.hsl_to_rgb"><code class="docutils literal notranslate"><span class="pre">hsl_to_rgb()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.vector_to_rgb"><code class="docutils literal notranslate"><span class="pre">vector_to_rgb()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.get_rgb"><code class="docutils literal notranslate"><span class="pre">get_rgb()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.get_rgba"><code class="docutils literal notranslate"><span class="pre">get_rgba()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_field"><code class="docutils literal notranslate"><span class="pre">show_field()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.plotter"><code class="docutils literal notranslate"><span class="pre">plotter()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_layer"><code class="docutils literal notranslate"><span class="pre">show_layer()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_neel_quiver"><code class="docutils literal notranslate"><span class="pre">show_neel_quiver()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.slice_field_right_handed"><code class="docutils literal notranslate"><span class="pre">slice_field_right_handed()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.downsample"><code class="docutils literal notranslate"><span class="pre">downsample()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.SIprefix_to_mul"><code class="docutils literal notranslate"><span class="pre">SIprefix_to_mul()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.appropriate_SIprefix"><code class="docutils literal notranslate"><span class="pre">appropriate_SIprefix()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter"><code class="docutils literal notranslate"><span class="pre">UnitScalarFormatter</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.set_locs"><code class="docutils literal notranslate"><span class="pre">set_locs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.format_data"><code class="docutils literal notranslate"><span class="pre">format_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.format_data_short"><code class="docutils literal notranslate"><span class="pre">format_data_short()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.plot_field"><code class="docutils literal notranslate"><span class="pre">plot_field()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.inspect_field"><code class="docutils literal notranslate"><span class="pre">inspect_field()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_regions"><code class="docutils literal notranslate"><span class="pre">show_regions()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_magnet_geometry"><code class="docutils literal notranslate"><span class="pre">show_magnet_geometry()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_field_3D"><code class="docutils literal notranslate"><span class="pre">show_field_3D()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_regions"><code class="docutils literal notranslate"><span class="pre">show_regions()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -385,51 +399,413 @@ document.write(`
 <dt class="sig sig-object py" id="mumaxplus.util.show.vector_to_rgb">
 <span class="sig-name descname"><span class="pre">vector_to_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.vector_to_rgb" title="Link to this definition">#</a></dt>
 <dd><p>Map vector (with norm ≤ 1) to RGB.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The saturation does not depend on the z-component, so the color sphere is
+continuous.</p>
+</div>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="mumaxplus.util.show.get_rgba">
-<span class="sig-name descname"><span class="pre">get_rgba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.get_rgba" title="Link to this definition">#</a></dt>
-<dd><p>Get rgba values of given field.
-There is also a CUDA version of this function which utilizes the GPU.
-Use <a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity.get_rgb" title="mumaxplus.FieldQuantity.get_rgb"><code class="xref py py-func docutils literal notranslate"><span class="pre">mumaxplus.FieldQuantity.get_rgb()</span></code></a>, but it has a different shape.</p>
+<dt class="sig sig-object py" id="mumaxplus.util.show.get_rgb">
+<span class="sig-name descname"><span class="pre">get_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OoP_axis_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.get_rgb" title="Link to this definition">#</a></dt>
+<dd><p>Get rgb values of given field quantity along a given layer.</p>
+<p class="rubric">Notes</p>
+<p>There is also a CUDA version of this function:
+<a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity.get_rgb" title="mumaxplus.FieldQuantity.get_rgb"><code class="xref py py-func docutils literal notranslate"><span class="pre">mumaxplus.FieldQuantity.get_rgb()</span></code></a>, but the RGB components are on the
+first axis, like with FieldQuantity evaluations. Here, RGB values are on the
+last axis to work nicely with plotting libraries, such as imshow in matplotlib.</p>
+<p>The final color scheme is different from mumax³. In this case, the
+saturation does not depend on the z-component anymore, meaning the z=0 plane
+remains unchanged, but other colors will appear slightly less saturated.
+This ensures that the color sphere is continuous everywhere, particularly
+when crossing the xz- or yz-plane with a normalized length less than 1,
+where the colors will fade through gray.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>quantity</strong> (<a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><em>FieldQuantity</em></a><em> (</em><em>default None</em><em>)</em>) – Used to set alpha value to 0 where geometry is False.</p></li>
-<li><p><strong>layer</strong> (<em>int</em><em> (</em><em>default None</em><em>)</em>) – z-layer of which to get rgba. Calculates rgba for all layers if None.</p></li>
+<li><p><strong>field_quantity</strong> (<a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><em>mumaxplus.FieldQuantity</em></a><em> or </em><em>numpy.ndarray</em>) – The vector field_quantity of which to get the rgb representation. It can
+have any number of axes, but the first axis must contain the 3 vector
+components. It needs to have the shape (3, nz, ny, nx) in order to index
+along a given layer.</p></li>
+<li><p><strong>OoP_axis_idx</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default=2</em>) – The index of the axis pointing out of plane: 0, 1 and 2 correspond to
+x, y and z respectively. The other two are aranged according to a
+right-handed coordinate system.
+If None, both OoP_axis_idx and layer are ignored and rgb values are
+calculated for all cells.
+This cannot be interpreted if field_quantity does not have 4 dimensions.</p></li>
+<li><p><strong>layer</strong> (<em>int</em><em>, </em><em>optional</em>) – Layer index of the out-of-plane axis.
+Calculates rgb for all layers if None (default).
+This cannot be interpreted if field_quantity does not have 4 dimensions.</p></li>
+<li><p><strong>geometry</strong> (<em>numpy.ndarray</em><em> of </em><em>booleans</em><em>, </em><em>optional</em>) – Cells where geometry is False are not used in normalization and are set to gray.
+The shape of the geometry should correspond to the shape of the
+field_quantity, except for the first component axis.
+The given geometry is ignored if field_quantity is a FieldQuantity.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>rgba</strong> – shape (ny, nx, 4) if layer is given, otherwise (nz, ny, nx, 4).</p>
+<dd class="field-even"><p><strong>rgb</strong> – It has shape <code class="docutils literal notranslate"><span class="pre">(n_vertical,</span> <span class="pre">n_horizontal,</span> <span class="pre">3)</span></code> if OoP_axis_idx and layer
+are given, otherwize <code class="docutils literal notranslate"><span class="pre">(*field_quantity.shape[1:],</span> <span class="pre">3)</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray</p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.util.show.vector_to_rgb" title="mumaxplus.util.show.vector_to_rgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vector_to_rgb</span></code></a>, <a class="reference internal" href="#mumaxplus.util.show.get_rgba" title="mumaxplus.util.show.get_rgba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rgba</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="mumaxplus.util.show.show_field">
-<span class="sig-name descname"><span class="pre">show_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.show_field" title="Link to this definition">#</a></dt>
-<dd><p>Plot a <a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><code class="xref py py-func docutils literal notranslate"><span class="pre">mumaxplus.FieldQuantity()</span></code></a> with 3 components using the mumax³ colorscheme.</p>
+<dt class="sig sig-object py" id="mumaxplus.util.show.get_rgba">
+<span class="sig-name descname"><span class="pre">get_rgba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OoP_axis_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.get_rgba" title="Link to this definition">#</a></dt>
+<dd><p>Get rgba values of given field_quantity.</p>
+<p>See docstring of <a class="reference internal" href="#mumaxplus.util.show.get_rgb" title="mumaxplus.util.show.get_rgb"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_rgb()</span></code></a> for an explanation of the parameters.</p>
+<p>Additionally, the geometry is used to set alpha value to 0 where geometry is False.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.util.show.get_rgb" title="mumaxplus.util.show.get_rgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rgb</span></code></a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field_quantity</strong> (<a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><em>FieldQuantity</em></a><em> | </em><em>ndarray</em>)</p></li>
+<li><p><strong>OoP_axis_idx</strong> (<em>Literal</em><em>[</em><em>0</em><em>, </em><em>1</em><em>, </em><em>2</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>layer</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>geometry</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="mumaxplus.util.show.plotter">
-<span class="sig-name descname"><span class="pre">plotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgba</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.plotter" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="mumaxplus.util.show.show_layer">
-<span class="sig-name descname"><span class="pre">show_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.show_layer" title="Link to this definition">#</a></dt>
-<dd><p>Visualize a single component of a <a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><code class="xref py py-func docutils literal notranslate"><span class="pre">mumaxplus.FieldQuantity()</span></code></a>.</p>
+<dt class="sig sig-object py" id="mumaxplus.util.show.slice_field_right_handed">
+<span class="sig-name descname"><span class="pre">slice_field_right_handed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OoP_axis_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.slice_field_right_handed" title="Link to this definition">#</a></dt>
+<dd><p>Return a right-handed two dimensional slice of the given field with
+shape (ncomp, n_vertical, n_horizontal) or (n_vertical, n_horizontal) by
+taking the <cite>layer</cite> index of the out-of-plane axis given by <cite>OoP_axis_idx</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> (<em>numpy.ndarray with shape</em><em> (</em><em>[</em><em>ncomp</em><em>,</em><em>] </em><em>nz</em><em>, </em><em>ny</em><em>, </em><em>nx</em><em>)</em>) – Field array to slice</p></li>
+<li><p><strong>OoP_axis_idx</strong> (<em>int</em><em>, </em><em>default=2</em>) – Index of the out of plane axis. 0, 1 and 2 represent x, y and z respectively.</p></li>
+<li><p><strong>layer</strong> (<em>int</em><em>, </em><em>default=0</em>) – Chosen index at which to slice the out-of-plane axis.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>field_2D</strong> – Right-handed two dimensional slice of given field.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray with shape ([ncomp,] n_vertical, n_horizontal)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="mumaxplus.util.show.show_neel_quiver">
-<span class="sig-name descname"><span class="pre">show_neel_quiver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.show_neel_quiver" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="mumaxplus.util.show.downsample">
+<span class="sig-name descname"><span class="pre">downsample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intrinsic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.downsample" title="Link to this definition">#</a></dt>
+<dd><p>Downsample the field to a new shape. If the given and returned fields are
+imagined to be overlayed on top of one another with their edges aligned,
+then the cells of the returned array contain the average (or sum, if not
+intrinsic) of all cells they (partially) cover, weighted by the fraction of
+the covered area/volume.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> (<em>numpy.ndarray</em>) – The field to downsample.</p></li>
+<li><p><strong>new_shape</strong> (<em>tuple</em><em> of </em><em>integers</em>) – The new shape, which must have the same number of dimensions as the
+given <cite>field</cite>, with smaller or equal length per dimension.</p></li>
+<li><p><strong>intrinsic</strong> (<em>bool</em><em>, </em><em>True</em>) – Whether to take the average or the total sum, so whether to divide the
+resulting sum by the number of old cells contained within the new cells
+or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>new_field</strong> – The downsampled field with a smaller size.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mumaxplus.util.show.SIprefix_to_mul">
+<span class="sig-name descname"><span class="pre">SIprefix_to_mul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.SIprefix_to_mul" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mumaxplus.util.show.appropriate_SIprefix">
+<span class="sig-name descname"><span class="pre">appropriate_SIprefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_thousands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.appropriate_SIprefix" title="Link to this definition">#</a></dt>
+<dd><p>Converts <cite>n</cite> with old SI prefix <cite>unit_prefix</cite> to a reasonable number with
+a new SI prefix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>float</em><em> or </em><em>numpy.ndarray</em>) – Number or array of numbers to convert.</p></li>
+<li><p><strong>unit_prefix</strong> (<em>str</em><em>, </em><em>default=''</em>) – Previous SI prefix of the unit of <cite>n</cite>.</p></li>
+<li><p><strong>only_thousands</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If True (default), then centi, deci, deca and hecto are not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new scalar value(s) and the new appropriate SI prefix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[float, str]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">appropriate_SIprefix</span><span class="p">(</span><span class="mf">0.0000238</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
+<span class="go">(23.8, &#39;n&#39;)</span>
+</pre></div>
+</div>
+<p>Converting 0.0000238 ms returns 23.8 ns.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.show.UnitScalarFormatter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnitScalarFormatter</span></span><a class="headerlink" href="#mumaxplus.util.show.UnitScalarFormatter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ScalarFormatter</span></code></p>
+<p>An extension of the ScalarFormatter to take units into account.
+<a class="github reference external" href="https://github.com/matplotlib/matplotlib/blob/v3.10.3/lib/matplotlib/ticker.py#L397">matplotlib/matplotlib</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.show.UnitScalarFormatter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SIprefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useOffset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useMathText</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useLocale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.UnitScalarFormatter.__init__" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>SIprefix</strong> (<em>str</em>)</p></li>
+<li><p><strong>unit</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.show.UnitScalarFormatter.set_locs">
+<span class="sig-name descname"><span class="pre">set_locs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.UnitScalarFormatter.set_locs" title="Link to this definition">#</a></dt>
+<dd><p>Use rescaled locs according to preferred unit multiplier for all math,
+then save original locs for proper drawing in data coordinates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.show.UnitScalarFormatter.format_data">
+<span class="sig-name descname"><span class="pre">format_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.UnitScalarFormatter.format_data" title="Link to this definition">#</a></dt>
+<dd><p>Return the full string representation of the value with the
+position unspecified.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.show.UnitScalarFormatter.format_data_short">
+<span class="sig-name descname"><span class="pre">format_data_short</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.UnitScalarFormatter.format_data_short" title="Link to this definition">#</a></dt>
+<dd><p>This is exactly the same implementation as with ScalarFormatter.
+Value is only divided by self.SImultiplier at the end and a unit is added.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mumaxplus.util.show.plot_field">
+<span class="sig-name descname"><span class="pre">plot_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_of_plane_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imshow_symmetric_clim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imshow_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_quiver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiver_cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiver_symmetric_clim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiver_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.plot_field" title="Link to this definition">#</a></dt>
+<dd><p>Plot a <a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><code class="xref py py-func docutils literal notranslate"><span class="pre">mumaxplus.FieldQuantity()</span></code></a> or <cite>numpy.ndarray</cite>
+with 1 component as a scalar field, with 3 components as a vector field or
+plot one selected component as a a scalar field.
+Vector fields are plotted using an HSL colorscheme, with optionally added
+arrows. This differs slightly from mumax³, see <a class="reference internal" href="#mumaxplus.util.show.get_rgb" title="mumaxplus.util.show.get_rgb"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_rgb()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field_quantity</strong> (<a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><em>mumaxplus.FieldQuantity</em></a><em> or </em><em>numpy.ndarray</em>) – The field_quantity needs to have 4 dimensions with the shape (ncomp, nx, ny, nz).
+Additional dressing of the Axes is done if given a mumaxplus.FieldQuantity.</p></li>
+<li><p><strong>out_of_plane_axis</strong> (<em>string</em><em>, </em><em>default=&quot;z&quot;</em>) – <p>The axis pointing out of plane: “x”, “y” or “z”. The other two are plotted according to a right-handed coordinate system.</p>
+<ul>
+<li><p>”x”: z over y</p></li>
+<li><p>”y”: x over z</p></li>
+<li><p>”z”: y over x</p></li>
+</ul>
+</p></li>
+<li><p><strong>layer</strong> (<em>int</em><em>, </em><em>default=0</em>) – Chosen index at which to slice the out-of-plane axis.</p></li>
+<li><p><strong>component</strong> (<em>int</em><em>, </em><em>optional</em>) – <p>The component of the field_quantity to plot as an image.
+If set to an integer, that component is plotted as a scalar field.
+If None (default), a field_quantity with</p>
+<ul>
+<li><p>1 component is plotted as a scalar field</p></li>
+<li><p>3 components is plotted as a vector field with an HSL colorscheme.</p></li>
+<li><p>a different number of components can’t be plotted.</p></li>
+</ul>
+</p></li>
+<li><p><strong>geometry</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – The geometry of the field_quantity with shape (nz, ny, nx) to mask
+scalar field plots where geometry is False.</p></li>
+<li><p><strong>field</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – If given and if <cite>field_quantity</cite> is a mumaxplus.FieldQuantity, this
+field will be plotted instead of evaluating <cite>field_quantity</cite> (again).
+<cite>field_quantity</cite> will still be used for dressing the plot (extent, name,
+unit, …).
+If <cite>field_quantity</cite> is a numpy.ndarray then <cite>field</cite> is ignored.</p></li>
+<li><p><strong>file_name</strong> (<em>string</em><em>, </em><em>optional</em>) – If given, the resulting figure will be saved with the given file name.</p></li>
+<li><p><strong>show</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to call <cite>matplotlib.pyplot.show</cite> at the end.
+If None (default), <cite>matplotlib.pyplot.show</cite> will be called only if no
+<cite>ax</cite> and no <cite>file_name</cite> have been provided.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – The Axes instance to plot onto. If None (default), new Figure and Axes
+instances will be created.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 2</em><em>, </em><em>optional</em>) – The size of the figure, if a new figure has to be created.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – The title of the Axes. <cite>None</cite> will generate a default title, while an
+empty string won’t set any title.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em><em>, </em><em>optional</em>) – The label of the x/y-axis. <cite>None</cite> will generate a default label, while
+an empty string won’t set any label.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – The label of the x/y-axis. <cite>None</cite> will generate a default label, while
+an empty string won’t set any label.</p></li>
+<li><p><strong>imshow_symmetric_clim</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to map zero to the central color if a scalar field is plotted
+in the image.
+This is ignored if vmin or vmax is given in <cite>imshow_kwargs</cite>.
+This is best used with diverging colormaps, like “bwr”.</p></li>
+<li><p><strong>imshow_kwargs</strong> (<em>dict</em><em>, </em><em>default={}</em>) – Keyword arguments to pass to <cite>matplotlib.axes.Axes.imshow</cite>, e.g. “cmap”.</p></li>
+<li><p><strong>enable_colorbar</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to automatically add a colorbar to the figure of the Axes when relevant.</p></li>
+<li><p><strong>colorbar_kwargs</strong> (<em>dict</em><em>, </em><em>default={}</em>) – Keyword arguments to pass to <cite>matplotlib.figure.Figure.colorbar</cite>.
+Relevant formatting and labeling with units is done automatically,
+unless the keyword arguments “label” or “format” are specified.</p></li>
+<li><p><strong>enable_quiver</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to plot arrows on top of the colored image. If None (default),
+arrows are only added if no specific component for the image has been
+given.
+This is only relevant for field quantities with 3 components.</p></li>
+<li><p><strong>arrow_size</strong> (<em>float</em><em>, </em><em>default=8</em>) – Length of an arrow as a number of cells, so one arrow is designated to
+an area of <cite>arrow_size</cite> by <cite>arrow_size</cite>.
+This is only relevant for field quantities with 3 components.</p></li>
+<li><p><strong>quiver_cmap</strong> (<em>string</em><em>, </em><em>optional</em>) – A colormap to use for the quiver. By default, no colormap is used, so
+the arrows are a solid color. If set to “HSL”, the 3D vector data is
+used for an HSL colorscheme, where the x- and y-components control the
+hue and saturation and the z-component controls lightness, regardless of
+the <cite>out_of_plane_axis</cite>. Any matplotlib colormap can also be given to
+color the arrows according to the out-of-plane component.
+This is only relevant for field quantities with 3 components.</p></li>
+<li><p><strong>quiver_symmetric_clim</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to map zero to the central color if the arrows are colored
+according to the out-of-plane component of the vector field.
+This is ignored if clim is given in <cite>quiver_kwargs</cite>.
+This is best used with diverging colormaps, like “bwr”.
+This is only relevant for field quantities with 3 components.</p></li>
+<li><p><strong>quiver_kwargs</strong> (<em>dict</em><em>, </em><em>default={}</em>) – Keyword arguments to pass to <cite>matplotlib.axes.Axes.quiver</cite>.
+This is only relevant for field quantities with 3 components.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ax</strong> – The resulting Axes on which is plotted.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.axes.Axes</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.util.show.get_rgb" title="mumaxplus.util.show.get_rgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rgb</span></code></a>, <a class="reference internal" href="#mumaxplus.util.show.get_rgba" title="mumaxplus.util.show.get_rgba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rgba</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mumaxplus.util.show.inspect_field">
+<span class="sig-name descname"><span class="pre">inspect_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_of_plane_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suptitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric_clim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imshow_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.inspect_field" title="Link to this definition">#</a></dt>
+<dd><p>Plot every component of a <a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><code class="xref py py-func docutils literal notranslate"><span class="pre">mumaxplus.FieldQuantity()</span></code></a> or
+<cite>numpy.ndarray</cite> as a scalar field subplot on one figure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field_quantity</strong> (<a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><em>mumaxplus.FieldQuantity</em></a><em> or </em><em>numpy.ndarray</em>) – The field_quantity needs to have 4 dimensions with the shape (ncomp, nx, ny, nz).
+Additional dressing of the Axes is done if given a mumaxplus.FieldQuantity.</p></li>
+<li><p><strong>out_of_plane_axis</strong> (<em>string</em><em>, </em><em>default=&quot;z&quot;</em>) – <p>The axis pointing out of plane: “x”, “y” or “z”. The other two are plotted according to a right-handed coordinate system.</p>
+<ul>
+<li><p>”x”: z over y</p></li>
+<li><p>”y”: x over z</p></li>
+<li><p>”z”: y over x</p></li>
+</ul>
+</p></li>
+<li><p><strong>layer</strong> (<em>int</em><em>, </em><em>default=0</em>) – Chosen index at which to slice the out-of-plane axis.</p></li>
+<li><p><strong>geometry</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – The geometry of the field_quantity with shape (nz, ny, nx) to mask plots
+where geometry is False.</p></li>
+<li><p><strong>field</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – If given and if <cite>field_quantity</cite> is a mumaxplus.FieldQuantity, this
+field will be plotted instead of evaluating <cite>field_quantity</cite> (again).
+<cite>field_quantity</cite> will still be used for dressing the plot (extent, name,
+unit, …).
+If <cite>field_quantity</cite> is a numpy.ndarray then <cite>field</cite> is ignored.</p></li>
+<li><p><strong>file_name</strong> (<em>string</em><em>, </em><em>optional</em>) – If given, the resulting figure will be saved with the given file name.</p></li>
+<li><p><strong>show</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to call <cite>matplotlib.pyplot.show</cite> at the end.
+If None (default), <cite>matplotlib.pyplot.show</cite> will be called only if no
+<cite>file_name</cite> has been provided.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 2</em><em>, </em><em>optional</em>) – The size of the new figure created. Automatically tries to find suitable
+figsize if not given.</p></li>
+<li><p><strong>nrows</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of rows/columns of the subplot grid. If only one is defined,
+the other will be made large enough to accommodate all components of the
+field_quantity. If both are None (default), a suitable arrangement will
+be sought.</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of rows/columns of the subplot grid. If only one is defined,
+the other will be made large enough to accommodate all components of the
+field_quantity. If both are None (default), a suitable arrangement will
+be sought.</p></li>
+<li><p><strong>suptitle</strong> (<em>str</em><em>, </em><em>optional</em>) – The suptitle of the Figure. <cite>None</cite> will generate a default title, while
+an empty string won’t set any title.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em><em>, </em><em>optional</em>) – The label of the x/y-axes of all lowest/leftmost Axes respectively.
+<cite>None</cite> will generate a default label, while an empty string won’t set
+any label.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – The label of the x/y-axes of all lowest/leftmost Axes respectively.
+<cite>None</cite> will generate a default label, while an empty string won’t set
+any label.</p></li>
+<li><p><strong>symmetric_clim</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to map zero to the central color. This is ignored if vmin or
+vmax is given in <cite>imshow_kwargs</cite>.
+This is best used with diverging colormaps, like “bwr”.</p></li>
+<li><p><strong>imshow_kwargs</strong> (<em>dict</em><em>, </em><em>default={}</em>) – Keyword arguments to pass to <cite>matplotlib.axes.Axes.imshow</cite>, e.g. “cmap”.</p></li>
+<li><p><strong>enable_colorbar</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to add (a) colorbar(s) to the figure of the Axes.</p></li>
+<li><p><strong>shared_colorbar</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to share one colorbar with the color limits (vmin, vmax) between
+all plots.</p></li>
+<li><p><strong>colorbar_kwargs</strong> (<em>dict</em><em>, </em><em>default={}</em>) – Keyword arguments to pass to <cite>matplotlib.figure.Figure.colorbar</cite>.
+Relevant formatting and labeling with units is done automatically,
+unless the keyword arguments “label” or “format” are specified.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The created figure.</p></li>
+<li><p><strong>axs</strong> (<em>matplotlib.axes.Axes or array of Axes</em>) – All the resulting Axes on which is plotted.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mumaxplus.util.show.show_regions">
+<span class="sig-name descname"><span class="pre">show_regions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_of_plane_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imshow_symmetric_clim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imshow_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.show_regions" title="Link to this definition">#</a></dt>
+<dd><p>Plot the boundaries between regions of the given magnet.
+For details about the function parameters, see <a class="reference internal" href="#mumaxplus.util.show.plot_field" title="mumaxplus.util.show.plot_field"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_field()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out_of_plane_axis</strong> (<em>Literal</em><em>[</em><em>'x'</em><em>, </em><em>'y'</em><em>, </em><em>'z'</em><em>]</em>)</p></li>
+<li><p><strong>layer</strong> (<em>int</em>)</p></li>
+<li><p><strong>component</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>geometry</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>field</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>file_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>ax</strong> (<em>Axes</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>imshow_symmetric_clim</strong> (<em>bool</em>)</p></li>
+<li><p><strong>imshow_kwargs</strong> (<em>dict</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Axes</em></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mumaxplus.util.show.show_magnet_geometry">
@@ -439,26 +815,26 @@ Use <a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.htm
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mumaxplus.util.show.show_field_3D">
-<span class="sig-name descname"><span class="pre">show_field_3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mumax3'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.show_field_3D" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">show_field_3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'HSL'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_quiver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric_clim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.show_field_3D" title="Link to this definition">#</a></dt>
 <dd><p>Plot a <a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><code class="xref py py-func docutils literal notranslate"><span class="pre">mumaxplus.FieldQuantity()</span></code></a> with 3 components as a vectorfield.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>quantity</strong> (<a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.FieldQuantity"><em>mumaxplus.FieldQuantity</em></a><em> (</em><em>3 components</em><em>)</em>) – The <cite>FieldQuantity</cite> to plot as a vectorfield.</p></li>
-<li><p><strong>cmap</strong> (<em>string</em><em>, </em><em>optional</em><em>, </em><em>default: &quot;mumax3&quot;</em>) – A colormap to use. By default the mumax³ colormap is used.
+<li><p><strong>cmap</strong> (<em>string</em><em>, </em><em>optional</em><em>, </em><em>default: &quot;HSL&quot;</em>) – A colormap to use. By default an HSL colormap is used. This differs
+slightly from mumax³, see <a class="reference internal" href="#mumaxplus.util.show.get_rgb" title="mumaxplus.util.show.get_rgb"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_rgb()</span></code></a>.
 Any matplotlib colormap can also be given to color the vectors according
 to their z-component. It’s best to use diverging colormaps, like “bwr”.</p></li>
-<li><p><strong>quiver</strong> (<em>boolean</em><em>, </em><em>optional</em><em>, </em><em>default: True</em>) – If set to True, a cone is placed at each cell indicating the direction.
+<li><p><strong>enable_quiver</strong> (<em>boolean</em><em>, </em><em>optional</em><em>, </em><em>default: True</em>) – If set to True, a cone is placed at each cell indicating the direction.
 If False, colored voxels are used instead.</p></li>
+<li><p><strong>symmetric_clim</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to have symmetric color limits if the given cmap is not “HSL”.</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="mumaxplus.util.show.show_regions">
-<span class="sig-name descname"><span class="pre">show_regions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.show.show_regions" title="Link to this definition">#</a></dt>
-<dd><p>Plot the boundaries between regions of the given magnet.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.util.show.get_rgb" title="mumaxplus.util.show.get_rgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rgb</span></code></a></p>
+</div>
 </dd></dl>
 
 </section>
@@ -510,14 +886,24 @@ If False, colored voxels are used instead.</p></li>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.hsl_to_rgb"><code class="docutils literal notranslate"><span class="pre">hsl_to_rgb()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.vector_to_rgb"><code class="docutils literal notranslate"><span class="pre">vector_to_rgb()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.get_rgb"><code class="docutils literal notranslate"><span class="pre">get_rgb()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.get_rgba"><code class="docutils literal notranslate"><span class="pre">get_rgba()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_field"><code class="docutils literal notranslate"><span class="pre">show_field()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.plotter"><code class="docutils literal notranslate"><span class="pre">plotter()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_layer"><code class="docutils literal notranslate"><span class="pre">show_layer()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_neel_quiver"><code class="docutils literal notranslate"><span class="pre">show_neel_quiver()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.slice_field_right_handed"><code class="docutils literal notranslate"><span class="pre">slice_field_right_handed()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.downsample"><code class="docutils literal notranslate"><span class="pre">downsample()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.SIprefix_to_mul"><code class="docutils literal notranslate"><span class="pre">SIprefix_to_mul()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.appropriate_SIprefix"><code class="docutils literal notranslate"><span class="pre">appropriate_SIprefix()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter"><code class="docutils literal notranslate"><span class="pre">UnitScalarFormatter</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.set_locs"><code class="docutils literal notranslate"><span class="pre">set_locs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.format_data"><code class="docutils literal notranslate"><span class="pre">format_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.UnitScalarFormatter.format_data_short"><code class="docutils literal notranslate"><span class="pre">format_data_short()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.plot_field"><code class="docutils literal notranslate"><span class="pre">plot_field()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.inspect_field"><code class="docutils literal notranslate"><span class="pre">inspect_field()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_regions"><code class="docutils literal notranslate"><span class="pre">show_regions()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_magnet_geometry"><code class="docutils literal notranslate"><span class="pre">show_magnet_geometry()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_field_3D"><code class="docutils literal notranslate"><span class="pre">show_field_3D()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.show.show_regions"><code class="docutils literal notranslate"><span class="pre">show_regions()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -544,7 +930,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-10, v1.1.0.
+  Last updated on 2025-09-30, v1.1.1.
   <br/>
 </p>
   </div>

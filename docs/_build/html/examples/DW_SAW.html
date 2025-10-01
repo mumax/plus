@@ -28,9 +28,10 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d4b325e0" />
   
@@ -39,13 +40,16 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../_static/documentation_options.js?v=bee7790f"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/DW_SAW';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
     <link rel="icon" href="../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -53,7 +57,7 @@
     <link rel="prev" title="Magnetoelastics" href="magnetoelastics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+    <meta name="docbuild:last-update" content="2025-09-30, v1.1.1"/>
   </head>
   
   
@@ -358,12 +362,11 @@ document.write(`
 <p>In this example we move a domain wall by setting a time and space dependent
 strain in a ferromagnet to simulate the effect of a SAW wave. This is
 based on the method used <a class="reference external" href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.108.104420">here</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">mumaxplus</span> <span class="kn">import</span> <span class="n">World</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">Ferromagnet</span>
-<span class="kn">from</span> <span class="nn">mumaxplus.util</span> <span class="kn">import</span> <span class="n">twodomain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">World</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">Ferromagnet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">twodomain</span><span class="p">,</span> <span class="n">plot_field</span>
 
 <span class="c1"># simulation time</span>
 <span class="n">run</span> <span class="o">=</span> <span class="mf">10e-9</span>
@@ -371,14 +374,16 @@ based on the method used <a class="reference external" href="https://journals.ap
 <span class="n">dt</span> <span class="o">=</span> <span class="n">run</span><span class="o">/</span><span class="n">steps</span>
 
 <span class="c1"># simulation grid parameters</span>
-<span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">1</span>
-<span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span> <span class="o">=</span> <span class="mf">2.4e-9</span><span class="p">,</span> <span class="mf">2.4e-9</span><span class="p">,</span> <span class="mf">1e-9</span>
+<span class="c1"># Use a very large y cell size and periodic boundary conditions to replicate a</span>
+<span class="c1"># wider track while only simulating a thin strip</span>
+<span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span>
+<span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span> <span class="o">=</span> <span class="mf">2.4e-9</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="mf">2.4e-9</span><span class="p">,</span> <span class="mf">1e-9</span>
+<span class="n">mastergrid</span><span class="p">,</span> <span class="n">pbc_repetitions</span> <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># create a world and a magnet</span>
 <span class="n">cellsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">)</span>
-<span class="n">grid</span> <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">))</span>
-<span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="p">)</span>
-<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+<span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="p">,</span> <span class="n">mastergrid</span><span class="o">=</span><span class="n">mastergrid</span><span class="p">,</span> <span class="n">pbc_repetitions</span><span class="o">=</span><span class="n">pbc_repetitions</span><span class="p">)</span>
+<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">Grid</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">)))</span>
 
 <span class="c1"># setting magnet parameters</span>
 <span class="n">magnet</span><span class="o">.</span><span class="n">msat</span> <span class="o">=</span> <span class="mf">6e5</span>
@@ -414,44 +419,27 @@ based on the method used <a class="reference external" href="https://journals.ap
                                        <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">E</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">x</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">))</span>
 
 <span class="c1"># plot the initial and final magnetization</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span> <span class="o">=</span> <span class="n">axs</span>
-<span class="n">im_extent</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">cx</span><span class="o">*</span><span class="mf">1e6</span><span class="p">,</span> <span class="p">(</span><span class="n">nx</span><span class="o">*</span><span class="n">cx</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">cx</span><span class="p">)</span><span class="o">*</span><span class="mf">1e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">cy</span><span class="o">*</span><span class="mf">1e6</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="o">*</span><span class="n">cy</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">cy</span><span class="p">)</span><span class="o">*</span><span class="mf">1e6</span><span class="p">)</span>
-
-<span class="c1"># initial magnetization</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">get_rgb</span><span class="p">()[:,</span><span class="mi">0</span><span class="p">,:,:],</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">im_extent</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Initial magnetization&quot;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Final magnetization&quot;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x (µm)&quot;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x (µm)&quot;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y (µm)&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Initial magnetization&quot;</span><span class="p">,</span>
+           <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># function to estimate the position of the DW</span>
-<span class="k">def</span> <span class="nf">DW_position</span><span class="p">(</span><span class="n">magnet</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">DW_position</span><span class="p">(</span><span class="n">magnet</span><span class="p">):</span>
     <span class="n">m_av</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">average</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">m_av</span><span class="o">*</span><span class="n">nx</span><span class="o">*</span><span class="n">cx</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">nx</span><span class="o">*</span><span class="n">cx</span><span class="o">/</span><span class="mi">2</span>
 
 <span class="c1"># run the simulation and save the DW postion</span>
-<span class="n">DW_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">steps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">DW_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DW_position</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
-<span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">steps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">time</span>
-
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;running...&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">steps</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
-    <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
-    <span class="n">DW_pos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">DW_position</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
-    <span class="n">time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">time</span>
+<span class="n">quantity_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;DW_pos&quot;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">DW_position</span><span class="p">(</span><span class="n">magnet</span><span class="p">)}</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">steps</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">quantity_dict</span><span class="p">,</span> <span class="n">tqdm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done!&quot;</span><span class="p">)</span>
 
 <span class="c1"># final magnetization</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">get_rgb</span><span class="p">()[:,</span><span class="mi">0</span><span class="p">,:,:],</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span>
-           <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">im_extent</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Final magnetization&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+           <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-<span class="c1"># plot DW position in function of time</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="o">*</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">DW_pos</span><span class="o">*</span><span class="mf">1e6</span><span class="p">)</span>
+<span class="c1"># plot DW position as a function of time</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span><span class="o">*</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;DW_pos&quot;</span><span class="p">])</span><span class="o">*</span><span class="mf">1e6</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time (ns)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Domain wall position (µm)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Domain wall position in time&quot;</span><span class="p">)</span>
@@ -521,7 +509,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-10, v1.1.0.
+  Last updated on 2025-09-30, v1.1.1.
   <br/>
 </p>
   </div>

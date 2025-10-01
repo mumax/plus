@@ -1,7 +1,6 @@
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import neelskyrmion
+from mumaxplus.util import neelskyrmion, plot_field
 import matplotlib.pyplot as plt
-import numpy as np
 
 # create the world
 cellsize = (1e-9, 1e-9, 0.4e-9)
@@ -23,10 +22,14 @@ magnet.magnetization = neelskyrmion(
     position=(64e-9, 32e-9, 0), radius=5e-9, charge=-1, polarization=1
 )
 
+fig, axs = plt.subplots(nrows=3, sharex="all", sharey="all", figsize=(6, 8))
+fig.suptitle("magnetization")
+def time_string(): return f"t = {world.timesolver.time*1e9:.2f} ns"
+plot_kwrargs = {"arrow_size": 4, "quiver_kwargs": {"width": 2e-9, "units": "xy"}}
+
 print("minimizing...")
 magnet.minimize()
-rgbs = [np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], axes=[1,2,0])]
-times = [world.timesolver.time]
+plot_field(magnet.magnetization, ax=axs[0], title=time_string(), xlabel="", **plot_kwrargs)
 
 # add a current
 magnet.xi = 0.3
@@ -34,29 +37,10 @@ magnet.jcur = (1e12, 0, 0)
 magnet.pol = 0.4
 
 print("running...")
-for i in range(2):
-    world.timesolver.run(3e-10)
-    rgbs.append(np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], axes=[1,2,0]))
-    times.append(world.timesolver.time)
-
-# -------------------------
-# plot
-print("plotting...")
-
-fig, axs = plt.subplots(nrows=3, sharex="all", sharey="all", figsize=(6, 8))
-
-fig.suptitle("magnetization")
-
-extent = [- 0.5 * cellsize[0] * 1e9, cellsize[0] * (nx - 0.5) * 1e9,
-          - 0.5 * cellsize[1] * 1e9, cellsize[1] * (ny - 0.5) * 1e9]
-
-for ax, rgb, time in zip(axs, rgbs, times):
-    ax.imshow(rgb, origin="lower", extent=extent, )
-    ax.set_title(f"t = {time*1e9:.2f} ns")
-    ax.set_aspect("equal")
-
-axs.flatten()[-1].set_xlabel("x (nm)")
-axs.flatten()[1].set_ylabel("y (nm)")
+world.timesolver.run(3e-10)
+plot_field(magnet.magnetization, ax=axs[1], title=time_string(), xlabel="", **plot_kwrargs)
+world.timesolver.run(3e-10)
+plot_field(magnet.magnetization, ax=axs[2], title=time_string(), **plot_kwrargs)
 
 fig.tight_layout()
 

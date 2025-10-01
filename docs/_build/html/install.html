@@ -28,9 +28,10 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/logo.css?v=81431fe9" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d4b325e0" />
   
@@ -39,13 +40,16 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="_static/documentation_options.js?v=051bfb12"></script>
+    <script src="_static/documentation_options.js?v=bee7790f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'install';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="_static/google-analytics.js?v=27e7bdd4"></script>
     <link rel="icon" href="_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +57,7 @@
     <link rel="prev" title="mumax+" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+    <meta name="docbuild:last-update" content="2025-09-30, v1.1.1"/>
   </head>
   
   
@@ -352,8 +356,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-mumax">Building mumax⁺</a></li>
 </ul>
             </nav>
         </div>
@@ -369,104 +372,115 @@ document.write(`
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">#</a></h2>
-<p>You should install these yourself</p>
+<p>You should install the following tools yourself. Open the dropdowns for more details.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">CUDA Toolkit <em>(version 10.0 or later)</em></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <ul class="simple">
-<li><p>CUDA Toolkit 10.0 or later</p></li>
-<li><p>A C++ compiler which supports C++17, such as GCC</p></li>
-<li><p>On Windows (good luck): MSVC 2019</p></li>
+<li><p class="sd-card-text"><strong>Windows</strong>: Download an installer from <a class="reference external" href="https://developer.nvidia.com/cuda-toolkit-archive">the CUDA website</a>.</p></li>
+<li><p class="sd-card-text"><strong>Linux</strong>: Use <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">nvidia-cuda-toolkit</span></code>, or <a class="reference external" href="https://developer.nvidia.com/cuda-toolkit-archive">download an installer</a>.</p></li>
 </ul>
-<p>These will be installed automatically within the conda environment</p>
-<ul class="simple">
-<li><p>cmake 4.0.0</p></li>
-<li><p>Python 3.13</p></li>
-<li><p>pybind11 v2.13.6</p></li>
-<li><p>NumPy</p></li>
-<li><p>matplotlib</p></li>
-<li><p>SciPy</p></li>
-<li><p>Sphinx</p></li>
-</ul>
-</section>
-<section id="linux">
-<h2>Linux<a class="headerlink" href="#linux" title="Link to this heading">#</a></h2>
-<p>Make sure that the following applications and build tools are installed:</p>
-<ul class="simple">
-<li><p>C++ compiler which supports c++17, such as GCC</p></li>
-<li><p>CPython (version ≥ 3.8 recommended) and pip</p></li>
-<li><p>CUDA Toolkit (version 10.0 or later)</p></li>
-<li><p>git</p></li>
-<li><p>miniconda or anaconda</p></li>
-</ul>
-<p>Make especially sure that everything CUDA-related (like <code class="docutils literal notranslate"><span class="pre">nvcc</span></code>) can be found
-inside your path. This can be done by editing your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file and adding
-the following lines.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p class="sd-card-text">Make especially sure that everything CUDA-related (like <code class="docutils literal notranslate"><span class="pre">nvcc</span></code>) can
+be found inside your PATH. On Linux, for instance, this can be done
+by editing your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file and adding the following lines:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># add CUDA</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/cuda/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/cuda/lib64:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/cuda/&gt; lib64:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
-<p>The paths might differ if CUDA Toolkit has been installed in a different location.
-If successful, a command such as <code class="docutils literal notranslate"><span class="pre">nvcc</span> <span class="pre">--version</span></code> should work.</p>
-<p>Clone the mumax<sup>+</sup> git repository. The <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">flag</span></code> is used here to get
-the pybind11 submodule which is needed to build mumax<sup>+</sup>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://github.com/mumax/plus.git<span class="w"> </span>mumaxplus<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>mumaxplus
+<p class="sd-card-text">The paths may differ if the CUDA Toolkit was installed in a different
+location.</p>
+</div>
+<p class="sd-card-text">👉 <em>Check CUDA installation with:</em> <code class="docutils literal notranslate"><span class="pre">nvcc</span> <span class="pre">--version</span></code></p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">A C++ compiler which supports C++17</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Linux:</strong> <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">gcc</span></code></dt><dd><ul>
+<li><p class="sd-card-text">⚠️ each CUDA version has a maximum supported <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version. <a class="reference external" href="https://stackoverflow.com/a/46380601">This StackOverflow answer</a> lists the maximum supported <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version for each CUDA version. If necessary, use <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">gcc-&lt;min_version&gt;</span></code> instead, with the appropriate <code class="docutils literal notranslate"><span class="pre">&lt;min_version&gt;</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Windows:</strong></dt><dd><ul>
+<li><p class="sd-card-text">CUDA does not support the <code class="docutils literal notranslate"><span class="pre">gcc</span></code> compiler on Windows, so download and install <a class="reference external" href="https://visualstudio.microsoft.com/downloads/">Microsoft Visual Studio</a> with the “Desktop development with C++” workload. After installing, check if the path to <code class="docutils literal notranslate"><span class="pre">cl.exe</span></code> was added to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable (i.e., check whether <code class="docutils literal notranslate"><span class="pre">where</span> <span class="pre">cl.exe</span></code> returns an appropriate path like <code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\Microsoft</span> <span class="pre">Visual</span> <span class="pre">Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64</span></code>). If not, add it manually.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p class="sd-card-text">👉 <em>Check C installation with:</em> <code class="docutils literal notranslate"><span class="pre">gcc</span> <span class="pre">--version</span></code> <em>on Linux and</em> <code class="docutils literal notranslate"><span class="pre">where.exe</span> <span class="pre">cl.exe</span></code> <em>on Windows.</em></p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Git</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<ul class="simple">
+<li><p class="sd-card-text"><strong>Windows:</strong> <a class="reference external" href="https://git-scm.com/downloads">Download</a> and install.</p></li>
+<li><p class="sd-card-text"><strong>Linux:</strong> <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">git</span></code></p></li>
+</ul>
+<p class="sd-card-text">👉 <em>Check Git installation with:</em> <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">--version</span></code></p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">CPython <em>(version ≥ 3.8 recommended)</em>, pip and miniconda/anaconda</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">All these Python-related tools should be included in a standard installation of <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda or Miniconda</a>.</p>
+<p class="sd-card-text">👉 <em>Check installation with</em> <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code>, <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">--version</span></code> <em>and</em> <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">--version</span></code>.</p>
+</div>
+</details></section>
+<section id="building-mumax">
+<h2>Building mumax⁺<a class="headerlink" href="#building-mumax" title="Link to this heading">#</a></h2>
+<p>First, clone the mumax⁺ Git repository. The <code class="docutils literal notranslate"><span class="pre">--recursive</span></code> flag is used in the following command to get the pybind11 submodule, which is needed to build mumax⁺.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://github.com/mumax/plus.git<span class="w"> </span>mumaxplus
+<span class="nb">cd</span><span class="w"> </span>mumaxplus
 </pre></div>
 </div>
-<p>We recommend to install mumax<sup>+</sup> in a clean conda environment. You could also skip
-this step and use your own conda environment instead if preferred.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
+<p>We recommend to install mumax⁺ in a clean conda environment as follows. You could also skip this step and use your own conda environment instead if preferred.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Tools automatically installed in the conda environment</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<ul class="simple">
+<li><p class="sd-card-text">cmake 4.0.0</p></li>
+<li><p class="sd-card-text">Python 3.13</p></li>
+<li><p class="sd-card-text">pybind11 v2.13.6</p></li>
+<li><p class="sd-card-text">NumPy</p></li>
+<li><p class="sd-card-text">matplotlib</p></li>
+<li><p class="sd-card-text">SciPy</p></li>
+<li><p class="sd-card-text">Sphinx</p></li>
+</ul>
+</div>
+</details><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
 conda<span class="w"> </span>activate<span class="w"> </span>mumaxplus
 </pre></div>
 </div>
-<p>Then build and install mumax<sup>+</sup> using pip.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>.
+<p>Finally, build and install mumax⁺ using pip.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
-<p>If changes are made to the code, then <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-v</span> <span class="pre">.</span></code> can be used to
-rebuild mumax<sup>+</sup>. If you want to change the Python code without needing
-to reinstall, you can use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-ve</span> <span class="pre">.</span></code>.</p>
-<p>You could also compile the source code with double precision, by changing
-<code class="docutils literal notranslate"><span class="pre">FP_PRECISION</span></code> in <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> from <code class="docutils literal notranslate"><span class="pre">SINGLE</span></code> to <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code> before
-rebuilding.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>add_definitions<span class="o">(</span>-DFP_PRECISION<span class="o">=</span>DOUBLE<span class="o">)</span><span class="w"> </span><span class="c1"># FP_PRECISION should be SINGLE or DOUBLE</span>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If changes are made to the code, then <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-v</span> <span class="pre">.</span></code> can be used to rebuild mumax⁺, with the <code class="docutils literal notranslate"><span class="pre">-v</span></code> flag enabling verbose debug information.</p>
+<p>If you want to change only the Python code, without needing to reinstall after each change, <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-ve</span> <span class="pre">.</span></code> can also be used.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The source code can also be compiled with double precision, by changing <code class="docutils literal notranslate"><span class="pre">FP_PRECISION</span></code> in <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> from <code class="docutils literal notranslate"><span class="pre">SINGLE</span></code> to <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code> before rebuilding.</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">add_definitions</span><span class="p">(</span><span class="s">-DFP_PRECISION=DOUBLE</span><span class="p">)</span><span class="w"> </span><span class="c"># FP_PRECISION &gt; should be SINGLE or DOUBLE</span>
 </pre></div>
 </div>
-</section>
-<section id="windows">
-<h2>Windows<a class="headerlink" href="#windows" title="Link to this heading">#</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>These instructions are old and worked at some point (2021), but not today.
-If you are brave enough to try Windows and you manage to get it working,
-please let us know!</p>
 </div>
-<ol class="arabic">
-<li><p>Install Visual Studio 2019 and the desktop development with C++ workload</p></li>
-<li><p>Install CUDA Toolkit 10.x</p></li>
-<li><p>Install cmake</p></li>
-<li><p>Download the pybind11 submodule with git</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>submodule<span class="w"> </span>init
-git<span class="w"> </span>submodule<span class="w"> </span>update
-</pre></div>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Troubleshooting</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<ul class="simple">
+<li><p class="sd-card-text">(<em>Windows</em>) If you encounter the error <code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">CUDA</span> <span class="pre">toolset</span> <span class="pre">found</span></code>, try copying the files in <code class="docutils literal notranslate"><span class="pre">NVIDIA</span> <span class="pre">GPU</span> <span class="pre">Computing</span> <span class="pre">Toolkit/CUDA/&lt;version&gt;/extras/visual_studio_integration/MSBuildExtensions</span></code> to <code class="docutils literal notranslate"><span class="pre">Microsoft</span> <span class="pre">Visual</span> <span class="pre">Studio/&lt;year&gt;/&lt;edition&gt;/MSBuild/Microsoft/VC/&lt;version&gt;/BuildCustomizations</span></code>. See <a class="reference external" href="https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170">these instructions</a> for more details.</p></li>
+</ul>
 </div>
-</li>
-<li><p>Install Python packages using conda</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
-</pre></div>
-</div>
-</li>
-<li><p>Build <code class="docutils literal notranslate"><span class="pre">mumaxplus</span></code> using <code class="docutils literal notranslate"><span class="pre">setuptools</span></code></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>activate<span class="w"> </span>mumaxplus
-python<span class="w"> </span>setup.py<span class="w"> </span>develop
-</pre></div>
-</div>
-<p>or <code class="docutils literal notranslate"><span class="pre">conda</span></code></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>mumaxplus
-conda<span class="w"> </span>develop<span class="w"> </span>-b<span class="w"> </span>.
-</pre></div>
-</div>
-</li>
-</ol>
-</section>
+</details></section>
 </section>
 
 
@@ -515,8 +529,7 @@ conda<span class="w"> </span>develop<span class="w"> </span>-b<span class="w"> <
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-mumax">Building mumax⁺</a></li>
 </ul>
   </nav></div>
 
@@ -543,7 +556,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-10, v1.1.0.
+  Last updated on 2025-09-30, v1.1.1.
   <br/>
 </p>
   </div>

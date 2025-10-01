@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath("../mumaxplus"))
 project = "mumax⁺"
 # "Diego De Gusem, Oleh Kozynets, Ian Lateur, Lars Moreels, Jeroen Mulkers"
 author = "the DyNaMat group, Ghent University, Belgium."
-release = "1.1.0"
+release = "1.1.1"
 
 date = datetime.datetime.now()
 html_last_updated_fmt = f"{date.strftime("%Y")}-{date.strftime("%m")}-{date.strftime("%d")}, v{release}"
@@ -32,7 +32,8 @@ extensions = [
     "sphinx.ext.autosummary", 
     "sphinxcontrib.video",
     "sphinx_copybutton",
-    "sphinx.ext.napoleon"
+    "sphinx.ext.napoleon",
+    "sphinx_design"
 ]
 
 toc_object_entries_show_parents = 'hide'
@@ -77,6 +78,11 @@ html_title = "mumax⁺"
 
 html_static_path = ['_static']
 html_css_files = ['logo.css', 'custom.css']
+
+html_js_files = [
+    ('https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH', {'async': 'async'}),
+    'google-analytics.js',
+]
 
 html_favicon = "_static/nimble-plus.png"
 

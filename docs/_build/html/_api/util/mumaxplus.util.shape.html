@@ -28,9 +28,10 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d4b325e0" />
   
@@ -39,13 +40,17 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../../_static/documentation_options.js?v=bee7790f"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_api/util/mumaxplus.util.shape';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../../_static/google-analytics.js?v=27e7bdd4"></script>
     <link rel="icon" href="../../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -53,7 +58,7 @@
     <link rel="prev" title="formulary" href="mumaxplus.util.formulary.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+    <meta name="docbuild:last-update" content="2025-09-30, v1.1.1"/>
   </head>
   
   
@@ -438,6 +443,10 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus"><code class="docutils literal notranslate"><span class="pre">Torus</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball"><code class="docutils literal notranslate"><span class="pre">Superball</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull"><code class="docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a><ul class="visible nav section-nav flex-column">
@@ -891,6 +900,30 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Superball">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Superball</span></span><a class="headerlink" href="#mumaxplus.util.shape.Superball" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Superball.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Superball.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Superball with given diameter and shape parameter <cite>p</cite>.</p>
+<p>A superball is defined by the inequality:</p>
+<div class="math notranslate nohighlight">
+\[|x/r|^{2p} + |y/r|^{2p} + |z/r|^{2p} ≤ 1\]</div>
+<p>where r is the radius (not diameter) and p controls the shape:</p>
+<ul class="simple">
+<li><p>p &gt; 1 gives a rounded cube</p></li>
+<li><p>p = 1 gives a sphere</p></li>
+<li><p>p = 0.5 gives an octahedron</p></li>
+<li><p>p &lt;= 0 gives empty space</p></li>
+</ul>
+<p>For consistency with other shapes, diameter (2r) is used as parameter
+instead of radius.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.DelaunayHull">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DelaunayHull</span></span><a class="headerlink" href="#mumaxplus.util.shape.DelaunayHull" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
@@ -1166,6 +1199,10 @@ pixel of the image. z-coordinate can be given but is ignored.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball"><code class="docutils literal notranslate"><span class="pre">Superball</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull"><code class="docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
@@ -1228,7 +1265,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-10, v1.1.0.
+  Last updated on 2025-09-30, v1.1.1.
   <br/>
 </p>
   </div>

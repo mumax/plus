@@ -9,7 +9,7 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import Ellipse
+from mumaxplus.util import Ellipse, get_rgb
 
 
 # --- set up the world ---
@@ -47,7 +47,7 @@ timepoints = np.linspace(0, tmax, 151)
 outputquantities = {"mx": lambda: magnet.magnetization.average()[0],
                     "my": lambda: magnet.magnetization.average()[1],
                     "mz": lambda: magnet.magnetization.average()[2],
-                    "rgb": lambda: np.moveaxis(magnet.magnetization.get_rgb()[:,0,:,:], 0, -1)}
+                    "rgb": lambda: get_rgb(magnet.magnetization, layer=0)}
 # --- run te solver ---
 output = world.timesolver.solve(timepoints, outputquantities)
 

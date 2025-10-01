@@ -3,6 +3,7 @@
 #include "reduce.hpp"
 
 #include <algorithm>
+#include <string>
 
 InterParameter::InterParameter(std::shared_ptr<const System> system,
                                real value, std::string name, std::string unit)
@@ -25,13 +26,14 @@ const std::vector<real> InterParameter::eval() const {
   return valuesBuffer_.getData();
 }
 
-__global__ void k_set(real* values, real value) {
+__global__ void k_set(real* values, real value, size_t valuesLimit) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < 0 || idx >= valuesLimit) { return; }
   values[idx] = value;
 }
 
 void InterParameter::setBuffer(real value) {
-  cudaLaunch(valuesLimit_, k_set, valuesBuffer_.get(), value);
+  cudaLaunch(valuesLimit_, k_set, valuesBuffer_.get(), value, valuesLimit_);
 }
 
 void InterParameter::set(real value) {

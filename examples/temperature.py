@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import show_field
+from mumaxplus.util import plot_field
 
 length, width, thickness = 500e-9, 125e-9, 3e-9
 nx, ny, nz = 128, 32, 1
@@ -18,4 +18,4 @@ magnet.magnetization = (1, 0.1, 0)
 
 world.timesolver.run(1e-10)
 
-show_field(magnet.magnetization)
+plot_field(magnet.magnetization)

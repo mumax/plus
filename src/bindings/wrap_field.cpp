@@ -7,6 +7,11 @@
 #include "field.hpp"
 #include "wrappers.hpp"
 
+#ifdef _MSC_VER  // On Windows, ssize_t is undefined, so declare it manually
+  #include <BaseTsd.h>
+  typedef SSIZE_T ssize_t;
+#endif
+
 void wrap_field(py::module& m) {
   py::class_<Field>(m, "Field")
       .def_property_readonly("grid", &Field::grid)

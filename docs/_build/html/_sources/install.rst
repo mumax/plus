@@ -6,117 +6,99 @@ Installation
 Dependencies
 ------------
 
-You should install these yourself
+You should install the following tools yourself. Open the dropdowns for more details.
 
-* CUDA Toolkit 10.0 or later
-* A C++ compiler which supports C++17, such as GCC
-* On Windows (good luck): MSVC 2019
+.. dropdown:: CUDA Toolkit *(version 10.0 or later)*
+  
+   -  **Windows**: Download an installer from `the CUDA website <https://developer.nvidia.com/cuda-toolkit-archive>`_.
+   -  **Linux**: Use ``sudo apt-get install nvidia-cuda-toolkit``, or `download an installer <https://developer.nvidia.com/cuda-toolkit-archive>`_.
 
-These will be installed automatically within the conda environment
+   .. important::
 
-* cmake 4.0.0
-* Python 3.13
-* pybind11 v2.13.6
-* NumPy
-* matplotlib
-* SciPy
-* Sphinx
+      Make especially sure that everything CUDA-related (like ``nvcc``) can
+      be found inside your PATH. On Linux, for instance, this can be done
+      by editing your ``~/.bashrc`` file and adding the following lines:
 
-Linux
------
+      .. code-block:: bash
 
-Make sure that the following applications and build tools are installed:
+         # add CUDA
+         export PATH="/usr/local/cuda/bin:$PATH"
+         export LD_LIBRARY_PATH="/usr/local/cuda/> lib64:$LD_LIBRARY_PATH"
 
-* C++ compiler which supports c++17, such as GCC
-* CPython (version ≥ 3.8 recommended) and pip
-* CUDA Toolkit (version 10.0 or later)
-* git
-* miniconda or anaconda
+      The paths may differ if the CUDA Toolkit was installed in a different
+      location.
 
-Make especially sure that everything CUDA-related (like ``nvcc``) can be found
-inside your path. This can be done by editing your ``~/.bashrc`` file and adding
-the following lines.
+   👉 *Check CUDA installation with:* ``nvcc --version``
 
-.. code-block:: bash
+.. dropdown:: A C++ compiler which supports C++17
 
-    # add CUDA
-    export PATH="/usr/local/cuda/bin:$PATH"
-    export LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
+   - **Linux:** ``sudo apt-get install gcc``
+      - ⚠️ each CUDA version has a maximum supported ``gcc`` version. `This StackOverflow answer <https://stackoverflow.com/a/46380601>`_ lists the maximum supported ``gcc`` version for each CUDA version. If necessary, use ``sudo apt-get install gcc-<min_version>`` instead, with the appropriate ``<min_version>``.
+   - **Windows:**
+      - CUDA does not support the ``gcc`` compiler on Windows, so download and install `Microsoft Visual Studio <https://visualstudio.microsoft.com/downloads/>`_ with the "Desktop development with C++" workload. After installing, check if the path to ``cl.exe`` was added to your ``PATH`` environment variable (i.e., check whether ``where cl.exe`` returns an appropriate path like ``C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64``). If not, add it manually.
 
-The paths might differ if CUDA Toolkit has been installed in a different location.
-If successful, a command such as ``nvcc --version`` should work.
+   👉 *Check C installation with:* ``gcc --version`` *on Linux and* ``where.exe cl.exe`` *on Windows.*
 
-Clone the mumax\ :sup:`+` git repository. The ``--recursive flag`` is used here to get
-the pybind11 submodule which is needed to build mumax\ :sup:`+`.
+.. dropdown:: Git
 
-.. code-block:: bash
+   - **Windows:** `Download <https://git-scm.com/downloads>`_ and install.
+   - **Linux:** ``sudo apt install git``
 
-    git clone --recursive https://github.com/mumax/plus.git mumaxplus && cd mumaxplus
+   👉 *Check Git installation with:* ``git --version``
 
-We recommend to install mumax\ :sup:`+` in a clean conda environment. You could also skip
-this step and use your own conda environment instead if preferred.
+.. dropdown:: CPython *(version ≥ 3.8 recommended)*, pip and miniconda/anaconda
 
-.. code-block:: bash
+   All these Python-related tools should be included in a standard installation of `Anaconda or Miniconda <https://www.anaconda.com/download/success>`_.
 
-    conda env create -f environment.yml
-    conda activate mumaxplus
+   👉 *Check installation with* ``python --version``, ``pip --version`` *and* ``conda --version``.
 
-Then build and install mumax\ :sup:`+` using pip.
+Building mumax⁺
+---------------
+
+First, clone the mumax⁺ Git repository. The ``--recursive`` flag is used in the following command to get the pybind11 submodule, which is needed to build mumax⁺.
 
 .. code-block:: bash
 
-    pip install -v .
+   git clone --recursive https://github.com/mumax/plus.git mumaxplus
+   cd mumaxplus
 
-If changes are made to the code, then ``pip install -v .`` can be used to
-rebuild mumax\ :sup:`+`. If you want to change the Python code without needing
-to reinstall, you can use ``pip install -ve .``.
+We recommend to install mumax⁺ in a clean conda environment as follows. You could also skip this step and use your own conda environment instead if preferred.
 
-You could also compile the source code with double precision, by changing
-``FP_PRECISION`` in ``CMakeLists.txt`` from ``SINGLE`` to ``DOUBLE`` before
-rebuilding.
+.. dropdown:: Tools automatically installed in the conda environment
+
+   - cmake 4.0.0
+   - Python 3.13
+   - pybind11 v2.13.6
+   - NumPy
+   - matplotlib
+   - SciPy
+   - Sphinx
 
 .. code-block:: bash
 
-    add_definitions(-DFP_PRECISION=DOUBLE) # FP_PRECISION should be SINGLE or DOUBLE
+   conda env create -f environment.yml
+   conda activate mumaxplus
 
-Windows
--------
+Finally, build and install mumax⁺ using pip.
 
-.. warning::
+.. code-block:: bash
 
-    These instructions are old and worked at some point (2021), but not today.
-    If you are brave enough to try Windows and you manage to get it working,
-    please let us know!
+   pip install .
 
-#. Install Visual Studio 2019 and the desktop development with C++ workload
+.. tip::
 
-#. Install CUDA Toolkit 10.x
+   If changes are made to the code, then ``pip install -v .`` can be used to rebuild mumax⁺, with the ``-v`` flag enabling verbose debug information.
+   
+   If you want to change only the Python code, without needing to reinstall after each change, ``pip install -ve .`` can also be used.
 
-#. Install cmake
+.. tip::
 
-#. Download the pybind11 submodule with git
+   The source code can also be compiled with double precision, by changing ``FP_PRECISION`` in ``CMakeLists.txt`` from ``SINGLE`` to ``DOUBLE`` before rebuilding.
 
-   .. code-block:: bash
+   .. code-block:: cmake
 
-      git submodule init
-      git submodule update
+      add_definitions(-DFP_PRECISION=DOUBLE) # FP_PRECISION > should be SINGLE or DOUBLE
 
-#. Install Python packages using conda
+.. dropdown:: Troubleshooting
 
-   .. code-block:: bash
-
-      conda env create -f environment.yml
-
-#. Build ``mumaxplus`` using ``setuptools``
-
-   .. code-block:: bash
-
-      activate mumaxplus
-      python setup.py develop
-
-   or ``conda``
-
-   .. code-block:: bash
-
-      conda activate mumaxplus
-      conda develop -b .
+   - (*Windows*) If you encounter the error ``No CUDA toolset found``, try copying the files in ``NVIDIA GPU Computing Toolkit/CUDA/<version>/extras/visual_studio_integration/MSBuildExtensions`` to ``Microsoft Visual Studio/<year>/<edition>/MSBuild/Microsoft/VC/<version>/BuildCustomizations``. See `these instructions <https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170>`_ for more details.

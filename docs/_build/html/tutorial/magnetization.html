@@ -28,9 +28,10 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d4b325e0" />
   
@@ -39,13 +40,16 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=051bfb12"></script>
+    <script src="../_static/documentation_options.js?v=bee7790f"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/magnetization';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
     <link rel="icon" href="../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -53,7 +57,7 @@
     <link rel="prev" title="Tutorials" href="../tutorial.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+    <meta name="docbuild:last-update" content="2025-09-30, v1.1.1"/>
   </head>
   
   
@@ -384,15 +388,15 @@ magnetization configuration:</p>
 <li><p>Setting the magnetization using a numpy array</p></li>
 </ol>
 <p>Let’s start by creating a magnet which will be used throughout this notebook.
-When we use the <cite>show_field</cite> function to visualize the magnetization configuration,
+When we use the <cite>plot_field</cite> function to visualize the magnetization configuration,
 we see that the magnetization is initialized with random values.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mumaxplus</span> <span class="kn">import</span> <span class="n">Ferromagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
-<span class="kn">from</span> <span class="nn">mumaxplus.util</span> <span class="kn">import</span> <span class="n">show_field</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ferromagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_field</span>
 
 <span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span><span class="mf">1e-9</span><span class="p">,</span><span class="mf">1e-9</span><span class="p">))</span>
 <span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">Grid</span><span class="p">((</span><span class="mi">200</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/random_mag.png"><img alt="../_images/random_mag.png" class="align-center" src="../_images/random_mag.png" style="width: 600px;" />
@@ -403,7 +407,7 @@ we see that the magnetization is initialized with random values.</p>
 need to specify the magnetization direction using three floats:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/uniform_mag.png"><img alt="../_images/uniform_mag.png" class="align-center" src="../_images/uniform_mag.png" style="width: 600px;" />
@@ -425,9 +429,9 @@ function. When the magnetization is set equal to this function, then this functi
 will be evaluated cell by cell to set the magnetization field.</p>
 <p>The snippet below demonstrates how this approach can be used to initialize a
 helical magnetization configuration with a certain wave vector.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
-<span class="k">def</span> <span class="nf">helical</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">helical</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
     <span class="n">kx</span><span class="p">,</span> <span class="n">ky</span> <span class="o">=</span> <span class="mf">1e8</span><span class="p">,</span> <span class="mf">2e8</span>
     <span class="n">mx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">kx</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">ky</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
     <span class="n">my</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">kx</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">ky</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
@@ -436,7 +440,7 @@ helical magnetization configuration with a certain wave vector.</p>
 
 <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">helical</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/function_mag.png"><img alt="../_images/function_mag.png" class="align-center" src="../_images/function_mag.png" style="width: 600px;" />
@@ -446,7 +450,7 @@ helical magnetization configuration with a certain wave vector.</p>
 <h2>3. Using predefined magnetization configurations<a class="headerlink" href="#using-predefined-magnetization-configurations" title="Link to this heading">#</a></h2>
 <p>mumax⁺ comes with a number of predefined magnetization configurations. This
 configurations can be found in <a class="reference internal" href="../_api/util/mumaxplus.util.config.html#module-mumaxplus.util.config" title="mumaxplus.util.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mumaxplus.util.config</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mumaxplus.util.config</span> <span class="k">as</span> <span class="nn">config</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mumaxplus.util.config</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">config</span>
 </pre></div>
 </div>
 <p>Below you can find an example for each predefined magnetization configuration.
@@ -483,7 +487,7 @@ the <cite>help</cite>, e.g:</p>
                                      <span class="n">circulation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                      <span class="n">polarization</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(9.949999935088272e-08, 4.9499998766577846e-08, 0.0)</span>
@@ -499,7 +503,7 @@ the <cite>help</cite>, e.g:</p>
                                          <span class="n">circulation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                          <span class="n">polarization</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/antivortex_mag.png"><img alt="../_images/antivortex_mag.png" class="align-center" src="../_images/antivortex_mag.png" style="width: 600px;" />
@@ -512,7 +516,7 @@ the <cite>help</cite>, e.g:</p>
                                            <span class="n">charge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                            <span class="n">polarization</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/neelskyrm_mag.png"><img alt="../_images/neelskyrm_mag.png" class="align-center" src="../_images/neelskyrm_mag.png" style="width: 600px;" />
@@ -525,7 +529,7 @@ the <cite>help</cite>, e.g:</p>
                                             <span class="n">charge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                             <span class="n">polarization</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/blochskyrm_mag.png"><img alt="../_images/blochskyrm_mag.png" class="align-center" src="../_images/blochskyrm_mag.png" style="width: 600px;" />
@@ -552,7 +556,7 @@ should match the shape of the magnetization.</p>
 <p>Once you understand this convention, you can use all sorts of numpy trickery to
 set the magnetization configuration. E.g., the snippet below shows how to set two
 domain state magnetization configuration using basic numpy functionalities:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">,:,:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># set my=1 in the left half</span>
@@ -560,7 +564,7 @@ domain state magnetization configuration using basic numpy functionalities:</p>
 
 <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">m</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/DW_mag.png"><img alt="../_images/DW_mag.png" class="align-center" src="../_images/DW_mag.png" style="width: 600px;" />
@@ -578,7 +582,7 @@ the snippet below.</p>
 
 <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">m</span>
 
-<span class="n">show_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/rainbow_mag.png"><img alt="../_images/rainbow_mag.png" class="align-center" src="../_images/rainbow_mag.png" style="width: 600px;" />
@@ -667,7 +671,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-10, v1.1.0.
+  Last updated on 2025-09-30, v1.1.1.
   <br/>
 </p>
   </div>
