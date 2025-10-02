@@ -22,7 +22,7 @@ __global__ void k_kineticEnergyDensity(CuField kinField,
   const CuSystem system = kinField.system;
 
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx) || !rho.valueAt(idx)) {
+  if (!system.inGeometry(idx)) {
     if (system.grid.cellInGrid(idx)) {
       kinField.setValueInCell(idx, 0, 0);
     }
@@ -73,7 +73,7 @@ __global__ void k_elasticEnergyDensity(CuField elField,
   const CuSystem system = elField.system;
 
   // When outside the geometry, set to zero and return early
-  if (!system.inGeometry(idx) && rho.valueAt(idx)) {
+  if (!system.inGeometry(idx) || (!rho.valueAt(idx))) {
     if (system.grid.cellInGrid(idx)) {
       elField.setValueInCell(idx, 0, 0);
     }
