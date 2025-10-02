@@ -32,9 +32,6 @@ __global__ void k_thermalNoise(CuField noiseField,
     return;
   }
 
-  if (!noiseField.cellInGrid(idx) || msat.valueAt(idx) == 0)
-    return;
-
   real Ms = msat.valueAt(idx);
   real T = temperature.valueAt(idx);
   real a = alpha.valueAt(idx);
