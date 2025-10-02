@@ -20,6 +20,8 @@ from .variable import Variable
 from .world import World
 from . import util
 
+FP_PRECISION = {1: "SINGLE", 2: "DOUBLE"}.get(_cpp.FP_PRECISION, "UNKNOWN")
+
 __all__ = [
     "_cpp",
     "Antiferromagnet",
@@ -39,4 +41,5 @@ __all__ = [
     "World",
     "PoissonSystem",
     "util",
+    "FP_PRECISION"
 ]
