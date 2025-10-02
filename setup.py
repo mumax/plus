@@ -42,6 +42,9 @@ class CMakeBuild(build_ext):
             "-DPYTHON_EXECUTABLE=" + sys.executable,
         ]
 
+        precision = os.environ.get("MUMAXPLUS_FP_PRECISION", "SINGLE")
+        cmake_args += ["-DFP_PRECISION=" + precision]
+
         cfg = "Debug" if self.debug else "Release"
         build_args = ["--config", cfg]
 
