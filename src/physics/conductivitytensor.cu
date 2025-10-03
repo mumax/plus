@@ -11,10 +11,11 @@ bool conductivityTensorAssuredZero(const Ferromagnet* magnet) {
 __global__ static void k_conductTensor(CuField conductivity,
                                        const CuParameter conductivity0,
                                        const CuParameter amrRatio,
-                                       const CuField mField) {
+                                       const CuField mField,
+                                       const CuParameter msat) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (!mField.cellInGeometry(idx))
+  if (!mField.cellInGeometry(idx) || !msat.valueAt(idx))
     return;
 
   const real amr = amrRatio.valueAt(idx);
@@ -36,7 +37,8 @@ Field evalConductivityTensor(const Ferromagnet* magnet) {
   auto conduct0 = magnet->conductivity.cu();
   auto amr = magnet->amrRatio.cu();
   auto mField = magnet->magnetization()->field().cu();
-  cudaLaunch(ncells, k_conductTensor, conductivity.cu(), conduct0, amr, mField);
+  auto msat = magnet->msat.cu();
+  cudaLaunch(ncells, k_conductTensor, conductivity.cu(), conduct0, amr, mField, msat);
   return conductivity;
 }
 
