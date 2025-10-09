@@ -1,0 +1,28 @@
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.5
+
+enableDemag = True
+openBC = true
+
+fixDt = 1e-13
+
+c := 4e-9
+setcellsize(c, c, c)
+
+for e:=2; e<12; e++{
+	n := pow(2, e)
+	setgridsize(n, n, 1)
+
+	steps(10) // warm-up kernel
+
+	t = 0
+	start := now()
+
+	steps(100)
+
+    wall := since(start).Seconds()
+	N2 := n*n
+    throughput := N2 * 100 / wall
+	fprintln("benchmark.txt", N2, throughput)
+}
