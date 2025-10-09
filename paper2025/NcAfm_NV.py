@@ -1,5 +1,5 @@
 """
-This script generates and plots the data from Fig. 3 of the paper
+This script generates and plots the data from Fig. 5 of the paper
 'mumax+: extensible GPU-accelerated micromagnetics and beyond' (https://arxiv.org/abs/2411.18194)
 and uses the mumax+ version v1.1.0.
 
