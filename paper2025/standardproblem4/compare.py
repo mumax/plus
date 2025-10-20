@@ -103,9 +103,7 @@ def main(ERRORLEVEL=0):
     try:
         dfs = {
             "OOMMF_1nm": read_ODT(DATA_DIR + "/standardproblem4a.odt"),
-            "mumax+32_2.5nm": pd.read_csv(DATA_DIR + "/2.5nm/standardproblem4a_plus_SINGLE.out", sep="\t"),
             "mumax3_1nm": pd.read_csv(DATA_DIR + "/1nm/standardproblem4a.out/table.txt", sep="\t"),
-            "mumax3_2.5nm": pd.read_csv(DATA_DIR + "/2.5nm/standardproblem4a.out/table.txt", sep="\t"),
             "mumax+32_1nm": pd.read_csv(DATA_DIR + "/1nm/standardproblem4a_plus_SINGLE.out", sep="\t")
         }
     except Exception as e:
@@ -155,19 +153,16 @@ def main(ERRORLEVEL=0):
     # Legend entries
     for tool, color in tools_colors.items():
         if tool == base.split("_")[0]: continue
-        ax.fill_between([], [], [], color=color, label=f"{tools_names[tool]}")
-    for cs, ls in cs_linestyles.items():
-        ax.plot([], [], color="k", ls=ls, lw=lw, label=f"{cs_names[cs]}")
+        ax.plot([], [], color=color, label=f"{tools_names[tool]}")
     
     if len(plot_comps) == 1:
-        ax.legend(ncols=2, bbox_to_anchor=(0, 1.12, 1, 0.2), handletextpad=0.7, handlelength=2, loc="upper left", mode="expand", borderaxespad=0)
+        ax.legend(loc="upper right")
     else:
         fig.legend(*ax.get_legend_handles_labels(), ncols=2, loc="upper center")
     t_max = min(df["time"].to_numpy().max() for df in dfs.values())
     ax.set_xlim([0, t_max*t_factor])
-    # ax.ticklabel_format(axis="y", style="scientific", scilimits=[-1,1])
     ax.set_xlabel(f"Time ({t_unit}s)")
-    ax.set_ylabel(f"$\\Delta m_{comp}$" + f" $/\\,{m_unit}$"*(m_unit != ""))
+    ax.set_ylabel(f"$\\Delta \\langle m_{comp} \\rangle$" + f" $/\\,{m_unit}$"*(m_unit != ""))
     in_range = np.where(np.logical_and(t >= 0, t <= t_max))
     ymax = max([np.max(np.abs(deviation(df, f"m{comp}")[in_range])) for df in dfs.values() for comp in plot_comps])*m_factor
     pady = 0.05
@@ -175,13 +170,10 @@ def main(ERRORLEVEL=0):
     
     multi = MultiCursor(None, tuple(axes.flat), horizOn=False, vertOn=True, color='k', lw=1, ls=":")
     
-    # title = f"Standard problem 4 comparison with {tools_names[base.split('_')[0]]}"
-    # if len(plot_comps) == 1: ax.set_title(title)
-    # else: fig.suptitle(title)
     fig.tight_layout(h_pad=0)
-    fig.subplots_adjust(top=0.78, bottom=0.18)
+    fig.subplots_adjust(top=0.98, bottom=0.18)
     for ext in ("pdf", "png", "svg"):
-        outfile = Path(f"{OUTPUT_DIR}/comparison_{base}.{ext}").absolute()
+        outfile = Path(f"{OUTPUT_DIR}/comparison_m{comp}_{base}.{ext}").absolute()
         outfile.parent.mkdir(exist_ok=True)
         fig.savefig(outfile, dpi=1200)
     plt.show()
