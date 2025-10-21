@@ -15,8 +15,9 @@ from mumaxplus import World, Grid, Antiferromagnet
 from mumaxplus.util.shape import Polygon
 from mumaxplus.util.config import twodomain
 
-
-D = 0.7e-3 # chosen DMI
+# Interfacial DMI parameter
+# https://doi.org/10.1103/PhysRevB.102.224414
+D = 0.7e-3
 
 # magnet parameters (NiO)
 # https://doi.org/10.1103/PhysRevB.66.064434
