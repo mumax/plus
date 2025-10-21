@@ -2,6 +2,8 @@
 This script simulates and plots the data from Fig. 2 of the paper
 'mumax+: extensible GPU-accelerated micromagnetics and beyond' (https://arxiv.org/abs/2411.18194)
 
+The peak GPU memory usage can be logged using the `nvidia-smi` command.
+
 Note that an installation of mumax3 is necessary in order to generate the full plot.
 """
 
