@@ -1,5 +1,5 @@
 """
-This script simulates and plots the data from Fig. 2 of the paper
+This script simulates and plots the data from Fig. 5 of the paper
 'mumax+: extensible GPU-accelerated micromagnetics and beyond' (https://arxiv.org/abs/2411.18194)
 
 The peak GPU memory usage can be logged using the `nvidia-smi` command.
