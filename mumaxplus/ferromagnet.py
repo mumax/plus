@@ -1033,6 +1033,42 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.homogeneous_exchange_energy(self._impl))
 
     @property
+    def anisotropic_exchange_field(self) -> FieldQuantity:
+        """Effective field of the anisotropic exchange interaction (T).
+        This field is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_energy_density, anisotropic_exchange_energy
+        """
+        return FieldQuantity(_cpp.anisotropic_exchange_field(self._impl))
+    
+    @property
+    def anisotropic_exchange_energy_density(self) -> FieldQuantity:
+        """Energy density related to the anisotropic exchange interaction (J/m³).
+        This energy density is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_field, anisotropic_exchange_energy
+        """
+        return FieldQuantity(_cpp.anisotropic_exchange_energy_density(self._impl))
+
+    @property
+    def anisotropic_exchange_energy(self) -> ScalarQuantity:
+        """Energy related to the anisotropic exchange interaction (J).
+        This energy is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_field, anisotropic_exchange_energy_density
+        """
+        return ScalarQuantity(_cpp.anisotropic_exchange_energy(self._impl))
+
+    @property
     def homogeneous_dmi_field(self):
         """Effective field of the homogeneous DMI (T)."""
         return FieldQuantity(_cpp.homogeneous_dmi_field(self._impl))

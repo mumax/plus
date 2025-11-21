@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "altermagnet.hpp"
 #include "antiferromagnet.hpp"
 #include "datatypes.hpp"
 #include "dynamicequation.hpp"
@@ -103,6 +104,30 @@ Antiferromagnet* MumaxWorld::addAntiferromagnet(Grid grid,
   return newMagnet;
 }
 
+Altermagnet* MumaxWorld::addAltermagnet(Grid grid,
+                                        GpuBuffer<bool> geometry,
+                                        GpuBuffer<unsigned int> regions,
+                                        std::string name) {
+  // Create name if not given.
+  static int idxUnnamed = 1;
+  if (name.length() == 0) {
+    name = "altermagnet_" + std::to_string(idxUnnamed++);
+  }                
+
+  // Check if Altermagnet can be added to this world.
+  checkAddibility(grid, name);
+
+  // Create the magnet and add it to this world
+  altermagnets_[name] =
+      std::make_unique<Altermagnet>(this, grid, name, geometry, regions);
+  Altermagnet* newMagnet = altermagnets_[name].get();
+  magnets_[name] = newMagnet;
+
+  handleNewStrayfield(newMagnet);
+  resetTimeSolverEquations();
+  return newMagnet;
+}
+
 NcAfm* MumaxWorld::addNcAfm(Grid grid,
                             GpuBuffer<bool> geometry,
                             GpuBuffer<unsigned int> regions,
@@ -160,6 +185,13 @@ Antiferromagnet* MumaxWorld::getAntiferromagnet(std::string name) const {
   return namedMagnet->second.get();
 }
 
+Altermagnet* MumaxWorld::getAltermagnet(std::string name) const {
+  auto namedMagnet = altermagnets_.find(name);
+  if (namedMagnet == altermagnets_.end())
+    return nullptr;
+  return namedMagnet->second.get();
+}
+
 NcAfm* MumaxWorld::getNcAfm(std::string name) const {
   auto namedMagnet = ncafms_.find(name);
   if (namedMagnet == ncafms_.end())
@@ -187,6 +219,14 @@ const std::map<std::string, Antiferromagnet*> MumaxWorld::antiferromagnets() con
   return sharedAntiferromagnets;
 }
 
+const std::map<std::string, Altermagnet*> MumaxWorld::altermagnets() const {
+  std::map<std::string, Altermagnet*> sharedAltermagnets;
+  for (const auto& pair : altermagnets_) {
+    sharedAltermagnets[pair.first] = pair.second.get();
+  }
+  return sharedAltermagnets;
+}
+
 const std::map<std::string, NcAfm*> MumaxWorld::ncafms() const {
   std::map<std::string, NcAfm*> sharedNcAfms;
   for (const auto& pair : ncafms_) {
@@ -208,6 +248,16 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
 
   for (const auto& namedMagnet : antiferromagnets_) {
     const Antiferromagnet* magnet = namedMagnet.second.get();
+    for (const Ferromagnet* sub : magnet->sublattices()) {
+      DynamicEquation eq(
+        sub->magnetization(),
+        std::shared_ptr<FieldQuantity>(torque(sub).clone()),
+        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()));
+      equations.push_back(eq);
+    }
+  }
+  for (const auto& namedMagnet : altermagnets_) {
+    const Altermagnet* magnet = namedMagnet.second.get();
     for (const Ferromagnet* sub : magnet->sublattices()) {
       DynamicEquation eq(
         sub->magnetization(),

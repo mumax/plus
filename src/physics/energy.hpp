@@ -2,6 +2,7 @@
 
 #include "quantityevaluator.hpp"
 
+class Altermagnet;
 class Antiferromagnet;
 class Ferromagnet;
 class Field;
@@ -17,6 +18,7 @@ real energyFromEnergyDensity(const Magnet*, real);
 
 Field evalTotalEnergyDensity(const Ferromagnet*);
 Field evalTotalEnergyDensity(const Antiferromagnet*);
+Field evalTotalEnergyDensity(const Altermagnet*);
 Field evalTotalEnergyDensity(const NcAfm*);
 real evalTotalEnergy(const Magnet*);
 
@@ -25,6 +27,9 @@ FM_ScalarQuantity totalEnergyQuantity(const Ferromagnet*);
 
 AFM_FieldQuantity totalEnergyDensityQuantity(const Antiferromagnet*);
 AFM_ScalarQuantity totalEnergyQuantity(const Antiferromagnet*);
+
+ATM_FieldQuantity totalEnergyDensityQuantity(const Altermagnet*);
+ATM_ScalarQuantity totalEnergyQuantity(const Altermagnet*);
 
 NcAfm_FieldQuantity totalEnergyDensityQuantity(const NcAfm*);
 NcAfm_ScalarQuantity totalEnergyQuantity(const NcAfm*);

@@ -1,4 +1,5 @@
 #include "afmexchange.hpp"
+#include "altermagnet.hpp"
 #include "anisotropy.hpp"
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
@@ -82,6 +83,14 @@ Field evalTotalEnergyDensity(const Antiferromagnet* magnet) {
   return edens;
 }
 
+Field evalTotalEnergyDensity(const Altermagnet* magnet) {
+  Field edens = evalTotalEnergyDensity(magnet->sub1()) +
+                evalTotalEnergyDensity(magnet->sub2());
+  if (!kineticEnergyAssuredZero(magnet)) {edens += evalKineticEnergyDensity(magnet);}
+  if (!elasticityAssuredZero(magnet)) {edens += evalElasticEnergyDensity(magnet);}
+  return edens;
+}
+
 Field evalTotalEnergyDensity(const NcAfm* magnet) {
   Field edens = evalTotalEnergyDensity(magnet->sub1()) +
                 evalTotalEnergyDensity(magnet->sub2()) +
@@ -97,12 +106,14 @@ real evalTotalEnergy(const Magnet* magnet) {
     edensAverage = totalEnergyDensityQuantity(mag).average()[0];
   else if (const Antiferromagnet* mag = magnet->asAFM())
     edensAverage = totalEnergyDensityQuantity(mag).average()[0];
+  else if (const Altermagnet* mag = magnet->asATM())
+    edensAverage = totalEnergyDensityQuantity(mag).average()[0];
   else if (const NcAfm* mag = magnet->asNcAfm())
     edensAverage = totalEnergyDensityQuantity(mag).average()[0];
   else
     throw std::invalid_argument("Cannot calculate energy of instance which "
-                                "is no Ferromagnet, Antiferromagnet or"
-                                "non-collinear antiferromagnet.");                 
+                                "is no Ferromagnet, Antiferromagnet, Altermagnet "
+                                "or non-collinear antiferromagnet.");                 
   return energyFromEnergyDensity(magnet, edensAverage);
 }
 
@@ -124,6 +135,16 @@ AFM_FieldQuantity totalEnergyDensityQuantity(const Antiferromagnet* magnet) {
 
 AFM_ScalarQuantity totalEnergyQuantity(const Antiferromagnet* magnet) {
   return AFM_ScalarQuantity(magnet, evalTotalEnergy, "total_energy", "J");
+}
+
+ATM_FieldQuantity totalEnergyDensityQuantity(const Altermagnet* magnet) {
+  return ATM_FieldQuantity(magnet,
+    static_cast<Field(*)(const Altermagnet*)>(evalTotalEnergyDensity),
+    1, "total_energy_density", "J/m3");
+}
+
+ATM_ScalarQuantity totalEnergyQuantity(const Altermagnet* magnet) {
+  return ATM_ScalarQuantity(magnet, evalTotalEnergy, "total_energy", "J");
 }
 
 NcAfm_FieldQuantity totalEnergyDensityQuantity(const NcAfm* magnet) {

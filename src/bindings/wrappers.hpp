@@ -13,6 +13,7 @@ class Field;
 
 void setArrayInField(Field&, py::array_t<real>);
 
+void wrap_altermagnet(py::module& m);
 void wrap_antiferromagnet(py::module& m);
 void wrap_antiferromagnetfieldquantity(py::module& m);
 void wrap_antiferromagnetscalarquantity(py::module& m);

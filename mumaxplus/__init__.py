@@ -2,6 +2,7 @@
 
 import _mumaxpluscpp as _cpp
 
+from .altermagnet import Altermagnet
 from .antiferromagnet import Antiferromagnet
 from .dmitensor import DmiTensor
 from .ferromagnet import Ferromagnet
@@ -22,6 +23,7 @@ from . import util
 
 __all__ = [
     "_cpp",
+    "Altermagnet"
     "Antiferromagnet",
     "BoundaryTraction",
     "DmiTensor",

@@ -77,6 +77,19 @@ void wrap_world(py::module& m) {
           py::arg("regions_array")=py::none(), py::arg("name") = std::string(""),
           py::return_value_policy::reference_internal)
 
+     .def("add_altermagnet",
+          [](MumaxWorld* world, Grid grid, py::object geometryArray=py::none(),
+             py::object regionsArray=py::none(), std::string name="") {
+               return add_magnet(world, grid,
+                                 geometryArray,
+                                 regionsArray,
+                                 name,
+                                 &MumaxWorld::addAltermagnet);
+          },
+          py::arg("grid"), py::arg("geometry_array")=py::none(),
+          py::arg("regions_array")=py::none(), py::arg("name") = std::string(""),
+          py::return_value_policy::reference_internal)
+
      .def("add_ncafm",
           [](MumaxWorld* world, Grid grid, py::object geometryArray=py::none(),
                py::object regionsArray=py::none(), std::string name="") {

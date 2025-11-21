@@ -13,6 +13,7 @@
 #include "torque.hpp"
 #include "world.hpp"
 
+class Altermagnet;
 class Antiferromagnet;
 class Ferromagnet;
 class Magnet;
@@ -49,6 +50,12 @@ class MumaxWorld : public World {
                                       GpuBuffer<bool> geometry,
                                       GpuBuffer<unsigned int> regions,
                                       std::string name = "");
+  
+  /** Add an altermagnet to the world. */
+  Altermagnet* addAltermagnet(Grid grid,
+                              GpuBuffer<bool> geometry,
+                              GpuBuffer<unsigned int> regions,
+                              std::string name = "");
 
   /** Add a non-collinear antiferromagnet to the world. */
   NcAfm* addNcAfm(Grid grid,
@@ -68,6 +75,9 @@ class MumaxWorld : public World {
   /** Get an antiferromagnet by its name.
    *  Return a nullptr if there is no antiferromagnet with specified name. */
   Antiferromagnet* getAntiferromagnet(std::string name) const;
+  /** Get an altermagnet by its name.
+   *  Return a nullptr if there is no altermagnet with specified name. */
+  Altermagnet* getAltermagnet(std::string name) const;
   /** Get a non-collinear antiferromagnet by its name.
    *  Return a nullptr if there is no non-collinear antiferromagnet with specified name. */
   NcAfm* getNcAfm(std::string name) const;
@@ -78,6 +88,8 @@ class MumaxWorld : public World {
   const std::map<std::string, Ferromagnet*> ferromagnets() const;
   /** Get map of all Antiferromagnets in this world. */
   const std::map<std::string, Antiferromagnet*> antiferromagnets() const;
+  /** Get map of all Altermagnets in this world. */
+  const std::map<std::string, Altermagnet*> altermagnets() const;
   /** Get map of all non-collinear antiferromagnets in this world. */
   const std::map<std::string, NcAfm*> ncafms() const;
 
@@ -203,5 +215,6 @@ class MumaxWorld : public World {
   std::map<std::string, Magnet*> magnets_;
   std::map<std::string, std::unique_ptr<Ferromagnet>> ferromagnets_;
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
+  std::map<std::string, std::unique_ptr<Altermagnet>> altermagnets_;
   std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
 };
