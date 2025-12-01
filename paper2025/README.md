@@ -10,9 +10,9 @@ A short summary of the available scripts for each section in the paper is given 
 
 ## Implementations and Methods
 
-* The data in Fig. 1 can be generated with [anti_AFM.py](https://github.com/mumax/plus/tree/paper2025/paper2025/antiAFM.py)
+* The data in Fig. 1 can be generated with [anti_AFM.py](https://github.com/mumax/plus/tree/paper2025/paper2025/anti_AFM.py)
 * The benchmark data in Fig. 5 can be generated with [bench.py](https://github.com/mumax/plus/tree/paper2025/paper2025/bench.py). Note that you will need an installation of mumax³ if you want to generate the complete plot.
-* The data in Fig. 6 can be generated with the scripts in the [standardproblem4](https://github.com/mumax/plus/tree/paper2025/paper2025/standardproblem4) directory. Use [standardproblem4a_1nm.py](https://github.com/mumax/plusmumax/plus/tree/paper2025/paper2025/standardproblem4/standardproblem4a_1nm.py) for the mumax⁺ data and use [standardproblem4a_1nm.mx3](https://github.com/mumaxmumax/plus/tree/paper2025/paper2025//standardproblem4/standardproblem4a_1nm.mx3) for the mumax³ data. The [compare.py](https://github.com/mumaxmumax/plus/tree/paper2025/paper2025/standardproblem4/compare.py) script can then be used to compare the results with OOMMF. Note that you need an installation of mumax³ if you want to generate the complete plot.
+* The data in Fig. 6 can be generated with the scripts in the [standardproblem4](https://github.com/mumax/plus/tree/paper2025/paper2025/standardproblem4) directory. Use [standardproblem4a_1nm.py](https://github.com/mumax/plus/tree/paper2025/paper2025/standardproblem4/standardproblem4a_1nm.py) for the mumax⁺ data and use [standardproblem4a_1nm.mx3](https://github.com/mumax/plus/tree/paper2025/paper2025/standardproblem4/standardproblem4a_1nm.mx3) for the mumax³ data. The [compare.py](https://github.com/mumax/plus/tree/paper2025/paper2025/standardproblem4/compare.py) script can then be used to compare the results with OOMMF. Note that you need an installation of mumax³ if you want to generate the complete plot.
 
 ## Demonstrations
 
