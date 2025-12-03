@@ -1,3 +1,4 @@
+#include "altermagnet.hpp"
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
 #include "datatypes.hpp"
@@ -430,6 +431,17 @@ Field evalDmiField(const Ferromagnet* magnet) {
     cudaLaunch(ncells, k_dmiFieldFM, hField.cu(),
               mag, dmiTensor, msat, grid, aex, BC);
   else if (auto host = magnet->hostMagnet()->asAFM()){
+    // magnet is sublattice in AFM
+    auto mag2 = host->getOtherSublattices(magnet)[0]->magnetization()->field().cu();
+    auto afmex_nn = host->afmex_nn.cu();
+    auto interDmiTensor = host->dmiTensor.cu();
+    auto msat2 = host->getOtherSublattices(magnet)[0]->msat.cu();
+    auto inter = host->interAfmExchNN.cu();
+    auto scale = host->scaleAfmExchNN.cu();
+    cudaLaunch(ncells, k_dmiFieldAFM, hField.cu(), mag, mag2,
+              dmiTensor, interDmiTensor, msat, msat2, grid, aex, afmex_nn, inter, scale, BC);
+  }
+  else if (auto host = magnet->hostMagnet()->asATM()){
     // magnet is sublattice in AFM
     auto mag2 = host->getOtherSublattices(magnet)[0]->magnetization()->field().cu();
     auto afmex_nn = host->afmex_nn.cu();

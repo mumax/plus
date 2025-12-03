@@ -15,6 +15,8 @@ void setArrayInField(Field&, py::array_t<real>);
 
 void wrap_altermagnet(py::module& m);
 void wrap_antiferromagnet(py::module& m);
+void wrap_altermagnetfieldquantity(py::module& m);
+void wrap_altermagnetscalarquantity(py::module& m);
 void wrap_antiferromagnetfieldquantity(py::module& m);
 void wrap_antiferromagnetscalarquantity(py::module& m);
 void wrap_ferromagnet(py::module& m);

@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "altermagnet.hpp"
 #include "antiferromagnet.hpp"
 #include "magnet.hpp"
 #include "ferromagnet.hpp"
@@ -126,6 +127,8 @@ bool StrayField::assuredZero() const {
     return mag->msat.assuredZero();
   else if (const Antiferromagnet* mag = magnet_->asAFM())
     return mag->sub1()->msat.assuredZero() && mag->sub2()->msat.assuredZero();
+  else if (const Altermagnet* mag = magnet_->asATM())
+    return mag->sub1()->msat.assuredZero() && mag->sub2()->msat.assuredZero();
   else if (const NcAfm* mag = magnet_->asNcAfm())
     return mag->sub1()->msat.assuredZero() &&
            mag->sub2()->msat.assuredZero() &&
@@ -133,5 +136,5 @@ bool StrayField::assuredZero() const {
   else 
     throw std::invalid_argument("Cannot calculate strayfield since magnet is neither "
                                 "a Ferromagnet, an Antiferromagnet/Ferrimagnet, "
-                                "nor an NcAfm.");
+                                "Altermagnet, nor an NcAfm.");
 }

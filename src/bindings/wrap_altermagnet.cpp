@@ -33,7 +33,8 @@ void wrap_altermagnet(py::module& m) {
       .def("minimize", &Altermagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Altermagnet::relax, py::arg("tol"));
       
-  m.def("neel_vector", &neelVectorQuantity);
+  m.def("neel_vector",
+        py::overload_cast<const Altermagnet*> (&neelVectorQuantity));
   m.def("full_magnetization",
         py::overload_cast<const Altermagnet*>(&fullMagnetizationQuantity));
 

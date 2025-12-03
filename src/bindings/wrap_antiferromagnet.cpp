@@ -33,7 +33,8 @@ void wrap_antiferromagnet(py::module& m) {
       .def("minimize", &Antiferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Antiferromagnet::relax, py::arg("tol"));
       
-  m.def("neel_vector", &neelVectorQuantity);
+  m.def("neel_vector",
+        py::overload_cast<const Antiferromagnet*> (&neelVectorQuantity));
   m.def("full_magnetization",
         py::overload_cast<const Antiferromagnet*>(&fullMagnetizationQuantity));
 
