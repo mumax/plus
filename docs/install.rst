@@ -6,7 +6,7 @@ Installation
 Dependencies
 ------------
 
-mumax⁺ should work on any NVIDIA GPU. To get sarted you should install the
+mumax⁺ should work on any NVIDIA GPU. To get started you should install the
 following tools yourself. Open the dropdowns for more details.
 
 .. dropdown:: CUDA Toolkit
