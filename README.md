@@ -66,7 +66,7 @@ To see which CUDA Toolkit works for your GPU's Compute Capability, check [this S
 
 </details>
 
-<details><summary>CPython <i>(version ≥ 3.8 recommended)</i>, pip and miniconda/anaconda</summary>
+<details><summary>CPython <i>(version ≥ 3.11)</i>, pip and miniconda/anaconda</summary>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All these Python-related tools should be included in a standard installation of [Anaconda or Miniconda](https://www.anaconda.com/download/success).
 

@@ -50,7 +50,7 @@ following tools yourself. Open the dropdowns for more details.
 
    👉 *Check Git installation with:* ``git --version``
 
-.. dropdown:: CPython *(version ≥ 3.8 recommended)*, pip and miniconda/anaconda
+.. dropdown:: CPython *(version ≥ 3.11)*, pip and miniconda/anaconda
 
    All these Python-related tools should be included in a standard installation of `Anaconda or Miniconda <https://www.anaconda.com/download/success>`_.
 
