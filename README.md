@@ -23,7 +23,7 @@ All demonstrations in the paper were simulated using version [v1.1.0](https://gi
 
 mumax⁺ should work on any NVIDIA GPU.
 To get started you should install the following tools yourself.
-Take care to avoid **version conflicts** between these different types of software: click the arrows for more details.
+Take care to avoid **version conflicts** between these different types of software and your hardware: click the arrows for more details.
 
 <details><summary>CUDA Toolkit</summary>
 

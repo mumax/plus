@@ -8,7 +8,7 @@ Dependencies
 
 mumax⁺ should work on any NVIDIA GPU.
 To get started you should install the following tools yourself.
-Take care to avoid **version conflicts** between these different types of software: open the dropdowns for more details.
+Take care to avoid **version conflicts** between these different types of software and your hardware: open the dropdowns for more details.
 
 .. dropdown:: CUDA Toolkit
 
