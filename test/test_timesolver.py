@@ -5,7 +5,6 @@ from numpy import arccos, arctan, cos, exp, pi, sin, sqrt, tan
 import pytest
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util.constants import GAMMALL
 
 VALID_METHOD_NAMES = [
     "Heun",
@@ -23,7 +22,7 @@ def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping=0.
     mx, my, mz = initial_magnetization
     theta0 = arccos(mz / sqrt(mx ** 2 + my ** 2 + mz ** 2))
     phi0 = arctan(my / mx)
-    freq = GAMMALL * hfield_z / (1 + damping ** 2)
+    freq = 1.7595e11 * hfield_z / (1 + damping ** 2)
     phi = phi0 + freq * time
     theta = pi - 2 * arctan(exp(damping * freq * time) * tan(pi / 2 - theta0 / 2))
     return {"mx": sin(theta) * cos(phi), "my": sin(theta) * sin(phi), "mz": cos(theta)}

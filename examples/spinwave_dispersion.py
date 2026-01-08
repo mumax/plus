@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util.constants import GAMMALL
 
 # Ferromagnetic spinwave dispersion relation
 
@@ -29,7 +28,7 @@ Bz = 0.2           # bias field along the z direction
 A = 13E-12         # exchange constant
 Ms = 800E3         # saturation magnetization
 alpha = 0.05       # damping parameter
-gamma = GAMMALL    # gyromagnetic ratio
+gamma = 1.7595e11  # gyromagnetic ratio in rad/Ts
 
 # Create the world
 grid_size = (nx, 1, 1)

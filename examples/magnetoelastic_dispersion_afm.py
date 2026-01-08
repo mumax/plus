@@ -11,7 +11,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from mumaxplus import World, Grid, Antiferromagnet
 import os.path
-from mumaxplus.util.constants import *
+from mumaxplus.util.constants import MU0
 
 # angle between magnetization and wave propagation
 theta = np.pi/6
@@ -25,6 +25,7 @@ A_nn = 0
 K = 611e3
 alpha = 1e-4
 Bdc = 2
+gamma = 1.7595e11 # gyromagnetic ratio in rad/Ts
 
 # magnetoelastic parameters
 rho = 2800
@@ -191,11 +192,11 @@ ax.plot(k*1e-9, -w_t/(2*np.pi)*1e-12, color="darkorange", lw=linewidth, label="e
 ax.plot(k*1e-9, -w_l/(2*np.pi)*1e-12, color="darkorange", lw=linewidth)
 
 # spin wave frequencies
-w_ext = GAMMALL * Bdc
-w_ani = GAMMALL * 2*K / msat
-w_ex = GAMMALL * 2*aex/msat * k**2
-w_c = GAMMALL * 4*A_c/(a**2 * msat)
-w_nn = GAMMALL * A_nn/msat * k**2
+w_ext = gamma * Bdc
+w_ani = gamma * 2*K / msat
+w_ex = gamma * 2*aex/msat * k**2
+w_c = gamma * 4*A_c/(a**2 * msat)
+w_nn = gamma * A_nn/msat * k**2
 
 # spin waves
 w_mag = np.sqrt((w_ani + w_ex - w_nn)*(w_ani + w_ex - 2*w_c + w_nn))
@@ -209,7 +210,7 @@ ax.plot(k*1e-9, omega_magn3/(2*np.pi)*1e-12, color="green", lw=linewidth)
 ax.plot(k*1e-9, omega_magn4/(2*np.pi)*1e-12, color="green", lw=linewidth)
 
 # Magnetoelastic waves
-J = GAMMALL * B**2 / (rho*msat)
+J = gamma * B**2 / (rho*msat)
 w = np.linspace(ymin*(2*np.pi)*1e12, ymax*(2*np.pi)*1e12, 2000)
 k, w = np.meshgrid(k,w)
 

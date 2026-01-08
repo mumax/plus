@@ -47,7 +47,7 @@ def compute_domain_wall_speed(magnet):
     alpha = magnet.sub1.alpha.uniform_value
 
     Hsh = HBAR * pol * J / (2 * QE * FL)
-    L = Ms / GAMMALL
+    L = Ms / 1.7595e11 # divide by gyromagnetic ratio
     return np.pi * compute_domain_wall_width(magnet) * Hsh / (alpha * 2 * L)
 
 def DW_profile(x, position, width):

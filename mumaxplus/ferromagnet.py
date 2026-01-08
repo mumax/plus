@@ -238,6 +238,18 @@ class Ferromagnet(Magnet):
         self.alpha.set(value)
 
     @property
+    def gamma(self) -> Parameter:
+        """Gyromagnetic ratio (rad/Ts).
+
+        Default = 1.7595e11 rad/Ts
+        """
+        return Parameter(self._impl.gamma)
+
+    @gamma.setter
+    def gamma(self, value):
+        self.gamma.set(value)
+
+    @property
     def aex(self) -> Parameter:
         """Exchange constant (J/m)."""
         return Parameter(self._impl.aex)

@@ -3,8 +3,6 @@
 #include "datatypes.hpp"
 
 #if FP_PRECISION == SINGLE
-// Gyromagnetic ratio in rad/Ts
-#define GAMMALL 1.7595E11F
 // Vacuum permeability in H/m
 #define MU0 1.256637062E-6F
 // Boltzmann constant in J/K
@@ -16,8 +14,6 @@
 // Reduced Planck constant in Js
 #define HBAR 1.054571817E-34F
 #elif FP_PRECISION == DOUBLE
-// Gyromagnetic ratio in rad/Ts
-#define GAMMALL 1.7595E11
 // Vacuum permeability in H/m
 #define MU0 1.25663706212E-6
 // Boltzmann constant in J/K

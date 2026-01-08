@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 from mumaxplus import Antiferromagnet, Grid, World
-from mumaxplus.util.constants import GAMMALL, MU0
+from mumaxplus.util.constants import MU0
 import os.path
 
 # Antiferromagnetic spinwave dispersion relation
@@ -24,6 +24,7 @@ A_c = -400E-12
 Ms = 400e3          # saturation magnetization
 alpha = 1e-3        # damping parameter
 K = 1e3
+gamma = 1.7595e11 # gyromagnetic ratio in rad/Ts
 
 # Create the world
 grid_size = (nx, 1, 1)
@@ -109,10 +110,10 @@ wex = 2*A/Ms * k**2
 wc = 4*A_c/(a*a*Ms)
 wnn = A_nn/Ms * k**2
 wmagnon = np.sqrt((wani + wex - wnn) * (wani + wex - 2*wc + wnn))
-w1 = GAMMALL * (wmagnon + wext)
-w2 = GAMMALL * (wmagnon - wext)
-w3 = GAMMALL * (-wmagnon + wext)
-w4 = GAMMALL * (-wmagnon - wext)
+w1 = gamma * (wmagnon + wext)
+w2 = gamma * (wmagnon - wext)
+w3 = gamma * (-wmagnon + wext)
+w4 = gamma * (-wmagnon - wext)
 
 ax.plot(k, w1/(2*np.pi), '--', lw=1, color="green", label="Theory")
 ax.plot(k, w2/(2*np.pi), '--', lw=1, color="green")
@@ -123,7 +124,7 @@ ax.plot(k, w4/(2*np.pi), '--', lw=1, color="green")
 ax.imshow(FT_tot, aspect='auto', origin='lower', extent=extent, cmap="inferno")
 
 # Shows how much the dispersion relation has shifted up due to an external field
-ax.axhline(GAMMALL * Bz / (2 * np.pi), c='g', ls='--', lw=1)
+ax.axhline(gamma * Bz / (2 * np.pi), c='g', ls='--', lw=1)
 
 
 # Shows where mumax⁺ breaks down due to waves being smaller than cell size
