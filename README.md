@@ -132,7 +132,7 @@ or to run the [tests](#testing) in the `test/` directory.
 
 * (*Windows*) If you encounter the error `No CUDA toolset found`, try copying the files in `NVIDIA GPU Computing Toolkit/CUDA/<version>/extras/visual_studio_integration/MSBuildExtensions` to `Microsoft Visual Studio/<year>/<edition>/MSBuild/Microsoft/VC/<version>/BuildCustomizations`. See [these instructions](https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170) for more details.
 
-* (*Windows*) If you encounter other CMake- or MSVC-related errors during compilation, you may try to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. Sometimes this special shell solves conflicts between MSVC and CUDA, sometimes not.
+* (*Windows*) If you encounter errors related to interactions between CMake, MSVC and CUDA, like `-- Detecting CUDA compiler ABI info - failed`, you may try the following methods to activate an appropriate set of environment variables. One option is to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. For CUDA &leq;12.9, another option is to call one of the `.bat` scripts in the folder `& C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build`, such as `vcvars64.bat`, before you run `pip install`.
 
 </details>
 
