@@ -3,6 +3,7 @@ import numpy as np
 from scipy.fft import rfft, rfftfreq
 from scipy.signal import find_peaks
 from mumaxplus import Antiferromagnet, Grid, World
+from mumaxplus.util.constants import GAMMALL_DEFAULT
 
 Ms = 200e3
 A0 = -100e-12
@@ -11,7 +12,7 @@ A12 = -15e-12
 K = 1e3
 a = 0.35e-9
 mu0 = 1.256637062E-6
-gamma = 1.7595e11 / (2 * np.pi) # gyromagnetic ratio in Hz/T
+gamma = GAMMALL_DEFAULT / (2 * np.pi) # gyromagnetic ratio in Hz/T
 alpha = 0
 
 c = 1e-9

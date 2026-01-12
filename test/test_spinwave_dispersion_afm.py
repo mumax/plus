@@ -6,7 +6,7 @@ analytical and simulation results within the valid range.
 import numpy as np
 
 from mumaxplus import Antiferromagnet, Grid, World
-from mumaxplus.util import MU0
+from mumaxplus.util import GAMMALL_DEFAULT, MU0
 
 RTOL = 3e-2  # 3%
 
@@ -26,7 +26,6 @@ def test_spinwave_dispersion_afm():
     A_c = -400E-12
     Ms = 400e3         # saturation magnetization
     alpha = 0.005      # damping parameter
-    gamma = 1.7595e11 # gyromagnetic ratio in rad/Ts
     K = 1e3
 
     # Create the world
@@ -85,7 +84,7 @@ def test_spinwave_dispersion_afm():
     He = -4 * A_c / (dx*dx*mu0Ms)
     Ha = 2 * K / mu0Ms
     Hint = (2*A - A_nn) / mu0Ms
-    freq_theory = MU0 * gamma / (2*np.pi) * np.sqrt((2*He + Ha + Hint * k**2) * (Ha + Hint * k**2)) + Bz * gamma/(2*np.pi)
+    freq_theory = MU0 * GAMMALL_DEFAULT / (2*np.pi) * np.sqrt((2*He + Ha + Hint * k**2) * (Ha + Hint * k**2)) + Bz * GAMMALL_DEFAULT/(2*np.pi)
 
     # difference
     freq_diff = abs(freq_mumaxplus - freq_theory)

@@ -1,6 +1,6 @@
 """Utilities for mumax⁺."""
 
-from .constants import MU0, KB, QE, MUB, HBAR
+from .constants import GAMMALL_DEFAULT, MU0, KB, QE, MUB, HBAR
 from .config import twodomain, antivortex, blochskyrmion, neelskyrmion, vortex
 from .config import gaussian_spherical_OoP, gaussian_spherical_IP, gaussian_uniform_IP
 from .formulary import *
@@ -11,7 +11,7 @@ from .voronoi import VoronoiTessellator
 
 __all__ = [
     # constants
-    "MU0", "KB", "QE", "MUB", "HBAR",
+    "GAMMALL_DEFAULT", "MU0", "KB", "QE", "MUB", "HBAR",
     # config
     "twodomain", "vortex", "antivortex", "neelskyrmion", "blochskyrmion",
     "gaussian_spherical_OoP", "gaussian_spherical_IP", "gaussian_uniform_IP",

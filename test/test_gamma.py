@@ -1,10 +1,15 @@
 from mumaxplus import Grid, World, Ferromagnet
 import numpy as np
 
-def max_relative_error(result, wanted):
-    err = np.linalg.norm(result - wanted, axis=0)
-    relerr = err / np.linalg.norm(wanted, axis=0)
-    return np.max(relerr)
+def max_absolute_error(result, wanted):
+    """Maximum error for vector quantities."""
+    return np.max(np.linalg.norm(result - wanted, axis=0))
+
+def max_semirelative_error(result, wanted):
+    """Like relative error, but divides by the maximum of wanted.
+    Useful when removing units but the results go through zero.
+    """
+    return max_absolute_error(result, wanted) / np.max(abs(wanted))
 
 def test_gyromagnetic_ratio_LLG_torque():
     """Reduce the gyromagnetic ratio in a copy of a magnet and compare the torques."""
@@ -24,8 +29,8 @@ def test_gyromagnetic_ratio_LLG_torque():
     t1 = magnet1.torque()
     t2 = magnet2.torque()
     
-    err = max_relative_error(t2 / 2, t1)
-    assert err < 5e-4
+    err = max_semirelative_error(t2 / 2, t1)
+    assert err < 1e-6
 
 def test_gyromagnetic_ratio_damping_torque():
     """Reduce the gyromagnetic ratio in a copy of a magnet and compare the torques."""
@@ -46,8 +51,8 @@ def test_gyromagnetic_ratio_damping_torque():
     t1 = magnet1.damping_torque()
     t2 = magnet2.damping_torque()
     
-    err = max_relative_error(t2 / 2, t1)
-    assert err < 5e-4
+    err = max_semirelative_error(t2 / 2, t1)
+    assert err < 1e-6
 
 def test_gyromagnetic_ratio_Slonczewski():
     """Slonczewski STT scales with the gyromagnetic ratio"""
@@ -67,5 +72,5 @@ def test_gyromagnetic_ratio_Slonczewski():
     magnet.gamma = magnet.gamma() * 2
     t2 = magnet.spin_transfer_torque()
 
-    err = max_relative_error(t2 / 2, t1)
+    err = max_semirelative_error(t2 / 2, t1)
     assert err < 1e-7
