@@ -120,9 +120,9 @@ std::vector<Center> VoronoiTessellator::centersInTile(const int3 pos) {
         return it->second.centers;
     }
 
-    const int64_t seed = ((int64_t(pos.x) + (1LL << 20)) * (1LL << 40)) +
-                         ((int64_t(pos.y) + (1LL << 20)) * (1LL << 20)) +
-                         ( int64_t(pos.z) + (1LL << 20));
+    const int32_t seed = ((int32_t(pos.x) + (1LL << 10)) * (1LL << 20)) +
+                         ((int32_t(pos.y) + (1LL << 10)) * (1LL << 10)) +
+                         ( int32_t(pos.z) + (1LL << 10));
 
     engine_.seed (seed ^ seed_);
     int N = Poisson(lambda_);
