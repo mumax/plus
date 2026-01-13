@@ -6,8 +6,9 @@ Installation
 Dependencies
 ------------
 
-mumax⁺ should work on any NVIDIA GPU. To get sarted you should install the
-following tools yourself. Open the dropdowns for more details.
+mumax⁺ should work on any NVIDIA GPU.
+To get started you should install the following tools yourself.
+Take care to avoid **version conflicts** between these different types of software and your hardware: open the dropdowns for more details.
 
 .. dropdown:: CUDA Toolkit
 
@@ -37,9 +38,11 @@ following tools yourself. Open the dropdowns for more details.
 .. dropdown:: A C++ compiler which supports C++17
 
    - **Linux:** ``sudo apt-get install gcc``
-      - ⚠️ each CUDA version has a maximum supported ``gcc`` version. `This StackOverflow answer <https://stackoverflow.com/a/46380601>`_ lists the maximum supported ``gcc`` version for each CUDA version. If necessary, use ``sudo apt-get install gcc-<min_version>`` instead, with the appropriate ``<min_version>``.
-   - **Windows:**
-      - CUDA does not support the ``gcc`` compiler on Windows, so download and install `Microsoft Visual Studio <https://visualstudio.microsoft.com/downloads/>`_ with the "Desktop development with C++" workload. After installing, check if the path to ``cl.exe`` was added to your ``PATH`` environment variable (i.e., check whether ``where cl.exe`` returns an appropriate path like ``C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64``). If not, add it manually.
+      - ⚠️ Each CUDA version has a maximum supported ``gcc`` version, as listed in `This StackOverflow answer <https://stackoverflow.com/a/46380601>`_. If necessary, use ``sudo apt-get install gcc-<min_version>`` instead, with the appropriate ``<min_version>``.
+   - **Windows:** `Microsoft Visual C++ <https://visualstudio.microsoft.com/downloads/>`_ (MSVC) must be used, since CUDA does not support ``gcc`` on Windows.
+      - ⚠️ Make sure you install a version of MSVC that is compatible with your installed CUDA toolkit, as listed in `this table <https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html>`_ (e.g., MSVC 2026 does not yet seem to be supported by CUDA as of January 2026).
+      - During installation, check the box to include the "Desktop development with C++" workload.
+      - After installing, check if the path to ``cl.exe`` was added to your ``PATH`` environment variable (i.e., check whether ``where cl.exe`` returns an appropriate path like ``C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64``). If not, add it manually.
 
    👉 *Check C installation with:* ``gcc --version`` *on Linux and* ``where.exe cl.exe`` *on Windows.*
 
@@ -50,7 +53,7 @@ following tools yourself. Open the dropdowns for more details.
 
    👉 *Check Git installation with:* ``git --version``
 
-.. dropdown:: CPython *(version ≥ 3.8 recommended)*, pip and miniconda/anaconda
+.. dropdown:: CPython *(version ≥ 3.11)*, pip and miniconda/anaconda
 
    All these Python-related tools should be included in a standard installation of `Anaconda or Miniconda <https://www.anaconda.com/download/success>`_.
 
@@ -121,3 +124,4 @@ Or you could run the tests from the ``test/`` directory.
 .. dropdown:: Troubleshooting
 
    - (*Windows*) If you encounter the error ``No CUDA toolset found``, try copying the files in ``NVIDIA GPU Computing Toolkit/CUDA/<version>/extras/visual_studio_integration/MSBuildExtensions`` to ``Microsoft Visual Studio/<year>/<edition>/MSBuild/Microsoft/VC/<version>/BuildCustomizations``. See `these instructions <https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170>`_ for more details.
+   - (*Windows*) If you encounter errors related to interactions between CMake, MSVC and CUDA, like ``-- Detecting CUDA compiler ABI info - failed``, you may try the following methods to activate an appropriate set of environment variables. One option is to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. For CUDA :math:`\leq` 12.9, another option is to call one of the ``.bat`` scripts in the folder ``& C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build``, such as ``vcvars64.bat``, before you run ``pip install``.
