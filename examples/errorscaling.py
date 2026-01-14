@@ -21,7 +21,7 @@ def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping):
     mx, my, mz = initial_magnetization
     theta0 = acos(mz)
     phi0 = atan(my / mx)
-    freq = GAMMALL * hfield_z / (1 + damping ** 2)
+    freq = GAMMALL_DEFAULT * hfield_z / (1 + damping ** 2)
     phi = phi0 + freq * time
     theta = pi - 2 * atan(exp(damping * freq * time) * tan(pi / 2 - theta0 / 2))
     return np.array([sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)])
@@ -42,7 +42,7 @@ def single_system(method, dt):
     magnetization = (1/np.sqrt(2), 0, 1/np.sqrt(2))
     damping = 0.001
     hfield_z = 0.1  # External field strength
-    duration = 2*np.pi/(GAMMALL * hfield_z) * (1 + damping**2) * 10  # Time of 10 precessions
+    duration = 2*np.pi/(GAMMALL_DEFAULT * hfield_z) * (1 + damping**2) * 10  # Time of 10 precessions
 
     magnet = Ferromagnet(world, grid=Grid((1, 1, 1)))
     magnet.enable_demag = False
