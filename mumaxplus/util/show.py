@@ -1445,7 +1445,8 @@ def show_regions(magnet,
     boundaries = _np.zeros((1,) + regions.shape, dtype=int)
 
     boundaries[0, 1:, :, :] |= regions[1:, :, :] != regions[:-1, :, :]   # up
-    boundaries[0, :, 1:, :] |= regions[:, 1:, :] != regions[:, :-1, :]   # left
+    boundaries[0, :, 1:, :] |= regions[:, 1:, :] != regions[:, :-1, :]   # forward
+    boundaries[0, :, :, 1:] |= regions[:, :, 1:] != regions[:, :, :-1]   # right
 
     # Reuse _Plotter logic, but no need for quiver map or cbar
     if title is None:

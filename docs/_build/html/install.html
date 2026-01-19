@@ -40,7 +40,7 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="_static/documentation_options.js?v=bee7790f"></script>
+    <script src="_static/documentation_options.js?v=a993f969"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
     <link rel="prev" title="mumax+" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-09-30, v1.1.1"/>
+    <meta name="docbuild:last-update" content="2025-10-23, v1.1.2"/>
   </head>
   
   
@@ -357,6 +357,7 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-mumax">Building mumax⁺</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-the-compilation">Check the compilation</a></li>
 </ul>
             </nav>
         </div>
@@ -372,10 +373,13 @@ document.write(`
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">#</a></h2>
-<p>You should install the following tools yourself. Open the dropdowns for more details.</p>
+<p>mumax⁺ should work on any NVIDIA GPU. To get sarted you should install the
+following tools yourself. Open the dropdowns for more details.</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
-<span class="sd-summary-text">CUDA Toolkit <em>(version 10.0 or later)</em></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<span class="sd-summary-text">CUDA Toolkit</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">To see which CUDA Toolkit works for your GPU’s Compute Capability, check
+<a class="reference external" href="https://stackoverflow.com/questions/28932864/which-compute-capability-is-supported-by-which-cuda-versions">this Stack Overflow post</a>.</p>
 <ul class="simple">
 <li><p class="sd-card-text"><strong>Windows</strong>: Download an installer from <a class="reference external" href="https://developer.nvidia.com/cuda-toolkit-archive">the CUDA website</a>.</p></li>
 <li><p class="sd-card-text"><strong>Linux</strong>: Use <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">nvidia-cuda-toolkit</span></code>, or <a class="reference external" href="https://developer.nvidia.com/cuda-toolkit-archive">download an installer</a>.</p></li>
@@ -473,6 +477,17 @@ conda<span class="w"> </span>activate<span class="w"> </span>mumaxplus
 </pre></div>
 </div>
 </div>
+</section>
+<section id="check-the-compilation">
+<h2>Check the compilation<a class="headerlink" href="#check-the-compilation" title="Link to this heading">#</a></h2>
+<p>To check if you successfully compiled mumax⁺, we recommend you to run some examples from the <code class="docutils literal notranslate"><span class="pre">examples/</span></code> directory, such as standard problem 4.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/standardproblem4.py
+</pre></div>
+</div>
+<p>Or you could run the tests from the <code class="docutils literal notranslate"><span class="pre">test/</span></code> directory.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">Troubleshooting</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
@@ -530,6 +545,7 @@ conda<span class="w"> </span>activate<span class="w"> </span>mumaxplus
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-mumax">Building mumax⁺</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-the-compilation">Check the compilation</a></li>
 </ul>
   </nav></div>
 
@@ -556,7 +572,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-09-30, v1.1.1.
+  Last updated on 2025-10-23, v1.1.2.
   <br/>
 </p>
   </div>

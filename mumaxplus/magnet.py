@@ -341,7 +341,7 @@ class Magnet(ABC):
         η = β * C
 
         This parameter is completely **ignored** when any component of the viscosity
-        tensor (:attr:`eta11`, :attr:`et12` or :attr:`eta44`) has been set.
+        tensor (:attr:`eta11`, :attr:`eta12` or :attr:`eta44`) has been set.
 
         See Also
         --------

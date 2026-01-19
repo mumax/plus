@@ -2,6 +2,10 @@ import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 
+SRTOL = 3e-7
+
+def max_semirelative_error(result, wanted):
+    return np.max(np.abs(result - wanted) / np.max(np.abs(wanted)))
 
 def compute_exchange_numpy(magnet):
     m = magnet.magnetization.get()
@@ -40,10 +44,7 @@ class TestExchange:
         result = magnet.exchange_field.eval()
         wanted = compute_exchange_numpy(magnet)
 
-        relative_error = np.abs(result - wanted) / np.abs(wanted)
-        max_relative_error = np.max(relative_error)
-
-        assert max_relative_error < 1e-3
+        assert max_semirelative_error(result, wanted) < SRTOL
 
     def test_exchange_spiral(self):
         """This test compares numerical and analytical exchange energy for spiral

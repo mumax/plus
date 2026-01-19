@@ -208,8 +208,8 @@ class Parameter(FieldQuantity):
 
     def _reset_fields_default(self):
         if isinstance(self._impl, _cpp.Parameter):
-            self._impl.set(0)
+            self._impl.set(0.0)
         elif isinstance(self._impl, _cpp.VectorParameter):
-            self._impl.set((0, 0, 0))
+            self._impl.set((0.0, 0.0, 0.0))
 
         self.remove_time_terms()

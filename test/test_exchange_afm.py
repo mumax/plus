@@ -3,6 +3,10 @@ import numpy as np
 from mumaxplus import Antiferromagnet, Grid, World
 from mumaxplus.util import *
 
+SRTOL = 3e-7
+
+def max_semirelative_error(result, wanted):
+    return np.max(np.abs(result - wanted) / np.max(np.abs(wanted)))
 
 def compute_fm_exchange_numpy(magnet):
     m = magnet.magnetization.get()
@@ -72,10 +76,7 @@ class TestAfmExchange:
             result = sub.exchange_field.eval()
             wanted = compute_fm_exchange_numpy(sub)
 
-            relative_error = np.abs(result - wanted) / np.abs(wanted)
-            max_relative_error = np.max(relative_error)
-
-            assert max_relative_error < 1e-3
+            assert max_semirelative_error(result, wanted) < SRTOL
     
     def test_homo_exchange(self):
         world = World((1e3, 2e3, 3e3))
@@ -88,9 +89,7 @@ class TestAfmExchange:
             result = sub.homogeneous_exchange_field()
             wanted = compute_homo_exchange_numpy(magnet, magnet.other_sublattice(sub))
 
-            relative_error = np.abs(result - wanted) / np.abs(wanted)
-            max_relative_error = np.max(relative_error)
-            assert max_relative_error < 1e-3
+            assert max_semirelative_error(result, wanted) < SRTOL
 
     def test_inhomo_exchange(self):
         world = World((1e3, 2e3, 3e3))
@@ -104,10 +103,7 @@ class TestAfmExchange:
             result = sub.inhomogeneous_exchange_field()
             wanted = compute_inhomo_exchange_numpy(magnet, othersub)
 
-            relative_error = np.abs(result - wanted) / np.abs(wanted)
-            max_relative_error = np.max(relative_error)
-
-            assert max_relative_error < 1e-3
+            assert max_semirelative_error(result, wanted) < SRTOL
 
     def test_exchange_spiral(self):
         """This test compares numerical and analytical exchange energy for spiral

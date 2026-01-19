@@ -21,6 +21,7 @@ bool thermalNoiseAssuredZero(const Ferromagnet* magnet) {
 __global__ void k_thermalNoise(CuField noiseField,
                                const CuParameter msat,
                                const CuParameter alpha,
+                               const CuParameter gamma,
                                const CuParameter temperature,
                                real preFactor) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -38,9 +39,10 @@ __global__ void k_thermalNoise(CuField noiseField,
   real Ms = msat.valueAt(idx);
   real T = temperature.valueAt(idx);
   real a = alpha.valueAt(idx);
+  real g = gamma.valueAt(idx);
 
   real3 noise = noiseField.vectorAt(idx);
-  noise *= sqrt(preFactor * a * T / ((1 + a * a) * Ms));
+  noise *= sqrt(preFactor * g * a * T / ((1 + a * a) * Ms));
   noiseField.setVectorInCell(idx, noise);
 }
 
@@ -62,10 +64,11 @@ Field evalThermalNoise(const Ferromagnet* magnet) {
 
   auto msat = magnet->msat.cu();
   auto alpha = magnet->alpha.cu();
+  auto gamma = magnet->gamma.cu();
   auto temp = magnet->temperature.cu();
   real cellVolume = magnet->world()->cellVolume();
-  real preFactor = 2 * KB * GAMMALL / cellVolume;
-  cudaLaunch(N, k_thermalNoise, noise.cu(), msat, alpha, temp, preFactor);
+  real preFactor = 2 * KB / cellVolume;
+  cudaLaunch(N, k_thermalNoise, noise.cu(), msat, alpha, gamma, temp, preFactor);
   return noise;
 }
 
