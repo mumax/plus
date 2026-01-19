@@ -6,7 +6,7 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 
 add_subdirectory(pybind11)
 
-pybind11_add_module(_mumaxpluscpp
+pybind11_add_module(${MUMAX_MODULE_NAME}
     cast.hpp
     main.cpp
     wrappers.hpp
@@ -32,5 +32,7 @@ pybind11_add_module(_mumaxpluscpp
     wrap_traction.cpp
 )
 
-target_include_directories(_mumaxpluscpp PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-target_link_libraries(_mumaxpluscpp PRIVATE core physics)
+target_include_directories(${MUMAX_MODULE_NAME} PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+target_link_libraries(${MUMAX_MODULE_NAME} PRIVATE core physics)
+set_target_properties(${MUMAX_MODULE_NAME} PROPERTIES OUTPUT_NAME "${MUMAX_MODULE_NAME}")
+target_compile_definitions(${MUMAX_MODULE_NAME} PRIVATE MUMAX_MODULE_NAME=${MUMAX_MODULE_NAME})

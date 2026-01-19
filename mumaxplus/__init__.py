@@ -1,6 +1,7 @@
 """GPU accelerated micromagnetic simulator."""
 
-import _mumaxpluscpp as _cpp
+# TODO: select single or double precision appropriately here in the Python layer
+import _mumaxpluscpp_single as _cpp
 
 from .antiferromagnet import Antiferromagnet
 from .dmitensor import DmiTensor

@@ -117,6 +117,6 @@ if (WIN32)
     add_custom_command(TARGET physics POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${CUDA_RUNTIME_DLLS}
-            $<TARGET_FILE_DIR:_mumaxpluscpp>
+            $<TARGET_FILE_DIR:${MUMAX_MODULE_NAME}>
     )
 endif()
