@@ -3,7 +3,7 @@
 import numpy as _np
 from abc import ABC, abstractmethod
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .fieldquantity import FieldQuantity
 from .grid import Grid

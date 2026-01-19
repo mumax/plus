@@ -1,6 +1,6 @@
 """StrayField implementation."""
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .fieldquantity import FieldQuantity
 
