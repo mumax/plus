@@ -21,6 +21,10 @@ class Variable(FieldQuantity):
             Or the new value can be set cell by cell with an ndarray with the same
             shape as this variable, or with a function which returns the cell value
             as a function of the position.
+
+        See Also
+        --------
+        :func:`set_in_region`
         """
         if hasattr(value, "__call__"):
             self._set_func(value)
