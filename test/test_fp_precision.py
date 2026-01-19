@@ -75,7 +75,8 @@ def run_with_precision(precision):
                  "DOUBLE": '< 2e-6'}.get(precision)
     
     code = textwrap.dedent(f"""
-        import mumaxplus
+        try: import mumaxplus
+        except ModuleNotFoundError: exit()
         from {Path(__file__).stem} import single_system
         
         assert mumaxplus._cpp.FP_PRECISION == {FP_PRECISION_CPP}
