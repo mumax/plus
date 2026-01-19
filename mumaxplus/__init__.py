@@ -1,7 +1,17 @@
 """GPU accelerated micromagnetic simulator."""
 
-# TODO: select single or double precision appropriately here in the Python layer
-import _mumaxpluscpp_single as _cpp
+import os
+
+
+FP_PRECISION = os.environ.get("MUMAXPLUS_FP_PRECISION")
+if not FP_PRECISION: FP_PRECISION = "SINGLE"
+match FP_PRECISION.upper():
+    case "SINGLE" | "1" | "32":
+        import _mumaxpluscpp_single as _cpp
+    case "DOUBLE" | "2" | "64":
+        import _mumaxpluscpp_double as _cpp
+    case _:
+        raise RuntimeError(f"Unknown MUMAXPLUS_FP_PRECISION='{FP_PRECISION}'")
 
 from .antiferromagnet import Antiferromagnet
 from .dmitensor import DmiTensor
@@ -21,7 +31,7 @@ from .variable import Variable
 from .world import World
 from . import util
 
-FP_PRECISION = {1: "SINGLE", 2: "DOUBLE"}.get(_cpp.FP_PRECISION, "UNKNOWN")
+FP_PRECISION = {1: "SINGLE", 2: "DOUBLE"}.get(_cpp.FP_PRECISION, "UNKNOWN") # Use _cpp value, as that is certainly the correct one
 
 __all__ = [
     "_cpp",
