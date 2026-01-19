@@ -1,10 +1,26 @@
 """GPU accelerated micromagnetic simulator."""
 
+import argparse
 import os
 
 
-FP_PRECISION = os.environ.get("MUMAXPLUS_FP_PRECISION")
-if not FP_PRECISION: FP_PRECISION = "SINGLE"
+## Determine and use the desired floating point precision
+# Was a command line argument passed?
+parser = argparse.ArgumentParser()
+parser.add_argument('--mumaxplus-fp-precision', dest='fp_precision', type=str, nargs='?', default=None,
+                    help='Let mumax+ use single (FP_PRECISION = SINGLE, 1 or 32) or double (DOUBLE, 2 or 64) precision. This argument takes precedence over the environment variable MUMAXPLUS_FP_PRECISION.')
+args = parser.parse_args()
+FP_PRECISION = args.fp_precision # Can be None
+
+# If not, was an environment variable set?
+if not FP_PRECISION:
+    FP_PRECISION = os.environ.get("MUMAXPLUS_FP_PRECISION")
+
+# If not, default to single precision.
+if not FP_PRECISION:
+    FP_PRECISION = "SINGLE"
+
+# Load the appropriate C++ binary
 match FP_PRECISION.upper():
     case "SINGLE" | "1" | "32":
         import _mumaxpluscpp_single as _cpp
@@ -13,6 +29,8 @@ match FP_PRECISION.upper():
     case _:
         raise RuntimeError(f"Unknown MUMAXPLUS_FP_PRECISION='{FP_PRECISION}'")
 
+
+## Populate the "mumaxplus." namespace
 from .antiferromagnet import Antiferromagnet
 from .dmitensor import DmiTensor
 from .ferromagnet import Ferromagnet
