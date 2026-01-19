@@ -214,7 +214,7 @@ class Parameter(FieldQuantity):
 
         # uniform value
         if isinstance(value, (float, int)) or (
-           isinstance(value, tuple) and len(value) == 3):
+           (isinstance(value, tuple) or isinstance(value, _np.ndarray)) and len(value) == 3):
             self._impl.set_in_region(region_idx, value)
 
         # evaluate value based on function
