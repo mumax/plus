@@ -64,7 +64,10 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         
-        for precision in ["SINGLE", "DOUBLE"]:
+        precision = os.environ.get("MUMAXPLUS_FP_PRECISION")
+        aliases = {"SINGLE": ("SINGLE", "1", "32"), "DOUBLE": ("DOUBLE", "2", "64")}
+        precisions = [k for k, v in aliases.items() if precision in v] if precision else aliases.keys()
+        for precision in precisions:
             build_temp = Path(self.build_temp) / precision.lower()
             build_temp.mkdir(parents=True, exist_ok=True)
             cmake_precision_args = [f"-DMUMAX_MODULE_NAME=_mumaxpluscpp_{precision.lower()}", f"-DFP_PRECISION={precision}"]
