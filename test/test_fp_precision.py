@@ -20,7 +20,7 @@ def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping):
     mx, my, mz = initial_magnetization
     theta0 = np.acos(mz)
     phi0 = np.atan(my / mx)
-    freq = mumaxplus.util.constants.GAMMALL * hfield_z / (1 + damping ** 2)
+    freq = mumaxplus.util.constants.GAMMALL_DEFAULT * hfield_z / (1 + damping ** 2)
     phi = phi0 + freq * time
     theta = np.pi - 2 * np.atan(np.exp(damping * freq * time) * np.tan(np.pi / 2 - theta0 / 2))
     return np.array([np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)])
@@ -41,7 +41,7 @@ def single_system(method, dt):
     magnetization = (1/np.sqrt(2), 0, 1/np.sqrt(2))
     damping = 0.001
     hfield_z = 0.1  # External field strength
-    duration = 2*np.pi/(mumaxplus.util.constants.GAMMALL * hfield_z) * (1 + damping**2) * 10  # Time of 10 precessions
+    duration = 2*np.pi/(mumaxplus.util.constants.GAMMALL_DEFAULT * hfield_z) * (1 + damping**2) * 10  # Time of 10 precessions
 
     magnet = mumaxplus.Ferromagnet(world, grid=mumaxplus.Grid((1, 1, 1)))
     magnet.enable_demag = False
