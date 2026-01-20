@@ -114,7 +114,7 @@ pip install .
 > If you want to change only the Python code, without needing to reinstall after each change, ``pip install -ve .`` can also be used.
 
 > [!TIP]
-> mumax⁺ can use either single or double floating-point precision, but this choice must be made before the `import mumaxplus` statement. It can be controlled in two ways: either by passing the command line argument `--mumaxplus-fp-precision` to the `python` call, or by setting the environment variable `MUMAXPLUS_FP_PRECISION`. The former takes precedence over the latter, and both can be set to `SINGLE` or `DOUBLE`. If neither are specified, single precision is used.
+> mumax⁺ can use either single or double floating-point precision, but this choice must be made before the `import mumaxplus` statement. It can be controlled in two ways: either by passing the command line argument `--mumaxplus-fp-precision` to the `python` call, or by setting the environment variable `MUMAXPLUS_FP_PRECISION`. The former takes precedence over the latter, and both can be set to `SINGLE` or `DOUBLE`. If neither are specified, single precision is used. The precision used can be accessed through `mumaxplus.FP_PRECISION`.
 >
 > By default, compiling the source code provides support for both options. However, the environment variable also affects the compilation of the source code: setting it results in faster compilation as it will cause the binaries to only support one precision.
 

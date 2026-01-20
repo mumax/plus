@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import sys
 import textwrap
+from typing import Literal
 
 import mumaxplus
 
@@ -66,11 +67,9 @@ def single_system(method, dt):
     return error
 
 
-def run_with_precision(precision):
+def run_with_precision(precision: Literal["SINGLE", "DOUBLE"]):
     FP_PRECISION_CPP = {"SINGLE": 1,
                         "DOUBLE": 2}.get(precision)
-    FP_PRECISION = {"SINGLE": '"SINGLE"',
-                    "DOUBLE": '"DOUBLE"'}.get(precision)
     PREC_TEST = {"SINGLE": '> 1e-4',
                  "DOUBLE": '< 2e-6'}.get(precision)
     
@@ -80,7 +79,7 @@ def run_with_precision(precision):
         from {Path(__file__).stem} import single_system
         
         assert mumaxplus._cpp.FP_PRECISION == {FP_PRECISION_CPP}
-        assert mumaxplus.FP_PRECISION == {FP_PRECISION}
+        assert mumaxplus.FP_PRECISION == "{precision}"
         assert single_system("DormandPrince", 1.1e-11) {PREC_TEST}
     """)
     subprocess.check_output([sys.executable, "-c", code, "--mumaxplus-fp-precision", precision], cwd=Path(__file__).parent)
