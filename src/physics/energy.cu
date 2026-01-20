@@ -75,84 +75,21 @@ Field evalTotalEnergyDensity(const Ferromagnet* magnet) {
   return edens;
 }
 
-Field evalTotalEnergyDensity(const Antiferromagnet* magnet) {
-  Field edens = evalTotalEnergyDensity(magnet->sub1()) +
-                evalTotalEnergyDensity(magnet->sub2());
-  if (!kineticEnergyAssuredZero(magnet)) {edens += evalKineticEnergyDensity(magnet);}
-  if (!elasticityAssuredZero(magnet)) {edens += evalElasticEnergyDensity(magnet);}
-  return edens;
-}
+Field evalTotalEnergyDensity(const HostMagnet* magnet) {
+  Field edens(magnet->system(), 1, 0.0);
 
-Field evalTotalEnergyDensity(const Altermagnet* magnet) {
-  Field edens = evalTotalEnergyDensity(magnet->sub1()) +
-                evalTotalEnergyDensity(magnet->sub2());
-  if (!kineticEnergyAssuredZero(magnet)) {edens += evalKineticEnergyDensity(magnet);}
-  if (!elasticityAssuredZero(magnet)) {edens += evalElasticEnergyDensity(magnet);}
-  return edens;
-}
+  for (const Ferromagnet* sub : magnet->sublattices())
+    edens += evalTotalEnergyDensity(sub);
 
-Field evalTotalEnergyDensity(const NcAfm* magnet) {
-  Field edens = evalTotalEnergyDensity(magnet->sub1()) +
-                evalTotalEnergyDensity(magnet->sub2()) +
-                evalTotalEnergyDensity(magnet->sub3());
-  if (!kineticEnergyAssuredZero(magnet)) {edens += evalKineticEnergyDensity(magnet);}
-  if (!elasticityAssuredZero(magnet)) {edens += evalElasticEnergyDensity(magnet);}
+  if (!kineticEnergyAssuredZero(magnet)) { edens += evalKineticEnergyDensity(magnet); }
+  if (!elasticityAssuredZero(magnet)) { edens += evalElasticEnergyDensity(magnet); }
   return edens;
 }
 
 real evalTotalEnergy(const Magnet* magnet) {
-  real edensAverage = 0;
   if (const Ferromagnet* mag = magnet->asFM())
-    edensAverage = totalEnergyDensityQuantity(mag).average()[0];
-  else if (const Antiferromagnet* mag = magnet->asAFM())
-    edensAverage = totalEnergyDensityQuantity(mag).average()[0];
-  else if (const Altermagnet* mag = magnet->asATM())
-    edensAverage = totalEnergyDensityQuantity(mag).average()[0];
-  else if (const NcAfm* mag = magnet->asNcAfm())
-    edensAverage = totalEnergyDensityQuantity(mag).average()[0];
-  else
-    throw std::invalid_argument("Cannot calculate energy of instance which "
-                                "is no Ferromagnet, Antiferromagnet, Altermagnet "
-                                "or non-collinear antiferromagnet.");                 
-  return energyFromEnergyDensity(magnet, edensAverage);
-}
-
-FM_FieldQuantity totalEnergyDensityQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet,
-    static_cast<Field(*)(const Ferromagnet*)>(evalTotalEnergyDensity),
-    1, "total_energy_density", "J/m3");
-}
-
-FM_ScalarQuantity totalEnergyQuantity(const Ferromagnet* magnet) {
-  return FM_ScalarQuantity(magnet, evalTotalEnergy, "total_energy", "J");
-}
-
-AFM_FieldQuantity totalEnergyDensityQuantity(const Antiferromagnet* magnet) {
-  return AFM_FieldQuantity(magnet,
-    static_cast<Field(*)(const Antiferromagnet*)>(evalTotalEnergyDensity),
-    1, "total_energy_density", "J/m3");
-}
-
-AFM_ScalarQuantity totalEnergyQuantity(const Antiferromagnet* magnet) {
-  return AFM_ScalarQuantity(magnet, evalTotalEnergy, "total_energy", "J");
-}
-
-ATM_FieldQuantity totalEnergyDensityQuantity(const Altermagnet* magnet) {
-  return ATM_FieldQuantity(magnet,
-    static_cast<Field(*)(const Altermagnet*)>(evalTotalEnergyDensity),
-    1, "total_energy_density", "J/m3");
-}
-
-ATM_ScalarQuantity totalEnergyQuantity(const Altermagnet* magnet) {
-  return ATM_ScalarQuantity(magnet, evalTotalEnergy, "total_energy", "J");
-}
-
-NcAfm_FieldQuantity totalEnergyDensityQuantity(const NcAfm* magnet) {
-  return NcAfm_FieldQuantity(magnet,
-    static_cast<Field(*)(const NcAfm*)>(evalTotalEnergyDensity),
-    1, "total_energy_density", "J/m3");
-}
-
-NcAfm_ScalarQuantity totalEnergyQuantity(const NcAfm* magnet) {
-  return NcAfm_ScalarQuantity(magnet, evalTotalEnergy, "total_energy", "J");
+    return energyFromEnergyDensity(mag, totalEnergyDensityQuantity(mag).average()[0]);
+  if (const HostMagnet* mag = magnet->asHost())
+    return energyFromEnergyDensity(mag, totalEnergyDensityQuantity(mag).average()[0]);
+  throw std::invalid_argument("Cannot calculate energy of unknown magnet type.");
 }

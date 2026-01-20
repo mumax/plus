@@ -44,7 +44,7 @@ void wrap_altermagnet(py::module& m) {
   //m.def("max_intracell_angle", &maxAngle);
 
   m.def("total_energy_density",
-        py::overload_cast<const Altermagnet*>(&totalEnergyDensityQuantity));
+      [](const Altermagnet* m) {return totalEnergyDensityQuantity(m);});
   m.def("total_energy",
-        py::overload_cast<const Altermagnet*>(&totalEnergyQuantity));
+      [](const Altermagnet* m) {return totalEnergyQuantity(m);});
 }

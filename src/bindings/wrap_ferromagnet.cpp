@@ -118,9 +118,9 @@ void wrap_ferromagnet(py::module& m) {
 
   m.def("effective_field", &effectiveFieldQuantity);
   m.def("total_energy_density",
-        py::overload_cast<const Ferromagnet*>(&totalEnergyDensityQuantity));
+      [](const Ferromagnet* m) {return totalEnergyDensityQuantity(m); });
   m.def("total_energy",
-        py::overload_cast<const Ferromagnet*>(&totalEnergyQuantity));
+      [](const Ferromagnet* m) {return totalEnergyQuantity(m);});
 
   m.def("conductivity_tensor", &conductivityTensorQuantity);
   m.def("electrical_potential", &electricalPotentialQuantity);

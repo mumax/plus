@@ -42,7 +42,7 @@ void wrap_antiferromagnet(py::module& m) {
   m.def("max_intracell_angle", &maxAngle);
 
   m.def("total_energy_density",
-        py::overload_cast<const Antiferromagnet*>(&totalEnergyDensityQuantity));
+      [](const Antiferromagnet* m) {return totalEnergyDensityQuantity(m); });
   m.def("total_energy",
-        py::overload_cast<const Antiferromagnet*>(&totalEnergyQuantity));
+      [](const Antiferromagnet* m) {return totalEnergyQuantity(m);});
 }

@@ -90,11 +90,6 @@ __global__ void k_atmExchangeField(CuField hField,
     h += dot(normal, C) * dot(normal, w * w) * (m_ - m);
   }
 
-  int3 xm = int3{-1, 0, 0};
-  int3 xp = int3{+1, 0, 0};
-  int3 ym = int3{0, -1, 0};
-  int3 yp = int3{0, +1, 0};
-
   // MIXED DERIVATIVE
   const int3 c_xp_yp = mastergrid.wrap(coo + int3{+1, +1, 0});
   const int3 c_xp_ym = mastergrid.wrap(coo + int3{+1, -1, 0});

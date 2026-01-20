@@ -2,12 +2,10 @@
 
 #include "quantityevaluator.hpp"
 
-class Altermagnet;
-class Antiferromagnet;
 class Ferromagnet;
 class Field;
+class HostMagnet;
 class Magnet;
-class NcAfm;
 
 // Returns the energy density of an effective field term.
 //   edens = - prefactor * Msat * dot(m,h)
@@ -17,19 +15,22 @@ Field evalEnergyDensity(const Ferromagnet*, const Field&, real prefactor);
 real energyFromEnergyDensity(const Magnet*, real);
 
 Field evalTotalEnergyDensity(const Ferromagnet*);
-Field evalTotalEnergyDensity(const Antiferromagnet*);
-Field evalTotalEnergyDensity(const Altermagnet*);
-Field evalTotalEnergyDensity(const NcAfm*);
+Field evalTotalEnergyDensity(const HostMagnet*);
 real evalTotalEnergy(const Magnet*);
 
-FM_FieldQuantity totalEnergyDensityQuantity(const Ferromagnet*);
-FM_ScalarQuantity totalEnergyQuantity(const Ferromagnet*);
+template <class T>
+FieldQuantityEvaluator<T> totalEnergyDensityQuantity(const T* magnet) {
+  return FieldQuantityEvaluator<T>( magnet,
+                                    [](const T* m) { return evalTotalEnergyDensity(m); },
+                                    1,
+                                    "total_energy_density",
+                                    "J/m3");
+}
 
-AFM_FieldQuantity totalEnergyDensityQuantity(const Antiferromagnet*);
-AFM_ScalarQuantity totalEnergyQuantity(const Antiferromagnet*);
-
-ATM_FieldQuantity totalEnergyDensityQuantity(const Altermagnet*);
-ATM_ScalarQuantity totalEnergyQuantity(const Altermagnet*);
-
-NcAfm_FieldQuantity totalEnergyDensityQuantity(const NcAfm*);
-NcAfm_ScalarQuantity totalEnergyQuantity(const NcAfm*);
+template <class T>
+ScalarQuantityEvaluator<T> totalEnergyQuantity(const T* magnet) {
+  return ScalarQuantityEvaluator<T>( magnet,
+                                    [](const T* m) { return evalTotalEnergy(m); },
+                                    "total_energy",
+                                    "J");
+}
