@@ -125,16 +125,14 @@ std::string StrayField::unit() const {
 bool StrayField::assuredZero() const {
   if(const Ferromagnet* mag = magnet_->asFM())
     return mag->msat.assuredZero();
-  else if (const Antiferromagnet* mag = magnet_->asAFM())
-    return mag->sub1()->msat.assuredZero() && mag->sub2()->msat.assuredZero();
-  else if (const Altermagnet* mag = magnet_->asATM())
-    return mag->sub1()->msat.assuredZero() && mag->sub2()->msat.assuredZero();
-  else if (const NcAfm* mag = magnet_->asNcAfm())
-    return mag->sub1()->msat.assuredZero() &&
-           mag->sub2()->msat.assuredZero() &&
-           mag->sub3()->msat.assuredZero();
+  else if (const HostMagnet* mag = magnet_->asHost()) {
+    for (auto sub : mag->sublattices())
+      if (!sub->msat.assuredZero())
+        return false;
+    return true;
+  }
   else 
     throw std::invalid_argument("Cannot calculate strayfield since magnet is neither "
-                                "a Ferromagnet, an Antiferromagnet/Ferrimagnet, "
-                                "Altermagnet, nor an NcAfm.");
+                                "a Ferromagnet, a (non-collinear) "
+                                "Antiferromagnet/Ferrimagnet, nor an Altermagnet.");
 }
