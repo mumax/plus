@@ -12,7 +12,8 @@
 
 bool atmExchangeAssuredZero(const Ferromagnet* magnet) {
   if (!magnet->hostMagnet()->asATM()) { return true; }
-  if (magnet->hostMagnet()->asATM()->atmex_ani.assuredZero() ||
+  if ((magnet->hostMagnet()->asATM()->A1.assuredZero() &&
+       magnet->hostMagnet()->asATM()->A2.assuredZero()) ||
       magnet->msat.assuredZero()) { return true; }
 
   for (auto sub : magnet->hostMagnet()->getOtherSublattices(magnet)) {
@@ -25,12 +26,13 @@ bool atmExchangeAssuredZero(const Ferromagnet* magnet) {
 // ATM exchange between NN cells
 __global__ void k_atmExchangeField(CuField hField,
                                 const CuField mField,
-                                const CuParameter atmex_ani,
+                                const CuParameter A1,
+                                const CuParameter A2,
+                                const CuParameter angle,
                                 const CuParameter msat,
                                 const Grid mastergrid,
-                                const real fac) {
+                                const real3 w) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const auto system = hField.system;
 
   // When outside the geometry, set to zero and return early
   if (!hField.cellInGeometry(idx)) {
@@ -50,80 +52,97 @@ __global__ void k_atmExchangeField(CuField hField,
 
   const int3 coo = grid.index2coord(idx);
   const real3 m = mField.vectorAt(idx);
-  const real atmex = atmex_ani.valueAt(idx);
+  const real a1 = A1.valueAt(idx);
+  const real a2 = A2.valueAt(idx);
+
+  // CALCULATE PREFACTORS
+  real c = cos(angle.valueAt(idx));
+  real s = sin(angle.valueAt(idx));
+  real c2 = c * c;
+  real s2 = s * s;
+  real Cxx = a1 * c2 + a2 * s2;
+  real Cyy = a2 * c2 + a1 * s2;
+  real Cxy = 2 * c * s * (a1 - a2);
+
+  real3 C = {Cxx, Cyy, Cxy};
+
+  real3 h{0, 0, 0};
+
+  // SECOND ORDER DERIVATIVES
+#pragma unroll
+  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0}}) {
+    const int3 coo_ = mastergrid.wrap(coo + rel_coo);
+    const int idx_ = grid.coord2index(coo_);
+
+    real3 m_;
+    int3 normal = rel_coo * rel_coo;
+
+    if(hField.cellInGeometry(coo_)) {
+      if (msat.valueAt(idx_) == 0)
+        continue;
+
+      m_ = mField.vectorAt(idx_);
+    }
+    else { // TODO: add proper (Neumann) BC
+      m_ = m;
+    }
+
+    h += dot(normal, C) * dot(normal, w * w) * (m_ - m);
+  }
 
   int3 xm = int3{-1, 0, 0};
   int3 xp = int3{+1, 0, 0};
   int3 ym = int3{0, -1, 0};
   int3 yp = int3{0, +1, 0};
 
-  //int3 xm2 = int3{-2, 0, 0};
-  //int3 xp2 = int3{+2, 0, 0};
-  //int3 ym2 = int3{0, -2, 0};
-  //int3 yp2 = int3{0, +2, 0};
+  // MIXED DERIVATIVE
+  const int3 c_xp_yp = mastergrid.wrap(coo + int3{+1, +1, 0});
+  const int3 c_xp_ym = mastergrid.wrap(coo + int3{+1, -1, 0});
+  const int3 c_xm_yp = mastergrid.wrap(coo + int3{-1, +1, 0});
+  const int3 c_xm_ym = mastergrid.wrap(coo + int3{-1, -1, 0});
 
-  real hx = system.cellsize.x;
-  real hy = system.cellsize.y;
-
-  // four diagonal neighbors
-  const int3 c_xp_yp = mastergrid.wrap(coo + xp + yp);
-  const int3 c_xp_ym = mastergrid.wrap(coo + xp + ym);
-  const int3 c_xm_yp = mastergrid.wrap(coo + xm + yp);
-  const int3 c_xm_ym = mastergrid.wrap(coo + xm + ym);
-
-  //int3 c_xp2_yp2 = mastergrid.wrap(coo + xp2 + yp2);
-  //int3 c_xp2_ym2 = mastergrid.wrap(coo + xp2 + ym2);
-  //int3 c_xm2_yp2 = mastergrid.wrap(coo + xm2 + yp2);
-  //int3 c_xm2_ym2 = mastergrid.wrap(coo + xm2 + ym2);
 
   real3 m_xp_yp = hField.cellInGeometry(c_xp_yp) ? mField.vectorAt(c_xp_yp) : real3{0, 0, 0};
   real3 m_xp_ym = hField.cellInGeometry(c_xp_ym) ? mField.vectorAt(c_xp_ym) : real3{0, 0, 0};
   real3 m_xm_yp = hField.cellInGeometry(c_xm_yp) ? mField.vectorAt(c_xm_yp) : real3{0, 0, 0};
   real3 m_xm_ym = hField.cellInGeometry(c_xm_ym) ? mField.vectorAt(c_xm_ym) : real3{0, 0, 0};
 
-  //real3 m_xp2_yp2 = hField.cellInGeometry(c_xp2_yp2) ? mField.vectorAt(c_xp2_yp2) : real3{0, 0, 0};
-  //real3 m_xp2_ym2 = hField.cellInGeometry(c_xp2_ym2) ? mField.vectorAt(c_xp2_ym2) : real3{0, 0, 0};
-  //real3 m_xm2_yp2 = hField.cellInGeometry(c_xm2_yp2) ? mField.vectorAt(c_xm2_yp2) : real3{0, 0, 0};
-  //real3 m_xm2_ym2 = hField.cellInGeometry(c_xm2_ym2) ? mField.vectorAt(c_xm2_ym2) : real3{0, 0, 0};
-
   real check = 1.0;
   if (m_xp_yp == real3{0, 0, 0}) { check = 0.0; }
   if (m_xp_ym == real3{0, 0, 0}) { check = 0.0; }
   if (m_xm_yp == real3{0, 0, 0}) { check = 0.0; }
   if (m_xm_ym == real3{0, 0, 0}) { check = 0.0; }
-  //if (m_xp2_yp2 == real3{0, 0, 0}) { check = 0.0; }
-  //if (m_xp2_ym2 == real3{0, 0, 0}) { check = 0.0; }
-  //if (m_xm2_yp2 == real3{0, 0, 0}) { check = 0.0; }
-  //if (m_xm2_ym2 == real3{0, 0, 0}) { check = 0.0; }
 
-  real denom = hx * hy;
-  real3 dxy_m_first = (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp) );
+  real denom = w.x * w.y;
+  // TODO: replace with higher order stencil once BC are included.
   //real3 dxy_m_second = (1.0/48.0) * (m_xp2_yp2 + m_xm2_ym2 - m_xm2_yp2 - m_xp2_ym2);
 
-  real3 deriv = (dxy_m_first) * check / denom;
-  real3 result = 2.0 * fac * atmex * deriv;
-  hField.setVectorInCell(idx, result / msat.valueAt(idx));
+  h += C.z * check * (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp)) * denom;
+  hField.setVectorInCell(idx, h / msat.valueAt(idx));
 }
+
 
 Field evalAtmExchangeField(const Ferromagnet* magnet) {
   Field hField(magnet->system(), 3, real3{0, 0, 0});
 
   if (atmExchangeAssuredZero(magnet))
     return hField;
-
+  real3 c = magnet->cellsize();
+  real3 w = {1 / c.x, 1 / c.y, 1 / c.z};
   auto mag = magnet->magnetization()->field().cu();
   auto msat = magnet->msat.cu();
 
   auto host = magnet->hostMagnet();
-  auto atmex_ani = host->asATM()->atmex_ani.cu();
+  auto A1 = host->asATM()->A1.cu();
+  auto A2 = host->asATM()->A2.cu();
+  auto angle = host->asATM()->angle.cu();
 
-  int i = host->getSublatticeIndex(magnet);
-  real fac;
-  if (i == 0) { fac = 1.0; }
-  else { fac = -1.0; }
-
-  cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(),
-              mag, atmex_ani, msat, magnet->world()->mastergrid(), fac);
+  if (host->getSublatticeIndex(magnet) == 0)
+    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(),
+                mag, A1, A2, angle, msat, magnet->world()->mastergrid(), w);
+  else // Switch A1 and A2
+    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(),
+                mag, A2, A1, angle, msat, magnet->world()->mastergrid(), w);
   return hField;
 }
 

@@ -222,21 +222,54 @@ class Altermagnet(Magnet):
                           + " Make sure this is intentional!", UserWarning)
 
     @property
-    def atmex_ani(self) -> Parameter:
+    def A1(self) -> Parameter:
         """Intercell anisotropic exchange constant (J/m).
         This parameter plays the role of exchange constant of
-        the altermagnetic anisotropic exchange interaction
+        the anisotropic exchange interaction in the `x` direction
         between neighbouring simulation cells.
-        
+
         See Also
         --------
-        atmex_cell, atmex_nn
+        A2, angle, atmex_cell, atmex_nn
         """
-        return Parameter(self._impl.atmex_ani)
+        return Parameter(self._impl.A1)
 
-    @atmex_ani.setter
-    def atmex_ani(self, value):
-        self.atmex_ani.set(value)
+    @A1.setter
+    def A1(self, value):
+        self.A1.set(value)
+
+    @property
+    def A2(self) -> Parameter:
+        """Intercell anisotropic exchange constant (J/m).
+        This parameter plays the role of exchange constant of
+        the anisotropic exchange interaction in the `y` direction
+        between neighbouring simulation cells.
+
+        See Also
+        --------
+        A1, angle, atmex_cell, atmex_nn
+        """
+        return Parameter(self._impl.A2)
+
+    @A2.setter
+    def A2(self, value):
+        self.A2.set(value)
+
+    @property
+    def angle(self) -> Parameter:
+        """The angle at which the reference frame of the
+        anisotropic exchange interaction deviates from the
+        principal grid axes.
+
+        See Also
+        --------
+        A1, A2, atmex_cell, atmex_nn
+        """
+        return Parameter(self._impl.angle)
+
+    @angle.setter
+    def angle(self, value):
+        self.angle.set(value)
 
     @property
     def inter_atmex_nn(self) -> InterParameter:
