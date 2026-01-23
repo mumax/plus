@@ -97,9 +97,9 @@ Finally, build and install mumax⁺ using pip.
 
 .. tip::
 
-   mumax⁺ can use either single or double floating-point precision, but this choice must be made before the ``import mumaxplus`` statement. It can be controlled in two ways: either by passing the command line argument ``--mumaxplus-fp-precision`` to the ``python`` call, or by setting the environment variable ``MUMAXPLUS_FP_PRECISION``. The former takes precedence over the latter, and both can be set to ``SINGLE`` or ``DOUBLE``. If neither are specified, single precision is used. The precision used can be accessed through ``mumaxplus.FP_PRECISION``.
-
-   By default, compiling the source code provides support for both options. However, the environment variable also affects the compilation of the source code: setting it results in faster compilation as it will cause the binaries to only support one precision.
+   mumax⁺ can use either single or double floating-point precision.
+   This can be controlled by the command-line argument ``--mumaxplus-fp-precision`` and/or the environment variable ``MUMAXPLUS_FP_PRECISION``.
+   See `this tutorial page <tutorial/precision.html>`_ for more details.
 
 Check the compilation
 ---------------------
