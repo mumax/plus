@@ -1,8 +1,8 @@
 """GPU accelerated micromagnetic simulator."""
 
-import argparse
-import os
-import warnings
+import argparse as _argparse
+import os as _os
+import warnings as _warnings
 
 
 ## Determine and use the desired floating point precision
@@ -12,18 +12,18 @@ _FP_allowed_vals = {i: k for k, v in {
 }.items() for i in v}
 
 # Was a command line argument passed?
-parser = argparse.ArgumentParser()
-parser.add_argument('--mumaxplus-fp-precision', dest='fp_precision', type=str, nargs='?', default=None,
+_parser = _argparse.ArgumentParser()
+_parser.add_argument('--mumaxplus-fp-precision', dest='fp_precision', type=str, nargs='?', default=None,
                     help='Let mumax+ use single (FP_PRECISION = SINGLE, 1 or 32) or double (DOUBLE, 2 or 64) precision. This argument takes precedence over the environment variable MUMAXPLUS_FP_PRECISION.')
-args, unknown = parser.parse_known_args()
-FP_PRECISION = args.fp_precision # Can be None
+_args, _ = _parser.parse_known_args()
+FP_PRECISION: str = _args.fp_precision # Can be None
 
 # If not, was an environment variable set?
 if not FP_PRECISION:
-    FP_PRECISION = os.environ.get("MUMAXPLUS_FP_PRECISION")
-elif (mfpenv := os.environ.get("MUMAXPLUS_FP_PRECISION")): # Both envvar and CLI arg were set: warn user of this
+    FP_PRECISION = _os.environ.get("MUMAXPLUS_FP_PRECISION")
+elif (mfpenv := _os.environ.get("MUMAXPLUS_FP_PRECISION")): # Both envvar and CLI arg were set: warn user of this
     if _FP_allowed_vals.get(mfpenv.upper()) != _FP_allowed_vals.get(FP_PRECISION.upper()):
-        warnings.warn(f"\n\tCLI arg --mumaxplus-fp-precision ({FP_PRECISION}) and envvar MUMAXPLUS_FP_PRECISION ({os.environ.get("MUMAXPLUS_FP_PRECISION")}) differ.\n\tThe CLI arg takes precedence, so using FP_PRECISION={FP_PRECISION}.", stacklevel=2)
+        _warnings.warn(f"\n\tCLI arg --mumaxplus-fp-precision ({FP_PRECISION}) and envvar MUMAXPLUS_FP_PRECISION ({_os.environ.get("MUMAXPLUS_FP_PRECISION")}) differ.\n\tThe CLI arg takes precedence, so using FP_PRECISION={FP_PRECISION}.", stacklevel=2)
 
 # If not, default to single precision.
 if not FP_PRECISION:
