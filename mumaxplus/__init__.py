@@ -2,9 +2,15 @@
 
 import argparse
 import os
+import warnings
 
 
 ## Determine and use the desired floating point precision
+_FP_allowed_vals = {i: k for k, v in {
+    "SINGLE": ["SINGLE", "1", "32"],
+    "DOUBLE": ["DOUBLE", "2", "64"]
+}.items() for i in v}
+
 # Was a command line argument passed?
 parser = argparse.ArgumentParser()
 parser.add_argument('--mumaxplus-fp-precision', dest='fp_precision', type=str, nargs='?', default=None,
@@ -15,16 +21,19 @@ FP_PRECISION = args.fp_precision # Can be None
 # If not, was an environment variable set?
 if not FP_PRECISION:
     FP_PRECISION = os.environ.get("MUMAXPLUS_FP_PRECISION")
+elif (mfpenv := os.environ.get("MUMAXPLUS_FP_PRECISION")): # Both envvar and CLI arg were set: warn user of this
+    if _FP_allowed_vals.get(mfpenv.upper()) != _FP_allowed_vals.get(FP_PRECISION.upper()):
+        warnings.warn(f"\n\tCLI arg --mumaxplus-fp-precision ({FP_PRECISION}) and envvar MUMAXPLUS_FP_PRECISION ({os.environ.get("MUMAXPLUS_FP_PRECISION")}) differ.\n\tThe CLI arg takes precedence, so using FP_PRECISION={FP_PRECISION}.", stacklevel=2)
 
 # If not, default to single precision.
 if not FP_PRECISION:
     FP_PRECISION = "SINGLE"
 
 # Load the appropriate C++ binary
-match FP_PRECISION.upper():
-    case "SINGLE" | "1" | "32":
+match _FP_allowed_vals.get(FP_PRECISION.upper()):
+    case "SINGLE":
         import _mumaxpluscpp_single as _cpp
-    case "DOUBLE" | "2" | "64":
+    case "DOUBLE":
         import _mumaxpluscpp_double as _cpp
     case _:
         raise RuntimeError(f"Unknown MUMAXPLUS_FP_PRECISION='{FP_PRECISION}'")
