@@ -109,14 +109,9 @@ pip install .
 ```
 
 > [!TIP]
-> If changes are made to the code, then ``pip install -v .`` can be used to rebuild mumax⁺, with the `-v` flag enabling verbose debug information.
+> If changes are made to the code, then `pip install -v .` can be used to rebuild mumax⁺, with the `-v` flag enabling verbose debug information.
 >
-> If you want to change only the Python code, without needing to reinstall after each change, ``pip install -ve .`` can also be used.
-
-> [!TIP]
-> mumax⁺ can use either single or double floating-point precision, but this choice must be made before the `import mumaxplus` statement. It can be controlled in two ways: either by passing the command line argument `--mumaxplus-fp-precision` to the `python` call, or by setting the environment variable `MUMAXPLUS_FP_PRECISION`. The former takes precedence over the latter, and both can be set to `SINGLE` or `DOUBLE`. If neither are specified, single precision is used. The precision used can be accessed through `mumaxplus.FP_PRECISION`.
->
-> By default, compiling the source code provides support for both options. However, the environment variable also affects the compilation of the source code: setting it results in faster compilation as it will cause the binaries to only support one precision.
+> If you want to change only the Python code, without needing to reinstall after each change, `pip install -ve .` can also be used.
 
 ### Check the compilation
 
@@ -128,6 +123,13 @@ or to run the [tests](#testing) in the `test/` directory.
 * (*Windows*) If you encounter the error `No CUDA toolset found`, try copying the files in `NVIDIA GPU Computing Toolkit/CUDA/<version>/extras/visual_studio_integration/MSBuildExtensions` to `Microsoft Visual Studio/<year>/<edition>/MSBuild/Microsoft/VC/<version>/BuildCustomizations`. See [these instructions](https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170) for more details.
 
 </details>
+
+## Floating-point precision
+
+mumax⁺ can use either single or double floating-point precision.
+This can be controlled by the command-line argument `--mumaxplus-fp-precision` and/or the environment variable `MUMAXPLUS_FP_PRECISION`.
+
+See this [tutorial page](https://mumax.github.io/plus/tutorial/precision.html) or [example notebook](examples/precision.ipynb) for more details.
 
 ## Documentation
 
