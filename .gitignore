@@ -11,3 +11,4 @@ __pycache__
 sandbox/
 experiment/
 **.swp
+cu*_*.dll
