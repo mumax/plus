@@ -165,7 +165,7 @@ Below, we compare the numerical and analytical result of 10 precessions of one s
 
             plt.scatter(dts[i], error, marker="o", zorder=2)
 
-            intercept = np.polyfit(log_dts, log_error - log_dts * exact_order[i], 0)
+            intercept = np.polyfit(log_dts[-10:], log_error[-10:] - log_dts[-10:] * exact_order[i], 0) # Only fit the end of the lines
             plt.plot(np.array([1e-14, 1e-9]), (10**intercept)*np.array([1e-14, 1e-9])**exact_order[i], label=f"{RK_names[i]} {exact_names[i]}")
 
         plt.legend()
