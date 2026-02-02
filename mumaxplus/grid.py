@@ -1,6 +1,6 @@
 """Grid implementation."""
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 
 class Grid:

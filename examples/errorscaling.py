@@ -1,4 +1,4 @@
-"""This script compares numerical and analytical result of one spin after 10 precession
+"""This script compares the numerical and analytical result of one spin after 10 precessions
 in an external magnetic field of 0.1 T with damping. This comparison is done for different time steps
 in order to recreate figure 10 of the paper "The design and verification of MuMax3".
 However with different algorithms.

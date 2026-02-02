@@ -125,7 +125,7 @@ if (WIN32)
             add_custom_command(TARGET physics POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${dll}"
-                    "$<TARGET_FILE_DIR:_mumaxpluscpp>/${dllname}"
+                    "$<TARGET_FILE_DIR:${MUMAX_MODULE_NAME}>/${dllname}"
             )
         endforeach()
     else()

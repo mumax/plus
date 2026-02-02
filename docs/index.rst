@@ -15,7 +15,7 @@ use the `mumax⁺ GitHub Discussions <https://github.com/mumax/plus/discussions>
 Citations
 ---------
 
-mumax\ :sup:`+` is described the following paper:
+mumax\ :sup:`+` is described in the following paper:
 
    mumax+: extensible GPU-accelerated micromagnetics and beyond
 

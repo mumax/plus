@@ -97,11 +97,9 @@ Finally, build and install mumax⁺ using pip.
 
 .. tip::
 
-   The source code can also be compiled with double precision, by changing ``FP_PRECISION`` in ``CMakeLists.txt`` from ``SINGLE`` to ``DOUBLE`` before rebuilding.
-
-   .. code-block:: cmake
-
-      add_definitions(-DFP_PRECISION=DOUBLE) # FP_PRECISION > should be SINGLE or DOUBLE
+   mumax⁺ can use either single or double floating-point precision.
+   This can be controlled by the command-line argument ``--mumaxplus-fp-precision`` and/or the environment variable ``MUMAXPLUS_FP_PRECISION``.
+   See `this tutorial page <tutorial/precision.html>`_ for more details.
 
 Check the compilation
 ---------------------
