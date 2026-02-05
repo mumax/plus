@@ -12,3 +12,5 @@ sandbox/
 experiment/
 **.swp
 cu*_*.dll
+docs/_build
+!docs/_build/html
