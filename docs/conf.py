@@ -117,8 +117,8 @@ html_theme_options = {
             "type": "fontawesome",
         },
         {
-            "name": "Paper on arXiv",
-            "url": "https://arxiv.org/abs/2411.18194",
+            "name": "Paper",
+            "url": "https://www.nature.com/articles/s41524-025-01893-y",
             "icon": "fas fa-file-alt",  # generic document icon
             "type": "fontawesome",
         },

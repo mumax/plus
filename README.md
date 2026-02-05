@@ -12,7 +12,7 @@ If you have any questions, feel free to use the [mumax⁺ GitHub Discussions](ht
 mumax⁺ is described in the following paper:
 > mumax+: extensible GPU-accelerated micromagnetics and beyond
 >
-> https://arxiv.org/abs/2411.18194
+> https://www.nature.com/articles/s41524-025-01893-y
 
 Please cite this paper if you would like to cite mumax⁺.
 All demonstrations in the paper were simulated using version [v1.1.0](https://github.com/mumax/plus/tree/v1.1.0) of the code. The scripts used to generate the data can be found in the [paper2025 directory](https://github.com/mumax/plus/tree/paper2025/paper2025) under the [paper2025 tag](https://github.com/mumax/plus/tree/paper2025).
