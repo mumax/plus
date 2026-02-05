@@ -47,6 +47,7 @@
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'install';</script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
     <script src="_static/google-analytics.js?v=27e7bdd4"></script>
@@ -57,7 +58,7 @@
     <link rel="prev" title="mumax+" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-10-23, v1.1.2"/>
+    <meta name="docbuild:last-update" content="2026-01-13, v1.1.2"/>
   </head>
   
   
@@ -373,8 +374,9 @@ document.write(`
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">#</a></h2>
-<p>mumax⁺ should work on any NVIDIA GPU. To get sarted you should install the
-following tools yourself. Open the dropdowns for more details.</p>
+<p>mumax⁺ should work on any NVIDIA GPU.
+To get started you should install the following tools yourself.
+Take care to avoid <strong>version conflicts</strong> between these different types of software and your hardware: open the dropdowns for more details.</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">CUDA Toolkit</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
@@ -405,14 +407,16 @@ location.</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt><strong>Linux:</strong> <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">gcc</span></code></dt><dd><ul>
-<li><p class="sd-card-text">⚠️ each CUDA version has a maximum supported <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version. <a class="reference external" href="https://stackoverflow.com/a/46380601">This StackOverflow answer</a> lists the maximum supported <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version for each CUDA version. If necessary, use <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">gcc-&lt;min_version&gt;</span></code> instead, with the appropriate <code class="docutils literal notranslate"><span class="pre">&lt;min_version&gt;</span></code>.</p></li>
+<li><p class="sd-card-text">⚠️ Each CUDA version has a maximum supported <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version, as listed in <a class="reference external" href="https://stackoverflow.com/a/46380601">This StackOverflow answer</a>. If necessary, use <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">gcc-&lt;min_version&gt;</span></code> instead, with the appropriate <code class="docutils literal notranslate"><span class="pre">&lt;min_version&gt;</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Windows:</strong></dt><dd><ul>
-<li><p class="sd-card-text">CUDA does not support the <code class="docutils literal notranslate"><span class="pre">gcc</span></code> compiler on Windows, so download and install <a class="reference external" href="https://visualstudio.microsoft.com/downloads/">Microsoft Visual Studio</a> with the “Desktop development with C++” workload. After installing, check if the path to <code class="docutils literal notranslate"><span class="pre">cl.exe</span></code> was added to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable (i.e., check whether <code class="docutils literal notranslate"><span class="pre">where</span> <span class="pre">cl.exe</span></code> returns an appropriate path like <code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\Microsoft</span> <span class="pre">Visual</span> <span class="pre">Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64</span></code>). If not, add it manually.</p></li>
+<dt><strong>Windows:</strong> <a class="reference external" href="https://visualstudio.microsoft.com/downloads/">Microsoft Visual C++</a> (MSVC) must be used, since CUDA does not support <code class="docutils literal notranslate"><span class="pre">gcc</span></code> on Windows.</dt><dd><ul>
+<li><p class="sd-card-text">⚠️ Make sure you install a version of MSVC that is compatible with your installed CUDA toolkit, as listed in <a class="reference external" href="https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html">this table</a> (e.g., MSVC 2026 does not yet seem to be supported by CUDA as of January 2026).</p></li>
+<li><p class="sd-card-text">During installation, check the box to include the “Desktop development with C++” workload.</p></li>
+<li><p class="sd-card-text">After installing, check if the path to <code class="docutils literal notranslate"><span class="pre">cl.exe</span></code> was added to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable (i.e., check whether <code class="docutils literal notranslate"><span class="pre">where</span> <span class="pre">cl.exe</span></code> returns an appropriate path like <code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\Microsoft</span> <span class="pre">Visual</span> <span class="pre">Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64</span></code>). If not, add it manually.</p></li>
 </ul>
 </dd>
 </dl>
@@ -431,7 +435,7 @@ location.</p>
 </div>
 </details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
-<span class="sd-summary-text">CPython <em>(version ≥ 3.8 recommended)</em>, pip and miniconda/anaconda</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<span class="sd-summary-text">CPython <em>(version ≥ 3.11)</em>, pip and miniconda/anaconda</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <p class="sd-card-text">All these Python-related tools should be included in a standard installation of <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda or Miniconda</a>.</p>
 <p class="sd-card-text">👉 <em>Check installation with</em> <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code>, <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">--version</span></code> <em>and</em> <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">--version</span></code>.</p>
 </div>
@@ -493,6 +497,7 @@ conda<span class="w"> </span>activate<span class="w"> </span>mumaxplus
 <span class="sd-summary-text">Troubleshooting</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <ul class="simple">
 <li><p class="sd-card-text">(<em>Windows</em>) If you encounter the error <code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">CUDA</span> <span class="pre">toolset</span> <span class="pre">found</span></code>, try copying the files in <code class="docutils literal notranslate"><span class="pre">NVIDIA</span> <span class="pre">GPU</span> <span class="pre">Computing</span> <span class="pre">Toolkit/CUDA/&lt;version&gt;/extras/visual_studio_integration/MSBuildExtensions</span></code> to <code class="docutils literal notranslate"><span class="pre">Microsoft</span> <span class="pre">Visual</span> <span class="pre">Studio/&lt;year&gt;/&lt;edition&gt;/MSBuild/Microsoft/VC/&lt;version&gt;/BuildCustomizations</span></code>. See <a class="reference external" href="https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170">these instructions</a> for more details.</p></li>
+<li><p class="sd-card-text">(<em>Windows</em>) If you encounter errors related to interactions between CMake, MSVC and CUDA, like <code class="docutils literal notranslate"><span class="pre">--</span> <span class="pre">Detecting</span> <span class="pre">CUDA</span> <span class="pre">compiler</span> <span class="pre">ABI</span> <span class="pre">info</span> <span class="pre">-</span> <span class="pre">failed</span></code>, you may try the following methods to activate an appropriate set of environment variables. One option is to run the compilation commands in the “Developer Powershell for VS 20XX” that should have been automatically installed alongside MSVC. For CUDA <span class="math notranslate nohighlight">\(\leq\)</span> 12.9, another option is to call one of the <code class="docutils literal notranslate"><span class="pre">.bat</span></code> scripts in the folder <code class="docutils literal notranslate"><span class="pre">&amp;</span> <span class="pre">C:\Program</span> <span class="pre">Files\Microsoft</span> <span class="pre">Visual</span> <span class="pre">Studio\2022\Community\VC\Auxiliary\Build</span></code>, such as <code class="docutils literal notranslate"><span class="pre">vcvars64.bat</span></code>, before you run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>.</p></li>
 </ul>
 </div>
 </details></section>
@@ -572,7 +577,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-10-23, v1.1.2.
+  Last updated on 2026-01-13, v1.1.2.
   <br/>
 </p>
   </div>
