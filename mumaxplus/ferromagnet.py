@@ -2,7 +2,7 @@
 
 import numpy as _np
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .magnet import Magnet
 from .dmitensor import DmiTensor
@@ -236,6 +236,18 @@ class Ferromagnet(Magnet):
     @alpha.setter
     def alpha(self, value):
         self.alpha.set(value)
+
+    @property
+    def gamma(self) -> Parameter:
+        """Gyromagnetic ratio (rad/Ts).
+
+        Default = 1.7595e11 rad/Ts
+        """
+        return Parameter(self._impl.gamma)
+
+    @gamma.setter
+    def gamma(self, value):
+        self.gamma.set(value)
 
     @property
     def aex(self) -> Parameter:

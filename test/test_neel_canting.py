@@ -27,7 +27,7 @@ def test_neel_canting():
     H = 9.36e-23
     A = J / (2 * a)
     Ku = H / (2 * a**3)
-    Ms = GAMMALL * HBAR / (2 * a**3)
+    Ms = GAMMALL_DEFAULT * HBAR / (2 * a**3)
 
     global N
     N = 32

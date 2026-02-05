@@ -12,7 +12,7 @@ If you have any questions, feel free to use the [mumax⁺ GitHub Discussions](ht
 mumax⁺ is described in the following paper:
 > mumax+: extensible GPU-accelerated micromagnetics and beyond
 >
-> https://arxiv.org/abs/2411.18194
+> https://www.nature.com/articles/s41524-025-01893-y
 
 Please cite this paper if you would like to cite mumax⁺.
 All demonstrations in the paper were simulated using version [v1.1.0](https://github.com/mumax/plus/tree/v1.1.0) of the code. The scripts used to generate the data can be found in the [paper2025 directory](https://github.com/mumax/plus/tree/paper2025/paper2025) under the [paper2025 tag](https://github.com/mumax/plus/tree/paper2025).
@@ -112,16 +112,9 @@ pip install .
 ```
 
 > [!TIP]
-> If changes are made to the code, then ``pip install -v .`` can be used to rebuild mumax⁺, with the `-v` flag enabling verbose debug information.
+> If changes are made to the code, then `pip install -v .` can be used to rebuild mumax⁺, with the `-v` flag enabling verbose debug information.
 >
-> If you want to change only the Python code, without needing to reinstall after each change, ``pip install -ve .`` can also be used.
-
-> [!TIP]
-> The source code can also be compiled with double precision, by changing `FP_PRECISION` in `CMakeLists.txt` from `SINGLE` to `DOUBLE` before rebuilding.
->
-> ```cmake
-> add_definitions(-DFP_PRECISION=DOUBLE) # FP_PRECISION > should be SINGLE or DOUBLE
-> ```
+> If you want to change only the Python code, without needing to reinstall after each change, `pip install -ve .` can also be used.
 
 ### Check the compilation
 
@@ -135,6 +128,13 @@ or to run the [tests](#testing) in the `test/` directory.
 * (*Windows*) If you encounter errors related to interactions between CMake, MSVC and CUDA, like `-- Detecting CUDA compiler ABI info - failed`, you may try the following methods to activate an appropriate set of environment variables. One option is to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. For CUDA &leq;12.9, another option is to call one of the `.bat` scripts in the folder `& C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build`, such as `vcvars64.bat`, before you run `pip install`.
 
 </details>
+
+## Floating-point precision
+
+mumax⁺ can use either single or double floating-point precision.
+This can be controlled by the command-line argument `--mumaxplus-fp-precision` and/or the environment variable `MUMAXPLUS_FP_PRECISION`.
+
+See this [tutorial page](https://mumax.github.io/plus/tutorial/precision.html) or [example notebook](examples/precision.ipynb) for more details.
 
 ## Documentation
 

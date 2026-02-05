@@ -112,11 +112,23 @@ if (WIN32)
     file(GLOB CUDA_RUNTIME_DLLS
         "${CUDAToolkit_BIN_DIR}/cufft64_*.dll"
         "${CUDAToolkit_BIN_DIR}/curand64_*.dll"
-    )
+        "${CUDAToolkit_BIN_DIR}/x64/cufft64_*.dll"
+        "${CUDAToolkit_BIN_DIR}/x64/curand64_*.dll"
+    ) # CUDA 13.0 and higher puts them below the /x64 directory.
 
-    add_custom_command(TARGET physics POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${CUDA_RUNTIME_DLLS}
-            $<TARGET_FILE_DIR:_mumaxpluscpp>
-    )
+    message(STATUS "CUDAToolkit_BIN_DIR=${CUDAToolkit_BIN_DIR}")
+    message(STATUS "CUDA_RUNTIME_DLLS=${CUDA_RUNTIME_DLLS}")
+
+    if (CUDA_RUNTIME_DLLS)
+        foreach(dll IN LISTS CUDA_RUNTIME_DLLS)
+            get_filename_component(dllname "${dll}" NAME)
+            add_custom_command(TARGET physics POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${dll}"
+                    "$<TARGET_FILE_DIR:${MUMAX_MODULE_NAME}>/${dllname}"
+            )
+        endforeach()
+    else()
+        message(WARNING "No CUDA cufft and curand DLLs found in ${CUDAToolkit_BIN_DIR}")
+    endif()
 endif()
