@@ -14,13 +14,9 @@ bool atmExchangeAssuredZero(const Ferromagnet* magnet) {
   if (!magnet->hostMagnet()->asATM()) { return true; }
   if ((magnet->hostMagnet()->asATM()->A1.assuredZero() &&
        magnet->hostMagnet()->asATM()->A2.assuredZero()) ||
-      magnet->msat.assuredZero()) { return true; }
+       magnet->msat.assuredZero()) { return true; }
 
-  for (auto sub : magnet->hostMagnet()->getOtherSublattices(magnet)) {
-    if (!sub->msat.assuredZero())
-      return false;
-  }
-  return true;
+  return false;
 }
 
 // ATM exchange between NN cells
@@ -56,6 +52,7 @@ __global__ void k_atmExchangeField(CuField hField,
   const real a2 = A2.valueAt(idx);
 
   // CALCULATE PREFACTORS
+  // TODO: add inter-values of ai
   real c = cos(angle.valueAt(idx));
   real s = sin(angle.valueAt(idx));
   real c2 = c * c;
@@ -69,6 +66,7 @@ __global__ void k_atmExchangeField(CuField hField,
   real3 h{0, 0, 0};
 
   // SECOND ORDER DERIVATIVES
+  // TODO: add proper (Neumann) BC once mixed derivative formulation is clear
 #pragma unroll
   for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0}}) {
     const int3 coo_ = mastergrid.wrap(coo + rel_coo);
@@ -83,7 +81,7 @@ __global__ void k_atmExchangeField(CuField hField,
 
       m_ = mField.vectorAt(idx_);
     }
-    else { // TODO: add proper (Neumann) BC
+    else {
       m_ = m;
     }
 
@@ -91,28 +89,28 @@ __global__ void k_atmExchangeField(CuField hField,
   }
 
   // MIXED DERIVATIVE
+  // TODO: add proper (Neumann) BC
   const int3 c_xp_yp = mastergrid.wrap(coo + int3{+1, +1, 0});
   const int3 c_xp_ym = mastergrid.wrap(coo + int3{+1, -1, 0});
   const int3 c_xm_yp = mastergrid.wrap(coo + int3{-1, +1, 0});
   const int3 c_xm_ym = mastergrid.wrap(coo + int3{-1, -1, 0});
 
-
-  real3 m_xp_yp = hField.cellInGeometry(c_xp_yp) ? mField.vectorAt(c_xp_yp) : real3{0, 0, 0};
-  real3 m_xp_ym = hField.cellInGeometry(c_xp_ym) ? mField.vectorAt(c_xp_ym) : real3{0, 0, 0};
-  real3 m_xm_yp = hField.cellInGeometry(c_xm_yp) ? mField.vectorAt(c_xm_yp) : real3{0, 0, 0};
-  real3 m_xm_ym = hField.cellInGeometry(c_xm_ym) ? mField.vectorAt(c_xm_ym) : real3{0, 0, 0};
-
-  real check = 1.0;
-  if (m_xp_yp == real3{0, 0, 0}) { check = 0.0; }
-  if (m_xp_ym == real3{0, 0, 0}) { check = 0.0; }
-  if (m_xm_yp == real3{0, 0, 0}) { check = 0.0; }
-  if (m_xm_ym == real3{0, 0, 0}) { check = 0.0; }
-
-  real denom = w.x * w.y;
-  // TODO: replace with higher order stencil once BC are included.
-  //real3 dxy_m_second = (1.0/48.0) * (m_xp2_yp2 + m_xm2_ym2 - m_xm2_yp2 - m_xp2_ym2);
-
-  h += C.z * check * (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp)) * denom;
+  if (hField.cellInGeometry(c_xp_yp) &&
+      hField.cellInGeometry(c_xp_ym) &&
+      hField.cellInGeometry(c_xm_yp) &&
+      hField.cellInGeometry(c_xm_ym)) {
+        if (msat.valueAt(c_xp_yp) != 0 &&
+            msat.valueAt(c_xp_ym) != 0 &&
+            msat.valueAt(c_xm_yp) != 0 &&
+            msat.valueAt(c_xm_ym) != 0) {
+              real3 m_xp_yp = mField.vectorAt(c_xp_yp);
+              real3 m_xp_ym = mField.vectorAt(c_xp_ym);
+              real3 m_xm_yp = mField.vectorAt(c_xm_yp);
+              real3 m_xm_ym = mField.vectorAt(c_xm_ym);
+              real denom = w.x * w.y;
+              h += C.z * (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp)) * w.x * w.y;
+            }
+      }
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
 }
 
