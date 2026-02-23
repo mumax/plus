@@ -1,5 +1,6 @@
 #include "afmexchange.hpp"
 #include "altermagnet.hpp"
+#include "atmexchange.hpp"
 #include "anisotropy.hpp"
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
@@ -66,7 +67,7 @@ Field evalTotalEnergyDensity(const Ferromagnet* magnet) {
   if (!demagFieldAssuredZero(magnet)) {edens += evalDemagEnergyDensity(magnet);}
   if (!homoAfmExchangeAssuredZero(magnet)) {edens += evalHomoAfmExchangeEnergyDensity(magnet);}
   if (!inHomoAfmExchangeAssuredZero(magnet)) {edens += evalInHomoAfmExchangeEnergyDensity(magnet);}
-  
+  if (!atmExchangeAssuredZero(magnet)) {edens += evalAtmExchangeEnergyDensity(magnet);}
   // magnetoelastics; works if host or if sublattice
   if (!magnetoelasticAssuredZero(magnet)) {edens += evalMagnetoelasticEnergyDensity(magnet);}
   // elastics; only works if independent host
