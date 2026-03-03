@@ -16,3 +16,4 @@ started!
    tutorial/stdp4
    tutorial/langevin
    tutorial/precision
+   tutorial/plot_field
