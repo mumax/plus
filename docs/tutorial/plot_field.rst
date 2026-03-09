@@ -15,7 +15,7 @@ We will cover
 - further customization and bookkeeping
 
 We will use standard problem 3 as a basis.
-The Problem specification can be found on https://www.ctcms.nist.gov/~rdm/mumag.org.html.
+The problem specification can be found on `the µMAG website <https://www.ctcms.nist.gov/~rdm/mumag.org.html>`_.
 
 .. code-block:: python
 
@@ -54,7 +54,7 @@ The Problem specification can be found on https://www.ctcms.nist.gov/~rdm/mumag.
     mag = magnet.magnetization
 
 
-Layers and Axes
+Layers and axes
 ---------------
 
 Let's call ``plot_field`` on the magnetization of the magnet.
@@ -114,7 +114,7 @@ Combining these on a single figure can be more convenient. We'll make our own fi
     :align: center
     :width: 800px
 
-Inspecting Components
+Inspecting components
 ---------------------
 
 It can also be useful to look at an individual component.
@@ -233,7 +233,7 @@ Or this can be set to any matplotlib colormap, which will show the out-of-plane 
     :align: center
     :width: 600px
 
-Color Bars
+Color bars
 ----------
 
 Like with the arrows, we can disable the color bar with ``enable_colorbar = False``. We can also fully customize the color bar via ``colorbar_kwargs``.
@@ -247,7 +247,7 @@ Like with the arrows, we can disable the color bar with ``enable_colorbar = Fals
     :width: 600px
 
 
-Scalar and Tensor Fields
+Scalar and tensor fields
 ------------------------
 
 ``plot_field`` and ``inspect_field`` also work with fields with more or less than 3 components, although without the arrows.
@@ -277,7 +277,7 @@ Scalar and Tensor Fields
     :align: center
     :width: 800px
 
-Numpy Arrays
+Numpy arrays
 ------------
 
 We can't only plot ``FieldQuantity`` instances of ``mumaxplus``, but also ``numpy.ndarray`` s. This can be useful when working with custom calculations, saved fields or manipulated quantities. Just pass the array as the first argument. The only requirement is that it has the same shape as a ``FieldQuantity``, meaning components first, then z, y and x indices.
@@ -312,7 +312,7 @@ Let's set the title to be more appropriate though.
 
 If you do want to set a geometry explicitly, you can do that via the ``geometry`` argument.
 
-Further Customization and Bookkeeping
+Further customization and bookkeeping
 -------------------------------------
 
 Lastly, we can customize the plot by passing ``figsize``, ``title``, ``xlabel`` and ``ylabel``, along with the various keyword argument dictionaries as seen before. We can pass ``ax`` to integrate the plot within our own, and ``plot_field`` returns the (created) Axes, so we can customize it further afterwards. If we do or do not want to show the figure when plotting, we can change the ``show`` argument. We can easily save it by passing a ``file_name``.
