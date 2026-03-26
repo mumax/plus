@@ -1,6 +1,7 @@
 #include <memory>
 #include <stdexcept>
 
+#include "afmexchange.hpp"
 #include "altermagnet.hpp"
 #include "dmi.hpp"
 #include "energy.hpp"
@@ -40,8 +41,10 @@ void wrap_altermagnet(py::module& m) {
   m.def("full_magnetization",
         py::overload_cast<const Altermagnet*>(&fullMagnetizationQuantity));
 
-  //m.def("angle_field", &angleFieldQuantity);
-  //m.def("max_intracell_angle", &maxAngle);
+  m.def("angle_field",
+        py::overload_cast<const Altermagnet*>(&angleFieldQuantity));
+  m.def("max_intracell_angle",
+        py::overload_cast<const Altermagnet*>(&maxAngle));
 
   m.def("total_energy_density",
       [](const Altermagnet* m) {return totalEnergyDensityQuantity(m);});

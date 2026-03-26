@@ -420,7 +420,7 @@ class Altermagnet(Magnet):
         Ferromagnet.full_magnetization
         """
         return FieldQuantity(_cpp.full_magnetization(self._impl))
-    ''' 
+
     @property
     def angle_field(self) -> FieldQuantity:
         """Returns the deviation from the optimal angle (180°) between
@@ -446,7 +446,7 @@ class Altermagnet(Magnet):
         Ferromagnet.max_angle
         """
         return ScalarQuantity(_cpp.max_intracell_angle(self._impl))
-    '''
+
     @property
     def total_energy_density(self) -> FieldQuantity:
         """Total energy density of both sublattices combined (J/m³). Kinetic and
