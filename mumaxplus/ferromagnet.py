@@ -423,6 +423,8 @@ class Ferromagnet(Magnet):
     @property
     def Lambda(self) -> Parameter:
         """Slonczewski Λ parameter.
+
+        Default = 1.0
         
         See Also
         --------
