@@ -11,6 +11,7 @@
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "fieldops.hpp"
+#include "local_dmi.hpp"
 #include "magnetoelasticfield.hpp"
 #include "ncafm.hpp"
 #include "world.hpp"
@@ -62,6 +63,7 @@ Field evalTotalEnergyDensity(const Ferromagnet* magnet) {
   if (!anisotropyAssuredZero(magnet)) {edens += evalAnisotropyEnergyDensity(magnet);}
   if (!externalFieldAssuredZero(magnet)) {edens += evalZeemanEnergyDensity(magnet);}
   if (!inhomoDmiAssuredZero(magnet)) {edens += evalDmiEnergyDensity(magnet);}
+  if (!homoDmiAssuredZero(magnet)) {edens += evalHomoDmiEnergyDensity(magnet);}
   if (!demagFieldAssuredZero(magnet)) {edens += evalDemagEnergyDensity(magnet);}
   if (!homoAfmExchangeAssuredZero(magnet)) {edens += evalHomoAfmExchangeEnergyDensity(magnet);}
   if (!inHomoAfmExchangeAssuredZero(magnet)) {edens += evalInHomoAfmExchangeEnergyDensity(magnet);}
