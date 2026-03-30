@@ -439,7 +439,7 @@ class Ferromagnet(Magnet):
     @property
     def free_layer_thickness(self) -> Parameter:
         """Slonczewski free layer thickness (m). By default, the thickness is
-        deduced from the mesh size.
+        equal to the mesh size in the z-direction.
         
         See Also
         --------
