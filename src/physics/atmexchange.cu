@@ -89,6 +89,10 @@ __global__ void k_atmExchangeField(CuField hField,
   }
 
   // MIXED DERIVATIVE
+  if (C.z == 0) {
+    hField.setVectorInCell(idx, h / msat.valueAt(idx));
+    return;
+  }
   // TODO: add proper (Neumann) BC
   const int3 c_xp_yp = mastergrid.wrap(coo + int3{+1, +1, 0});
   const int3 c_xp_ym = mastergrid.wrap(coo + int3{+1, -1, 0});
