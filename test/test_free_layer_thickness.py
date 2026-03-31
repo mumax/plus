@@ -9,8 +9,8 @@ from mumaxplus import Ferromagnet, Grid, World
 RTOL = 1e-5  # 0.001%
 
 # Arbitrary parameters, resulting in a non-zero Slonczewski torque
-# and arbitrary but consistent magnetization
-magnetization = (0.8096410632133484, -0.29036206007003784, -0.5100698471069336)
+magnetization = np.random.normal(size=3)
+magnetization /= np.linalg.norm(magnetization)
 msat = 4.3
 jcur = (0,0,5.4)
 pol = 0.6
