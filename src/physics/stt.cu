@@ -133,7 +133,7 @@ __global__ void k_Slonczewski(CuField torque,
   const real alpha = alphaParam.valueAt(idx);
   const real gamma = gammaParam.valueAt(idx);
 
-  const real3 p = fixedLayer.vectorAt(idx);
+  const real3 p = normalized(fixedLayer.vectorAt(idx));
   const real lambda = lambdaParam.valueAt(idx);
   const real eps_p = epsilonPrime.valueAt(idx);
   real d = freeLayerThickness.valueAt(idx);
