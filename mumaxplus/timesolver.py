@@ -20,7 +20,8 @@ class TimeSolverOutput:
             Specify wether to store the data in an output dictionary.
         """
         self._quantities = quantity_dict
-        self._data = {"time": []}
+        self._values = {}  # dictionary to keep calculated quantities of one step
+        self._data = {"time": []}  # dict to keep all data
         for key in self._quantities.keys():
             self._data[key] = []
 
@@ -42,19 +43,19 @@ class TimeSolverOutput:
         """Compute all the specified quantities for the current state."""
 
         # Compute values
-        values = {"time": time}
+        self._values["time"] = time
         for key, func in self._quantities.items():
-            values[key] = func()
+            self._values[key] = func()
 
         # Store in memory
         if self._store_as_dict:
-            for key, value in values.items():
+            for key, value in self._values.items():
                 self._data[key].append(value)
 
         # Write to file
         if self._file_name is not None:
             with open(self._file_name, 'a') as file:
-                print(*[values[key] for key in self._keys], sep="\t", file=file)
+                print(*[self._values[key] for key in self._keys], sep="\t", file=file)
 
     def __getitem__(self, key):
         """Return the computed values of a quantity."""
