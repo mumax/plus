@@ -81,7 +81,7 @@ class TestSetGetBetween:
 
     def test_get_between_after_set_between(self, interex):
         interex.set_between(1, 3, 42.0)
-        assert interex.get_between(1, 3) == pytest.approx(42.0)
+        assert interex.get_between(1, 3) == 42.0
 
     def test_get_between_is_symmetric(self, interex):
         interex.set_between(2, 4, 7.0)
