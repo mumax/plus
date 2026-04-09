@@ -25,8 +25,8 @@ def max_relative_error(result, wanted):
 
 def compute_domain_wall_width(magnet):
     """Computes the domain wall width"""
-    A1 = magnet.A1.uniform_value
-    A2 = magnet.A2.uniform_value
+    A1 = magnet.alterex_1.uniform_value
+    A2 = magnet.alterex_2.uniform_value
     A12 = magnet.atmex_nn.uniform_value
     K = magnet.sub1.ku1.uniform_value
     return np.sqrt((0.5*(A1+A2) - A12) / (2*K))
@@ -35,8 +35,8 @@ def compute_magnetization_prefactor(magnet):
     K = magnet.sub1.ku1.uniform_value
     Ms = magnet.sub1.msat.uniform_value
     a = magnet.latcon.uniform_value
-    A1 = magnet.A1.uniform_value
-    A2 = magnet.A2.uniform_value
+    A1 = magnet.alterex_1.uniform_value
+    A2 = magnet.alterex_2.uniform_value
     A0 = magnet.atmex_cell.uniform_value
     A12 = magnet.atmex_nn.uniform_value
 
@@ -84,8 +84,8 @@ class TestAltermagneticDomainWall:
         self.magnet.alpha = 0.01
         self.magnet.ku1 = 2e5
         self.magnet.anisU = (0, 0, 1)
-        self.magnet.A1 = 25e-12
-        self.magnet.A2 = 15e-12
+        self.magnet.alterex_1 = 25e-12
+        self.magnet.alterex_2 = 15e-12
         self.magnet.atmex_cell = -5e-12
         self.magnet.atmex_nn = -2.5e-12
 

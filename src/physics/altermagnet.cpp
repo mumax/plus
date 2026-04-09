@@ -17,9 +17,9 @@ Altermagnet::Altermagnet(std::shared_ptr<System> system_ptr,
     : HostMagnet(system_ptr, name),
       sub1_(Ferromagnet(system_ptr, name + ":sublattice_1", this)),
       sub2_(Ferromagnet(system_ptr, name + ":sublattice_2", this)),
-      A1(system(), 0.0, name + ":A1", "J/m"),
-      A2(system(), 0.0, name + ":A2", "J/m"),
-      angle(system(), 0.0, name + ":angle", "") {
+      alterex_1(system(), 0.0, name + ":alterex_1", "J/m"),
+      alterex_2(system(), 0.0, name + ":alterex_2", "J/m"),
+      alterex_angle(system(), 0.0, name + ":alterex_angle", "") {
         addSublattice(&sub1_);
         addSublattice(&sub2_);
       }

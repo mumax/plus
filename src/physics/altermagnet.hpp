@@ -37,9 +37,9 @@ class Altermagnet : public HostMagnet {
  void relax(real tol);
 
  // Anisotropic exchange constant
-  Parameter A1;
-  Parameter A2;
-  Parameter angle;
+  Parameter alterex_1;
+  Parameter alterex_2;
+  Parameter alterex_angle;
 
  private:
   Ferromagnet sub1_;

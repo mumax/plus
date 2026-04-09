@@ -41,9 +41,9 @@ def compute_mixed_derivative(magnet, exch):
     return deriv
 
 def compute_anisotropic_exchange_numpy(magnet, sub, switch):
-    angle = magnet.angle.uniform_value
-    A1 = magnet.A1.uniform_value
-    A2 = magnet.A2.uniform_value
+    angle = magnet.alterex_angle.uniform_value
+    A1 = magnet.alterex_1.uniform_value
+    A2 = magnet.alterex_2.uniform_value
 
     c = np.cos(angle)
     s = np.sin(angle)
@@ -66,9 +66,9 @@ class TestAfmExchange:
         world = World((1e-9, 2e-9, 3e-9))
         magnet = Altermagnet(world, Grid((16, 16, 1)))
         magnet.msat = 5.4e3
-        magnet.A1 = 32e-12
-        magnet.A2 = 5.4e-12
-        magnet.angle = 1
+        magnet.alterex_1 = 32e-12
+        magnet.alterex_2 = 5.4e-12
+        magnet.alterex_angle = 1
         for i, sub in enumerate(magnet.sublattices):
             result = sub.anisotropic_exchange_field()
             wanted = compute_anisotropic_exchange_numpy(magnet, sub, i)

@@ -12,8 +12,8 @@
 
 bool atmExchangeAssuredZero(const Ferromagnet* magnet) {
   if (!magnet->hostMagnet()->asATM()) { return true; }
-  if ((magnet->hostMagnet()->asATM()->A1.assuredZero() &&
-       magnet->hostMagnet()->asATM()->A2.assuredZero()) ||
+  if ((magnet->hostMagnet()->asATM()->alterex_1.assuredZero() &&
+       magnet->hostMagnet()->asATM()->alterex_2.assuredZero()) ||
        magnet->msat.assuredZero()) { return true; }
 
   return false;
@@ -142,9 +142,9 @@ Field evalAtmExchangeField(const Ferromagnet* magnet) {
   auto msat = magnet->msat.cu();
 
   auto host = magnet->hostMagnet();
-  auto A1 = host->asATM()->A1.cu();
-  auto A2 = host->asATM()->A2.cu();
-  auto angle = host->asATM()->angle.cu();
+  auto A1 = host->asATM()->alterex_1.cu();
+  auto A2 = host->asATM()->alterex_2.cu();
+  auto angle = host->asATM()->alterex_angle.cu();
 
   if (host->getSublatticeIndex(magnet) == 0)
     cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(),
