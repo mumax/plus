@@ -103,30 +103,33 @@ __global__ void k_atmExchangeField(CuField hField,
     hField.setVectorInCell(idx, h / msat.valueAt(idx));
     return;
   }
-  // TODO: add proper (Neumann) BC
-  const int3 c_xp_yp = mastergrid.wrap(coo + int3{+1, +1, 0});
-  const int3 c_xp_ym = mastergrid.wrap(coo + int3{+1, -1, 0});
-  const int3 c_xm_yp = mastergrid.wrap(coo + int3{-1, +1, 0});
-  const int3 c_xm_ym = mastergrid.wrap(coo + int3{-1, -1, 0});
 
-  if (hField.cellInGeometry(c_xp_yp) &&
-      hField.cellInGeometry(c_xp_ym) &&
-      hField.cellInGeometry(c_xm_yp) &&
-      hField.cellInGeometry(c_xm_ym)) {
-        if (msat.valueAt(c_xp_yp) != 0 &&
-            msat.valueAt(c_xp_ym) != 0 &&
-            msat.valueAt(c_xm_yp) != 0 &&
-            msat.valueAt(c_xm_ym) != 0) {
-              real3 m_xp_yp = mField.vectorAt(c_xp_yp);
-              real3 m_xp_ym = mField.vectorAt(c_xp_ym);
-              real3 m_xm_yp = mField.vectorAt(c_xm_yp);
-              real3 m_xm_ym = mField.vectorAt(c_xm_ym);
-              h += Cxy * (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp)) * w.x * w.y;
-            }
-      }
+  // TODO: add proper (Neumann) BC
+  const int3 rel_coos[4] = { {+1, +1, 0}, {+1, -1, 0}, {-1, +1, 0}, {-1, -1, 0} };
+  int3 coos[4];
+  bool inBulk = true;
+
+#pragma unroll
+  for (int i = 0; i < 4; ++i) {
+    coos[i] = mastergrid.wrap(coo + rel_coos[i]);
+
+    inBulk &= hField.cellInGeometry(coos[i]);
+    inBulk &= (msat.valueAt(coos[i]) != 0);
+  }
+
+  if (!inBulk) {
+    hField.setVectorInCell(idx, h / msat.valueAt(idx));
+    return;
+  }
+
+  const real3 m_xp_yp = mField.vectorAt(coos[0]);
+  const real3 m_xp_ym = mField.vectorAt(coos[1]);
+  const real3 m_xm_yp = mField.vectorAt(coos[2]);
+  const real3 m_xm_ym = mField.vectorAt(coos[3]);
+
+  h += Cxy * (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp)) * w.x * w.y;
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
 }
-
 
 Field evalAtmExchangeField(const Ferromagnet* magnet) {
   Field hField(magnet->system(), 3, real3{0, 0, 0});
