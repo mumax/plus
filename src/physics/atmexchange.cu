@@ -1,6 +1,6 @@
 #include "altermagnet.hpp"
 #include "cudalaunch.hpp"
-#include "dmi.hpp" // used for Neumann BC
+#include "datatypes.hpp"
 #include "energy.hpp"
 #include "atmexchange.hpp"
 #include "ferromagnet.hpp"
@@ -47,6 +47,7 @@ __global__ void k_atmExchangeField(CuField hField,
   }
 
   const int3 coo = grid.index2coord(idx);
+  const real3 w2 = w * w;
   const real3 m = mField.vectorAt(idx);
   const real a1 = A1.valueAt(idx);
   const real a2 = A2.valueAt(idx);
@@ -57,11 +58,7 @@ __global__ void k_atmExchangeField(CuField hField,
   real s = sin(angle.valueAt(idx));
   real c2 = c * c;
   real s2 = s * s;
-  real Cxx = a1 * c2 + a2 * s2;
-  real Cyy = a2 * c2 + a1 * s2;
   real Cxy = 2 * c * s * (a1 - a2);
-
-  real3 C = {Cxx, Cyy, Cxy};
 
   real3 h{0, 0, 0};
 
@@ -73,6 +70,8 @@ __global__ void k_atmExchangeField(CuField hField,
     const int idx_ = grid.coord2index(coo_);
 
     real3 m_;
+    real a1_;
+    real a2_;
     int3 normal = rel_coo * rel_coo;
 
     if(hField.cellInGeometry(coo_)) {
@@ -80,16 +79,27 @@ __global__ void k_atmExchangeField(CuField hField,
         continue;
 
       m_ = mField.vectorAt(idx_);
+      a1_ = A1.valueAt(idx_);
+      a2_ = A2.valueAt(idx_);
     }
     else {
       m_ = m;
+      a1_ = a1;
+      a2_ = a2;
     }
 
-    h += dot(normal, C) * dot(normal, w * w) * (m_ - m);
+    real aex_x = harmonicMean(a1, a1_);
+    real aex_y = harmonicMean(a2, a2_);
+    real Aex;
+
+    if (rel_coo.x != 0) { Aex = aex_x * c2 + aex_y * s2; }
+    else { Aex = aex_x * s2 + aex_y * c2; }
+
+    h += Aex * dot(normal, w2) * (m_ - m);
   }
 
   // MIXED DERIVATIVE
-  if (C.z == 0) {
+  if (Cxy == 0) {
     hField.setVectorInCell(idx, h / msat.valueAt(idx));
     return;
   }
@@ -111,8 +121,7 @@ __global__ void k_atmExchangeField(CuField hField,
               real3 m_xp_ym = mField.vectorAt(c_xp_ym);
               real3 m_xm_yp = mField.vectorAt(c_xm_yp);
               real3 m_xm_ym = mField.vectorAt(c_xm_ym);
-              real denom = w.x * w.y;
-              h += C.z * (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp)) * w.x * w.y;
+              h += Cxy * (1.0/4.0) * ((m_xp_yp + m_xm_ym) - (m_xp_ym + m_xm_yp)) * w.x * w.y;
             }
       }
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
