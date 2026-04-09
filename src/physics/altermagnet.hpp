@@ -10,6 +10,7 @@
 #include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "hostmagnet.hpp"
+#include "inter_parameter.hpp"
 #include "parameter.hpp"
 #include "world.hpp"
 #include "system.hpp"
@@ -40,6 +41,10 @@ class Altermagnet : public HostMagnet {
   Parameter alterex_1;
   Parameter alterex_2;
   Parameter alterex_angle;
+  InterParameter interAlterex_1;
+  InterParameter scaleAlterex_1;
+  InterParameter interAlterex_2;
+  InterParameter scaleAlterex_2;
 
  private:
   Ferromagnet sub1_;

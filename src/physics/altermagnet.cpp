@@ -19,7 +19,11 @@ Altermagnet::Altermagnet(std::shared_ptr<System> system_ptr,
       sub2_(Ferromagnet(system_ptr, name + ":sublattice_2", this)),
       alterex_1(system(), 0.0, name + ":alterex_1", "J/m"),
       alterex_2(system(), 0.0, name + ":alterex_2", "J/m"),
-      alterex_angle(system(), 0.0, name + ":alterex_angle", "") {
+      alterex_angle(system(), 0.0, name + ":alterex_angle", ""),
+      interAlterex_1(system(), 0.0, name + ":inter_alterex_1", "J/m"),
+      scaleAlterex_1(system(), 1.0, name + ":scale_alterex_1", ""),
+      interAlterex_2(system(), 0.0, name + ":inter_alterex_2", "J/m"),
+      scaleAlterex_2(system(), 1.0, name + ":scale_alterex_2", "") {
         addSublattice(&sub1_);
         addSublattice(&sub2_);
       }

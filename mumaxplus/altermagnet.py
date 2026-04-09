@@ -276,6 +276,100 @@ class Altermagnet(Magnet):
         self.alterex_angle.set(value)
 
     @property
+    def inter_alterex_1(self) -> InterParameter:
+        """Interregional first anisotropic exchange constant (J/m).
+        If set to zero (default), then the harmonic mean of
+        the exchange constants of the two regions are used.
+
+        When no anisotropic exchange interaction between different regions
+        is wanted, set `scale_alterex_1` to zero.
+
+        This parameter should be set with
+
+        >>> magnet.inter_alterex_1.set_between(region1, region2, value)
+
+        See Also
+        --------
+        alterex_1, Ferromagnet.inter_exchange, scale_alterex_1, Ferromagnet.scale_exchange
+        """
+        return InterParameter(self._impl.inter_alterex_1)
+
+    @inter_alterex_1.setter
+    def inter_alterex_1(self, value):
+        self.inter_alterex_1.set(value)
+
+    @property
+    def scale_alterex_1(self) -> InterParameter:
+        """Scaling of the first altermagnetic exchange constant between
+        different regions. This factor is multiplied by the harmonic
+        mean of the exchange constants of the two regions.
+
+        If `inter_alterex_1` is set to a non-zero value, then this
+        overrides `scale_alterex_1`, i.e. `scale_alterex_1` is
+        automatically set to zero when `inter_alterex_1` is not.
+
+        This parameter should be set with
+
+        >>> magnet.scale_alterex_1.set_between(region1, region2, value)
+
+        See Also
+        --------
+        alterex_1, inter_alterex_1, Ferromagnet.inter_exchange, Ferromagnet.scale_exchange
+        """
+        return InterParameter(self._impl.scale_alterex_1)
+
+    @scale_alterex_1.setter
+    def scale_alterex_1(self, value):
+        self.scale_alterex_1.set(value)
+
+    @property
+    def inter_alterex_2(self) -> InterParameter:
+        """Interregional second anisotropic exchange constant (J/m).
+        If set to zero (default), then the harmonic mean of
+        the exchange constants of the two regions are used.
+
+        When no anisotropic exchange interaction between different regions
+        is wanted, set `scale_alterex_2` to zero.
+
+        This parameter should be set with
+
+        >>> magnet.inter_alterex_2.set_between(region1, region2, value)
+
+        See Also
+        --------
+        alterex_2, Ferromagnet.inter_exchange, scale_alterex_2, Ferromagnet.scale_exchange
+        """
+        return InterParameter(self._impl.inter_alterex_2)
+
+    @inter_alterex_2.setter
+    def inter_alterex_2(self, value):
+        self.inter_alterex_2.set(value)
+
+    @property
+    def scale_alterex_2(self) -> InterParameter:
+        """Scaling of the second altermagnetic exchange constant between
+        different regions. This factor is multiplied by the harmonic
+        mean of the exchange constants of the two regions.
+
+        If `inter_alterex_2` is set to a non-zero value, then this
+        overrides `scale_alterex_2`, i.e. `scale_alterex_2` is
+        automatically set to zero when `inter_alterex_2` is not.
+
+        This parameter should be set with
+
+        >>> magnet.scale_alterex_2.set_between(region1, region2, value)
+
+        See Also
+        --------
+        alterex_2, inter_alterex_2, Ferromagnet.inter_exchange, Ferromagnet.scale_exchange
+        """
+        return InterParameter(self._impl.scale_alterex_2)
+
+    @scale_alterex_2.setter
+    def scale_alterex_2(self, value):
+        self.scale_alterex_2.set(value)
+
+    @property
     def inter_atmex_nn(self) -> InterParameter:
         """Interregional altermagnetic exchange constant (J/m).
         If set to zero (default), then the harmonic mean of
