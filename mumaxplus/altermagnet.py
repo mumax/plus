@@ -40,6 +40,10 @@ class Altermagnet(Magnet):
             The altermagnet's identifier. If the name is empty (the default), a name for the
             altermagnet will be created.
         """
+        if grid.size[2] > 1:
+            warnings.warn("The anisotropic exchange interaction in altermagnets is only"
+                        + " supported for two-dimensional grids in the xy-plane. This"
+                        + " interaction will have no effect in the z-direction." , UserWarning)
         super().__init__(world._impl.add_altermagnet,
                          world, grid, name, geometry, regions)
 
