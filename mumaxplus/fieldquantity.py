@@ -1,7 +1,7 @@
 """FieldQuantity implementation."""
 
 import numpy as _np
-
+import pyovf
 from .grid import Grid
 
 
@@ -122,3 +122,34 @@ class FieldQuantity:
             self._impl.exec()
         stop = time.time()
         return (stop - start) / ntimes
+
+    def save_ovf(self, name=""):
+        """Save the FieldQuantity as an OVF file.
+
+        Parameters
+        ----------
+        name : str (default="")
+            The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used.
+            
+        Warning
+        -------
+        The shape of the array in the OVF file is (nz, ny, nx, ncomp) and not (ncomp, nz, ny, nx) in order to have the correct metadata."""
+        cx, cy, cz = self._impl.system.cellsize
+        ovf = pyovf.create(_np.moveaxis(self.eval(), 0, -1), xstepsize=cx, ystepsize=cy, zstepsize=cz, title=self.name)
+        ovf.TotalSimTime = self._impl.system.time
+        if name == "":
+            name = self.name + ".ovf"
+        pyovf.write(name, ovf)
+
+    def load_ovf(self, name=""):
+        """Load an OVF file as a FieldQuantity.
+
+        Parameters
+        ----------
+        name : str (default="")
+            The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used."""
+        if name == "":
+            name = self.name + ".ovf"
+        ovf = pyovf.read(name)
+        data = _np.ascontiguousarray(_np.moveaxis(ovf.data, -1, 0))
+        self.set(data)
