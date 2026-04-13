@@ -142,15 +142,19 @@ __global__ void k_atmExchangeField(CuField hField,
   for (int i = 0; i < 4; i++) {
     unsigned int ridx_ = system.getRegionIdx(coos[i]);
 
-    if (ridx != ridx) {
+    if (ridx_ != ridx) {
       scale1 = scaleEx1.valueBetween(ridx, ridx_);
       inter1 = interEx1.valueBetween(ridx, ridx_);
       scale2 = scaleEx2.valueBetween(ridx, ridx_);
       inter2 = interEx2.valueBetween(ridx, ridx_);
     }
-    real aex_1 = getExchangeStiffness(inter1, scale1, a1, A1.valueAt(coos[i]));
-    real aex_2 = getExchangeStiffness(inter2, scale2, a2, A2.valueAt(coos[i]));
-    Aex[i] = cs2 * (aex_1 - aex_2);
+
+    real ang_ = angle.valueAt(coos[i]);
+    real aex_1 = getExchangeStiffness(inter1, scale1, cs2 * a1,
+                                                      sin(2 * ang_) * A1.valueAt(coos[i]));
+    real aex_2 = getExchangeStiffness(inter2, scale2, cs2 * a2,
+                                                      sin(2 * ang_) * A2.valueAt(coos[i]));
+    Aex[i] = (aex_1 - aex_2);
   }
 
   const real3 m_xp_yp = mField.vectorAt(coos[0]);
