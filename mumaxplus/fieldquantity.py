@@ -151,5 +151,8 @@ class FieldQuantity:
         if name == "":
             name = self.name + ".ovf"
         ovf = pyovf.read(name)
-        data = _np.ascontiguousarray(_np.moveaxis(ovf.data, -1, 0))
+        if self.ncomp == 1:
+            data = _np.array([ovf.data])
+        else:
+            data = _np.ascontiguousarray(_np.moveaxis(ovf.data, -1, 0))
         self.set(data)
