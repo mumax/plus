@@ -138,7 +138,7 @@ class FieldQuantity:
         ovf = pyovf.create(_np.moveaxis(self.eval(), 0, -1), xstepsize=cx, ystepsize=cy, zstepsize=cz, title=self.name)
         ovf.TotalSimTime = self._impl.system.time
         if name == "":
-            name = self.name + ".ovf"
+            name = self.name.replace(":", "_") + ".ovf"
         pyovf.write(name, ovf)
 
     def load_ovf(self, name=""):
@@ -149,10 +149,11 @@ class FieldQuantity:
         name : str (default="")
             The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used."""
         if name == "":
-            name = self.name + ".ovf"
+            name = self.name.replace(":", "_") + ".ovf"
         ovf = pyovf.read(name)
         if self.ncomp == 1:
             data = _np.array([ovf.data])
         else:
+            # _np.ascontiguousarray is used so data is the transformed array. Otherwise the C++ layer still uses ovf.data
             data = _np.ascontiguousarray(_np.moveaxis(ovf.data, -1, 0))
         self.set(data)
