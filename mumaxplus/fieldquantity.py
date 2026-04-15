@@ -3,6 +3,7 @@
 import numpy as _np
 import pyovf
 from .grid import Grid
+from pathlib import Path
 
 
 class FieldQuantity:
@@ -156,11 +157,12 @@ class FieldQuantity:
         name : str (default="")
             The name of the OVF file. If the name is empty (the default), it will look for the most recently saved file with this FieldQuantity name."""
         if name == "":
-            if self.name not in self._ovf_counts:
-                raise FileNotFoundError(f"{self.name.replace(":", "_") + f"{0:06d}.ovf"} does not exist")
-            count = self._ovf_counts[self.name] - 1
-            name = self.name.replace(":", "_") + f"{count:06d}.ovf"
-
+            name_replace = self.name.replace(":", "_")
+            files = Path(".").glob(f"{name_replace}*.ovf")
+            try:
+                name = str(max(files, key=lambda f: int(f.stem[-6:])))
+            except ValueError:
+                raise FileNotFoundError(F"No files matching '{name_replace}*.ovf' found.")
         ovf = pyovf.read(name)
         if self.ncomp == 1:
             data = _np.array([ovf.data])
