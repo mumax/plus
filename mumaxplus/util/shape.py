@@ -610,7 +610,7 @@ class DelaunayHull(Shape):
         
         Parameters
         ----------
-        points : ndarray of double, shape (npoints, 3)
+        points : ndarray of double, ``shape (npoints, 3)``
         """
         hull = _Delaunay(points)
         def shape_func(x, y, z):

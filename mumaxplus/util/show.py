@@ -222,7 +222,7 @@ def slice_field_right_handed(field: _np.ndarray,
 
     Parameters
     ----------
-    field : numpy.ndarray with shape ([ncomp,] nz, ny, nx)
+    field : numpy.ndarray with ``shape ([ncomp,] nz, ny, nx)``
         Field array to slice
     OoP_axis_idx : int, default=2
         Index of the out of plane axis. 0, 1 and 2 represent x, y and z respectively.
@@ -231,7 +231,7 @@ def slice_field_right_handed(field: _np.ndarray,
 
     Returns
     -------
-    field_2D : numpy.ndarray with shape ([ncomp,] n_vertical, n_horizontal)
+    field_2D : numpy.ndarray with ``shape ([ncomp,] n_vertical, n_horizontal)``
         Right-handed two dimensional slice of given field.
     """
     slice_ = [slice(None)] * field.ndim
