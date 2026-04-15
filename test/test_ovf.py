@@ -2,7 +2,7 @@ from mumaxplus import World, Ferromagnet, Grid
 import pyovf
 import numpy as np
 
-RTOL = 2e-7
+RTOL = 5e-7
 
 def max_relative_error(result, wanted):
     return np.max(np.abs(result - wanted) / np.abs(wanted))
@@ -18,11 +18,8 @@ class TestOVF:
         self.magnet = Ferromagnet(self.world, Grid((nx, ny, nz)))
 
         self.magnet.enable_elastodynamics = True
-        self.magnet.magnetization = (1,0,0)
         self.magnet.aex = 13e-12
         self.magnet.elastic_displacement = np.random.rand(3,nz,ny,nx)*1e-14
-
-        self.world.timesolver.run(0.5e-9)
 
         self.magnetization = self.magnet.magnetization.eval()
         self.aex = self.magnet.aex.eval()
