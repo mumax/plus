@@ -15,3 +15,5 @@ started!
    tutorial/regions
    tutorial/stdp4
    tutorial/langevin
+   tutorial/precision
+   tutorial/plot_field

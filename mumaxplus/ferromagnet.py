@@ -2,7 +2,7 @@
 
 import numpy as _np
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .magnet import Magnet
 from .dmitensor import DmiTensor
@@ -238,6 +238,18 @@ class Ferromagnet(Magnet):
         self.alpha.set(value)
 
     @property
+    def gamma(self) -> Parameter:
+        """Gyromagnetic ratio (rad/Ts).
+
+        Default = 1.7595e11 rad/Ts
+        """
+        return Parameter(self._impl.gamma)
+
+    @gamma.setter
+    def gamma(self, value):
+        self.gamma.set(value)
+
+    @property
     def aex(self) -> Parameter:
         """Exchange constant (J/m)."""
         return Parameter(self._impl.aex)
@@ -411,6 +423,8 @@ class Ferromagnet(Magnet):
     @property
     def Lambda(self) -> Parameter:
         """Slonczewski Λ parameter.
+
+        Default = 1.0
         
         See Also
         --------
@@ -424,8 +438,8 @@ class Ferromagnet(Magnet):
     
     @property
     def free_layer_thickness(self) -> Parameter:
-        """Slonczewski free layer thickness (m). If set to zero (default),
-        then the thickness will be deduced from the mesh size.
+        """Slonczewski free layer thickness (m). By default, the thickness is
+        equal to the mesh size in the z-direction.
         
         See Also
         --------

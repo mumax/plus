@@ -13,7 +13,7 @@ magnetization configuration:
 #. Setting the magnetization using a numpy array
 
 Let's start by creating a magnet which will be used throughout this notebook.
-When we use the `plot_field` function to visualize the magnetization configuration,
+When we use the ``plot_field`` function to visualize the magnetization configuration,
 we see that the magnetization is initialized with random values.
 
 .. code-block:: python
@@ -98,7 +98,7 @@ configurations can be found in :py:mod:`mumaxplus.util.config`.
 
 Below you can find an example for each predefined magnetization configuration.
 If you want to know how to use a certain configuration, you can always consult
-the `help`, e.g:
+the ``help``, e.g:
 
 .. code-block:: python
     

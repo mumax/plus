@@ -40,7 +40,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=a993f969"></script>
+    <script src="../../_static/documentation_options.js?v=126f7b74"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
     <link rel="prev" title="FieldQuantity" href="mumaxplus.FieldQuantity.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-10-23, v1.1.2"/>
+    <meta name="docbuild:last-update" content="2026-02-05, v1.1.3"/>
   </head>
   
   
@@ -187,8 +187,8 @@
           
           
           
-          <a href="https://arxiv.org/abs/2411.18194" title="Paper on arXiv" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">Paper on arXiv</span></a>
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
         </li>
 </ul></div>
         <div class="sidebar-primary-item">
@@ -244,6 +244,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/regions.html">Regions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/precision.html">Single and double floating-point precision</a></li>
 </ul>
 </details></li>
 </ul>
@@ -358,6 +359,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable"><code class="docutils literal notranslate"><span class="pre">Variable</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.set"><code class="docutils literal notranslate"><span class="pre">set()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.set_in_region"><code class="docutils literal notranslate"><span class="pre">set_in_region()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
 </ul>
 </li>
@@ -397,6 +399,30 @@ shape as this variable, or with a function which returns the cell value
 as a function of the position.</p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Variable.set_in_region" title="mumaxplus.Variable.set_in_region"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_in_region()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.Variable.set_in_region">
+<span class="sig-name descname"><span class="pre">set_in_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.Variable.set_in_region" title="Link to this definition">#</a></dt>
+<dd><p>Set a static value in a specified region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region_idx</strong> (<em>int</em>) – The index of the region the variable must be set in.</p></li>
+<li><p><strong>value</strong> (<em>float</em><em>, </em><em>tuple</em><em> of </em><em>floats</em><em>, or </em><em>callable</em>) – Value to assign within the specified region. The value may be either a
+uniform scalar or vector matching the number of variable components, or
+a callable that takes grid coordinates and returns a compatible value.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Variable.set" title="mumaxplus.Variable.set"><code class="xref py py-func docutils literal notranslate"><span class="pre">set()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -457,6 +483,7 @@ as a function of the position.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable"><code class="docutils literal notranslate"><span class="pre">Variable</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.set"><code class="docutils literal notranslate"><span class="pre">set()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.set_in_region"><code class="docutils literal notranslate"><span class="pre">set_in_region()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Variable.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
 </ul>
 </li>
@@ -486,7 +513,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-10-23, v1.1.2.
+  Last updated on 2026-02-05, v1.1.3.
   <br/>
 </p>
   </div>

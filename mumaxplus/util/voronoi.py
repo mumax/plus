@@ -3,7 +3,7 @@
 import numpy as _np
 import warnings as _w
 
-import _mumaxpluscpp as _cpp
+from .. import _cpp
 from mumaxplus.world import World
 from mumaxplus.grid import Grid
 class VoronoiTessellator:

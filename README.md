@@ -12,7 +12,7 @@ If you have any questions, feel free to use the [mumax⁺ GitHub Discussions](ht
 mumax⁺ is described in the following paper:
 > mumax+: extensible GPU-accelerated micromagnetics and beyond
 >
-> https://arxiv.org/abs/2411.18194
+> https://www.nature.com/articles/s41524-025-01893-y
 
 Please cite this paper if you would like to cite mumax⁺.
 All demonstrations in the paper were simulated using version [v1.1.0](https://github.com/mumax/plus/tree/v1.1.0) of the code. The scripts used to generate the data can be found in the [paper2025 directory](https://github.com/mumax/plus/tree/paper2025/paper2025) under the [paper2025 tag](https://github.com/mumax/plus/tree/paper2025).
@@ -21,8 +21,9 @@ All demonstrations in the paper were simulated using version [v1.1.0](https://gi
 
 ### Dependencies
 
-mumax⁺ should work on any NVIDIA GPU. To get started you should install the
-following tools yourself. Click the arrows for more details.
+mumax⁺ should work on any NVIDIA GPU.
+To get started you should install the following tools yourself.
+Take care to avoid **version conflicts** between these different types of software and your hardware: click the arrows for more details.
 
 <details><summary>CUDA Toolkit</summary>
 
@@ -49,9 +50,11 @@ To see which CUDA Toolkit works for your GPU's Compute Capability, check [this S
 <details><summary>A C++ compiler which supports C++17</summary>
 
 * **Linux:** `sudo apt-get install gcc`
-  * ⚠️ each CUDA version has a maximum supported `gcc` version. [This StackOverflow answer](https://stackoverflow.com/a/46380601) lists the maximum supported `gcc` version for each CUDA version. If necessary, use `sudo apt-get install gcc-<min_version>` instead, with the appropriate `<min_version>`.
-* **Windows:**
-  * CUDA does not support the `gcc` compiler on Windows, so download and install [Microsoft Visual Studio](https://visualstudio.microsoft.com/downloads/) with the "Desktop development with C++" workload. After installing, check if the path to `cl.exe` was added to your `PATH` environment variable (i.e., check whether `where cl.exe` returns an appropriate path like `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`). If not, add it manually.
+  * ⚠️ Each CUDA version has a maximum supported `gcc` version, as listed in [this StackOverflow answer](https://stackoverflow.com/a/46380601). If necessary, use `sudo apt-get install gcc-<min_version>` instead, with the appropriate `<min_version>`.
+* **Windows:** [Microsoft Visual C++](https://visualstudio.microsoft.com/downloads/) (MSVC) must be used, since CUDA does not support `gcc` on Windows.
+  * ⚠️ Make sure you install a version of MSVC that is compatible with your installed CUDA toolkit, as listed in [this table](https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html) (e.g., MSVC 2026 does not yet seem to be supported by CUDA as of January 2026).
+  * During installation, check the box to include the "Desktop development with C++" workload.
+  * After installing, check if the path to `cl.exe` was added to your `PATH` environment variable (i.e., check whether `where cl.exe` returns an appropriate path like `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`). If not, add it manually.
 
 👉 *Check C installation with: `gcc --version` on Linux and `where.exe cl.exe` on Windows.*
 
@@ -66,7 +69,7 @@ To see which CUDA Toolkit works for your GPU's Compute Capability, check [this S
 
 </details>
 
-<details><summary>CPython <i>(version ≥ 3.8 recommended)</i>, pip and miniconda/anaconda</summary>
+<details><summary>CPython <i>(version ≥ 3.11)</i>, pip and miniconda/anaconda</summary>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All these Python-related tools should be included in a standard installation of [Anaconda or Miniconda](https://www.anaconda.com/download/success).
 
@@ -109,16 +112,9 @@ pip install .
 ```
 
 > [!TIP]
-> If changes are made to the code, then ``pip install -v .`` can be used to rebuild mumax⁺, with the `-v` flag enabling verbose debug information.
+> If changes are made to the code, then `pip install -v .` can be used to rebuild mumax⁺, with the `-v` flag enabling verbose debug information.
 >
-> If you want to change only the Python code, without needing to reinstall after each change, ``pip install -ve .`` can also be used.
-
-> [!TIP]
-> The source code can also be compiled with double precision, by changing `FP_PRECISION` in `CMakeLists.txt` from `SINGLE` to `DOUBLE` before rebuilding.
->
-> ```cmake
-> add_definitions(-DFP_PRECISION=DOUBLE) # FP_PRECISION > should be SINGLE or DOUBLE
-> ```
+> If you want to change only the Python code, without needing to reinstall after each change, `pip install -ve .` can also be used.
 
 ### Check the compilation
 
@@ -129,7 +125,16 @@ or to run the [tests](#testing) in the `test/` directory.
 
 * (*Windows*) If you encounter the error `No CUDA toolset found`, try copying the files in `NVIDIA GPU Computing Toolkit/CUDA/<version>/extras/visual_studio_integration/MSBuildExtensions` to `Microsoft Visual Studio/<year>/<edition>/MSBuild/Microsoft/VC/<version>/BuildCustomizations`. See [these instructions](https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170) for more details.
 
+* (*Windows*) If you encounter errors related to interactions between CMake, MSVC and CUDA, like `-- Detecting CUDA compiler ABI info - failed`, you may try the following methods to activate an appropriate set of environment variables. One option is to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. For CUDA &leq;12.9, another option is to call one of the `.bat` scripts in the folder `& C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build`, such as `vcvars64.bat`, before you run `pip install`.
+
 </details>
+
+## Floating-point precision
+
+mumax⁺ can use either single or double floating-point precision.
+This can be controlled by the command-line argument `--mumaxplus-fp-precision` and/or the environment variable `MUMAXPLUS_FP_PRECISION`.
+
+See this [tutorial page](https://mumax.github.io/plus/tutorial/precision.html) or [example notebook](examples/precision.ipynb) for more details.
 
 ## Documentation
 

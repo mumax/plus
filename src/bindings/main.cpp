@@ -1,6 +1,7 @@
 #include "wrappers.hpp"
 
-PYBIND11_MODULE(_mumaxpluscpp, m) {
+PYBIND11_MODULE(MUMAX_MODULE_NAME, m) {
+  m.attr("FP_PRECISION") = FP_PRECISION;
   wrap_fieldquantity(m);
   wrap_altermagnetfieldquantity(m);
   wrap_antiferromagnetfieldquantity(m);

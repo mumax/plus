@@ -445,6 +445,161 @@ class Superball(Shape):
                 return norm <= 1
             super().__init__(shape_func)
 
+class Line2D(Shape):
+    def __init__(self, p1, p2, diam, linecap):
+        """2D line segment between points `p1` and `p2`, with given diameter and
+        cap. This is the 2D equivalent of :class:`Line`, resulting in a uniform
+        fill along the z-axis.
+
+        Parameters
+        ----------
+        p1, p2 : tuple[float] of size 2 or 3
+            The two endpoints of the line segment, `(x1, y1)` and `(x2, y2)`.
+            If the size is 3, the z-values are simply ignored.
+        diam : float
+            Inclusive diameter or width of the line, with `diam > 0.0`.
+        linecap : str
+            The line cap can be 'infinite', 'round' or 'flat'.
+
+            - 'infinite': line extends indefinitely beyond the two specified points.
+            - 'round': the line segment ends in circles at the two specified points.
+            - 'flat': the line segment ends in a flat plane at the two specified points.
+
+        See Also
+        --------
+        Line
+        """
+
+        if diam <= 0: 
+            raise ValueError("`diam` should be strictly greater than 0.")
+
+        radSq = (diam / 2) ** 2
+        x1, y1 = p1[0], p1[1]
+        x2, y2 = p2[0], p2[1]
+
+        if x1 == x2 and y1 == y2:
+            raise ValueError("Points `p1` and `p2` should be different.")
+
+        dx, dy = x2-x1, y2-y1
+        lenSq = dx*dx + dy*dy
+
+        match linecap:
+            case "infinite":
+                def infinite_func(x, y, z):
+                    return radSq >= pow((x-x1)*(y-y2) - (x-x2)*(y-y1), 2) / lenSq
+                super().__init__(infinite_func)
+
+            case "flat":
+                def flat_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy) / lenSq
+
+                    # If param is not in [0,1], then point is beyond line segment
+                    valid = (0 <= param) & (param <= 1)
+                    # still continue for numpy array support
+
+                    xx, yy = x1 + param*dx, y1 + param*dy  # closest point on line
+                    dxx, dyy = x-xx, y-yy
+
+                    return valid & (dxx*dxx + dyy*dyy <= radSq)
+
+                super().__init__(flat_func)
+
+            case "round":
+                def round_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy) / lenSq
+
+                    # closest point on the line segment
+                    param = _np.clip(param, 0, 1)
+                    xx, yy = x1+param*dx, y1+param*dy
+
+                    dxx, dyy = x - xx, y - yy
+
+                    return dxx*dxx + dyy*dyy <= radSq
+
+                super().__init__(round_func)
+
+            case _:
+                raise ValueError(f"Line capping method \"{linecap}\" is not implemented.")
+
+class Line(Shape):
+    def __init__(self, p1, p2, diam, linecap):
+        """3D line segment between points `p1` and `p2`, with given diameter and cap.
+
+        Parameters
+        ----------
+        p1, p2 : tuple[float] of size 3
+            The two endpoints of the line segment, `(x1, y1, z1)` and `(x2, y2, z2)`.
+        diam : float
+            Inclusive diameter of the line, with `diam > 0.0`.
+        linecap : str
+            The line cap can be 'infinite', 'round' or 'flat'.
+
+            - 'infinite': line extends indefinitely beyond the two specified points.
+            - 'round': the line segment ends in circles at the two specified points.
+            - 'flat': the line segment ends in a flat plane at the two specified points.
+
+        See Also
+        --------
+        Line2D
+        """
+
+        if diam <= 0: 
+            raise ValueError("`diam` should be strictly greater than 0.")
+
+        radSq = (diam / 2) ** 2
+        x1, y1, z1 = p1[0], p1[1], p1[2]
+        x2, y2, z2 = p2[0], p2[1], p2[2]
+
+        if x1 == x2 and y1 == y2 and z1 == z2:
+            raise ValueError("Points `p1` and `p2` should be different.")
+
+        dx, dy, dz = x2-x1, y2-y1, z2-z1
+        lenSq = dx*dx + dy*dy + dz*dz
+
+        match linecap:
+            case "infinite":
+                def infinite_func(x, y, z):
+                    dx1, dy1, dz1 = x-x1, y-y1, z-z1
+                    dx2, dy2, dz2 = x-x2, y-y2, z-z2
+                    cross1, cross2, cross3 = dy1*dz2-dy2*dz1, dx1*dz2-dx2*dz1, dx1*dy2-dx2*dy1
+
+                    return radSq >= (cross1*cross1 + cross2*cross2 + cross3*cross3) / lenSq
+
+                super().__init__(infinite_func)
+
+            case "flat":
+                def flat_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy + (z-z1)*dz) / lenSq
+
+                    # If param is not in [0,1], then point is beyond line segment
+                    valid = (0 <= param) & (param <= 1)
+                    # still continue for numpy array support
+
+                    # closest point on line
+                    xx, yy, zz = x1 + param*dx, y1 + param*dy, z1 + param*dz
+                    dxx, dyy, dzz = x-xx, y-yy, z-zz
+
+                    return valid & (dxx*dxx + dyy*dyy + dzz*dzz <= radSq)
+
+                super().__init__(flat_func)
+
+            case "round":
+                def round_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy + (z-z1)*dz) / lenSq
+
+                    # closest point on the line segment
+                    param = _np.clip(param, 0, 1)
+                    xx, yy, zz = x1+param*dx, y1+param*dy, z1+param*dz
+
+                    dxx, dyy, dzz = x - xx, y - yy, z - zz
+
+                    return dxx*dxx + dyy*dyy + dzz*dzz <= radSq
+
+                super().__init__(round_func)
+
+            case _:
+                raise ValueError(f"Line capping method \"{linecap}\" is not implemented.")
+
 # =========================
 # Convex polyhedra
 
@@ -647,7 +802,7 @@ if __name__=="__main__":
         plt.show()
 
 
-    shape = Superball(1, 4)
+    shape = Line((-0.9, -0.8, -0.7), (0.5, 0.6, 0.7), 0.1, "infinite")
     shape.mirror_xy()
 
     res = 201

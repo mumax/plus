@@ -42,6 +42,7 @@ void wrap_ferromagnet(py::module& m) {
 
       .def_readonly("msat", &Ferromagnet::msat)
       .def_readonly("alpha", &Ferromagnet::alpha)
+      .def_readonly("gamma", &Ferromagnet::gamma)
       .def_readonly("aex", &Ferromagnet::aex)
       .def_readonly("inter_exchange", &Ferromagnet::interExch)
       .def_readonly("scale_exchange", &Ferromagnet::scaleExch)

@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath("../mumaxplus"))
 project = "mumax⁺"
 # "Diego De Gusem, Oleh Kozynets, Ian Lateur, Lars Moreels, Jeroen Mulkers"
 author = "the DyNaMat group, Ghent University, Belgium."
-release = "1.1.2"
+release = "1.1.3"
 
 date = datetime.datetime.now()
 html_last_updated_fmt = f"{date.strftime("%Y")}-{date.strftime("%m")}-{date.strftime("%d")}, v{release}"
@@ -117,8 +117,8 @@ html_theme_options = {
             "type": "fontawesome",
         },
         {
-            "name": "Paper on arXiv",
-            "url": "https://arxiv.org/abs/2411.18194",
+            "name": "Paper",
+            "url": "https://www.nature.com/articles/s41524-025-01893-y",
             "icon": "fas fa-file-alt",  # generic document icon
             "type": "fontawesome",
         },
