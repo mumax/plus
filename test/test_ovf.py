@@ -39,18 +39,18 @@ class TestOVF:
         self.magnet.strain_tensor.save_ovf()
 
         self.ovf_m = pyovf.read(self.name)
-        self.ovf_aex = pyovf.read(self.magnet.aex.name.replace(":", "_") + ".ovf")
-        self.ovf_strain = pyovf.read(self.magnet.strain_tensor.name.replace(":", "_") + ".ovf")
+        self.ovf_aex = pyovf.read(self.magnet.aex.name.replace(":", "_") + f"{0:06d}.ovf")
+        self.ovf_strain = pyovf.read(self.magnet.strain_tensor.name.replace(":", "_") + f"{0:06d}.ovf")
 
     def test_1D(self):
         self.magnet.aex = 1e-12 # Change aex
-        self.magnet.aex.load_ovf()
+        self.magnet.aex.load_ovf(self.magnet.aex.name.replace(":", "_") + f"{0:06d}.ovf")
         aex = self.magnet.aex.eval()
         assert max_relative_error(aex, self.aex) < RTOL
 
     def test_3D(self):
         self.magnet.magnetization = (0,0,1) # Change magnetization
-        self.magnet.magnetization.load_ovf()
+        self.magnet.magnetization.load_ovf(self.magnet.magnetization.name.replace(":", "_") + f"{0:06d}.ovf")
         mag = self.magnet.magnetization.eval()
         assert max_relative_error(mag, self.magnetization) < RTOL
 
@@ -59,7 +59,7 @@ class TestOVF:
         self.magnet.elastic_displacement = np.random.rand(3,nz,ny,nx)*1e-14 # Change strain_tensor
         strain = np.ascontiguousarray(np.moveaxis(self.ovf_strain.data, -1, 0))
         assert max_relative_error(strain, self.strain) < RTOL
-    
+
     def test_read_name(self):
         self.magnet.magnetization = (0,0,1) # Change magnetization
         self.magnet.magnetization.load_ovf(self.name)

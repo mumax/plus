@@ -7,6 +7,7 @@ from .grid import Grid
 
 class FieldQuantity:
     """A functor representing a physical field quantity."""
+    _ovf_counts = {} # It keeps resetting to 0 if it is in the __init__
     def __init__(self, impl):
         self._impl = impl
 
@@ -133,23 +134,27 @@ class FieldQuantity:
             
         Warning
         -------
-        The shape of the array in the OVF file is (nz, ny, nx, ncomp) and not (ncomp, nz, ny, nx) in order to have the correct metadata."""
+        The shape of the array in the OVF file is (nz, ny, nx, ncomp) and not (ncomp, nz, ny, nx) in order to have the correct metadata.
+        
+        Warning
+        -------
+        self.name returns a string with colons (:). To avoid issues on Windows, these colons are changed to underscores (_)."""
         cx, cy, cz = self._impl.system.cellsize
         ovf = pyovf.create(_np.moveaxis(self.eval(), 0, -1), xstepsize=cx, ystepsize=cy, zstepsize=cz, title=self.name)
         ovf.TotalSimTime = self._impl.system.time
         if name == "":
-            name = self.name.replace(":", "_") + ".ovf"
+            count = self._ovf_counts.get(self.name, 0)
+            name = self.name.replace(":", "_") + f"{count:06d}.ovf"
+            self._ovf_counts[self.name] = count + 1
         pyovf.write(name, ovf)
 
-    def load_ovf(self, name=""):
+    def load_ovf(self, name):
         """Load an OVF file as a FieldQuantity.
 
         Parameters
         ----------
         name : str (default="")
-            The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used."""
-        if name == "":
-            name = self.name.replace(":", "_") + ".ovf"
+            The name of the OVF file."""
         ovf = pyovf.read(name)
         if self.ncomp == 1:
             data = _np.array([ovf.data])
