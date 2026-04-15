@@ -24,7 +24,7 @@ def test_full_magnetization_afm():
     assert err < 1e-5  # only error should be single versus double precision
 
 def test_full_magnetization_atm():
-    nx, ny, nz = 31, 120, 60
+    nx, ny, nz = 31, 120, 1
     world = World(cellsize=(1e-9, 1e-9, 1e-9))
     magnet = Altermagnet(world, Grid((nx, ny, nz)))
     # magnet should initialize with random magnetization

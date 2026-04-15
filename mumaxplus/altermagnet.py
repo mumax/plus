@@ -170,58 +170,58 @@ class Altermagnet(Magnet):
     # ----- MATERIAL PARAMETERS -----------
 
     @property
-    def atmex_cell(self) -> Parameter:
-        """Intracell altermagnetic exchange constant (J/m).
+    def afmex_cell(self) -> Parameter:
+        """Intracell antiferromagnetic exchange constant (J/m).
         This parameter plays the role of exchange constant of
-        the altermagnetic homogeneous exchange interaction
+        the antiferromagnetic homogeneous exchange interaction
         in a single simulation cell.
         
         See Also
         --------
-        atmex_ani, atmex_nn, latcon
+        afmex_nn, latcon
         """
-        return Parameter(self._impl.atmex_cell)
+        return Parameter(self._impl.afmex_cell)
 
-    @atmex_cell.setter
-    def atmex_cell(self, value):
-        self.atmex_cell.set(value)
+    @afmex_cell.setter
+    def afmex_cell(self, value):
+        self.afmex_cell.set(value)
 
         warn = False
-        if self.atmex_cell.is_uniform:
-            warn = self.atmex_cell.uniform_value > 0
-        elif _np.any(self.atmex_cell.eval() > 0):
+        if self.afmex_cell.is_uniform:
+            warn = self.afmex_cell.uniform_value > 0
+        elif _np.any(self.afmex_cell.eval() > 0):
             warn = True
         
         if warn:
-            warnings.warn("The altermagnetic exchange constant atmex_cell"
+            warnings.warn("The antiferromagnetic exchange constant afmex_cell"
                           + " is set to a positive value, instead of negative (or zero)."
                           + " Make sure this is intentional!", UserWarning)
 
     @property
-    def atmex_nn(self) -> Parameter:
-        """Intercell altermagnetic exchange constant (J/m).
+    def afmex_nn(self) -> Parameter:
+        """Intercell antiferromagnetic exchange constant (J/m).
         This parameter plays the role of exchange constant of
-        the altermagnetic inhomogeneous exchange interaction
+        the antiferromagnetic inhomogeneous exchange interaction
         between neighbouring simulation cells.
         
         See Also
         --------
-        atmex_ani, atmex_cell
+        afmex_cell
         """
-        return Parameter(self._impl.atmex_nn)
+        return Parameter(self._impl.afmex_nn)
 
-    @atmex_nn.setter
-    def atmex_nn(self, value):
-        self.atmex_nn.set(value)
+    @afmex_nn.setter
+    def afmex_nn(self, value):
+        self.afmex_nn.set(value)
 
         warn = False
-        if self.atmex_nn.is_uniform:
-            warn = self.atmex_nn.uniform_value > 0
-        elif _np.any(self.atmex_nn.eval() > 0):
+        if self.afmex_nn.is_uniform:
+            warn = self.afmex_nn.uniform_value > 0
+        elif _np.any(self.afmex_nn.eval() > 0):
             warn = True
         
         if warn:
-            warnings.warn("The altermagnetic exchange constant atmex_nn"
+            warnings.warn("The antiferromagnetic exchange constant afmex_nn"
                           + " is set to a positive value, instead of negative (or zero)."
                           + " Make sure this is intentional!", UserWarning)
 
@@ -234,7 +234,7 @@ class Altermagnet(Magnet):
 
         See Also
         --------
-        alterex_2, alterex_angle, atmex_cell, atmex_nn
+        alterex_2, alterex_angle, afmex_cell, afmex_nn
         """
         return Parameter(self._impl.alterex_1)
 
@@ -251,7 +251,7 @@ class Altermagnet(Magnet):
 
         See Also
         --------
-        alterex_1, alterex_angle, atmex_cell, atmex_nn
+        alterex_1, alterex_angle, afmex_cell, afmex_nn
         """
         return Parameter(self._impl.alterex_2)
 
@@ -261,13 +261,13 @@ class Altermagnet(Magnet):
 
     @property
     def alterex_angle(self) -> Parameter:
-        """The angle at which the reference frame of the
+        """The angle (rad) at which the reference frame of the
         anisotropic exchange interaction deviates from the
         principal grid axes.
 
         See Also
         --------
-        alterex_1, alterex_2, atmex_cell, atmex_nn
+        alterex_1, alterex_2, afmex_cell, afmex_nn
         """
         return Parameter(self._impl.alterex_angle)
 
@@ -370,55 +370,55 @@ class Altermagnet(Magnet):
         self.scale_alterex_2.set(value)
 
     @property
-    def inter_atmex_nn(self) -> InterParameter:
-        """Interregional altermagnetic exchange constant (J/m).
+    def inter_afmex_nn(self) -> InterParameter:
+        """Interregional antiferromagnetic exchange constant (J/m).
         If set to zero (default), then the harmonic mean of
         the exchange constants of the two regions are used.
 
         When no exchange interaction between different regions
-        is wanted, set `scale_atmex_nn` to zero.
+        is wanted, set `scale_afmex_nn` to zero.
 
         This parameter should be set with
         
-        >>> magnet.inter_atmex_nn.set_between(region1, region2, value)
+        >>> magnet.inter_afmex_nn.set_between(region1, region2, value)
 
         See Also
         --------
-        atmex_nn, Ferromagnet.inter_exchange, scale_atmex_nn, Ferromagnet.scale_exchange
+        afmex_nn, Ferromagnet.inter_exchange, scale_afmex_nn, Ferromagnet.scale_exchange
         """
-        return InterParameter(self._impl.inter_atmex_nn)
+        return InterParameter(self._impl.inter_afmex_nn)
 
-    @inter_atmex_nn.setter
-    def inter_atmex_nn(self, value):
+    @inter_afmex_nn.setter
+    def inter_afmex_nn(self, value):
         if value > 0:
-            warnings.warn("The altermagnetic exchange constant inter_atmex_nn"
+            warnings.warn("The antiferromagnetic exchange constant inter_afmex_nn"
                           + " is set to a positive value, instead of negative (or zero)."
                           + " Make sure this is intentional!", UserWarning)
-        self.inter_atmex_nn.set(value)
+        self.inter_afmex_nn.set(value)
 
     @property
-    def scale_atmex_nn(self) -> InterParameter:
-        """Scaling of the altermagnetic exchange constant between
+    def scale_afmex_nn(self) -> InterParameter:
+        """Scaling of the antiferromagnetic exchange constant between
         different regions. This factor is multiplied by the harmonic
         mean of the exchange constants of the two regions.
 
-        If `inter_atmex_nn` is set to a non-zero value, then this
-        overrides `scale_atmex_nn`, i.e. `scale_atmex_nn` is
-        automatically set to zero when `inter_atmex_nn` is not.
+        If `inter_afmex_nn` is set to a non-zero value, then this
+        overrides `scale_afmex_nn`, i.e. `scale_afmex_nn` is
+        automatically set to zero when `inter_afmex_nn` is not.
 
         This parameter should be set with
         
-        >>> magnet.scale_atmex_nn.set_between(region1, region2, value)
+        >>> magnet.scale_afmex_nn.set_between(region1, region2, value)
 
         See Also
         --------
-        atmex_nn, inter_atmex_nn, Ferromagnet.inter_exchange, Ferromagnet.scale_exchange
+        afmex_nn, inter_afmex_nn, Ferromagnet.inter_exchange, Ferromagnet.scale_exchange
         """
-        return InterParameter(self._impl.scale_atmex_nn)
+        return InterParameter(self._impl.scale_afmex_nn)
 
-    @scale_atmex_nn.setter
-    def scale_atmex_nn(self, value):
-        self.scale_atmex_nn.set(value)
+    @scale_afmex_nn.setter
+    def scale_afmex_nn(self, value):
+        self.scale_afmex_nn.set(value)
 
     @property
     def latcon(self) -> Parameter:
@@ -426,14 +426,14 @@ class Altermagnet(Magnet):
 
         Physical lattice constant of the Altermagnet. This doesn't break the
         micromagnetic character of the simulation package, but is only used to
-        calculate the homogeneous exchange field, i.e. the altermagnetic
+        calculate the homogeneous exchange field, i.e. the antiferromagnetic
         exchange interaction between spins at the same site.
 
         Default = 0.35 nm.
 
         See Also
         --------
-        atmex_cell
+        afmex_cell
         """
         return Parameter(self._impl.latcon)
     
@@ -528,7 +528,7 @@ class Altermagnet(Magnet):
         See Also
         --------
         max_intracell_angle
-        atmex_cell
+        afmex_cell
         """
         return FieldQuantity(_cpp.angle_field(self._impl))
     
@@ -540,7 +540,7 @@ class Altermagnet(Magnet):
         See Also
         --------
         angle_field
-        atmex_cell
+        afmex_cell
         Ferromagnet.max_angle
         """
         return ScalarQuantity(_cpp.max_intracell_angle(self._impl))

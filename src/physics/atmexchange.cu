@@ -12,6 +12,7 @@
 #include "world.hpp"
 
 bool atmExchangeAssuredZero(const Ferromagnet* magnet) {
+  if (!magnet->hostMagnet()) { return true; }
   if (!magnet->hostMagnet()->asATM()) { return true; }
   if ((magnet->hostMagnet()->asATM()->alterex_1.assuredZero() &&
        magnet->hostMagnet()->asATM()->alterex_2.assuredZero() &&

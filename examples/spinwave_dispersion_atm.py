@@ -47,8 +47,8 @@ def simulate():
 
     magnet.latcon = a
 
-    magnet.atmex_cell = A0
-    magnet.atmex_nn   = A12
+    magnet.afmex_cell = A0
+    magnet.afmex_nn   = A12
     magnet.alterex_1  = A1
     magnet.alterex_2  = A2
     magnet.alterex_angle = angle
@@ -68,10 +68,10 @@ def simulate():
     m2 = np.zeros(shape=(nt, 3, 1, 1, nx))
     m1[0,...] = magnet.sub1.magnetization.eval()
     m2[0,...] = magnet.sub2.magnetization.eval()
-    for i in tqdm(range(nt)):
+    for i in tqdm(range(nt - 1)):
         world.timesolver.run(dt)
-        m1[i,...] = magnet.sub1.magnetization.eval()
-        m2[i,...] = magnet.sub2.magnetization.eval()
+        m1[i + 1,...] = magnet.sub1.magnetization.eval()
+        m2[i + 1,...] = magnet.sub2.magnetization.eval()
     np.save(m_filename, np.array([m1, m2]))
     return m1, m2
 

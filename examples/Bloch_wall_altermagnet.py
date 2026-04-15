@@ -40,8 +40,8 @@ magnet.alpha = 0.01
 magnet.ku1   = K
 magnet.anisU = (0, 0, 1)
 
-magnet.atmex_nn   = A12
-magnet.atmex_cell = A0
+magnet.afmex_nn   = A12
+magnet.afmex_cell = A0
 magnet.latcon     = a
 
 magnet.alterex_1 = A1 # first exchange matrix eigenvalue

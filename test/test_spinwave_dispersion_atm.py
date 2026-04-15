@@ -45,8 +45,8 @@ def test_spinwave_dispersion_afm():
     magnet.ku1 = K
     magnet.anisU = (0, 0, 1)
 
-    magnet.atmex_nn = A12
-    magnet.atmex_cell = A0
+    magnet.afmex_nn = A12
+    magnet.afmex_cell = A0
     magnet.alterex_1 = A1
     magnet.alterex_2 = A2
     magnet.alterex_angle = angle

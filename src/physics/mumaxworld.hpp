@@ -106,8 +106,8 @@ class MumaxWorld : public World {
   // ----------------------------------------------------------------------------------
 
   // * Helper function to add any magnet to the world
-  template <class T, class MapT>
-  T* addMagnetTempl(MapT& container,
+  template <class T>
+  T* addMagnetTempl(std::map<std::string, std::unique_ptr<T>>& container,
                     Grid grid,
                     GpuBuffer<bool> geometry,
                     GpuBuffer<unsigned int> regions,

@@ -22,8 +22,8 @@ void wrap_altermagnet(py::module& m) {
       .def("other_sublattice",
           [](const Altermagnet* m, Ferromagnet* mag) { return m->getOtherSublattices(mag)[0]; },
             py::return_value_policy::reference)
-      .def_readonly("atmex_cell", &Altermagnet::afmex_cell)
-      .def_readonly("atmex_nn", &Altermagnet::afmex_nn)
+      .def_readonly("afmex_cell", &Altermagnet::afmex_cell)
+      .def_readonly("afmex_nn", &Altermagnet::afmex_nn)
       .def_readonly("alterex_1", &Altermagnet::alterex_1)
       .def_readonly("alterex_2", &Altermagnet::alterex_2)
       .def_readonly("inter_alterex_1", &Altermagnet::interAlterex_1)
@@ -31,8 +31,8 @@ void wrap_altermagnet(py::module& m) {
       .def_readonly("inter_alterex_2", &Altermagnet::interAlterex_2)
       .def_readonly("scale_alterex_2", &Altermagnet::scaleAlterex_2)
       .def_readonly("alterex_angle", &Altermagnet::alterex_angle)
-      .def_readonly("inter_atmex_nn", &Altermagnet::interAfmExchNN)
-      .def_readonly("scale_atmex_nn", &Altermagnet::scaleAfmExchNN)
+      .def_readonly("inter_afmex_nn", &Altermagnet::interAfmExchNN)
+      .def_readonly("scale_afmex_nn", &Altermagnet::scaleAfmExchNN)
       .def_readonly("latcon", &Altermagnet::latcon)
       .def_readonly("dmi_tensor", &Altermagnet::dmiTensor)
       .def_readonly("dmi_vector", &Altermagnet::dmiVector)
