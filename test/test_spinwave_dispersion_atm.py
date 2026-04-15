@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from mumaxplus import Altermagnet, Grid, World
-from mumaxplus.util.constants import GAMMALL
+from mumaxplus.util.constants import GAMMALL_DEFAULT
 
 # Value of RTOL is a trade-off between necessary simulation time and accuracy.
 RTOL = 2e-2  # 2%
@@ -96,7 +96,7 @@ def test_spinwave_dispersion_afm():
     walt = 0.5*(A1-A2) * (np.cos(2*angle)*(kx**2 - ky**2) + 2*np.sin(2*angle)*kx*ky) / Ms
 
     wmagnon = np.sqrt((wani + wex - wnn) * (wani + wex - 2*wc + wnn))
-    freq_theory = GAMMALL * (wmagnon - wext + walt) / (2 * np.pi)
+    freq_theory = GAMMALL_DEFAULT * (wmagnon - wext + walt) / (2 * np.pi)
 
     # difference
     freq_diff = abs(freq_mumaxplus - freq_theory)

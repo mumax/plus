@@ -1,5 +1,5 @@
 from mumaxplus import Altermagnet, Grid, World
-from mumaxplus.util.constants import GAMMALL
+from mumaxplus.util.constants import GAMMALL_DEFAULT
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -131,8 +131,8 @@ walt = 0.5 * (A1 - A2) * (np.cos(2*angle) * (kx**2 - ky**2) + 2 * np.sin(2*angle
 
 wmagnon = np.sqrt((wani + wex - wnn) * (wani + wex - 2*wc + wnn))
 
-w1 = GAMMALL * ( wmagnon + wext + walt)
-w2 = GAMMALL * ( wmagnon - wext - walt)
+w1 = GAMMALL_DEFAULT * ( wmagnon + wext + walt)
+w2 = GAMMALL_DEFAULT * ( wmagnon - wext - walt)
 
 # plot numerical result
 xscale = 1e-9
