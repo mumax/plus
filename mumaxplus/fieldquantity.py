@@ -130,7 +130,7 @@ class FieldQuantity:
         Parameters
         ----------
         name : str (default="")
-            The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used.
+            The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used appended with an integer of 6 digits.
             
         Warning
         -------
@@ -148,13 +148,19 @@ class FieldQuantity:
             self._ovf_counts[self.name] = count + 1
         pyovf.write(name, ovf)
 
-    def load_ovf(self, name):
+    def load_ovf(self, name=""):
         """Load an OVF file as a FieldQuantity.
 
         Parameters
         ----------
         name : str (default="")
-            The name of the OVF file."""
+            The name of the OVF file. If the name is empty (the default), it will look for the most recently saved file with this FieldQuantity name."""
+        if name == "":
+            if self.name not in self._ovf_counts:
+                raise FileNotFoundError(f"{self.name.replace(":", "_") + f"{0:06d}.ovf"} does not exist")
+            count = self._ovf_counts[self.name] - 1
+            name = self.name.replace(":", "_") + f"{count:06d}.ovf"
+
         ovf = pyovf.read(name)
         if self.ncomp == 1:
             data = _np.array([ovf.data])

@@ -41,13 +41,13 @@ class TestOVF:
 
     def test_1D(self):
         self.magnet.aex = 1e-12 # Change aex
-        self.magnet.aex.load_ovf(self.magnet.aex.name.replace(":", "_") + f"{0:06d}.ovf")
+        self.magnet.aex.load_ovf()
         aex = self.magnet.aex.eval()
         assert max_relative_error(aex, self.aex) < RTOL
 
     def test_3D(self):
         self.magnet.magnetization = (0,0,1) # Change magnetization
-        self.magnet.magnetization.load_ovf(self.magnet.magnetization.name.replace(":", "_") + f"{0:06d}.ovf")
+        self.magnet.magnetization.load_ovf()
         mag = self.magnet.magnetization.eval()
         assert max_relative_error(mag, self.magnetization) < RTOL
 
