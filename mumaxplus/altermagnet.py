@@ -234,7 +234,7 @@ class Altermagnet(Magnet):
 
         See Also
         --------
-        alterex_2, alterex_angle, afmex_cell, afmex_nn
+        alterex_2, alterex_angle
         """
         return Parameter(self._impl.alterex_1)
 
@@ -251,7 +251,7 @@ class Altermagnet(Magnet):
 
         See Also
         --------
-        alterex_1, alterex_angle, afmex_cell, afmex_nn
+        alterex_1, alterex_angle
         """
         return Parameter(self._impl.alterex_2)
 
@@ -267,7 +267,7 @@ class Altermagnet(Magnet):
 
         See Also
         --------
-        alterex_1, alterex_2, afmex_cell, afmex_nn
+        alterex_1, alterex_2
         """
         return Parameter(self._impl.alterex_angle)
 
