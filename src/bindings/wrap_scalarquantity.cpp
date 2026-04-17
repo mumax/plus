@@ -21,6 +21,10 @@ void wrap_antiferromagnetscalarquantity(py::module& m) {
   py::class_<AFM_ScalarQuantity, ScalarQuantity>(m, "AntiferromagnetScalarQuantity");
 }
 
+void wrap_altermagnetscalarquantity(py::module& m) {
+  py::class_<ATM_ScalarQuantity, ScalarQuantity>(m, "AltermagnetScalarQuantity");
+}
+
 void wrap_ncafmscalarquantity(py::module& m) {
   py::class_<NcAfm_ScalarQuantity, ScalarQuantity>(m, "NcAfmScalarQuantity");
 }

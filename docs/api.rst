@@ -17,6 +17,7 @@ API
    Ferromagnet
    Antiferromagnet
    NcAfm
+   Altermagnet
    TimeSolver
    ScalarQuantity
    FieldQuantity

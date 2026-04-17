@@ -5,8 +5,12 @@ add_library(physics STATIC
     afmexchange.hpp
     anisotropy.cu 
     anisotropy.hpp 
+    altermagnet.cpp
+    altermagnet.hpp
     antiferromagnet.cpp
     antiferromagnet.hpp
+    atmexchange.cu
+    atmexchange.hpp
     conductivitytensor.cu
     conductivitytensor.hpp
     constants.hpp

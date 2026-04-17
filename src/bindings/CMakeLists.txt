@@ -10,6 +10,7 @@ pybind11_add_module(${MUMAX_MODULE_NAME}
     cast.hpp
     main.cpp
     wrappers.hpp
+    wrap_altermagnet.cpp
     wrap_antiferromagnet.cpp
     wrap_dmitensor.cpp
     wrap_ferromagnet.cpp

@@ -15,6 +15,7 @@
 #include "system.hpp"
 #include "traction.hpp"
 
+class Altermagnet;
 class Antiferromagnet;
 class Ferromagnet;
 class FieldQuantity;
@@ -47,6 +48,7 @@ class Magnet {
   const Ferromagnet* asFM() const;
   const HostMagnet* asHost() const;
   const Antiferromagnet* asAFM() const;
+  const Altermagnet* asATM() const;
   const NcAfm* asNcAfm() const;
 
   const StrayField* getStrayField(const Magnet*) const;
