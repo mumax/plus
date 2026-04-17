@@ -145,7 +145,7 @@ class FieldQuantity:
         ovf.TotalSimTime = self._impl.system.time
         if name == "":
             count = self._ovf_counts.get(self.name, 0)
-            name = self.name.replace(":", "_") + f"{count:06d}.ovf"
+            name = self.name.replace(":", "_") + f"_{count:06d}.ovf"
             self._ovf_counts[self.name] = count + 1
         pyovf.write(name, ovf)
 
@@ -160,9 +160,9 @@ class FieldQuantity:
             name_replace = self.name.replace(":", "_")
             files = Path(".").glob(f"{name_replace}*.ovf")
             try:
-                name = str(max(files, key=lambda f: int(f.stem[-6:])))
+                name = str(max(filter(lambda f: f.stem[-6:].isnumeric(), files), key=lambda f: int(f.stem[-6:])))
             except ValueError:
-                raise FileNotFoundError(F"No files matching '{name_replace}*.ovf' found.")
+                raise FileNotFoundError(F"No files matching '_{name_replace}*.ovf' found.")
         ovf = pyovf.read(name)
         if self.ncomp == 1:
             data = _np.array([ovf.data])

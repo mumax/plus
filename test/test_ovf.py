@@ -36,8 +36,8 @@ class TestOVF:
         self.magnet.strain_tensor.save_ovf()
 
         self.ovf_m = pyovf.read(self.name)
-        self.ovf_aex = pyovf.read(self.magnet.aex.name.replace(":", "_") + f"{0:06d}.ovf")
-        self.ovf_strain = pyovf.read(self.magnet.strain_tensor.name.replace(":", "_") + f"{0:06d}.ovf")
+        self.ovf_aex = pyovf.read(self.magnet.aex.name.replace(":", "_") + f"_{0:06d}.ovf")
+        self.ovf_strain = pyovf.read(self.magnet.strain_tensor.name.replace(":", "_") + f"_{0:06d}.ovf")
 
     def test_1D(self):
         self.magnet.aex = 1e-12 # Change aex
