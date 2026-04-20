@@ -13,6 +13,7 @@
 #include "torque.hpp"
 #include "world.hpp"
 
+class Altermagnet;
 class Antiferromagnet;
 class Ferromagnet;
 class Magnet;
@@ -49,6 +50,12 @@ class MumaxWorld : public World {
                                       GpuBuffer<bool> geometry,
                                       GpuBuffer<unsigned int> regions,
                                       std::string name = "");
+  
+  /** Add an altermagnet to the world. */
+  Altermagnet* addAltermagnet(Grid grid,
+                              GpuBuffer<bool> geometry,
+                              GpuBuffer<unsigned int> regions,
+                              std::string name = "");
 
   /** Add a non-collinear antiferromagnet to the world. */
   NcAfm* addNcAfm(Grid grid,
@@ -68,6 +75,9 @@ class MumaxWorld : public World {
   /** Get an antiferromagnet by its name.
    *  Return a nullptr if there is no antiferromagnet with specified name. */
   Antiferromagnet* getAntiferromagnet(std::string name) const;
+  /** Get an altermagnet by its name.
+   *  Return a nullptr if there is no altermagnet with specified name. */
+  Altermagnet* getAltermagnet(std::string name) const;
   /** Get a non-collinear antiferromagnet by its name.
    *  Return a nullptr if there is no non-collinear antiferromagnet with specified name. */
   NcAfm* getNcAfm(std::string name) const;
@@ -78,6 +88,8 @@ class MumaxWorld : public World {
   const std::map<std::string, Ferromagnet*> ferromagnets() const;
   /** Get map of all Antiferromagnets in this world. */
   const std::map<std::string, Antiferromagnet*> antiferromagnets() const;
+  /** Get map of all Altermagnets in this world. */
+  const std::map<std::string, Altermagnet*> altermagnets() const;
   /** Get map of all non-collinear antiferromagnets in this world. */
   const std::map<std::string, NcAfm*> ncafms() const;
 
@@ -89,9 +101,58 @@ class MumaxWorld : public World {
 
   void resetTimeSolverEquations(FM_Field torque = torqueQuantity) const;
 
+  // ----------------------------------------------------------------------------------
+  // -------------------------------- Helper functions --------------------------------
+  // ----------------------------------------------------------------------------------
 
-  // --------------------------------------------------
-  // PBC
+  // * Helper function to add any magnet to the world
+  template <class T>
+  T* addMagnetTempl(std::map<std::string, std::unique_ptr<T>>& container,
+                    Grid grid,
+                    GpuBuffer<bool> geometry,
+                    GpuBuffer<unsigned int> regions,
+                    std::string name,
+                    const std::string& prefix) {
+    // Create name if not given.
+    static int idxUnnamed = 1;
+    if (name.empty())
+      name = prefix + "_" + std::to_string(idxUnnamed++);
+    // Check if magnet can be added to this world.
+    checkAddibility(grid, name);
+
+    // Create the magnet and add it to this world
+    auto mag = std::make_unique<T>(this, grid, name, geometry, regions);
+    T* raw = mag.get();
+
+    container[name] = std::move(mag);
+    magnets_[name] = raw;
+
+    handleNewStrayfield(raw);
+    return raw;
+  }
+
+  // * Helper function to get any magnet in the world
+  template <class MapT>
+  auto getMagnetTempl(const MapT& container, const std::string& name) const
+        -> decltype(container.begin()->second.get()) {
+    auto it = container.find(name);
+    if (it == container.end()) return nullptr;
+    return it->second.get();
+  }
+
+  // * Helper function to get a map of any magnet type in the world
+  template <class T, class MapT>
+  std::map<std::string, T> getMagnetPointers(const MapT& container) const {
+      std::map<std::string, T> result;
+      for (const auto& pair : container) {
+          result[pair.first] = pair.second.get();
+      }
+      return result;
+  }
+
+  // ----------------------------------------------------------------------------------
+  // -------------------------------------- PBC ---------------------------------------
+  // ----------------------------------------------------------------------------------
 
   /** Check if all magnets fit inside the given grid.
    * @throws std:out_of_range Thrown not all magnets fit inside the given grid.
@@ -201,7 +262,9 @@ class MumaxWorld : public World {
 
  private:
   std::map<std::string, Magnet*> magnets_;
+  std::map<std::string, HostMagnet*> hostmagnets_;
   std::map<std::string, std::unique_ptr<Ferromagnet>> ferromagnets_;
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
+  std::map<std::string, std::unique_ptr<Altermagnet>> altermagnets_;
   std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
 };

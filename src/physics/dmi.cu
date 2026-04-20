@@ -1,3 +1,4 @@
+#include "altermagnet.hpp"
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
 #include "datatypes.hpp"
@@ -427,10 +428,10 @@ Field evalDmiField(const Ferromagnet* magnet) {
   
   if (!magnet->isSublattice())
     // magnet is stand-alone FM
-    cudaLaunch(ncells, k_dmiFieldFM, hField.cu(),
-              mag, dmiTensor, msat, grid, aex, BC);
-  else if (auto host = magnet->hostMagnet()->asAFM()){
-    // magnet is sublattice in AFM
+    cudaLaunch(ncells, k_dmiFieldFM, hField.cu(), mag, dmiTensor, msat, grid, aex, BC);
+  else if (magnet->hostMagnet()->sublattices().size() == 2) {
+    // magnet is sublattice and has exactly 1 sister sublattice (AFM or ATM)
+    auto host = magnet->hostMagnet();
     auto mag2 = host->getOtherSublattices(magnet)[0]->magnetization()->field().cu();
     auto afmex_nn = host->afmex_nn.cu();
     auto interDmiTensor = host->dmiTensor.cu();
@@ -440,8 +441,8 @@ Field evalDmiField(const Ferromagnet* magnet) {
     cudaLaunch(ncells, k_dmiFieldAFM, hField.cu(), mag, mag2,
               dmiTensor, interDmiTensor, msat, msat2, grid, aex, afmex_nn, inter, scale, BC);
   }
-  else {
-    // magnet is sublatice in NcAfm
+  else if (magnet->hostMagnet()->sublattices().size() == 3) {
+    // magnet is sublatice and has exactly 2 sister sublattices (NcAfm)
     auto m2 = magnet->hostMagnet()->getOtherSublattices(magnet)[0];
     auto m3 = magnet->hostMagnet()->getOtherSublattices(magnet)[1];
     auto mag2 = m2->magnetization()->field().cu();
@@ -455,6 +456,10 @@ Field evalDmiField(const Ferromagnet* magnet) {
     cudaLaunch(ncells, k_dmiFieldNcAfm, hField.cu(), mag, mag2, mag3, dmiTensor,
                interDmiTensor, msat, msat2, msat3, grid, aex, ncafmex_nn, inter, scale, BC);
   }
+  else
+    throw std::invalid_argument("Cannot calculate DMI field since magnet is neither "
+                                "a Ferromagnet, a (non-collinear) "
+                                "Antiferromagnet/Ferrimagnet, nor an Altermagnet.");
   return hField;
 }
 

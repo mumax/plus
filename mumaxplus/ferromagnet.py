@@ -423,6 +423,8 @@ class Ferromagnet(Magnet):
     @property
     def Lambda(self) -> Parameter:
         """Slonczewski Λ parameter.
+
+        Default = 1.0
         
         See Also
         --------
@@ -436,8 +438,8 @@ class Ferromagnet(Magnet):
     
     @property
     def free_layer_thickness(self) -> Parameter:
-        """Slonczewski free layer thickness (m). If set to zero (default),
-        then the thickness will be deduced from the mesh size.
+        """Slonczewski free layer thickness (m). By default, the thickness is
+        equal to the mesh size in the z-direction.
         
         See Also
         --------
@@ -1043,6 +1045,42 @@ class Ferromagnet(Magnet):
         homogeneous_exchange_field, homogeneous_exchange_energy_density
         """
         return ScalarQuantity(_cpp.homogeneous_exchange_energy(self._impl))
+
+    @property
+    def anisotropic_exchange_field(self) -> FieldQuantity:
+        """Effective field of the anisotropic exchange interaction (T).
+        This field is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_energy_density, anisotropic_exchange_energy
+        """
+        return FieldQuantity(_cpp.anisotropic_exchange_field(self._impl))
+    
+    @property
+    def anisotropic_exchange_energy_density(self) -> FieldQuantity:
+        """Energy density related to the anisotropic exchange interaction (J/m³).
+        This energy density is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_field, anisotropic_exchange_energy
+        """
+        return FieldQuantity(_cpp.anisotropic_exchange_energy_density(self._impl))
+
+    @property
+    def anisotropic_exchange_energy(self) -> ScalarQuantity:
+        """Energy related to the anisotropic exchange interaction (J).
+        This energy is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_field, anisotropic_exchange_energy_density
+        """
+        return ScalarQuantity(_cpp.anisotropic_exchange_energy(self._impl))
 
     @property
     def homogeneous_dmi_field(self):

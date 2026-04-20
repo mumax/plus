@@ -44,7 +44,7 @@ void wrap_ncafm(py::module& m) {
           py::arg("sub1"), py::arg("sub2"));
 
   m.def("total_energy_density",
-        py::overload_cast<const NcAfm*>(&totalEnergyDensityQuantity));
+      [](const NcAfm* m) {return totalEnergyDensityQuantity(m); });
   m.def("total_energy",
-        py::overload_cast<const NcAfm*>(&totalEnergyQuantity));
+      [](const NcAfm* m) {return totalEnergyQuantity(m);});
 }

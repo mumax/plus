@@ -14,8 +14,8 @@ authors:
     given-names: Diego
     orcid: "https://orcid.org/0009-0008-3341-0555"
 title: "mumax⁺"
-version: 1.1.3
-date-released: 2024-11-29
+version: 1.2.0
+date-released: 2026-04-20
 url: "https://github.com/mumax/plus"
 preferred-citation:
   type: generic

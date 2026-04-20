@@ -40,9 +40,9 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=126f7b74"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=db04a367"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
@@ -57,7 +57,7 @@
     <link rel="prev" title="ScalarQuantity" href="mumaxplus.ScalarQuantity.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2026-02-05, v1.1.3"/>
+    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
   </head>
   
   
@@ -215,6 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Altermagnet.html">Altermagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.TimeSolver.html">TimeSolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">FieldQuantity</a></li>
@@ -245,6 +246,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
 </ul>
 </details></li>
 </ul>
@@ -254,6 +256,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
 </ul>
 </details></li>
 </ul>
@@ -367,6 +370,8 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.average"><code class="docutils literal notranslate"><span class="pre">average()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.get_rgb"><code class="docutils literal notranslate"><span class="pre">get_rgb()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.meshgrid"><code class="docutils literal notranslate"><span class="pre">meshgrid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.save_ovf"><code class="docutils literal notranslate"><span class="pre">save_ovf()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.load_ovf"><code class="docutils literal notranslate"><span class="pre">load_ovf()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -384,7 +389,7 @@ document.write(`
 <h1>FieldQuantity<a class="headerlink" href="#fieldquantity" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.FieldQuantity">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FieldQuantity</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FieldQuantity</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A functor representing a physical field quantity.</p>
 <dl class="py method">
@@ -394,13 +399,13 @@ document.write(`
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.FieldQuantity.name">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mumaxplus.FieldQuantity.name" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity.name" title="Link to this definition">#</a></dt>
 <dd><p>Return instance’s name.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.FieldQuantity.unit">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mumaxplus.FieldQuantity.unit" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">unit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity.unit" title="Link to this definition">#</a></dt>
 <dd><p>Return the unit of the quantity.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -414,7 +419,7 @@ document.write(`
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.FieldQuantity.ncomp">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ncomp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#mumaxplus.FieldQuantity.ncomp" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ncomp</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity.ncomp" title="Link to this definition">#</a></dt>
 <dd><p>Return the number of components of the quantity.</p>
 <p>In most cases this would be either 1 (scalar field) or 3 (vector fields).</p>
 <dl class="field-list simple">
@@ -429,7 +434,7 @@ document.write(`
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.FieldQuantity.grid">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.grid.Grid"><span class="pre">Grid</span></a></em><a class="headerlink" href="#mumaxplus.FieldQuantity.grid" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">grid</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.grid.Grid"><span class="pre">Grid</span></a></span><a class="headerlink" href="#mumaxplus.FieldQuantity.grid" title="Link to this definition">#</a></dt>
 <dd><p>Return grid on which the quantity will be evaluated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -443,7 +448,7 @@ document.write(`
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.FieldQuantity.shape">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity.shape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity.shape" title="Link to this definition">#</a></dt>
 <dd><p>Return the shape of the output numpy array of this quantity.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -490,8 +495,38 @@ where the colors will fade through gray.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.FieldQuantity.meshgrid">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">meshgrid</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity.meshgrid" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">meshgrid</span></span><a class="headerlink" href="#mumaxplus.FieldQuantity.meshgrid" title="Link to this definition">#</a></dt>
 <dd><p>Return a numpy meshgrid with the x, y, and z coordinate of each cell.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.FieldQuantity.save_ovf">
+<span class="sig-name descname"><span class="pre">save_ovf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.FieldQuantity.save_ovf" title="Link to this definition">#</a></dt>
+<dd><p>Save the FieldQuantity as an OVF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em><em> (</em><em>default=&quot;&quot;</em><em>)</em>) – The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used appended with an integer of 6 digits.</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The shape of the array in the OVF file is (nz, ny, nx, ncomp) and not (ncomp, nz, ny, nx) in order to have the correct metadata.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>self.name returns a string with colons (:). To avoid issues on Windows, these colons are changed to underscores (_).</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.FieldQuantity.load_ovf">
+<span class="sig-name descname"><span class="pre">load_ovf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.FieldQuantity.load_ovf" title="Link to this definition">#</a></dt>
+<dd><p>Load an OVF file as a FieldQuantity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em><em> (</em><em>default=&quot;&quot;</em><em>)</em>) – The name of the OVF file. If the name is empty (the default), it will look for the most recently saved file with this FieldQuantity name.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -554,6 +589,8 @@ where the colors will fade through gray.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.average"><code class="docutils literal notranslate"><span class="pre">average()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.get_rgb"><code class="docutils literal notranslate"><span class="pre">get_rgb()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.meshgrid"><code class="docutils literal notranslate"><span class="pre">meshgrid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.save_ovf"><code class="docutils literal notranslate"><span class="pre">save_ovf()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.FieldQuantity.load_ovf"><code class="docutils literal notranslate"><span class="pre">load_ovf()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -582,7 +619,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-02-05, v1.1.3.
+  Last updated on 2026-04-20, v1.2.0.
   <br/>
 </p>
   </div>

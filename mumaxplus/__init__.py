@@ -4,7 +4,6 @@ import argparse as _argparse
 import os as _os
 import warnings as _warnings
 
-
 ## Determine and use the desired floating point precision
 _FP_allowed_vals = {i: k for k, v in {
     "SINGLE": ["SINGLE", "1", "32"],
@@ -38,8 +37,8 @@ match _FP_allowed_vals.get(FP_PRECISION.upper()):
     case _:
         raise RuntimeError(f"Unknown MUMAXPLUS_FP_PRECISION='{FP_PRECISION}'")
 
-
 ## Populate the "mumaxplus." namespace
+from .altermagnet import Altermagnet
 from .antiferromagnet import Antiferromagnet
 from .dmitensor import DmiTensor
 from .ferromagnet import Ferromagnet
@@ -62,6 +61,7 @@ FP_PRECISION = {1: "SINGLE", 2: "DOUBLE"}.get(_cpp.FP_PRECISION, "UNKNOWN") # Us
 
 __all__ = [
     "_cpp",
+    "Altermagnet"
     "Antiferromagnet",
     "BoundaryTraction",
     "DmiTensor",

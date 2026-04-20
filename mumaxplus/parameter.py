@@ -16,7 +16,7 @@ class Parameter(FieldQuantity):
         Parameters should only have to be initialized within the mumax⁺
         module and not by the end user.
         """
-        self._impl = impl
+        super().__init__(impl)
 
     def __repr__(self):
         """Return Parameter string representation."""
