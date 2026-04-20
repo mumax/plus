@@ -4,8 +4,9 @@ Altermagnetic domain wall
 =========================
 
 In this example, we compute the Néel and net magnetization profiles of a Bloch
-wall. The theoretical model is based on
-`Gomonay et al. (2024) <https://www.nature.com/articles/s44306-024-00042-3>`_.
+wall as described in `Moreels et al. (2026) <https://arxiv.org/abs/2604.15454>`_.
+The theoretical model is based on `Gomonay et al. (2024)
+<https://www.nature.com/articles/s44306-024-00042-3>`_.
 
 .. literalinclude:: ../../examples/Bloch_wall_altermagnet.py
   :language: python
