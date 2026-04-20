@@ -83,7 +83,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="mumaxplus",
-    version="1.1.3",
+    version="1.2.0",
     author="Jeroen Mulkers",
     author_email="jeroen.mulkers@gmail.com",
     maintainer="Diego De Gusem, Ian Lateur, Lars Moreels",
