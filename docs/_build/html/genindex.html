@@ -39,9 +39,9 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="_static/documentation_options.js?v=126f7b74"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=db04a367"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
@@ -54,7 +54,7 @@
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2026-02-05, v1.1.3"/>
+    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
   </head>
   
   
@@ -214,6 +214,7 @@
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
@@ -244,6 +245,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/langevin.html">Temperature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
 </ul>
 </details></li>
 </ul>
@@ -253,6 +255,7 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
 </ul>
 </details></li>
 </ul>
@@ -392,9 +395,11 @@ document.write(`
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.__init__">__init__() (Antiferromagnet method)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.__init__">__init__() (Altermagnet method)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.__init__">(Antiferromagnet method)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.BoundaryTraction.html#mumaxplus.BoundaryTraction.__init__">(BoundaryTraction method)</a>
 </li>
         <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Circle.__init__">(Circle method)</a>
@@ -432,6 +437,10 @@ document.write(`
         <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.ImageShape.__init__">(ImageShape method)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.InterParameter.html#mumaxplus.InterParameter.__init__">(InterParameter method)</a>
+</li>
+        <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Line.__init__">(Line method)</a>
+</li>
+        <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Line2D.__init__">(Line2D method)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.__init__">(Magnet method)</a>
 </li>
@@ -500,25 +509,49 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.aex">aex (Ferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.afmex_cell">afmex_cell (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.afmex_cell">afmex_cell (Altermagnet property)</a>
+
+      <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.afmex_cell">(Antiferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.afmex_nn">afmex_nn (Antiferromagnet property)</a>
+      </ul></li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.afmex_nn">afmex_nn (Altermagnet property)</a>
+
+      <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.afmex_nn">(Antiferromagnet property)</a>
 </li>
+      </ul></li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.alpha">alpha (Ferromagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.alterex_1">alterex_1 (Altermagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.alterex_2">alterex_2 (Altermagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.alterex_angle">alterex_angle (Altermagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet">Altermagnet (class in mumaxplus)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.amr_ratio">amr_ratio (Ferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.angle_field">angle_field (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.angle_field">angle_field (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.angle_field">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.angle_field">(NcAfm property)</a>
 </li>
       </ul></li>
-      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.anisC1">anisC1 (Ferromagnet property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.anisC1">anisC1 (Ferromagnet property)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.anisC2">anisC2 (Ferromagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.anisotropic_exchange_energy">anisotropic_exchange_energy (Ferromagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.anisotropic_exchange_energy_density">anisotropic_exchange_energy_density (Ferromagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.anisotropic_exchange_field">anisotropic_exchange_field (Ferromagnet property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.anisotropy_energy">anisotropy_energy (Ferromagnet property)</a>
 </li>
@@ -550,9 +583,11 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.B2">B2 (Ferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.bias_magnetic_field">bias_magnetic_field (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.bias_magnetic_field">bias_magnetic_field (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.bias_magnetic_field">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.bias_magnetic_field">(Ferromagnet property)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.bias_magnetic_field">(NcAfm property)</a>
@@ -634,9 +669,11 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.dmi_field">dmi_field (Ferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.dmi_tensor">dmi_tensor (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.dmi_tensor">dmi_tensor (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.dmi_tensor">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.dmi_tensor">(Ferromagnet property)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.dmi_tensor">(NcAfm property)</a>
@@ -644,15 +681,19 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.dmi_tensors">dmi_tensors (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.dmi_tensors">dmi_tensors (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.dmi_tensors">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.dmi_tensors">(NcAfm property)</a>
 </li>
       </ul></li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.dmi_vector">dmi_vector (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.dmi_vector">dmi_vector (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.dmi_vector">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.dmi_vector">(NcAfm property)</a>
 </li>
       </ul></li>
@@ -698,18 +739,20 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.enable_as_stray_field_source">enable_as_stray_field_source (Magnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.enable_demag">enable_demag (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.enable_demag">enable_demag (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.enable_demag">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.enable_demag">(Ferromagnet property)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.enable_demag">(NcAfm property)</a>
 </li>
       </ul></li>
-      <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.enable_elastodynamics">enable_elastodynamics (Magnet property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.enable_elastodynamics">enable_elastodynamics (Magnet property)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.enable_openbc">enable_openbc (Ferromagnet property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.enable_slonczewski_torque">enable_slonczewski_torque (Ferromagnet property)</a>
@@ -776,9 +819,11 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.frozen_spins">frozen_spins (Ferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.full_magnetization">full_magnetization (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.full_magnetization">full_magnetization (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.full_magnetization">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.full_magnetization">(Ferromagnet property)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.full_magnetization">(NcAfm property)</a>
@@ -880,10 +925,18 @@ document.write(`
 </li>
       <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.inspect_field">inspect_field() (in module mumaxplus.util.show)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.inter_afmex_nn">inter_afmex_nn (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.inter_afmex_nn">inter_afmex_nn (Altermagnet property)</a>
+
+      <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.inter_afmex_nn">(Antiferromagnet property)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.inter_alterex_1">inter_alterex_1 (Altermagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.inter_alterex_2">inter_alterex_2 (Altermagnet property)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.inter_exchange">inter_exchange (Ferromagnet property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.inter_ncafmex_nn">inter_ncafmex_nn (NcAfm property)</a>
@@ -948,9 +1001,11 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.Lambda">Lambda (Ferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.latcon">latcon (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.latcon">latcon (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.latcon">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.latcon">(NcAfm property)</a>
 </li>
       </ul></li>
@@ -958,7 +1013,13 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/util/mumaxplus.util.mfm.html#mumaxplus.util.mfm.MFM.lift">lift (MFM property)</a>
 </li>
+      <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Line">Line (class in mumaxplus.util.shape)</a>
+</li>
+      <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Line2D">Line2D (class in mumaxplus.util.shape)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.llg_torque">llg_torque (Ferromagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity.load_ovf">load_ovf() (FieldQuantity method)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.TimeSolver.html#mumaxplus.TimeSolver.lower_bound">lower_bound (TimeSolver property)</a>
 </li>
@@ -996,8 +1057,12 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.TimeSolver.html#mumaxplus.TimeSolver.max_error">max_error (TimeSolver property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.max_intracell_angle">max_intracell_angle (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.max_intracell_angle">max_intracell_angle (Altermagnet property)</a>
+
+      <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.max_intracell_angle">(Antiferromagnet property)</a>
 </li>
+      </ul></li>
       <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.max_intracell_angle_between">max_intracell_angle_between() (NcAfm method)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.PoissonSystem.html#mumaxplus.PoissonSystem.max_iter">max_iter (PoissonSystem property)</a>
@@ -1014,9 +1079,11 @@ document.write(`
       </ul></li>
       <li><a href="_api/util/mumaxplus.util.mfm.html#mumaxplus.util.mfm.MFM">MFM (class in mumaxplus.util.mfm)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.minimize">minimize() (Antiferromagnet method)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.minimize">minimize() (Altermagnet method)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.minimize">(Antiferromagnet method)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.minimize">(Ferromagnet method)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.minimize">(NcAfm method)</a>
@@ -1119,18 +1186,22 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.ncafms">ncafms (World property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Grid.html#mumaxplus.Grid.ncells">ncells (Grid property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity.ncomp">ncomp (FieldQuantity property)</a>
 
       <ul>
         <li><a href="_api/mumaxplus/mumaxplus.InterParameter.html#mumaxplus.InterParameter.ncomp">(InterParameter property)</a>
 </li>
       </ul></li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.neel_vector">neel_vector (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.neel_vector">neel_vector (Altermagnet property)</a>
+
+      <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.neel_vector">(Antiferromagnet property)</a>
 </li>
+      </ul></li>
       <li><a href="_api/util/mumaxplus.util.config.html#mumaxplus.util.config.neelskyrmion">neelskyrmion() (in module mumaxplus.util.config)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.BoundaryTraction.html#mumaxplus.BoundaryTraction.neg_x_side">neg_x_side (BoundaryTraction property)</a>
@@ -1157,16 +1228,20 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.StrayField.html#mumaxplus.StrayField.order">order (StrayField property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Grid.html#mumaxplus.Grid.origin">origin (Grid property)</a>
 
       <ul>
         <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.origin">(Magnet property)</a>
 </li>
       </ul></li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.other_sublattice">other_sublattice() (Antiferromagnet method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.other_sublattice">other_sublattice() (Altermagnet method)</a>
+
+      <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.other_sublattice">(Antiferromagnet method)</a>
 </li>
+      </ul></li>
       <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.other_sublattices">other_sublattices() (NcAfm method)</a>
 </li>
   </ul></td>
@@ -1217,9 +1292,11 @@ document.write(`
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.RegularPolygon">RegularPolygon (class in mumaxplus.util.shape)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.relax">relax() (Antiferromagnet method)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.relax">relax() (Altermagnet method)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.relax">(Antiferromagnet method)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.relax">(Ferromagnet method)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.relax">(NcAfm method)</a>
@@ -1227,14 +1304,14 @@ document.write(`
         <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.relax">(World method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.RelaxTorqueThreshold">RelaxTorqueThreshold (Ferromagnet property)</a>
 
       <ul>
         <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.RelaxTorqueThreshold">(World property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Parameter.html#mumaxplus.Parameter.remove_time_terms">remove_time_terms() (Parameter method)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.repeat">repeat() (Shape method)</a>
@@ -1261,11 +1338,21 @@ document.write(`
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/mumaxplus/mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity.save_ovf">save_ovf() (FieldQuantity method)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity">ScalarQuantity (class in mumaxplus)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.scale">scale() (Shape method)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.scale_afmex_nn">scale_afmex_nn (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.scale_afmex_nn">scale_afmex_nn (Altermagnet property)</a>
+
+      <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.scale_afmex_nn">(Antiferromagnet property)</a>
+</li>
+      </ul></li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.scale_alterex_1">scale_alterex_1 (Altermagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.scale_alterex_2">scale_alterex_2 (Altermagnet property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.scale_exchange">scale_exchange (Ferromagnet property)</a>
 </li>
@@ -1357,23 +1444,29 @@ document.write(`
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.sub">sub() (Shape method)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.sub1">sub1 (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.sub1">sub1 (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.sub1">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.sub1">(NcAfm property)</a>
 </li>
       </ul></li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.sub2">sub2 (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.sub2">sub2 (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.sub2">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.sub2">(NcAfm property)</a>
 </li>
       </ul></li>
       <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.sub3">sub3 (NcAfm property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.sublattices">sublattices (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.sublattices">sublattices (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.sublattices">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.sublattices">(NcAfm property)</a>
 </li>
       </ul></li>
@@ -1409,9 +1502,11 @@ document.write(`
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Torus">Torus (class in mumaxplus.util.shape)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.total_energy">total_energy (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.total_energy">total_energy (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.total_energy">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.total_energy">(Ferromagnet property)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.total_energy">(NcAfm property)</a>
@@ -1419,9 +1514,11 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.total_energy_density">total_energy_density (Antiferromagnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.total_energy_density">total_energy_density (Altermagnet property)</a>
 
       <ul>
+        <li><a href="_api/mumaxplus/mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet.total_energy_density">(Antiferromagnet property)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.total_energy_density">(Ferromagnet property)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.total_energy_density">(NcAfm property)</a>
@@ -1608,7 +1705,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-02-05, v1.1.3.
+  Last updated on 2026-04-20, v1.2.0.
   <br/>
 </p>
   </div>

@@ -40,14 +40,14 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=126f7b74"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=db04a367"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_api/mumaxplus/mumaxplus.Ferromagnet';</script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
     <script src="../../_static/google-analytics.js?v=27e7bdd4"></script>
@@ -58,7 +58,7 @@
     <link rel="prev" title="Magnet" href="mumaxplus.Magnet.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2026-02-05, v1.1.3"/>
+    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
   </head>
   
   
@@ -216,6 +216,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Ferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Altermagnet.html">Altermagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.TimeSolver.html">TimeSolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
@@ -246,6 +247,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
 </ul>
 </details></li>
 </ul>
@@ -255,6 +257,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
 </ul>
 </details></li>
 </ul>
@@ -433,6 +436,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy_density"><code class="docutils literal notranslate"><span class="pre">homogeneous_exchange_energy_density</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_energy"><code class="docutils literal notranslate"><span class="pre">inhomogeneous_exchange_energy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy"><code class="docutils literal notranslate"><span class="pre">homogeneous_exchange_energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.anisotropic_exchange_field"><code class="docutils literal notranslate"><span class="pre">anisotropic_exchange_field</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy_density"><code class="docutils literal notranslate"><span class="pre">anisotropic_exchange_energy_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy"><code class="docutils literal notranslate"><span class="pre">anisotropic_exchange_energy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_dmi_field"><code class="docutils literal notranslate"><span class="pre">homogeneous_dmi_field</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy_density"><code class="docutils literal notranslate"><span class="pre">homogeneous_dmi_energy_density</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy"><code class="docutils literal notranslate"><span class="pre">homogeneous_dmi_energy</span></code></a></li>
@@ -457,7 +463,7 @@ document.write(`
 <h1>Ferromagnet<a class="headerlink" href="#ferromagnet" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ferromagnet</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Ferromagnet</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet" title="mumaxplus.magnet.Magnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Magnet</span></code></a></p>
 <p>Create a ferromagnet instance.</p>
 <dl class="py method">
@@ -498,26 +504,26 @@ ferromagnet will be created.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.magnetization">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetization</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Variable.html#mumaxplus.Variable" title="mumaxplus.variable.Variable"><span class="pre">Variable</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetization" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnetization</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Variable.html#mumaxplus.Variable" title="mumaxplus.variable.Variable"><span class="pre">Variable</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetization" title="Link to this definition">#</a></dt>
 <dd><p>Direction of the magnetization (normalized).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.is_sublattice">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_sublattice</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Ferromagnet.is_sublattice" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_sublattice</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.is_sublattice" title="Link to this definition">#</a></dt>
 <dd><p>Returns True if the ferromagnet is a sublattice of a host magnet.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.enable_demag">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_demag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_demag" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">enable_demag</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_demag" title="Link to this definition">#</a></dt>
 <dd><p>Enable/disable demagnetization switch.</p>
 <p>Default = True.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.enable_openbc">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_openbc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_openbc" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">enable_openbc</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_openbc" title="Link to this definition">#</a></dt>
 <dd><p>Enable/disable open boundary conditions.</p>
 <p>When set to False (default), Neumann boundary conditions are applied.
 These affect the calculation of DMI and exchange field terms.</p>
@@ -525,7 +531,7 @@ These affect the calculation of DMI and exchange field terms.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.enable_zhang_li_torque">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_zhang_li_torque</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_zhang_li_torque" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">enable_zhang_li_torque</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_zhang_li_torque" title="Link to this definition">#</a></dt>
 <dd><p>Enable/disable Zhang-Li spin transfer torque.</p>
 <p>Default = True.</p>
 <div class="admonition seealso">
@@ -536,7 +542,7 @@ These affect the calculation of DMI and exchange field terms.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.enable_slonczewski_torque">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_slonczewski_torque</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_slonczewski_torque" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">enable_slonczewski_torque</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.enable_slonczewski_torque" title="Link to this definition">#</a></dt>
 <dd><p>Enable/disable Slonczewski spin transfer torue.</p>
 <p>Default = True.</p>
 <div class="admonition seealso">
@@ -547,7 +553,7 @@ These affect the calculation of DMI and exchange field terms.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.bias_magnetic_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bias_magnetic_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.bias_magnetic_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bias_magnetic_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.bias_magnetic_field" title="Link to this definition">#</a></dt>
 <dd><p>Uniform bias magnetic field which will affect a ferromagnet.</p>
 <p>The value should be specifed in Teslas.</p>
 </dd></dl>
@@ -597,7 +603,7 @@ but is more robust when starting from a high energy state (i.e. random).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.RelaxTorqueThreshold">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RelaxTorqueThreshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#mumaxplus.Ferromagnet.RelaxTorqueThreshold" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RelaxTorqueThreshold</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.RelaxTorqueThreshold" title="Link to this definition">#</a></dt>
 <dd><p>Threshold torque used for relaxing the system (default = -1).</p>
 <p>If set to a negative value (default behaviour),
 the system relaxes until the torque is steady or increasing.</p>
@@ -612,33 +618,33 @@ to this threshold.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.msat">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">msat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.msat" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">msat</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.msat" title="Link to this definition">#</a></dt>
 <dd><p>Saturation magnetization (A/m).</p>
 <p>Default = 1.0 A/m</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.alpha">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.alpha" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">alpha</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.alpha" title="Link to this definition">#</a></dt>
 <dd><p>LLG damping parameter.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.gamma">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gamma</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.gamma" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gamma</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.gamma" title="Link to this definition">#</a></dt>
 <dd><p>Gyromagnetic ratio (rad/Ts).</p>
 <p>Default = 1.7595e11 rad/Ts</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.aex">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aex</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.aex" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aex</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.aex" title="Link to this definition">#</a></dt>
 <dd><p>Exchange constant (J/m).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.inter_exchange">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inter_exchange</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.InterParameter.html#mumaxplus.InterParameter" title="mumaxplus.interparameter.InterParameter"><span class="pre">InterParameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.inter_exchange" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">inter_exchange</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.InterParameter.html#mumaxplus.InterParameter" title="mumaxplus.interparameter.InterParameter"><span class="pre">InterParameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.inter_exchange" title="Link to this definition">#</a></dt>
 <dd><p>Exchange constant (J/m) between different regions.
 If set to zero (default), then the harmonic mean of
 the exchange constants of the two regions are used.</p>
@@ -657,7 +663,7 @@ is wanted, set <cite>scale_exchange</cite> to zero.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.scale_exchange">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scale_exchange</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.InterParameter.html#mumaxplus.InterParameter" title="mumaxplus.interparameter.InterParameter"><span class="pre">InterParameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.scale_exchange" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">scale_exchange</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.InterParameter.html#mumaxplus.InterParameter" title="mumaxplus.interparameter.InterParameter"><span class="pre">InterParameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.scale_exchange" title="Link to this definition">#</a></dt>
 <dd><p>Scaling of the exchange constant between different
 regions.</p>
 <p>This parameter can be set with</p>
@@ -673,7 +679,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.ku1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ku1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.ku1" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ku1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.ku1" title="Link to this definition">#</a></dt>
 <dd><p>Uniaxial anisotropy parameter Ku1 (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -683,7 +689,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.ku2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ku2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.ku2" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ku2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.ku2" title="Link to this definition">#</a></dt>
 <dd><p>Uniaxial anisotropy parameter Ku2 (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -693,7 +699,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisU">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">anisU</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.anisU" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisU</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisU" title="Link to this definition">#</a></dt>
 <dd><p>Uniaxial anisotropy direction (the easy axis).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -703,7 +709,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.kc1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kc1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.kc1" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">kc1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.kc1" title="Link to this definition">#</a></dt>
 <dd><p>Cubic anisotropy parameter Kc1 (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -713,7 +719,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.kc2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kc2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.kc2" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">kc2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.kc2" title="Link to this definition">#</a></dt>
 <dd><p>Cubic anisotropy parameter Kc2 (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -723,7 +729,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.kc3">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kc3</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.kc3" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">kc3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.kc3" title="Link to this definition">#</a></dt>
 <dd><p>Cubic anisotropy parameter Kc3 (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -733,7 +739,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisC1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">anisC1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.anisC1" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisC1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisC1" title="Link to this definition">#</a></dt>
 <dd><p>First cubic anisotropy direction.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -743,7 +749,7 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisC2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">anisC2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.anisC2" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisC2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisC2" title="Link to this definition">#</a></dt>
 <dd><p>Second cubic anisotropy direction.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -753,8 +759,9 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.Lambda">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Lambda</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.Lambda" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Lambda</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.Lambda" title="Link to this definition">#</a></dt>
 <dd><p>Slonczewski Λ parameter.</p>
+<p>Default = 1.0</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#mumaxplus.Ferromagnet.epsilon_prime" title="mumaxplus.Ferromagnet.epsilon_prime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">epsilon_prime</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.jcur" title="mumaxplus.Ferromagnet.jcur"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jcur</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.pol" title="mumaxplus.Ferromagnet.pol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pol</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.fixed_layer" title="mumaxplus.Ferromagnet.fixed_layer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fixed_layer</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.fixed_layer_on_top" title="mumaxplus.Ferromagnet.fixed_layer_on_top"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fixed_layer_on_top</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.free_layer_thickness" title="mumaxplus.Ferromagnet.free_layer_thickness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">free_layer_thickness</span></code></a></p>
@@ -763,9 +770,9 @@ regions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.free_layer_thickness">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">free_layer_thickness</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.free_layer_thickness" title="Link to this definition">#</a></dt>
-<dd><p>Slonczewski free layer thickness (m). If set to zero (default),
-then the thickness will be deduced from the mesh size.</p>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">free_layer_thickness</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.free_layer_thickness" title="Link to this definition">#</a></dt>
+<dd><p>Slonczewski free layer thickness (m). By default, the thickness is
+equal to the mesh size in the z-direction.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#mumaxplus.Ferromagnet.epsilon_prime" title="mumaxplus.Ferromagnet.epsilon_prime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">epsilon_prime</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.jcur" title="mumaxplus.Ferromagnet.jcur"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jcur</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.Lambda" title="mumaxplus.Ferromagnet.Lambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lambda</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.pol" title="mumaxplus.Ferromagnet.pol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pol</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.fixed_layer" title="mumaxplus.Ferromagnet.fixed_layer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fixed_layer</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.fixed_layer_on_top" title="mumaxplus.Ferromagnet.fixed_layer_on_top"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fixed_layer_on_top</span></code></a></p>
@@ -774,7 +781,7 @@ then the thickness will be deduced from the mesh size.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.fixed_layer_on_top">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fixed_layer_on_top</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.Ferromagnet.fixed_layer_on_top" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fixed_layer_on_top</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.fixed_layer_on_top" title="Link to this definition">#</a></dt>
 <dd><p>The position of the fixed layer. If set to True (default),
 then the layer will be at the top. Otherwise it will be at the bottom.</p>
 <div class="admonition seealso">
@@ -785,7 +792,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.epsilon_prime">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epsilon_prime</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.epsilon_prime" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">epsilon_prime</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.epsilon_prime" title="Link to this definition">#</a></dt>
 <dd><p>Slonczewski secondary STT term ε’.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -795,7 +802,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.fixed_layer">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fixed_layer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.fixed_layer" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fixed_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.fixed_layer" title="Link to this definition">#</a></dt>
 <dd><p>Slonczewski fixed layer polarization.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -805,7 +812,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.xi">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.xi" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">xi</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.xi" title="Link to this definition">#</a></dt>
 <dd><p>Non-adiabaticity of the Zhang-Li spin-transfer torque.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -815,7 +822,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.pol">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.pol" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pol</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.pol" title="Link to this definition">#</a></dt>
 <dd><p>Electrical current polarization.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -825,7 +832,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.jcur">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">jcur</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.jcur" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">jcur</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.jcur" title="Link to this definition">#</a></dt>
 <dd><p>Electrical current density (A/m²).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -835,7 +842,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.temperature">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.temperature" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">temperature</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.temperature" title="Link to this definition">#</a></dt>
 <dd><p>Temperature (K).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -845,7 +852,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.dmi_tensor">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dmi_tensor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.DmiTensor.html#mumaxplus.DmiTensor" title="mumaxplus.dmitensor.DmiTensor"><span class="pre">DmiTensor</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_tensor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_tensor</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.DmiTensor.html#mumaxplus.DmiTensor" title="mumaxplus.dmitensor.DmiTensor"><span class="pre">DmiTensor</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_tensor" title="Link to this definition">#</a></dt>
 <dd><p>Get the DMI tensor of this Ferromagnet.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -863,7 +870,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.applied_potential">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">applied_potential</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.applied_potential" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">applied_potential</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.applied_potential" title="Link to this definition">#</a></dt>
 <dd><p>The applied electrical potential (V).</p>
 <p>Cells with Nan values do not have an applied potential.</p>
 <div class="admonition seealso">
@@ -874,7 +881,7 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.conductivity">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conductivity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.conductivity" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">conductivity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.conductivity" title="Link to this definition">#</a></dt>
 <dd><p>Conductivity without considering anisotropic magneto resistance (S/m).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -884,20 +891,20 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.amr_ratio">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">amr_ratio</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.amr_ratio" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">amr_ratio</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.amr_ratio" title="Link to this definition">#</a></dt>
 <dd><p>Anisotropic magneto resistance ratio.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.frozen_spins">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_spins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.frozen_spins" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">frozen_spins</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.frozen_spins" title="Link to this definition">#</a></dt>
 <dd><p>Defines spins that should be fixed by setting torque to (0, 0, 0)
 wherever frozen_spins is not 0.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.B1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">B1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.B1" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">B1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.B1" title="Link to this definition">#</a></dt>
 <dd><p>First magnetoelastic coupling constant (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -907,7 +914,7 @@ wherever frozen_spins is not 0.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.B2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">B2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.B2" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">B2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.B2" title="Link to this definition">#</a></dt>
 <dd><p>Second magnetoelastic coupling constant (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -917,7 +924,7 @@ wherever frozen_spins is not 0.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.poisson_system">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poisson_system</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.PoissonSystem.html#mumaxplus.PoissonSystem" title="mumaxplus.poissonsystem.PoissonSystem"><span class="pre">PoissonSystem</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.poisson_system" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">poisson_system</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.PoissonSystem.html#mumaxplus.PoissonSystem" title="mumaxplus.poissonsystem.PoissonSystem"><span class="pre">PoissonSystem</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.poisson_system" title="Link to this definition">#</a></dt>
 <dd><p>Get the poisson solver which computes the electric potential.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -927,19 +934,19 @@ wherever frozen_spins is not 0.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.torque">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">torque</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.torque" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">torque</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.torque" title="Link to this definition">#</a></dt>
 <dd><p>Total torque on the magnetization (rad/s).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.llg_torque">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">llg_torque</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.llg_torque" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">llg_torque</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.llg_torque" title="Link to this definition">#</a></dt>
 <dd><p>Torque on the magnetization exerted by the total effective field (rad/s).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.damping_torque">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">damping_torque</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.damping_torque" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">damping_torque</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.damping_torque" title="Link to this definition">#</a></dt>
 <dd><p>Torque used by the relax function (rad/s). This is the term in the
 Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 <div class="admonition seealso">
@@ -950,19 +957,19 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.spin_transfer_torque">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spin_transfer_torque</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.spin_transfer_torque" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">spin_transfer_torque</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.spin_transfer_torque" title="Link to this definition">#</a></dt>
 <dd><p>Spin transfer torque exerted on the magnetization (rad/s).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.max_torque">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_torque</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.max_torque" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">max_torque</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.max_torque" title="Link to this definition">#</a></dt>
 <dd><p>The maximum value of the torque over all cells (rad/s).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.demag_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">demag_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.demag_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">demag_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.demag_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the demag field (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -972,7 +979,7 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.demag_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">demag_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.demag_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">demag_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.demag_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the demag field (J).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -982,7 +989,7 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisotropy_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">anisotropy_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropy_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisotropy_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropy_field" title="Link to this definition">#</a></dt>
 <dd><p>Anisotropic effective field term (T).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -992,7 +999,7 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisotropy_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">anisotropy_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropy_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisotropy_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropy_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the magnetic anisotropy (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1002,7 +1009,7 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisotropy_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">anisotropy_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropy_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisotropy_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropy_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the magnetic anisotropy (J).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1012,7 +1019,7 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.exchange_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exchange_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.exchange_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">exchange_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.exchange_field" title="Link to this definition">#</a></dt>
 <dd><p>Effective field of the exchange interaction (T).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1022,7 +1029,7 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.exchange_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exchange_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.exchange_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">exchange_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.exchange_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the exchange interaction (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1032,7 +1039,7 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.exchange_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exchange_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.exchange_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">exchange_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.exchange_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the exchange interaction (J).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1042,13 +1049,13 @@ Landau-Liftshitz-Gilbert torque with the damping factor α.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.max_angle">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_angle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.max_angle" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">max_angle</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.max_angle" title="Link to this definition">#</a></dt>
 <dd><p>Maximal angle difference of the magnetization between exchange         coupled cells (rad).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.dmi_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dmi_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_field" title="Link to this definition">#</a></dt>
 <dd><p>Effective field of the Dzyaloshinskii-Moriya interaction (T).</p>
 <p>Returns a FieldQuantity which evaluates the effective field corresponding to the
 DMI energy density.</p>
@@ -1068,7 +1075,7 @@ DMI energy density.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.dmi_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dmi_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the Dzyaloshinskii-Moriya interaction (J/m³).</p>
 <p>Returns a FieldQuantity which evaluates the Dzyaloshinskii-Moriya energy
 density:</p>
@@ -1091,7 +1098,7 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.dmi_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dmi_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.dmi_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the Dzyaloshinskii-Moriya interaction (J).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1109,7 +1116,7 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.external_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">external_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.external_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">external_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.external_field" title="Link to this definition">#</a></dt>
 <dd><p>Sum of external fields (T).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1119,7 +1126,7 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.zeeman_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zeeman_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.zeeman_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zeeman_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.zeeman_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to external fields (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1129,7 +1136,7 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.zeeman_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zeeman_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.zeeman_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zeeman_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.zeeman_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to external fields (J).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1139,13 +1146,13 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.effective_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">effective_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.effective_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">effective_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.effective_field" title="Link to this definition">#</a></dt>
 <dd><p>Sum of all effective field terms (T).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.total_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_energy_density</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.total_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">total_energy_density</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.total_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the total effective field (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1155,7 +1162,7 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.total_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.total_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">total_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.total_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the total effective field (J).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1165,7 +1172,7 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.electrical_potential">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">electrical_potential</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.electrical_potential" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">electrical_potential</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.electrical_potential" title="Link to this definition">#</a></dt>
 <dd><p>Electrical potential (V).</p>
 <p>Calculates the electrical potential with a Poisson solver, using the
 <cite>applied_potential</cite> and <cite>conductivity(_tensor)</cite>.</p>
@@ -1177,7 +1184,7 @@ density:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.conductivity_tensor">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conductivity_tensor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.conductivity_tensor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">conductivity_tensor</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.conductivity_tensor" title="Link to this definition">#</a></dt>
 <dd><p>Conductivity tensor taking into account AMR (S/m).</p>
 <p>This quantity has six components (Cxx, Cyy, Czz, Cxy, Cxz, Cyz)
 which forms the symmetric conductivity tensor:</p>
@@ -1195,7 +1202,7 @@ Cxz &amp; Cyz &amp; Czz
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.thermal_noise">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">thermal_noise</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.thermal_noise" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">thermal_noise</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.thermal_noise" title="Link to this definition">#</a></dt>
 <dd><p>Thermal noise on the magnetization.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1205,7 +1212,7 @@ Cxz &amp; Cyz &amp; Czz
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.full_magnetization">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">full_magnetization</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.full_magnetization" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">full_magnetization</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.full_magnetization" title="Link to this definition">#</a></dt>
 <dd><p>Unnormalized magnetization (A/m).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1215,7 +1222,7 @@ Cxz &amp; Cyz &amp; Czz
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.inhomogeneous_exchange_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inhomogeneous_exchange_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">inhomogeneous_exchange_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_field" title="Link to this definition">#</a></dt>
 <dd><p>Effective field of the inhomogeneous exchange interaction (T).
 This field is related to the antiferromagnetic exchange interaction
 between neighbouring cells.</p>
@@ -1227,7 +1234,7 @@ between neighbouring cells.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.homogeneous_exchange_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">homogeneous_exchange_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_exchange_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">homogeneous_exchange_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_exchange_field" title="Link to this definition">#</a></dt>
 <dd><p>Effective field of the homogeneous exchange interaction (T).
 This field is related to the antiferromagnetic exchange interaction
 between spins in a single simulation cell.</p>
@@ -1239,7 +1246,7 @@ between spins in a single simulation cell.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.inhomogeneous_exchange_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inhomogeneous_exchange_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">inhomogeneous_exchange_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the inhomogeneous exchange interaction (J/m³).
 This energy density is related to the antiferromagnetic exchange interaction
 between neighbouring cells.</p>
@@ -1251,7 +1258,7 @@ between neighbouring cells.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.homogeneous_exchange_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">homogeneous_exchange_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">homogeneous_exchange_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the homogeneous exchange interaction (J/m³).
 This energy density is related to the antiferromagnetic exchange interaction
 between spins in a single simulation cell.</p>
@@ -1263,7 +1270,7 @@ between spins in a single simulation cell.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.inhomogeneous_exchange_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inhomogeneous_exchange_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">inhomogeneous_exchange_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the inhomogeneous exchange interaction (J).
 This energy is related to the antiferromagnetic exchange interaction
 between neighbouring cells.</p>
@@ -1275,7 +1282,7 @@ between neighbouring cells.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.homogeneous_exchange_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">homogeneous_exchange_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">homogeneous_exchange_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the homogeneous exchange interaction (J).
 This energy is related to the antiferromagnetic exchange interaction
 between spins in a single simulation cell.</p>
@@ -1286,26 +1293,62 @@ between spins in a single simulation cell.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisotropic_exchange_field">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisotropic_exchange_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropic_exchange_field" title="Link to this definition">#</a></dt>
+<dd><p>Effective field of the anisotropic exchange interaction (T).
+This field is related to the altermagnetic exchange interaction
+between neighbouring cells.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy_density" title="mumaxplus.Ferromagnet.anisotropic_exchange_energy_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anisotropic_exchange_energy_density</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy" title="mumaxplus.Ferromagnet.anisotropic_exchange_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anisotropic_exchange_energy</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisotropic_exchange_energy_density">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisotropic_exchange_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy_density" title="Link to this definition">#</a></dt>
+<dd><p>Energy density related to the anisotropic exchange interaction (J/m³).
+This energy density is related to the altermagnetic exchange interaction
+between neighbouring cells.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.anisotropic_exchange_field" title="mumaxplus.Ferromagnet.anisotropic_exchange_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anisotropic_exchange_field</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy" title="mumaxplus.Ferromagnet.anisotropic_exchange_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anisotropic_exchange_energy</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Ferromagnet.anisotropic_exchange_energy">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">anisotropic_exchange_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy" title="Link to this definition">#</a></dt>
+<dd><p>Energy related to the anisotropic exchange interaction (J).
+This energy is related to the altermagnetic exchange interaction
+between neighbouring cells.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.anisotropic_exchange_field" title="mumaxplus.Ferromagnet.anisotropic_exchange_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anisotropic_exchange_field</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy_density" title="mumaxplus.Ferromagnet.anisotropic_exchange_energy_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anisotropic_exchange_energy_density</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.homogeneous_dmi_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">homogeneous_dmi_field</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_dmi_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">homogeneous_dmi_field</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_dmi_field" title="Link to this definition">#</a></dt>
 <dd><p>Effective field of the homogeneous DMI (T).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.homogeneous_dmi_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">homogeneous_dmi_energy_density</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">homogeneous_dmi_energy_density</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to the homogeneous DMI (J/m³).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.homogeneous_dmi_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">homogeneous_dmi_energy</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">homogeneous_dmi_energy</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to the homogeneous DMI (J).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.magnetoelastic_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetoelastic_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnetoelastic_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_field" title="Link to this definition">#</a></dt>
 <dd><p>Magnetoelastic effective field due to effects of inverse
 magnetostriction (T).</p>
 <div class="admonition seealso">
@@ -1316,7 +1359,7 @@ magnetostriction (T).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.magnetoelastic_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetoelastic_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnetoelastic_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Energy density related to magnetoelastic field (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1326,7 +1369,7 @@ magnetostriction (T).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.magnetoelastic_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetoelastic_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnetoelastic_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_energy" title="Link to this definition">#</a></dt>
 <dd><p>Energy related to magnetoelastic field (J).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1336,7 +1379,7 @@ magnetostriction (T).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Ferromagnet.magnetoelastic_force">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetoelastic_force</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_force" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnetoelastic_force</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.magnetoelastic_force" title="Link to this definition">#</a></dt>
 <dd><p>Magnetoelastic body force density due to magnetostriction effect (N/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1469,6 +1512,9 @@ magnetostriction (T).</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy_density"><code class="docutils literal notranslate"><span class="pre">homogeneous_exchange_energy_density</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.inhomogeneous_exchange_energy"><code class="docutils literal notranslate"><span class="pre">inhomogeneous_exchange_energy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_exchange_energy"><code class="docutils literal notranslate"><span class="pre">homogeneous_exchange_energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.anisotropic_exchange_field"><code class="docutils literal notranslate"><span class="pre">anisotropic_exchange_field</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy_density"><code class="docutils literal notranslate"><span class="pre">anisotropic_exchange_energy_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.anisotropic_exchange_energy"><code class="docutils literal notranslate"><span class="pre">anisotropic_exchange_energy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_dmi_field"><code class="docutils literal notranslate"><span class="pre">homogeneous_dmi_field</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy_density"><code class="docutils literal notranslate"><span class="pre">homogeneous_dmi_energy_density</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.homogeneous_dmi_energy"><code class="docutils literal notranslate"><span class="pre">homogeneous_dmi_energy</span></code></a></li>
@@ -1504,7 +1550,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-02-05, v1.1.3.
+  Last updated on 2026-04-20, v1.2.0.
   <br/>
 </p>
   </div>
