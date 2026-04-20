@@ -1,3 +1,6 @@
+"""This script simulates the dispersion of spinwaves
+in a 1D altermagnet as described in https://arxiv.org/abs/2604.15454.
+"""
 from mumaxplus import Altermagnet, Grid, World
 from mumaxplus.util.constants import GAMMALL_DEFAULT
 
