@@ -68,6 +68,7 @@ diagrams:
         - Altermagnet
         - Antiferromagnet
         - DmiTensor
+        - CuDmiTensor
         - Ferromagnet
         - HostMagnet
         - Magnet
@@ -75,6 +76,7 @@ diagrams:
         - MumaxWorld
         - NcAfm
         - BoundaryTraction
+        - CuBoundaryTraction
     exclude:
       namespaces:
         - std
@@ -113,14 +115,18 @@ diagrams:
       elements:
         - "DynamicParameter<T>"
         - Field
+        - CuField
         - FieldQuantity
         - InterParameter
         - Parameter
+        - CuParameter
         - VectorParameter
+        - CuVectorParameter
         - ScalarQuantity
         - Variable
         - NormalizedVariable
         - "ScalarQuantityEvaluator<T>"
+        - "FieldQuantityEvaluator<T>"
     exclude:
       namespaces:
         - std
@@ -204,6 +210,7 @@ diagrams:
       elements:
         - Grid
         - System
+        - CuSystem
         - World
     exclude:
       namespaces:

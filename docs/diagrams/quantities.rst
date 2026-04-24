@@ -3,6 +3,6 @@
 Quantities
 ==========
 
-UML diagram of ``DynamicParameter``, ``Field``, ``FieldQuantity``, ``InterParameter``, ``NormalizedVariable``, ``Parameter``, ``ScalarQuantity``, ``ScalarQuantityEvaluator``, ``Variable``, ``VectorParameter``.
+UML diagram of ``CuField``, ``CuParameter``, ``CuVectorParameter``, ``DynamicParameter``, ``Field``, ``FieldQuantity``, ``FieldQuantityEvaluator``, ``InterParameter``, ``NormalizedVariable``, ``Parameter``, ``ScalarQuantity``, ``ScalarQuantityEvaluator``, ``Variable``, ``VectorParameter``.
 
 .. uml:: ./puml/quantities.puml

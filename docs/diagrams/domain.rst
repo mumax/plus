@@ -3,6 +3,6 @@
 Domain
 ======
 
-UML diagram of ``Grid``, ``System``, ``World``.
+UML diagram of ``CuSystem``, ``Grid``, ``System``, ``World``.
 
 .. uml:: ./puml/domain.puml
