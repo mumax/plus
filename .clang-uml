@@ -148,7 +148,7 @@ diagrams:
         - '  Visibility ..> WeakDependency : Weak dependency'
         - '}'
         
-  domain:
+  strayfield:
     type: class
     generate_method_arguments: full
     generate_packages: false
@@ -188,7 +188,7 @@ diagrams:
         - '  Visibility o-- Aggregation : Aggregation'
         - '}'
         
-  spacetime:
+  domain:
     type: class
     generate_method_arguments: full
     generate_packages: false
