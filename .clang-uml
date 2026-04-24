@@ -219,8 +219,8 @@ diagrams:
         - '    -private field'
         - '    #protected field'
         - '  }'
-        - '  Class -[hidden]-> Extension'
-        - '  Visibility o-- Aggregation : Dependency'
+        - '  Class -[hidden]-> Dependency'
+        - '  Visibility o-- Aggregation : Aggregation'
         - '  Visibility --> Dependency : Dependency'
         - '}'
         
