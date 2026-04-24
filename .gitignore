@@ -12,3 +12,4 @@ sandbox/
 experiment/
 **.swp
 cu*_*.dll
+docs/diagrams/puml

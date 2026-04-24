@@ -8,7 +8,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
+import glob
 import datetime
+import subprocess
 
 sys.path.insert(0, os.path.abspath("../mumaxplus"))
 
@@ -33,7 +35,8 @@ extensions = [
     "sphinxcontrib.video",
     "sphinx_copybutton",
     "sphinx.ext.napoleon",
-    "sphinx_design"
+    "sphinx_design",
+    "sphinxcontrib.plantuml"
 ]
 
 toc_object_entries_show_parents = 'hide'
@@ -82,6 +85,8 @@ html_css_files = ['logo.css', 'custom.css']
 html_js_files = [
     ('https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH', {'async': 'async'}),
     'google-analytics.js',
+    'js/svg-pan-zoom.min.js',
+    'js/setup-pan-zoom.js',
 ]
 
 html_favicon = "_static/nimble-plus.png"
@@ -126,3 +131,11 @@ html_theme_options = {
     "icon_links_label": "Quick Links",  # screen reader label
     "use_download_button": False,
 }
+
+def setup(app):
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    subprocess.run(['clang-uml'], cwd=project_root)
+
+plantuml = f"java -jar {os.path.join(os.path.dirname(os.path.abspath(__file__)), 'diagrams', 'plantuml.jar')}"
+
+plantuml_output_format = 'svg_img'

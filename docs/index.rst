@@ -48,3 +48,8 @@ Contents
     :maxdepth: 2
 
     examples
+
+.. toctree::
+    :maxdepth: 2
+
+    class_diagrams
