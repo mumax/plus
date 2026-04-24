@@ -22,7 +22,7 @@ if not FP_PRECISION:
     FP_PRECISION = _os.environ.get("MUMAXPLUS_FP_PRECISION")
 elif (mfpenv := _os.environ.get("MUMAXPLUS_FP_PRECISION")): # Both envvar and CLI arg were set: warn user of this
     if _FP_allowed_vals.get(mfpenv.upper()) != _FP_allowed_vals.get(FP_PRECISION.upper()):
-        _warnings.warn(f"\n\tCLI arg --mumaxplus-fp-precision ({FP_PRECISION}) and envvar MUMAXPLUS_FP_PRECISION ({_os.environ.get("MUMAXPLUS_FP_PRECISION")}) differ.\n\tThe CLI arg takes precedence, so using FP_PRECISION={FP_PRECISION}.", stacklevel=2)
+        _warnings.warn(f"\n\tCLI arg --mumaxplus-fp-precision ({FP_PRECISION}) and envvar MUMAXPLUS_FP_PRECISION ({_os.environ.get('MUMAXPLUS_FP_PRECISION')}) differ.\n\tThe CLI arg takes precedence, so using FP_PRECISION={FP_PRECISION}.", stacklevel=2)
 
 # If not, default to single precision.
 if not FP_PRECISION:
