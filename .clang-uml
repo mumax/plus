@@ -1,7 +1,7 @@
 compilation_database_dir: build
 output_directory: docs/diagrams/puml
 diagrams:
-  timesolver:
+  timeintegration:
     type: class
     generate_method_arguments: full
     generate_packages: false
@@ -51,7 +51,7 @@ diagrams:
         - '  Visibility ..> WeakDependency : Weak dependency'
         - '}'
         
-  magnets:
+  magnetics:
     type: class
     generate_method_arguments: full
     generate_packages: false
@@ -97,7 +97,7 @@ diagrams:
         - '  Visibility ..> WeakDependency : Weak dependency'
         - '}'
         
-  parameters:
+  quantities:
     type: class
     generate_method_arguments: full
     generate_packages: false
@@ -148,7 +148,7 @@ diagrams:
         - '  Visibility ..> WeakDependency : Weak dependency'
         - '}'
         
-  strayfield:
+  domain:
     type: class
     generate_method_arguments: full
     generate_packages: false
@@ -224,7 +224,7 @@ diagrams:
         - '  Visibility --> Dependency : Dependency'
         - '}'
         
-  addons:
+  utilities:
     type: class
     generate_method_arguments: full
     generate_packages: false

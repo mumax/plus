@@ -3,16 +3,15 @@
 Class Diagrams
 ==============
 
-Here we will show you how to create your first micromagnetic simulation in
-mumax⁺ using notebook-style tutorials. Pick one of the tutorials and let's get
-started!
+These sections will show you the C++ class diagrams of mumax⁺. The classes are split
+in 6 main groups to maintain a clear overview.
 
 .. toctree::
    :maxdepth: 1
 
-   diagrams/parameters
-   diagrams/magnets
+   diagrams/quantities
+   diagrams/magnetics
    diagrams/strayfield
-   diagrams/timesolver
-   diagrams/spacetime
-   diagrams/addons
+   diagrams/timeintegration
+   diagrams/domain
+   diagrams/utilities
