@@ -1,6 +1,8 @@
 name: mumaxplus
 channels:
   - conda-forge
+  - defaults
+  - bkryza/label/clang-uml  # for the UML diagrams in the documentation
 dependencies:
   # required
   - python=3.13
@@ -40,3 +42,6 @@ dependencies:
   - sphinxcontrib-video
   - sphinx-copybutton
   - sphinx-design
+  - clang-uml
+  - pip:
+      - sphinxcontrib.plantuml
