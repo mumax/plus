@@ -134,6 +134,11 @@ html_theme_options = {
 
 def setup(app):
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    subprocess.run([
+    "cmake",
+    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+    "-B", "build"
+    ], check=True, cwd=project_root)
     subprocess.run(['clang-uml'], cwd=project_root)
 
 plantuml = f"java -jar {os.path.join(os.path.dirname(os.path.abspath(__file__)), 'diagrams', 'plantuml.jar')}"
