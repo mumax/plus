@@ -40,9 +40,9 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=126f7b74"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=db04a367"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
@@ -57,7 +57,7 @@
     <link rel="prev" title="API" href="../../api.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2026-02-05, v1.1.3"/>
+    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
   </head>
   
   
@@ -215,6 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Altermagnet.html">Altermagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.TimeSolver.html">TimeSolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
@@ -245,6 +246,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
 </ul>
 </details></li>
 </ul>
@@ -254,6 +256,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
 </ul>
 </details></li>
 </ul>
@@ -392,7 +395,7 @@ document.write(`
 <h1>World<a class="headerlink" href="#world" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.World">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">World</span></span><a class="headerlink" href="#mumaxplus.World" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">World</span></span><a class="headerlink" href="#mumaxplus.World" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Construct a world with a given cell size.</p>
 <dl class="py method">
@@ -427,7 +430,7 @@ All subsequently added magnets need to fit inside this mastergrid.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.timesolver">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timesolver</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.TimeSolver.html#mumaxplus.TimeSolver" title="mumaxplus.timesolver.TimeSolver"><span class="pre">TimeSolver</span></a></em><a class="headerlink" href="#mumaxplus.World.timesolver" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">timesolver</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.TimeSolver.html#mumaxplus.TimeSolver" title="mumaxplus.timesolver.TimeSolver"><span class="pre">TimeSolver</span></a></span><a class="headerlink" href="#mumaxplus.World.timesolver" title="Link to this definition">#</a></dt>
 <dd><p><a class="reference internal" href="mumaxplus.TimeSolver.html#mumaxplus.TimeSolver" title="mumaxplus.TimeSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeSolver</span></code></a> for this world.</p>
 </dd></dl>
 
@@ -464,19 +467,19 @@ Raises KeyError if there is no magnet with the given name.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.ferromagnets">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ferromagnets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.World.ferromagnets" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ferromagnets</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.ferromagnets" title="Link to this definition">#</a></dt>
 <dd><p>Get a dictionairy of <a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.Ferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ferromagnet</span></code></a> names.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.antiferromagnets">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">antiferromagnets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet" title="mumaxplus.antiferromagnet.Antiferromagnet"><span class="pre">Antiferromagnet</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.World.antiferromagnets" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">antiferromagnets</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet" title="mumaxplus.antiferromagnet.Antiferromagnet"><span class="pre">Antiferromagnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.antiferromagnets" title="Link to this definition">#</a></dt>
 <dd><p>Get a dictionairy of <a class="reference internal" href="mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet" title="mumaxplus.Antiferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Antiferromagnet</span></code></a> names.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.ncafms">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ncafms</span></span><a class="headerlink" href="#mumaxplus.World.ncafms" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ncafms</span></span><a class="headerlink" href="#mumaxplus.World.ncafms" title="Link to this definition">#</a></dt>
 <dd><p>Get a dictionairy of non-collinear antiferromagnets by name.</p>
 </dd></dl>
 
@@ -524,7 +527,7 @@ minimized.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.RelaxTorqueThreshold">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RelaxTorqueThreshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#mumaxplus.World.RelaxTorqueThreshold" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RelaxTorqueThreshold</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#mumaxplus.World.RelaxTorqueThreshold" title="Link to this definition">#</a></dt>
 <dd><p>Threshold torque used for relaxing the system (default = -1).</p>
 <p>If set to a negative value (default behaviour),
 the system relaxes until the total torque (i.e. the sum of all
@@ -540,7 +543,7 @@ equal to this threshold.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.cellsize">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cellsize</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.World.cellsize" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">cellsize</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.cellsize" title="Link to this definition">#</a></dt>
 <dd><p>Return the cell size of the world.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -555,13 +558,13 @@ of the cells in the x, y, and z direction.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.bias_magnetic_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bias_magnetic_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.World.bias_magnetic_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bias_magnetic_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.bias_magnetic_field" title="Link to this definition">#</a></dt>
 <dd><p>Return a uniform magnetic field which extends over the whole world.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.mastergrid">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mastergrid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.grid.Grid"><span class="pre">Grid</span></a></em><a class="headerlink" href="#mumaxplus.World.mastergrid" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">mastergrid</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.grid.Grid"><span class="pre">Grid</span></a></span><a class="headerlink" href="#mumaxplus.World.mastergrid" title="Link to this definition">#</a></dt>
 <dd><p>The master grid of the world.</p>
 <p>Mastergrid defines a periodic simulation box. If it has zero size in a
 direction, then it is considered to be infinitely large (no periodicity) in
@@ -575,7 +578,7 @@ that direction.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.pbc_repetitions">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pbc_repetitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.World.pbc_repetitions" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pbc_repetitions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.pbc_repetitions" title="Link to this definition">#</a></dt>
 <dd><p>The number of repetitions for everything inside mastergrid in the
 x, y and z directions to create periodic boundary conditions. The number of
 repetitions determines the cutoff range for the demagnetization.</p>
@@ -592,7 +595,7 @@ creating a 5x1x3 grid.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.bounding_grid">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bounding_grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.grid.Grid"><span class="pre">Grid</span></a></em><a class="headerlink" href="#mumaxplus.World.bounding_grid" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bounding_grid</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.grid.Grid"><span class="pre">Grid</span></a></span><a class="headerlink" href="#mumaxplus.World.bounding_grid" title="Link to this definition">#</a></dt>
 <dd><p>Returns <a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.Grid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grid</span></code></a> which is the minimum bounding box of all magnets
 currently in the world.</p>
 </dd></dl>
@@ -736,7 +739,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-02-05, v1.1.3.
+  Last updated on 2026-04-20, v1.2.0.
   <br/>
 </p>
   </div>

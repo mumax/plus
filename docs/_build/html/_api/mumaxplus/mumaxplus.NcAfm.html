@@ -40,9 +40,9 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=126f7b74"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=db04a367"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
@@ -53,11 +53,11 @@
     <link rel="icon" href="../../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="TimeSolver" href="mumaxplus.TimeSolver.html" />
+    <link rel="next" title="Altermagnet" href="mumaxplus.Altermagnet.html" />
     <link rel="prev" title="Antiferromagnet" href="mumaxplus.Antiferromagnet.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2026-02-05, v1.1.3"/>
+    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
   </head>
   
   
@@ -215,6 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Altermagnet.html">Altermagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.TimeSolver.html">TimeSolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
@@ -245,6 +246,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
 </ul>
 </details></li>
 </ul>
@@ -254,6 +256,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
 </ul>
 </details></li>
 </ul>
@@ -398,7 +401,7 @@ document.write(`
 <h1>NcAfm<a class="headerlink" href="#ncafm" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NcAfm</span></span><a class="headerlink" href="#mumaxplus.NcAfm" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NcAfm</span></span><a class="headerlink" href="#mumaxplus.NcAfm" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet" title="mumaxplus.magnet.Magnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Magnet</span></code></a></p>
 <p>Create a non-collinear antiferromagnet instance.</p>
 <dl class="py method">
@@ -431,25 +434,25 @@ a name for the non-collinear antiferromagnet will be created.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.sub1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sub1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.sub1" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sub1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.sub1" title="Link to this definition">#</a></dt>
 <dd><p>First sublattice instance.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.sub2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sub2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.sub2" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sub2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.sub2" title="Link to this definition">#</a></dt>
 <dd><p>Second sublattice instance.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.sub3">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sub3</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.sub3" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sub3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.sub3" title="Link to this definition">#</a></dt>
 <dd><p>Third sublattice instance.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.sublattices">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sublattices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mumaxplus.NcAfm.sublattices" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sublattices</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.NcAfm.sublattices" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -468,14 +471,14 @@ a name for the non-collinear antiferromagnet will be created.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.bias_magnetic_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bias_magnetic_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.bias_magnetic_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bias_magnetic_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.bias_magnetic_field" title="Link to this definition">#</a></dt>
 <dd><p>Uniform bias magnetic field which will affect a non-collinear antiferromagnet.</p>
 <p>The value should be specifed in Teslas.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.enable_demag">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable_demag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mumaxplus.NcAfm.enable_demag" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">enable_demag</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#mumaxplus.NcAfm.enable_demag" title="Link to this definition">#</a></dt>
 <dd><p>Enable/disable demagnetization switch of all sublattices.</p>
 <p>Default = True.</p>
 </dd></dl>
@@ -525,7 +528,7 @@ but is more robust when starting from a high energy state (i.e. random).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.ncafmex_cell">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ncafmex_cell</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.ncafmex_cell" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ncafmex_cell</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.ncafmex_cell" title="Link to this definition">#</a></dt>
 <dd><p>Intracell non-collinear antiferromagnetic exchange constant (J/m).
 This parameter plays the role of exchange constant of the
 antiferromagnetic homogeneous exchange interaction in a single
@@ -538,7 +541,7 @@ simulation cell.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.ncafmex_nn">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ncafmex_nn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.ncafmex_nn" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ncafmex_nn</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.ncafmex_nn" title="Link to this definition">#</a></dt>
 <dd><p>Intercell non-collinear antiferromagnetic exchange constant (J/m).
 This parameter plays the role of exchange constant of the
 antiferromagnetic inhomogeneous exchange interaction between
@@ -551,7 +554,7 @@ neighbouring simulation cells.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.inter_ncafmex_nn">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inter_ncafmex_nn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.inter_ncafmex_nn" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">inter_ncafmex_nn</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.inter_ncafmex_nn" title="Link to this definition">#</a></dt>
 <dd><p>Interregional non-collinear antiferromagnetic exchange constant (J/m).
 If set to zero (default), then the harmonic mean of the exchange constants
 of the two regions are used.</p>
@@ -569,7 +572,7 @@ is wanted, set <cite>scale_ncafmex_nn</cite> to zero.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.scale_ncafmex_nn">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scale_ncafmex_nn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.scale_ncafmex_nn" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">scale_ncafmex_nn</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.scale_ncafmex_nn" title="Link to this definition">#</a></dt>
 <dd><p>Scaling of the non-collinear antiferromagneticic exchange constant
 between different regions. This factor is multiplied by the harmonic
 mean of the exchange constants of the two regions.</p>
@@ -588,7 +591,7 @@ automatically set to zero when <cite>inter_ncafmex_nn</cite> is not.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.latcon">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">latcon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.latcon" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">latcon</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.latcon" title="Link to this definition">#</a></dt>
 <dd><p>Lattice constant (m).</p>
 <p>Physical lattice constant of the non-collinear antiferromagnet. This
 doesn’t break the micromagnetic character of the simulation package,
@@ -604,7 +607,7 @@ at the same site.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.dmi_tensor">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dmi_tensor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.DmiTensor.html#mumaxplus.DmiTensor" title="mumaxplus.dmitensor.DmiTensor"><span class="pre">DmiTensor</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.dmi_tensor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_tensor</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.DmiTensor.html#mumaxplus.DmiTensor" title="mumaxplus.dmitensor.DmiTensor"><span class="pre">DmiTensor</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.dmi_tensor" title="Link to this definition">#</a></dt>
 <dd><p>Get the DMI tensor of this non-collinear antiferromagnet.
 This tensor describes intersublattice DMI exchange.</p>
 <p>Note that individual sublattices can have their own tensor
@@ -625,7 +628,7 @@ to describe intrasublattice DMI exchange.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.dmi_tensors">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dmi_tensors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DmiTensorGroup</span></em><a class="headerlink" href="#mumaxplus.NcAfm.dmi_tensors" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_tensors</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DmiTensorGroup</span></span><a class="headerlink" href="#mumaxplus.NcAfm.dmi_tensors" title="Link to this definition">#</a></dt>
 <dd><p>Returns the DMI tensor of self, self.sub1, self.sub2 and self.sub3.</p>
 <p>This group can be used to set the intersublattice and all intrasublattice
 DMI tensors at the same time.</p>
@@ -647,7 +650,7 @@ one could use</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.dmi_vector">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dmi_vector</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.dmi_vector" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_vector</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.dmi_vector" title="Link to this definition">#</a></dt>
 <dd><dl class="simple">
 <dt>DMI vector D (J/m³) associated with the homogeneous DMI (in a single simulation cell),</dt><dd><p>defined by the energy density ε = D . (m1 x m2 + m2 x m3 + m3 x m1) with m1, m2
 and m3 being the sublattice magnetizations.</p>
@@ -661,14 +664,14 @@ and m3 being the sublattice magnetizations.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.octupole_vector">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">octupole_vector</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.octupole_vector" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">octupole_vector</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.octupole_vector" title="Link to this definition">#</a></dt>
 <dd><p>Weighted dimensionless octupole vector of a non-collinear
 antiferromagnet as defined in <a class="reference external" href="https://doi.org/10.1038/s41563-023-01620-2">https://doi.org/10.1038/s41563-023-01620-2</a>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.full_magnetization">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">full_magnetization</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.full_magnetization" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">full_magnetization</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.full_magnetization" title="Link to this definition">#</a></dt>
 <dd><p>Full non-collinear antiferromagnetic magnetization M1 + M2 + M3 (A/m).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -678,7 +681,7 @@ antiferromagnet as defined in <a class="reference external" href="https://doi.or
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.angle_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">angle_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.angle_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">angle_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.angle_field" title="Link to this definition">#</a></dt>
 <dd><p>Returns the deviation from the optimal angle (120°) between
 magnetization vectors in the same cell which are coupled by the
 intracell exchange interaction (rad).
@@ -712,7 +715,7 @@ cell (rad). Input should be two integers from {1, 2, 3} denoting a sublattice in
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.total_energy_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_energy_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.total_energy_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">total_energy_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.FieldQuantity.html#mumaxplus.FieldQuantity" title="mumaxplus.fieldquantity.FieldQuantity"><span class="pre">FieldQuantity</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.total_energy_density" title="Link to this definition">#</a></dt>
 <dd><p>Total energy density of all sublattices combined (J/m³). Kinetic and
 elastic energy densities of the non-collinear antiferromagnet are also
 included if elastodynamics is enabled.</p>
@@ -724,7 +727,7 @@ included if elastodynamics is enabled.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.NcAfm.total_energy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></em><a class="headerlink" href="#mumaxplus.NcAfm.total_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">total_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.ScalarQuantity.html#mumaxplus.ScalarQuantity" title="mumaxplus.scalarquantity.ScalarQuantity"><span class="pre">ScalarQuantity</span></a></span><a class="headerlink" href="#mumaxplus.NcAfm.total_energy" title="Link to this definition">#</a></dt>
 <dd><p>Total energy of all sublattices combined (J). Kinetic and elastic
 energies of the non-collinear antiferromagnet are also included if
 elastodynamics is enabled.</p>
@@ -759,11 +762,11 @@ elastodynamics is enabled.</p>
       </div>
     </a>
     <a class="right-next"
-       href="mumaxplus.TimeSolver.html"
+       href="mumaxplus.Altermagnet.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">TimeSolver</p>
+        <p class="prev-next-title">Altermagnet</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -836,7 +839,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-02-05, v1.1.3.
+  Last updated on 2026-04-20, v1.2.0.
   <br/>
 </p>
   </div>
