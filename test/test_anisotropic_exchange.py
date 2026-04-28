@@ -9,20 +9,23 @@ def max_semirelative_error(result, wanted):
 def compute_second_order_derivative_numpy(magnet, exch):
     m = magnet.magnetization.get()
     cellsize = magnet.cellsize
-    deriv = np.zeros(m.shape)
 
-    m_ = np.roll(m, 1, axis=2)
-    deriv[:, :, 1:, :] += exch[1] * (m_ - m)[:, :, 1:, :] / (cellsize[1] ** 2)
+    dx2 = cellsize[0] ** 2
+    dy2 = cellsize[1] ** 2
 
-    m_ = np.roll(m, -1, axis=2)
-    deriv[:, :, 0:-1, :] += exch[1] * (m_ - m)[:, :, 0:-1, :] / (cellsize[1] ** 2)
+    m_pad = np.pad(m, ((0,0), (0,0), (1,1), (1,1)), mode='constant', constant_values=0)
 
-    m_ = np.roll(m, 1, axis=3)
-    deriv[:, :, :, 1:] += exch[0] * (m_ - m)[:, :, :, 1:] / (cellsize[0] ** 2)
+    # x-direction
+    m_x_plus  = m_pad[:, :, 1:-1, 2:]
+    m_x_minus = m_pad[:, :, 1:-1, :-2]
+    # y-direction
+    m_y_plus  = m_pad[:, :, 2:, 1:-1]
+    m_y_minus = m_pad[:, :, :-2, 1:-1]
+    # center
+    m_center = m_pad[:, :, 1:-1, 1:-1]
 
-    m_ = np.roll(m, -1, axis=3)
-    deriv[:, :, :, 0:-1] += exch[0] * (m_ - m)[:, :, :, 0:-1] / (cellsize[0] ** 2)
-
+    deriv = ( exch[1] * (m_y_plus + m_y_minus - 2 * m_center) / dy2 +
+              exch[0] * (m_x_plus + m_x_minus - 2 * m_center) / dx2)
     return deriv
 
 def compute_mixed_derivative(magnet, exch):
@@ -32,12 +35,14 @@ def compute_mixed_derivative(magnet, exch):
 
     deriv = np.zeros_like(m)
 
-    m_pp = np.roll(np.roll(m, -1, axis=3), -1, axis=2)
-    m_pm = np.roll(np.roll(m, -1, axis=3),  1, axis=2)
-    m_mp = np.roll(np.roll(m,  1, axis=3), -1, axis=2)
-    m_mm = np.roll(np.roll(m,  1, axis=3),  1, axis=2)
-    deriv[:, :, 1:-1, 1:-1] = exch * (m_pp - m_pm - m_mp + m_mm)[:, :, 1:-1, 1:-1] / denom
+    m_pad = np.pad(m, ((0,0), (0,0), (1,1), (1,1)), mode='constant', constant_values=0)
 
+    m_pp = m_pad[:, :, 2:, 2:]
+    m_pm = m_pad[:, :, 2:, :-2]
+    m_mp = m_pad[:, :, :-2, 2:]
+    m_mm = m_pad[:, :, :-2, :-2]
+
+    deriv = exch * (m_pp - m_pm - m_mp + m_mm) / denom
     return deriv
 
 def compute_anisotropic_exchange_numpy(magnet, sub, switch):
