@@ -22,8 +22,6 @@ dependencies:
   - isort # check that imports are in the right order
   - pre-commit
   - pip
-  - pip:
-      - clang-format
 
   # optional
   - ipython
@@ -32,8 +30,6 @@ dependencies:
   - pyvista
   - pillow  # should be contained in matplotlib
   - pandas
-  - pip:
-      - pyovf
 
   # documentation generation
   - sphinx
@@ -43,5 +39,9 @@ dependencies:
   - sphinx-copybutton
   - sphinx-design
   - clang-uml
+
+  # pip blocks
   - pip:
-      - sphinxcontrib.plantuml
+      - clang-format            # code checks
+      - pyovf                   # optional
+      - sphinxcontrib.plantuml  # documentation generation

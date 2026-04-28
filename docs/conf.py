@@ -141,6 +141,19 @@ def setup(app):
     ], check=True, cwd=project_root)
     subprocess.run(['clang-uml'], cwd=project_root)
 
+conf_dir = os.path.dirname(os.path.abspath(__file__))
+clang_uml_path = os.path.join(conf_dir, "../.clang-uml")
+
+print(clang_uml_path)
+
+with open(clang_uml_path, "r") as f:
+    content = f.read()
+
+content = os.path.expandvars(content)
+
+with open(clang_uml_path, "w") as f:
+    f.write(content)
+
 plantuml = f"java -jar {os.path.join(os.path.dirname(os.path.abspath(__file__)), 'diagrams', 'plantuml.jar')}"
 
 plantuml_output_format = 'svg_img'

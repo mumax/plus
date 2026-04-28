@@ -1,5 +1,7 @@
 compilation_database_dir: build
 output_directory: docs/diagrams/puml
+add_compile_flags:
+  - -resource-dir=/home/diego/miniconda3/envs/mumaxplus/lib/clang/22
 diagrams:
   timeintegration:
     type: class
