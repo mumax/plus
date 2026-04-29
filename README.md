@@ -145,7 +145,7 @@ It follows the [NumPy style guide](https://numpydoc.readthedocs.io/en/latest/for
 make html
 ```
 
-The documentation can then be found at `docs/_build/html/index.html`.
+The documentation can then be found at `docs/_build/html/index.html`. However, to generate the class diagrams you should be on a Linux device and first install [clang-uml](https://github.com/bkryza/clang-uml/tree/master) otherwise they will not be generated.
 
 ## Examples
 
