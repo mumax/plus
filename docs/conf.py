@@ -8,9 +8,11 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
-import glob
 import datetime
 import subprocess
+import shutil
+import warnings
+import platform
 
 sys.path.insert(0, os.path.abspath("../mumaxplus"))
 
@@ -133,6 +135,20 @@ html_theme_options = {
 }
 
 def setup(app):
+    if platform.system() == "Windows":
+        warnings.warn(
+            "UML diagram generation is not supported on Windows. Skipping.",
+            UserWarning
+        )
+        return
+    
+    if shutil.which("clang-uml") is None:
+        warnings.warn(
+            "clang-uml not found. Skipping UML diagram generation. "
+            "Install it from https://github.com/bkryza/clang-uml or via your package manager.",
+            UserWarning
+        )
+        return
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     subprocess.run([
     "cmake",
@@ -143,8 +159,6 @@ def setup(app):
 
 conf_dir = os.path.dirname(os.path.abspath(__file__))
 clang_uml_path = os.path.join(conf_dir, "../.clang-uml")
-
-print(clang_uml_path)
 
 with open(clang_uml_path, "r") as f:
     content = f.read()
