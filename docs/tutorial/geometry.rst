@@ -121,7 +121,7 @@ Here we will cut a sawtooth pattern out of a magnet.
 
 3. Shapes
 ---------
-Let's end this tutoial by using the `Shape` class to generate a geometry. For more information on different shapes and shape manipulations see `shape.ipynb`.
+Let's end this tutoial by using the `Shape` class to generate a geometry. For more information on different shapes and shape manipulations see :doc:`Shapes <shapes>`.
 
 3.1 Sphere
 ^^^^^^^^^^
