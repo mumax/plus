@@ -88,11 +88,13 @@ Or look along a different out-of-plane axis.
     plot_field(mag, out_of_plane_axis="x")
     plot_field(mag, out_of_plane_axis="y")
 
-.. image:: ../images/plot_field/plot_field_OoP_x.png
-   :width: 45%
+.. container:: side-by-side-images
 
-.. image:: ../images/plot_field/plot_field_OoP_y.png
-   :width: 45%
+    .. image:: ../images/plot_field/plot_field_OoP_x.png
+        :width: 100%
+
+    .. image:: ../images/plot_field/plot_field_OoP_y.png
+        :width: 100%
 
 A few things to note:
 
