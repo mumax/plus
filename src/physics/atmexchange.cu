@@ -102,8 +102,8 @@ __global__ void k_atmExchangeField(CuField hField,
         inter2 = interEx2.valueBetween(ridx, ridx_);
       }
     }
-    else {
-      m_ = m;
+    else { // Dirichlet boundaries
+      m_ = real3{0, 0, 0};
       a1_ = a1;
       a2_ = a2;
     }
@@ -118,53 +118,46 @@ __global__ void k_atmExchangeField(CuField hField,
 
   // MIXED DERIVATIVE
   // TODO: add proper (Neumann) BC
-  const int3 rel_coos[4] = { {+1, +1, 0}, {+1, -1, 0}, {-1, +1, 0}, {-1, -1, 0} };
-  int3 coos[4];
-  bool inBulk = true;
-
-#pragma unroll
-  for (int i = 0; i < 4; ++i) {
-    coos[i] = mastergrid.wrap(coo + rel_coos[i]);
-    inBulk &= hField.cellInGeometry(coos[i]);
-    inBulk &= (msat.valueAt(coos[i]) != 0);
-  }
-
-  if (!inBulk) {
-    hField.setVectorInCell(idx, h / msat.valueAt(idx));
-    return;
-  }
-
-  unsigned int ridx = system.getRegionIdx(idx);
-  real inter1 = 0, inter2 = 0;
-  real scale1 = 1, scale2 = 1;
+  real3 neighbours[4];
   real Aex[4];
+
+  const int3 rel_coos[4] = { {+1, +1, 0}, {+1, -1, 0}, {-1, +1, 0}, {-1, -1, 0} };
 
 #pragma unroll
   for (int i = 0; i < 4; i++) {
-    unsigned int ridx_ = system.getRegionIdx(coos[i]);
+    const int3 coo_ = mastergrid.wrap(coo + rel_coos[i]);
+    const int idx_ = grid.coord2index(coo_);
 
-    if (ridx_ != ridx) {
-      scale1 = scaleEx1.valueBetween(ridx, ridx_);
-      inter1 = interEx1.valueBetween(ridx, ridx_);
-      scale2 = scaleEx2.valueBetween(ridx, ridx_);
-      inter2 = interEx2.valueBetween(ridx, ridx_);
+    // Dirichlet boundaries
+    if (!hField.cellInGeometry(coo_) || msat.valueAt(coo_) == 0) {
+      neighbours[i] = real3{0, 0, 0};
+      Aex[i] = 0;
     }
+    else {
+      neighbours[i] = mField.vectorAt(coo_);
 
-    real ang_ = angle.valueAt(coos[i]);
-    real aex_1 = getExchangeStiffness(inter1, scale1, cs2 * a1,
-                                                      sin(2 * ang_) * A1.valueAt(coos[i]));
-    real aex_2 = getExchangeStiffness(inter2, scale2, cs2 * a2,
-                                                      sin(2 * ang_) * A2.valueAt(coos[i]));
-    Aex[i] = (aex_1 - aex_2);
+      real inter1 = 0, inter2 = 0;
+      real scale1 = 1, scale2 = 1;
+      unsigned int ridx = system.getRegionIdx(idx);
+      unsigned int ridx_ = system.getRegionIdx(idx_);
+
+      if (ridx_ != ridx) {
+        scale1 = scaleEx1.valueBetween(ridx, ridx_);
+        inter1 = interEx1.valueBetween(ridx, ridx_);
+        scale2 = scaleEx2.valueBetween(ridx, ridx_);
+        inter2 = interEx2.valueBetween(ridx, ridx_);
+      }
+      real ang_ = angle.valueAt(coo_);
+      real aex_1 = getExchangeStiffness(inter1, scale1, cs2 * a1,
+                                                        sin(2 * ang_) * A1.valueAt(coo_));
+      real aex_2 = getExchangeStiffness(inter2, scale2, cs2 * a2,
+                                                        sin(2 * ang_) * A2.valueAt(coo_));
+      Aex[i] = (aex_1 - aex_2);
+    }
   }
 
-  const real3 m_xp_yp = mField.vectorAt(coos[0]);
-  const real3 m_xp_ym = mField.vectorAt(coos[1]);
-  const real3 m_xm_yp = mField.vectorAt(coos[2]);
-  const real3 m_xm_ym = mField.vectorAt(coos[3]);
-
-  h += (1.0/4.0) * ((Aex[0] * m_xp_yp + Aex[3] * m_xm_ym)
-                  - (Aex[1] * m_xp_ym + Aex[2] * m_xm_yp)) * w.x * w.y;
+  h += (1.0/4.0) * ((Aex[0] * neighbours[0] + Aex[3] * neighbours[3])
+                  - (Aex[1] * neighbours[1] + Aex[2] * neighbours[2])) * w.x * w.y;
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
 }
 

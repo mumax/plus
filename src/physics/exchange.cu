@@ -1,4 +1,5 @@
 #include "antiferromagnet.hpp"
+#include "atmexchange.hpp"
 #include "cudalaunch.hpp"
 #include "dmi.hpp" // used for Neumann BC
 #include "dmitensor.hpp"
@@ -259,6 +260,18 @@ Field evalExchangeField(const Ferromagnet* magnet) {
   if (exchangeAssuredZero(magnet)) {
     hField.makeZero();
     return hField;
+  }
+
+  static bool warned = false;
+  if (!warned) {
+    if (!atmExchangeAssuredZero(magnet) &&
+        (!inhomoDmiAssuredZero(magnet) && !magnet->enableOpenBC)) {
+      std::cerr << "Warning: regular exchange uses different boundaries (Robin boundary conditions) "
+                    "than anisotropic exchange (Dirichlet boundary conditions). This can cause "
+                    "unexpected behaviour at the edges. Consider using open or periodic boundaries "
+                    "instead.\n";
+      warned = true;
+    }
   }
 
   real3 c = magnet->cellsize();
