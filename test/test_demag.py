@@ -150,8 +150,3 @@ class TestDemag:
 
         err = np.max(relative_error(mumaxplus_result, self.exact_aspect_Nxy))
         assert err < 1e-5
-
-
-world = World((1e-9, 1e-9, 1e-9))
-magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-print(magnet.demag_field.kernel)
