@@ -21,11 +21,9 @@ def compute_second_order_derivative_numpy(magnet, exch):
     # y-direction
     m_y_plus  = m_pad[:, :, 2:, 1:-1]
     m_y_minus = m_pad[:, :, :-2, 1:-1]
-    # center
-    m_center = m_pad[:, :, 1:-1, 1:-1]
 
-    deriv = ( exch[1] * (m_y_plus + m_y_minus - 2 * m_center) / dy2 +
-              exch[0] * (m_x_plus + m_x_minus - 2 * m_center) / dx2)
+    deriv = ( exch[1] * (m_y_plus + m_y_minus - 2 * m) / dy2 +
+              exch[0] * (m_x_plus + m_x_minus - 2 * m) / dx2)
     return deriv
 
 def compute_mixed_derivative(magnet, exch):

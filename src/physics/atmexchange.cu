@@ -132,7 +132,6 @@ __global__ void k_atmExchangeField(CuField hField,
     if (!hField.cellInGeometry(coo_) || msat.valueAt(coo_) == 0) {
       neighbours[i] = real3{0, 0, 0};
       Aex[i] = 0;
-      continue;
     }
     else {
       neighbours[i] = mField.vectorAt(coo_);
