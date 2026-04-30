@@ -6,3 +6,13 @@ html[data-theme="dark"] .navbar-brand img {
 .headerlink {
     display: none;
 }
+
+.side-by-side-images {
+   display: flex;
+   gap: 5%;
+}
+
+.side-by-side-images img {
+   display: block;
+   width: 100%;
+}
