@@ -9,6 +9,10 @@
 import os
 import sys
 import datetime
+import subprocess
+import shutil
+import warnings
+import platform
 
 sys.path.insert(0, os.path.abspath("../mumaxplus"))
 
@@ -33,7 +37,8 @@ extensions = [
     "sphinxcontrib.video",
     "sphinx_copybutton",
     "sphinx.ext.napoleon",
-    "sphinx_design"
+    "sphinx_design",
+    "sphinxcontrib.plantuml"
 ]
 
 toc_object_entries_show_parents = 'hide'
@@ -82,6 +87,8 @@ html_css_files = ['logo.css', 'custom.css']
 html_js_files = [
     ('https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH', {'async': 'async'}),
     'google-analytics.js',
+    'js/svg-pan-zoom.min.js',
+    'js/setup-pan-zoom.js',
 ]
 
 html_favicon = "_static/nimble-plus.png"
@@ -126,3 +133,41 @@ html_theme_options = {
     "icon_links_label": "Quick Links",  # screen reader label
     "use_download_button": False,
 }
+
+def setup(app):
+    if platform.system() == "Windows":
+        warnings.warn(
+            "UML diagram generation is not supported on Windows. Skipping.",
+            UserWarning
+        )
+        return
+    
+    if shutil.which("clang-uml") is None:
+        warnings.warn(
+            "clang-uml not found. Skipping UML diagram generation. "
+            "Install it from https://github.com/bkryza/clang-uml or via your package manager.",
+            UserWarning
+        )
+        return
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    subprocess.run([
+    "cmake",
+    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+    "-B", "build"
+    ], check=True, cwd=project_root)
+    subprocess.run(['clang-uml'], cwd=project_root)
+
+conf_dir = os.path.dirname(os.path.abspath(__file__))
+clang_uml_path = os.path.join(conf_dir, "../.clang-uml")
+
+with open(clang_uml_path, "r") as f:
+    content = f.read()
+
+content = os.path.expandvars(content)
+
+with open(clang_uml_path, "w") as f:
+    f.write(content)
+
+plantuml = f"java -jar {os.path.join(os.path.dirname(os.path.abspath(__file__)), 'diagrams', 'plantuml.jar')}"
+
+plantuml_output_format = 'svg_img'

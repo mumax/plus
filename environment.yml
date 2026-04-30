@@ -1,6 +1,7 @@
 name: mumaxplus
 channels:
   - conda-forge
+  - defaults
 dependencies:
   # required
   - python=3.13
@@ -20,8 +21,6 @@ dependencies:
   - isort # check that imports are in the right order
   - pre-commit
   - pip
-  - pip:
-      - clang-format
 
   # optional
   - ipython
@@ -30,8 +29,6 @@ dependencies:
   - pyvista
   - pillow  # should be contained in matplotlib
   - pandas
-  - pip:
-      - pyovf
 
   # documentation generation
   - sphinx
@@ -40,3 +37,9 @@ dependencies:
   - sphinxcontrib-video
   - sphinx-copybutton
   - sphinx-design
+
+  # pip blocks
+  - pip:
+      - clang-format            # code checks
+      - pyovf                   # optional
+      - sphinxcontrib.plantuml  # documentation generation

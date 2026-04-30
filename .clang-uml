@@ -1,0 +1,287 @@
+compilation_database_dir: build
+output_directory: docs/diagrams/puml
+add_compile_flags:
+  - -resource-dir=/home/diego/miniconda3/envs/mumaxplus/lib/clang/22
+diagrams:
+  timeintegration:
+    type: class
+    generate_method_arguments: full
+    generate_packages: false
+    glob:
+      - core/**/*.cpp
+      - physics/**/*.cpp
+    relative_to: src
+    package_type: directory
+    include:
+      paths:
+        - core
+        - physics
+      elements:
+        - RKmethod
+        - ButcherTableau
+        - DynamicEquation
+        - RungeKuttaStepper
+        - "RungeKuttaStepper##RungeKuttaStageExecutor"
+        - Stepper
+        - TimeSolver
+        - Relaxer
+    exclude:
+      namespaces:
+        - std
+    plantuml:
+      before:
+        - '!theme vibrant'
+        - 'left to right direction'
+        - 'package Legend {'
+        - '  class Class'
+        - '  abstract class Abstract'
+        - '  enum Enum'
+        - '  class Visibility {'
+        - '    +public field'
+        - '    +public method()'
+        - '    -private field'
+        - '    -private method()'
+        - '    #protected field'
+        - '  }'
+        - '  Class -[hidden]-> Extension'
+        - '  Abstract -[hidden]-> Extension'
+        - '  Enum -[hidden]-> Extension'
+        - '  Visibility <|-- Extension : Extension'
+        - '  Visibility o-- Aggregation : Aggregation'
+        - '  Visibility +.. Nested : Nested'
+        - '  Visibility --> Dependency : Dependency'
+        - '  Visibility ..> WeakDependency : Weak dependency'
+        - '}'
+        
+  magnetics:
+    type: class
+    generate_method_arguments: full
+    generate_packages: false
+    glob:
+      - core/**/*.cpp
+      - physics/**/*.cpp
+    relative_to: src
+    package_type: directory
+    include:
+      paths:
+        - core
+        - physics
+      elements:
+        - Altermagnet
+        - Antiferromagnet
+        - DmiTensor
+        - CuDmiTensor
+        - Ferromagnet
+        - HostMagnet
+        - Magnet
+        - Minimizer
+        - MumaxWorld
+        - NcAfm
+        - BoundaryTraction
+        - CuBoundaryTraction
+    exclude:
+      namespaces:
+        - std
+    plantuml:
+      before:
+        - '!theme vibrant'
+        - 'left to right direction'
+        - 'package Legend {'
+        - '  class Class'
+        - '  class Visibility {'
+        - '    +public field'
+        - '    +public method()'
+        - '    -private field'
+        - '    -private method()'
+        - '  }'
+        - '  Class -[hidden]-> Extension'
+        - '  Visibility <|-- Extension : Extension'
+        - '  Visibility o-- Aggregation : Aggregation'
+        - '  Visibility --> Dependency : Dependency'
+        - '  Visibility ..> WeakDependency : Weak dependency'
+        - '}'
+        
+  quantities:
+    type: class
+    generate_method_arguments: full
+    generate_packages: false
+    glob:
+      - core/**/*.cpp
+      - physics/**/*.cpp
+    relative_to: src
+    package_type: directory
+    include:
+      paths:
+        - core
+        - physics
+      elements:
+        - "DynamicParameter<T>"
+        - Field
+        - CuField
+        - FieldQuantity
+        - InterParameter
+        - Parameter
+        - CuParameter
+        - VectorParameter
+        - CuVectorParameter
+        - ScalarQuantity
+        - Variable
+        - NormalizedVariable
+        - "ScalarQuantityEvaluator<T>"
+        - "FieldQuantityEvaluator<T>"
+    exclude:
+      namespaces:
+        - std
+    plantuml:
+      before:
+        - '!theme vibrant'
+        - 'left to right direction'
+        - 'package Legend {'
+        - '  class Class'
+        - '  abstract class Abstract'
+        - '  class Template <T>'
+        - '  class Visibility {'
+        - '    +public method()'
+        - '    -private field'
+        - '    -private method()'
+        - '    #protected field'
+        - '    #protected method()'
+        - '  }'
+        - '  Class -[hidden]-> Extension'
+        - '  Abstract -[hidden]-> Extension'
+        - '  Template -[hidden]-> Extension'
+        - '  Visibility <|-- Extension : Extension'
+        - '  Visibility o-- Aggregation : Aggregation'
+        - '  Visibility --> Dependency : Dependency'
+        - '  Visibility ..> WeakDependency : Weak dependency'
+        - '}'
+        
+  strayfield:
+    type: class
+    generate_method_arguments: full
+    generate_packages: false
+    glob:
+      - physics/**/*.cpp
+    relative_to: src
+    package_type: directory
+    include:
+      paths:
+        - core
+        - physics
+      elements:
+        - StrayFieldExecutor
+        - StrayField
+        - StrayFieldBruteExecutor
+        - StrayFieldFFTExecutor
+        - StrayFieldKernel
+    exclude:
+      namespaces:
+        - std
+    plantuml:
+      before:
+        - '!theme vibrant'
+        - 'left to right direction'
+        - 'package Legend {'
+        - '  class Class'
+        - '  abstract class Abstract'
+        - '  class Visibility {'
+        - '    +public method()'
+        - '    -private field'
+        - '    #protected field'
+        - '    #protected method()'
+        - '  }'
+        - '  Class -[hidden]-> Extension'
+        - '  Abstract -[hidden]-> Extension'
+        - '  Visibility <|-- Extension : Extension'
+        - '  Visibility o-- Aggregation : Aggregation'
+        - '}'
+        
+  domain:
+    type: class
+    generate_method_arguments: full
+    generate_packages: false
+    glob:
+      - core/**/*.cpp
+      - physics/**/*.cpp
+    relative_to: src
+    package_type: directory
+    include:
+      paths:
+        - core
+        - physics
+      elements:
+        - Grid
+        - System
+        - CuSystem
+        - World
+    exclude:
+      namespaces:
+        - std
+    plantuml:
+      before:
+        - '!theme vibrant'
+        - 'left to right direction'
+        - 'package Legend {'
+        - '  class Class'
+        - '  class Visibility {'
+        - '    +public method()'
+        - '    -private field'
+        - '    #protected field'
+        - '  }'
+        - '  Class -[hidden]-> Dependency'
+        - '  Visibility o-- Aggregation : Aggregation'
+        - '  Visibility --> Dependency : Dependency'
+        - '}'
+        
+  utilities:
+    type: class
+    generate_method_arguments: full
+    generate_packages: false
+    glob:
+      - core/**/*.cpp
+      - physics/**/*.cpp
+      - linsolver/**/*.cpp
+      - bindings/wrap_mfm.cpp
+    relative_to: src
+    package_type: directory
+    include:
+      paths:
+        - core
+        - physics
+        - linsolver
+      elements:
+        - VoronoiTessellator
+        - Center
+        - Tile
+        - Int3Hash
+        - MFM
+        - PoissonSystem
+        - LinSolver
+        - "LinSolver##Stepper"
+        - LinearSystem
+        - "LinearSystem##CuData"
+    exclude:
+      namespaces:
+        - std
+    plantuml:
+      before:
+        - '!theme vibrant'
+        - 'left to right direction'
+        - 'package Legend {'
+        - '  class Class'
+        - '  abstract class Abstract'
+        - '  class Visibility {'
+        - '    +public field'
+        - '    +public method()'
+        - '    -private field'
+        - '    -private method()'
+        - '    #protected method()'
+        - '  }'
+        - '  Class -[hidden]-> WeakDependency'
+        - '  Abstract -[hidden]-> WeakDependency'
+        - '  Visibility o-- Aggregation : Aggregation'
+        - '  Visibility +.. Nested : Nested'
+        - '  Visibility --> Dependency : Dependency'
+        - '  Visibility ..> WeakDependency : Weak dependency'
+        - '}'
+        
