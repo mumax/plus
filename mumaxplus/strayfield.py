@@ -99,3 +99,8 @@ class StrayField(FieldQuantity):
     @switch_radius.setter
     def switch_radius(self, value=-1):
         self._impl.switching_radius = value
+
+    @property
+    def kernel(self):
+        """Return the StrayFieldKernel."""
+        return self._impl.kernel

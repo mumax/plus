@@ -41,6 +41,8 @@ class StrayFieldBruteExecutor : public StrayFieldExecutor {
   /** Return the switching radius. */
   double switchingradius() const { return kernel_.switchingradius();}
 
+  Field kernel() const;
+
  private:
   StrayFieldKernel kernel_;
 };

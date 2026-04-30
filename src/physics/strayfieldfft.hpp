@@ -45,6 +45,8 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
   /** Return the switching radius. */
   double switchingradius() const { return kernel_.switchingradius();}
 
+  Field kernel() const;
+
  private:
   StrayFieldKernel kernel_;
   int3 fftSize;

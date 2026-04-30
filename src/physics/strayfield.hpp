@@ -65,6 +65,9 @@ class StrayFieldExecutor {
   /** Return the switching radius of the executor. */
   virtual double switchingradius() const = 0;
 
+  /** Return the strayfieldkernel as a field */
+  virtual Field kernel() const = 0;
+
  protected:
   /** Source of the stray field*/
   const Magnet* magnet_;
@@ -151,6 +154,9 @@ class StrayField : public FieldQuantity {
 
   /** Return true if one can be sure that the stray field is exactly zero. */
   bool assuredZero() const;
+
+  /** Return the strayfieldkernel as a field */
+  Field kernel() const;
 
  private:
   std::shared_ptr<const System> system_;

@@ -24,5 +24,6 @@ void wrap_strayfield(py::module& m) {
       })
       .def_property("order", &StrayField::order, &StrayField::setOrder)
       .def_property("epsilon", &StrayField::eps, &StrayField::setEps)
-      .def_property("switching_radius", &StrayField::switchingradius, &StrayField::setSwitchingradius);
+      .def_property("switching_radius", &StrayField::switchingradius, &StrayField::setSwitchingradius)
+      .def_property_readonly("kernel", [](const StrayField& sf) {return fieldToArray(sf.kernel());});
 }
