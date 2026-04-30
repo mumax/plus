@@ -1,5 +1,5 @@
 import numpy as np
-from mumaxplus import Ferromagnet, Grid, World, _cpp
+from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import MU0
 from pathlib import Path
 
@@ -11,7 +11,10 @@ def relative_error(result, wanted):
     return np.abs((wanted - result) / result)
 
 def demag_field_py(magnet):
-    kernel = _cpp._demag_kernel(magnet._impl, order, eps, R)
+    magnet.demag_field.order = order
+    magnet.demag_field.epsilon = eps
+    magnet.demag_field.switch_radius = R
+    kernel = magnet.demag_field.kernel
     mag = magnet.msat.average() * magnet.magnetization.get()
     # add padding to the magnetization so that the size of magnetization
     # matches the size of the kernel
@@ -49,12 +52,18 @@ class TestDemag:
         
         world = World((1e-9, 1e-9, 1e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        self.kernel = _cpp._demag_kernel(magnet._impl, order, eps, R)
+        magnet.demag_field.order = order
+        magnet.demag_field.epsilon = eps
+        magnet.demag_field.switch_radius = R
+        self.kernel = magnet.demag_field.kernel
 
         # in the aspect tests, the cellsizes are different
         world = World((1e-9, 1.27e-9, 1.13e-9))
         magnet = Ferromagnet(world, Grid((nx_aspect, ny_aspect, nz_aspect)))
-        self.kernel_aspect = _cpp._demag_kernel(magnet._impl, order, eps, R)
+        magnet.demag_field.order = order
+        magnet.demag_field.epsilon = eps
+        magnet.demag_field.switch_radius = R
+        self.kernel_aspect = magnet.demag_field.kernel
 
         # open all files
         script_dir = Path(__file__).resolve().parent
@@ -81,7 +90,10 @@ class TestDemag:
         nx, ny, nz = 126, 64, 8
         world = World((1e-9, 1e-9, 1e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus_result = _cpp._demag_kernel(magnet._impl, 11, 5e-10, 5e-9)[0,nz:,ny:, nx:] # Nxx component
+        magnet.demag_field.order = 11
+        magnet.demag_field.epsilon = 5e-10
+        magnet.demag_field.switch_radius = 5e-9
+        mumaxplus_result = magnet.demag_field.kernel[0,nz:,ny:,nx:]
 
         # avoid fake errors when both values are super small
         mask = ~((np.abs(self.exact_Nxx) < 5e-15) & (np.abs(mumaxplus_result) < 5e-15))
@@ -138,3 +150,8 @@ class TestDemag:
 
         err = np.max(relative_error(mumaxplus_result, self.exact_aspect_Nxy))
         assert err < 1e-5
+
+
+world = World((1e-9, 1e-9, 1e-9))
+magnet = Ferromagnet(world, Grid((nx, ny, nz)))
+print(magnet.demag_field.kernel)

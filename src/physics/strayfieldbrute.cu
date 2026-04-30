@@ -74,3 +74,7 @@ Field StrayFieldBruteExecutor::exec() const {
   }
   return h;
 }
+
+Field StrayFieldBruteExecutor::kernel() const {
+    return kernel_.field();
+}
