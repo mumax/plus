@@ -3,7 +3,6 @@
 Geometry
 ========
 
-# Geometry
 This tutorial will teach you how to set your geometry for your magnets. The `geometry` parameter can accept numpy arrays and functions.
 We'll need some basic code to view the shapes. To pan around in the 3D PyVista plots, you might need to install some extra stuff (namely trame):
 
