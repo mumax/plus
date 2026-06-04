@@ -11,7 +11,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from mumaxplus import World, Grid, Ferromagnet
 import os.path
-from mumaxplus.util.constants import *
+from mumaxplus.util.constants import GAMMALL_DEFAULT, MU0
 from mumaxplus.util.formulary import exchange_length
 from mumaxplus.util.shape import XRange
 
@@ -167,8 +167,8 @@ omega_t = vt*k
 omega_l = vl*k
 
 # spin waves
-omega_0 = GAMMALL * Bdc
-omega_M = GAMMALL * MU0 * msat
+omega_0 = GAMMALL_DEFAULT * Bdc
+omega_M = GAMMALL_DEFAULT * MU0 * msat
 P = 1 - (1 - np.exp(-k*cz)) / (k*cz)
 omega_fx = omega_0 + omega_M * (lambda_exch * k**2 + P * np.sin(theta)**2)
 omega_fy = omega_0 + omega_M * (lambda_exch * k**2 + 1 - P)
@@ -182,7 +182,7 @@ ax.plot(k*1e-6, omega_l/(2*np.pi)*1e-9, color="red", lw=linewidth)
 ax.plot(k*1e-6, omega_fm/(2*np.pi)*1e-9, color="green", lw=linewidth, label="magnetic")
 
 # exact coupled analytical dispersion relations
-J = GAMMALL * B1**2 / (rho * msat)
+J = GAMMALL_DEFAULT * B1**2 / (rho * msat)
 
 omega = np.linspace(ymin*(2*np.pi)*1e9, ymax*(2*np.pi)*1e9, 2000)
 k, omega = np.meshgrid(k,omega)

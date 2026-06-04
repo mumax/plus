@@ -67,6 +67,21 @@ void Variable::set(real3 value) const {
   field_->setUniformComponent(2, value.z);
 }
 
+void Variable::setInRegion(const unsigned int region_idx, real value) const {
+  if (ncomp() != 1)
+    throw std::runtime_error("Variable has " + std::to_string(ncomp()) +
+                             "components instead of 1");
+  field_->setUniformComponentInRegion(region_idx, 0, value);
+}
+
+void Variable::setInRegion(const unsigned int region_idx, real3 value) const {
+  if (ncomp() != 3)
+    throw std::runtime_error("Variable has " + std::to_string(ncomp()) +
+                             "components instead of 3");
+  field_->setUniformValueInRegion(region_idx, value);
+}
+
+
 NormalizedVariable::NormalizedVariable(std::shared_ptr<const System> system,
                                        int ncomp,
                                        std::string name,
@@ -84,4 +99,12 @@ void NormalizedVariable::set(real value) const {
 
 void NormalizedVariable::set(real3 value) const {
   Variable::set(normalized(value));
+}
+
+void NormalizedVariable::setInRegion(const unsigned int region_idx, real value) const {
+  Variable::setInRegion(region_idx, 1);
+}
+
+void NormalizedVariable::setInRegion(const unsigned int region_idx, real3 value) const {
+  Variable::setInRegion(region_idx, normalized(value));
 }

@@ -135,7 +135,7 @@ real fieldComponentAverage(const Field& f, int comp) {
   }
   
   real result;
-  int cellsingeo = f.system()->cellsingeo();
+  int cellsingeo = f.system()->cellsInGeo();
   GpuBuffer<real> d_result(1);
   cudaLaunchReductionKernel(k_average, d_result.get(), f.cu(), comp, cellsingeo);
   checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(real),

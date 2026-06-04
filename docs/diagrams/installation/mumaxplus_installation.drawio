@@ -1,0 +1,84 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="1209" dy="536" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="630" pageHeight="472" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-4" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="WIyWlLk6GJQsqaUBKTNV-6" style="rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;edgeStyle=orthogonalEdgeStyle;" target="WIyWlLk6GJQsqaUBKTNV-10" value="&lt;div&gt;Yes&lt;/div&gt;">
+          <mxGeometry relative="1" x="0.2" y="15" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-5" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="WIyWlLk6GJQsqaUBKTNV-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;" target="WIyWlLk6GJQsqaUBKTNV-7" value="No">
+          <mxGeometry relative="1" y="10" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-6" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rhombus;whiteSpace=wrap;html=1;shadow=0;fontFamily=Helvetica;fontSize=12;align=center;strokeWidth=1;spacing=6;spacingTop=-4;" value="&lt;div&gt;Do you have&lt;/div&gt;&lt;div&gt;an NVIDIA GPU?&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="150" x="65" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-7" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" value="&lt;div&gt;&lt;b&gt;Option 1:&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Run mumax⁺ in a&lt;/div&gt;&lt;div&gt;Google Colab notebook&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="150" x="260" y="25" as="geometry" />
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-8" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="AW_GET76onBBrHUR9A3b-2" style="rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;edgeStyle=orthogonalEdgeStyle;" target="WIyWlLk6GJQsqaUBKTNV-11" value="Yes">
+          <mxGeometry relative="1" x="0.2" y="15" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-9" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="AW_GET76onBBrHUR9A3b-0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;exitX=0.994;exitY=0.501;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="WIyWlLk6GJQsqaUBKTNV-12" value="No">
+          <mxGeometry relative="1" x="-0.0583" y="15" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="476" y="315" as="sourcePoint" />
+            <mxPoint x="508" y="315.1" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-10" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rhombus;whiteSpace=wrap;html=1;shadow=0;fontFamily=Helvetica;fontSize=12;align=center;strokeWidth=1;spacing=6;spacingTop=-4;" value="&lt;div&gt;Does your&lt;/div&gt;&lt;div&gt;GPU have a compute&lt;/div&gt;&lt;div&gt;capability&amp;nbsp;≥5.2?&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="155" x="62.5" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-11" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" value="&lt;div&gt;&lt;b&gt;Option 2:&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Download a wheel from&lt;/div&gt;the GitHub releases." vertex="1">
+          <mxGeometry height="50" width="140" x="70" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-12" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" value="&lt;div&gt;&lt;b&gt;Option 3b:&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Clone the Git repo&lt;/div&gt;&lt;div&gt;and build mumax⁺&lt;/div&gt;&lt;div&gt;from source.&lt;/div&gt;" vertex="1">
+          <mxGeometry height="61.25" width="113" x="506.25" y="284.38" as="geometry" />
+        </mxCell>
+        <mxCell id="AW_GET76onBBrHUR9A3b-1" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="WIyWlLk6GJQsqaUBKTNV-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;" target="AW_GET76onBBrHUR9A3b-0" value="No">
+          <mxGeometry relative="1" y="10" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="210" y="170" as="sourcePoint" />
+            <mxPoint x="375" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AW_GET76onBBrHUR9A3b-0" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rhombus;whiteSpace=wrap;html=1;" value="&lt;div&gt;Does the latest&lt;/div&gt;&lt;div&gt;stable&amp;nbsp;release of mumax⁺&lt;/div&gt;fulfill your needs?" vertex="1">
+          <mxGeometry height="95" width="170" x="305" y="267.5" as="geometry" />
+        </mxCell>
+        <mxCell id="AW_GET76onBBrHUR9A3b-3" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="WIyWlLk6GJQsqaUBKTNV-10" style="rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;edgeStyle=orthogonalEdgeStyle;" target="AW_GET76onBBrHUR9A3b-2" value="Yes">
+          <mxGeometry relative="1" x="0.2" y="15" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="135" y="210" as="sourcePoint" />
+            <mxPoint x="135" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AW_GET76onBBrHUR9A3b-2" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rhombus;whiteSpace=wrap;html=1;align=center;" value="&lt;div align=&quot;center&quot;&gt;Do you have&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;(or can you install)&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;Python 3.11-3.14 &lt;i&gt;and&lt;/i&gt; a CUDA driver of&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;version ≥550.54.15 on Linux or&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;≥551.78 on Windows?&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="260" x="10" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="AW_GET76onBBrHUR9A3b-8" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="AW_GET76onBBrHUR9A3b-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="AW_GET76onBBrHUR9A3b-0" value="No">
+          <mxGeometry relative="1" x="-0.2079" y="15" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="335" y="350" as="sourcePoint" />
+            <mxPoint x="480" y="455" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AW_GET76onBBrHUR9A3b-10" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" value="&lt;div&gt;&lt;b&gt;Option 3a:&lt;/b&gt;&lt;/div&gt;&lt;div&gt;pip install mumaxplus&lt;/div&gt;(NOTE: requires CUDA &amp;amp; C++ compilers)" vertex="1">
+          <mxGeometry height="50" width="232.5" x="273.75" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="AW_GET76onBBrHUR9A3b-11" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="AW_GET76onBBrHUR9A3b-0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="AW_GET76onBBrHUR9A3b-10" value="Yes">
+          <mxGeometry relative="1" x="-0.0435" y="20" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="355" y="390" as="sourcePoint" />
+            <mxPoint x="545" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

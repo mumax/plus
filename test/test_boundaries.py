@@ -20,8 +20,6 @@ Open:      0.5958252040658198
 Periodic:  0.5958256832017506
 """
 
-
-import pytest
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World

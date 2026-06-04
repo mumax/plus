@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import Circle, VoronoiTessellator
-from mumaxplus.util import show_field, vortex
+from mumaxplus.util import Circle, VoronoiTessellator, vortex, plot_field, show_regions
 
 # Set up simulation parameters
 N = 256
@@ -33,7 +32,7 @@ magnet.msat = 860e3
 
 # Set vortex magnetization
 magnet.magnetization = vortex(magnet.center, 2*c, 1, 1)
-show_field(magnet.magnetization)
+plot_field(magnet.magnetization)
 
 for i in tessellator.indices:
     # Set random anisotropy axes in each region
@@ -52,13 +51,7 @@ magnet.scale_exchange = 0.9
 # Evolve the world in time
 world.timesolver.run(0.1e-9)
 
-show_field(magnet.magnetization)
+plot_field(magnet.magnetization)
+plot_field(magnet.kc1, imshow_kwargs={"cmap": "Greys"}, enable_colorbar=False)
 
-fig = plt.figure()
-plt.imshow(magnet.kc1()[0][0], vmin=np.unique(magnet.kc1().flatten())[1],
-            vmax=np.max(magnet.kc1()), cmap="Greys")
-plt.title(r"First cubic anisotropy constant $K_{c1}$ (J / m³)")
-plt.xlabel(r"$x$ (m)")
-plt.ylabel(r"$y$ (m)")
-plt.colorbar()
-plt.show()
+show_regions(magnet, geometry=magnet.geometry, imshow_kwargs={"cmap":"Greys"})

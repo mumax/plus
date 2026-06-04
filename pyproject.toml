@@ -1,3 +1,55 @@
+[build-system]
+requires = ["setuptools", "cmake"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mumaxplus"
+dynamic = ["version"]
+dependencies = [
+  "numpy>=2",
+  "scipy",
+  "matplotlib",
+  "pyovf",
+  "tqdm"
+]
+requires-python = ">=3.11"
+authors = [
+  {name = "Jeroen Mulkers", email = "jeroen.mulkers@gmail.com"}
+]
+maintainers = [
+  {name = "Diego De Gusem", email = "diego.degusem@ugent.be"},
+  {name = "Ian Lateur", email = "ian.lateur@ugent.be"},
+  {name = "Lars Moreels", email = "lars.moreels@ugent.be"}
+]
+description = "Finite difference micromagnetic solver"
+readme = "README.md"
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
+keywords = ["mumax", "mumax+", "plus", "antiferromagnetism", "ferrimagnetism", "ferromagnetism", "finite difference", "GPU", "magnetoelasticity", "micromagnetism", "non-collinear antiferromagnetism", "simulation"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: GPU :: NVIDIA CUDA",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Physics"
+]
+
+[project.optional-dependencies]
+all = ["mumaxplus[show]"]
+show = ["pyvista[all,trame]"]
+
+[dependency-groups] # Installable via "pip install --group dev"
+docs = ["sphinx", "sphinxcontrib-video", "sphinx-copybutton", "sphinx-design", "sphinx-book-theme"]
+test = ["pytest", "pandas"]
+dev = [{include-group = "docs"}, {include-group = "test"}]
+
+[project.urls]
+Homepage = "https://mumax.github.io/plus/"
+Repository = "https://github.com/mumax/plus.git"
+"Release notes" = "https://github.com/mumax/plus/releases"
+Documentation = "https://mumax.github.io/plus/api.html"
+Issues = "https://github.com/mumax/plus/issues"
+Paper = "https://doi.org/10.1038/s41524-025-01893-y"
+
 [tool.black]
 target-version = ['py37', 'py38']
 force-exclude = '''
@@ -16,5 +68,6 @@ force-exclude = '''
 minversion = '6.0'
 addopts = '-ra -q --verbose'
 testpaths = ['test']
-[build-system]
-requires = ["setuptools", "cmake"]
+
+[tool.setuptools.dynamic]
+version = { attr = "mumaxplus.__version__" }

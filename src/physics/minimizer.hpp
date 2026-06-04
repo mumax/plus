@@ -4,8 +4,6 @@
 
 #include "quantityevaluator.hpp"
 
-class Antiferromagnet;
-class Ferromagnet;
 class MumaxWorld;
 
 // Minimize follows the steepest descent method as per Exl et al., JAP 115,
@@ -14,7 +12,7 @@ class MumaxWorld;
 class Minimizer {
  public:
   Minimizer(const Ferromagnet*, real stopMaxMagDiff, int nMagDiffSamples);
-  Minimizer(const Antiferromagnet*, real stopMaxMagDiff, int nMagDiffSamples);
+  Minimizer(const HostMagnet*, real stopMaxMagDiff, int nMagDiffSamples);
   Minimizer(const MumaxWorld*, real stopMaxMagDiff, int nMagDiffSamples);
 
   void exec();

@@ -3,7 +3,6 @@
 
 class PoissonSystem:
     """Poisson System which can be solver for the electrostatic potential."""
-
     def __init__(self, impl):
         self._impl = impl
 
@@ -11,20 +10,22 @@ class PoissonSystem:
         """Solve the Poisson equation."""
         return self._impl.solve()
 
-    def set_method(self, method_name):
+    def set_method(self, method_name) -> str:
         """Set the solver method.
 
         The implemented methods are:
-            - jacobi
-            - conjugategradient
-            - minimalresidual
-            - steepestdescent
+
+        * jacobi
+        * conjugategradient
+        * minimalresidual
+        * steepestdescent
+        
         """
         return self._impl.solver.set_method(method_name)
 
     @property
-    def max_iter(self):
-        """Maximum of iterations for the solver (no maximum if <0)."""
+    def max_iter(self) -> int:
+        """Maximum of iterations for the solver (no maximum if < 0)."""
         return self._impl.solver.max_iter
 
     @max_iter.setter
@@ -32,7 +33,7 @@ class PoissonSystem:
         self._impl.solver.max_iter = max_iter
 
     @property
-    def tol(self):
+    def tol(self) -> float:
         """Error tollerance on the max norm of the residual."""
         return self._impl.solver.tol
 
@@ -40,7 +41,7 @@ class PoissonSystem:
     def tol(self, tol):
         self._impl.solver.tol = tol
 
-    def max_norm_residual(self):
+    def max_norm_residual(self) -> float:
         """Return the maximum norm of the residual."""
         return self._impl.solver.max_norm_residual()
 

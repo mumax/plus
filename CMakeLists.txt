@@ -17,7 +17,11 @@ endif()
 
 set(CMAKE_CUDA_ARCHITECTURES native)
 
-add_definitions(-DFP_PRECISION=SINGLE) # FP_PRECISION should be SINGLE or DOUBLE
+set(FP_PRECISION "SINGLE" CACHE STRING "Floating point precision (SINGLE or DOUBLE)")
+add_definitions(-DFP_PRECISION=${FP_PRECISION})
+set(MUMAX_MODULE_NAME "_mumaxpluscpp_single" CACHE STRING "Name of the mumaxpluscpp module")
+add_definitions(-DMUMAX_MODULE_NAME=${MUMAX_MODULE_NAME})
+
 add_definitions(-D_USE_MATH_DEFINES) # Needed for cmath constants on Windows
 
 add_subdirectory(src/bindings)

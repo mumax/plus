@@ -2,28 +2,37 @@
 
 from typing import Callable
 import os as _os
+import warnings
 from tqdm import tqdm as _tqdm
 
 class TimeSolverOutput:
-    """Collect values of a list of quantities on specified timepoints.
+    def __init__(self, quantity_dict, file_name=None, store_as_dict=True):
+        """Collect values of a list of quantities on specified timepoints.
 
-    Parameters
-    ----------
-    quantity_dict : dict
-        Quantities to collect.
-    file_name : str, optional
-        Optional name of an output file, in which the data is also written as
-        tab-separated values.
-    """
-
-    def __init__(self, quantity_dict, file_name=None):
+        Parameters
+        ----------
+        quantity_dict : dict
+            Quantities to collect.
+        file_name : str, optional
+            Optional name of an output file, in which the data is also written as
+            tab-separated values.
+        store_as_dict : bool (default=True)
+            Specify wether to store the data in an output dictionary.
+        """
         self._quantities = quantity_dict
-        self._data = {"time": []}
+        self._values = {}  # dictionary to keep calculated quantities of one step
+        self._data = {"time": []}  # dict to keep all data
         for key in self._quantities.keys():
             self._data[key] = []
 
         self._keys = list(self._data.keys())  # keep list of keys to maintain order
         self._file_name = file_name
+        self._store_as_dict = store_as_dict
+
+        if self._file_name is None and self._store_as_dict is False:
+            warnings.warn("The timesolver output will not be saved or stored if `file_name` "
+            "is not specified and `store_as_dict` is set to `False`. Consider using `run()` instead.")
+
         if self._file_name is not None:
             if directory := _os.path.dirname(self._file_name):
                 _os.makedirs(directory, exist_ok=True)
@@ -32,14 +41,21 @@ class TimeSolverOutput:
 
     def write_line(self, time):
         """Compute all the specified quantities for the current state."""
-        self._data["time"].append(time)
-        for key, func in self._quantities.items():
-            self._data[key].append(func())
 
-        # write all latest data to a new line in file
+        # Compute values
+        self._values["time"] = time
+        for key, func in self._quantities.items():
+            self._values[key] = func()
+
+        # Store in memory
+        if self._store_as_dict:
+            for key, value in self._values.items():
+                self._data[key].append(value)
+
+        # Write to file
         if self._file_name is not None:
             with open(self._file_name, 'a') as file:
-                print(*[self._data[key][-1] for key in self._keys], sep="\t", file=file)
+                print(*[self._values[key] for key in self._keys], sep="\t", file=file)
 
     def __getitem__(self, key):
         """Return the computed values of a quantity."""
@@ -73,11 +89,12 @@ class TimeSolver:
         """Set the Runga Kutta method used by the time solver.
 
         Implemented methods are:
-          'Heun'
-          'BogackiShampine'
-          'CashKarp'
-          'Fehlberg'
-          'DormandPrince'
+        
+        * 'Heun'
+        * 'BogackiShampine'
+        * 'CashKarp'
+        * 'Fehlberg'
+        * 'DormandPrince'
 
         The default and recommended Runge Kutta method is 'Fehlberg'.
         """
@@ -111,7 +128,7 @@ class TimeSolver:
         self._assure_sensible_timestep()
         self._impl.run(duration)
 
-    def solve(self, timepoints, quantity_dict, file_name=None, tqdm=False) -> "TimeSolverOutput":
+    def solve(self, timepoints, quantity_dict, file_name=None, store_as_dict=True, tqdm=False) -> TimeSolverOutput:
         """Solve the differential equation.
 
         The functions collects values of a list of specified quantities
@@ -126,6 +143,8 @@ class TimeSolver:
         file_name : str, optional
             Optional name of an output file, in which the data is also written
             as tab-separated values during the simulation.
+        store_as_dict : bool (default=True)
+            Specify whether to store the evaluated quantities in an output dictionary.
         tqdm : bool (default=False)
             Prints tqdm progress bar if set to True.
 
@@ -133,13 +152,14 @@ class TimeSolver:
         -------
         output : TimeSolverOutput
             Collected values of specified quantities at specified timepoints.
+            If store_as_dict=False, this returns None.
         """
         # check if time points are increasing and lie in the future
         assert all(i1 <= i2 for i1, i2 in zip(timepoints, timepoints[1:])), "The list of timepoints should be increasing."
         assert self.time <= timepoints[0], "The list of timepoints should lie in the future."
 
         self._assure_sensible_timestep()
-        output = TimeSolverOutput(quantity_dict, file_name)
+        output = TimeSolverOutput(quantity_dict, file_name, store_as_dict)
 
         if tqdm: timepoints = _tqdm(timepoints)
         for tp in timepoints:
@@ -149,10 +169,11 @@ class TimeSolver:
             self._impl.run(duration)
 
             output.write_line(self.time)
-        return output
+        if store_as_dict:
+            return output
 
     @property
-    def timestep(self):
+    def timestep(self) -> float:
         """Return the timestep value."""
         return self._impl.timestep
 
@@ -161,7 +182,7 @@ class TimeSolver:
         self._impl.timestep = timestep
 
     @property
-    def adaptive_timestep(self):
+    def adaptive_timestep(self) -> bool:
         """Return the adaptive_timestep value.
 
         True if an adaptive time step is used, False otherwise.
@@ -174,7 +195,7 @@ class TimeSolver:
         self._impl.adaptive_timestep = adaptive
 
     @property
-    def time(self):
+    def time(self) -> float:
         """Return the time value."""
         return self._impl.time
 
@@ -183,7 +204,7 @@ class TimeSolver:
         self._impl.time = time
 
     @property
-    def max_error(self):
+    def max_error(self) -> float:
         """Return the maximum error per step the solver can tollerate.
         
         The default value is 1e-5.
@@ -201,7 +222,7 @@ class TimeSolver:
         self._impl.max_error = error
     
     @property
-    def headroom(self):
+    def headroom(self) -> float:
         """Return the solver headroom.
         
         The default value is 0.8.
@@ -218,7 +239,7 @@ class TimeSolver:
         self._impl.headroom = headr
     
     @property
-    def lower_bound(self):
+    def lower_bound(self) -> float:
         """Return the lower bound which is used to cap the scaling of the time step
         from below.
         
@@ -236,7 +257,7 @@ class TimeSolver:
         self._impl.lower_bound = lower
     
     @property
-    def upper_bound(self):
+    def upper_bound(self) -> float:
         """Return the upper bound which is used to cap the scaling of the time step
         from the top.
         
@@ -254,7 +275,7 @@ class TimeSolver:
         self._impl.upper_bound = upper
     
     @property
-    def sensible_factor(self):
+    def sensible_factor(self) -> float:
         """Return the sensible time step factor which is used as a scaling factor
         when determining a sensible timestep.
         
@@ -272,7 +293,7 @@ class TimeSolver:
         self._impl.sensible_factor = fact
 
     @property
-    def sensible_timestep_default(self):
+    def sensible_timestep_default(self) -> float:
         """Return the time step which is used if no sensible time step
         can be calculated (e.g. when the total torque is zero).
 

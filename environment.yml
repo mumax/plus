@@ -6,6 +6,7 @@ dependencies:
   - python=3.13
   - conda-build
   - pytest
+  - pytest-repeat
   - matplotlib
   - numpy
   - cmake=4.0.0
@@ -29,8 +30,13 @@ dependencies:
   - pyvista
   - pillow  # should be contained in matplotlib
   - pandas
+  - pip:
+      - pyovf
 
   # documentation generation
   - sphinx
-  - sphinx_rtd_theme
+  - sphinx-book-theme
   - numpydoc
+  - sphinxcontrib-video
+  - sphinx-copybutton
+  - sphinx-design

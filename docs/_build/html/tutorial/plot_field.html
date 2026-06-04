@@ -1,0 +1,747 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The plot_field function &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d4b325e0" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=db04a367"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/plot_field';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
+    <link rel="icon" href="../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples.html" />
+    <link rel="prev" title="Single and double floating-point precision" href="precision.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <script>document.write(`<img src="../_static/nimble-plus.png" class="logo__image only-dark" alt="mumax⁺ - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../tutorial.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="langevin.html">Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>The plot_field function</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layers-and-axes">Layers and axes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspecting-components">Inspecting components</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arrows">Arrows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#color-bars">Color bars</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalar-and-tensor-fields">Scalar and tensor fields</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-arrays">Numpy arrays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-customization-and-bookkeeping">Further customization and bookkeeping</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="the-plot-field-function">
+<h1>The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function<a class="headerlink" href="#the-plot-field-function" title="Link to this heading">#</a></h1>
+<p>We will explore the functionality of the <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function, which is a part of the <code class="docutils literal notranslate"><span class="pre">util</span></code> package of <code class="docutils literal notranslate"><span class="pre">mumaxplus</span></code>.
+We will cover</p>
+<ul class="simple">
+<li><p>layers and axes</p></li>
+<li><p>inspecting components</p></li>
+<li><p>arrows</p></li>
+<li><p>color bars</p></li>
+<li><p>scalar and tensor fields</p></li>
+<li><p>numpy arrays</p></li>
+<li><p>further customization and bookkeeping</p></li>
+</ul>
+<p>We will use standard problem 3 as a basis.
+The problem specification can be found on <a class="reference external" href="https://www.ctcms.nist.gov/~rdm/mumag.org.html">the µMAG website</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ferromagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">vortex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util.formulary</span><span class="w"> </span><span class="kn">import</span> <span class="n">exchange_length</span><span class="p">,</span> <span class="n">magnetostatic_energy_density</span>
+
+<span class="n">msat</span> <span class="o">=</span> <span class="mf">800e3</span>
+<span class="n">aex</span> <span class="o">=</span> <span class="mf">13e-12</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.02</span>
+<span class="n">ku1</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">magnetostatic_energy_density</span><span class="p">(</span><span class="n">msat</span><span class="p">)</span>
+<span class="n">anisU</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># close to cube size where vortex and flower states have equal energy</span>
+<span class="n">length_in_lex</span> <span class="o">=</span> <span class="mf">8.46</span>  <span class="c1"># in unit of exchange length</span>
+<span class="n">lex</span> <span class="o">=</span> <span class="n">exchange_length</span><span class="p">(</span><span class="n">aex</span><span class="p">,</span> <span class="n">msat</span><span class="p">)</span>
+<span class="n">length</span> <span class="o">=</span> <span class="n">length_in_lex</span> <span class="o">*</span> <span class="n">lex</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">32</span>
+
+<span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">length</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">length</span> <span class="o">/</span> <span class="n">N</span><span class="p">))</span>
+<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">Grid</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">)))</span>
+
+<span class="n">magnet</span><span class="o">.</span><span class="n">msat</span> <span class="o">=</span> <span class="n">msat</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">aex</span> <span class="o">=</span> <span class="n">aex</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">ku1</span> <span class="o">=</span> <span class="n">ku1</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">anisU</span> <span class="o">=</span> <span class="n">anisU</span>
+
+<span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># flower</span>
+<span class="c1"># magnet.magnetization = vortex(magnet.center, length / 12, -1, 1)  # vortex</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+
+<span class="c1"># make magnetization a shorter variable</span>
+<span class="n">mag</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span>
+</pre></div>
+</div>
+<section id="layers-and-axes">
+<h2>Layers and axes<a class="headerlink" href="#layers-and-axes" title="Link to this heading">#</a></h2>
+<p>Let’s call <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> on the magnetization of the magnet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util.show</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_field</span>
+
+<span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field.png"><img alt="../_images/plot_field.png" class="align-center" src="../_images/plot_field.png" style="width: 600px;" />
+</a>
+<p>As explained by the title, this displays the magnetization in z-layer number 0, so the bottom layer, with the z-axis as the out-of-plane axis.
+We can also look at a different layer.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_layer.png"><img alt="../_images/plot_field_layer.png" class="align-center" src="../_images/plot_field_layer.png" style="width: 600px;" />
+</a>
+<p>Or look along a different out-of-plane axis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">out_of_plane_axis</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">out_of_plane_axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_OoP_x.png"><img alt="../_images/plot_field_OoP_x.png" src="../_images/plot_field_OoP_x.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="../_images/plot_field_OoP_y.png"><img alt="../_images/plot_field_OoP_y.png" src="../_images/plot_field_OoP_y.png" style="width: 45%;" />
+</a>
+<p>A few things to note:</p>
+<ul class="simple">
+<li><p>The arrows always lie in the plotting plane and are scaled according to the magnitude of their projection in that plane.</p></li>
+<li><p>The HSL color scheme is independent of the out-of-plane axis, where the x- and y-components always control the hue and saturation and the z-component controls lightness.</p></li>
+<li><p>The axes make a right-handed coordinate system, hence x is plotted vertically and z horizontally with y as the out-of-plane axis.</p></li>
+</ul>
+<p>Combining these on a single figure can be more convenient. We’ll make our own figure with multiple Axes, and pass each one to the <code class="docutils literal notranslate"><span class="pre">ax</span></code> argument.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">OoP_axis</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="s2">&quot;zyx&quot;</span><span class="p">):</span>
+    <span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">out_of_plane_axis</span><span class="o">=</span><span class="n">OoP_axis</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Magnetization seen along different out-of-plane axes&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_OoP_combined.png"><img alt="../_images/plot_field_OoP_combined.png" class="align-center" src="../_images/plot_field_OoP_combined.png" style="width: 800px;" />
+</a>
+</section>
+<section id="inspecting-components">
+<h2>Inspecting components<a class="headerlink" href="#inspecting-components" title="Link to this heading">#</a></h2>
+<p>It can also be useful to look at an individual component.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">component</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Different components of the magnetization.&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_components.png"><img alt="../_images/plot_field_components.png" class="align-center" src="../_images/plot_field_components.png" style="width: 800px;" />
+</a>
+<p>While this gives a clear overview, it could be useful to fix <code class="docutils literal notranslate"><span class="pre">vmin</span></code> and <code class="docutils literal notranslate"><span class="pre">vmax</span></code> to known values and perhaps change the colormap to a symmetric one like <code class="docutils literal notranslate"><span class="pre">&quot;PuOr&quot;</span></code>. This can be done via the <code class="docutils literal notranslate"><span class="pre">imshow_kwargs</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">imshow_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vmin&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;vmax&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;cmap&quot;</span><span class="p">:</span> <span class="s2">&quot;PuOr&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_imshow_kwargs.png"><img alt="../_images/plot_field_imshow_kwargs.png" class="align-center" src="../_images/plot_field_imshow_kwargs.png" style="width: 600px;" />
+</a>
+<p>We may wish to keep the symmetric color limits, but let it figure out the limits itself. We can set <code class="docutils literal notranslate"><span class="pre">imshow_symmetric_clim</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>, without specifying <code class="docutils literal notranslate"><span class="pre">vmin</span></code> or <code class="docutils literal notranslate"><span class="pre">vmax</span></code>. We also don’t have to specify the colormap in this case (although we still can), because <code class="docutils literal notranslate"><span class="pre">&quot;bwr&quot;</span></code> will automatically be used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">imshow_symmetric_clim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_symmetric_clim.png"><img alt="../_images/plot_field_symmetric_clim.png" class="align-center" src="../_images/plot_field_symmetric_clim.png" style="width: 600px;" />
+</a>
+<p>Inspecting all field components at once is a fairly common action, so <code class="docutils literal notranslate"><span class="pre">inspect_field</span></code> is a function that does just that. It has most of the same functionality as <code class="docutils literal notranslate"><span class="pre">plot_field</span></code>, except for drawing arrows. Via <code class="docutils literal notranslate"><span class="pre">shared_colorbar</span></code>, we can set the color bar of the different components to be shared too.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util.show</span><span class="w"> </span><span class="kn">import</span> <span class="n">inspect_field</span>
+
+<span class="n">inspect_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">shared_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">symmetric_clim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/inspect_field.png"><img alt="../_images/inspect_field.png" class="align-center" src="../_images/inspect_field.png" style="width: 800px;" />
+</a>
+</section>
+<section id="arrows">
+<h2>Arrows<a class="headerlink" href="#arrows" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Change the state to a vortex state to make it more interesting</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">vortex</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">length</span> <span class="o">/</span> <span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We can change the size of the arrows (in number of cells). A smaller arrow_size yields more total arrows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_arrows.png"><img alt="../_images/plot_field_arrows.png" class="align-center" src="../_images/plot_field_arrows.png" style="width: 600px;" />
+</a>
+<p>Or we can disable the arrows altogether.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_disable_quiver.png"><img alt="../_images/plot_field_disable_quiver.png" class="align-center" src="../_images/plot_field_disable_quiver.png" style="width: 600px;" />
+</a>
+<p>The arrows are automatically disabled when looking at only one component, but when plotting vector fields we can enable them again.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_component_enable_quiver.png"><img alt="../_images/plot_field_component_enable_quiver.png" class="align-center" src="../_images/plot_field_component_enable_quiver.png" style="width: 600px;" />
+</a>
+<p>It might be hard to see, so we can change the color of the arrows, the alpha value, shape of the arrows, etc. via <code class="docutils literal notranslate"><span class="pre">quiver_kwargs</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">quiver_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_quiver_kwargs.png"><img alt="../_images/plot_field_quiver_kwargs.png" class="align-center" src="../_images/plot_field_quiver_kwargs.png" style="width: 600px;" />
+</a>
+<p>We can also color the arrows with the same HSL color scheme by setting <code class="docutils literal notranslate"><span class="pre">quiver_cmap</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;HSL&quot;</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">quiver_cmap</span><span class="o">=</span><span class="s2">&quot;HSL&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_quiver_cmap.png"><img alt="../_images/plot_field_quiver_cmap.png" class="align-center" src="../_images/plot_field_quiver_cmap.png" style="width: 600px;" />
+</a>
+<p>Or this can be set to any matplotlib colormap, which will show the out-of-plane component. Just like before, we can control symmetrization of the color limits with <code class="docutils literal notranslate"><span class="pre">quiver_symmetric_clim</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">enable_quiver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">quiver_cmap</span><span class="o">=</span><span class="s2">&quot;Grays_r&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_quiver_symmetric_clim.png"><img alt="../_images/plot_field_quiver_symmetric_clim.png" class="align-center" src="../_images/plot_field_quiver_symmetric_clim.png" style="width: 600px;" />
+</a>
+</section>
+<section id="color-bars">
+<h2>Color bars<a class="headerlink" href="#color-bars" title="Link to this heading">#</a></h2>
+<p>Like with the arrows, we can disable the color bar with <code class="docutils literal notranslate"><span class="pre">enable_colorbar</span> <span class="pre">=</span> <span class="pre">False</span></code>. We can also fully customize the color bar via <code class="docutils literal notranslate"><span class="pre">colorbar_kwargs</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">imshow_symmetric_clim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colorbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ticks&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="s2">&quot;orientation&quot;</span> <span class="p">:</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;$m_x$&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_colorbar_kwargs.png"><img alt="../_images/plot_field_colorbar_kwargs.png" class="align-center" src="../_images/plot_field_colorbar_kwargs.png" style="width: 600px;" />
+</a>
+</section>
+<section id="scalar-and-tensor-fields">
+<h2>Scalar and tensor fields<a class="headerlink" href="#scalar-and-tensor-fields" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">plot_field</span></code> and <code class="docutils literal notranslate"><span class="pre">inspect_field</span></code> also work with fields with more or less than 3 components, although without the arrows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># plotting all energy density components on one figure</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Energy densities&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">E</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">magnet</span><span class="o">.</span><span class="n">exchange_energy_density</span><span class="p">,</span> <span class="n">magnet</span><span class="o">.</span><span class="n">anisotropy_energy_density</span><span class="p">,</span> <span class="n">magnet</span><span class="o">.</span><span class="n">demag_energy_density</span><span class="p">]):</span>
+    <span class="n">plot_field</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_energy_densities.png"><img alt="../_images/plot_field_energy_densities.png" class="align-center" src="../_images/plot_field_energy_densities.png" style="width: 800px;" />
+</a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># parameters for illustrative purposes</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">conductivity</span> <span class="o">=</span> <span class="mf">2.5e6</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">amr_ratio</span> <span class="o">=</span> <span class="mf">0.02</span>
+<span class="n">inspect_field</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">conductivity_tensor</span><span class="p">);</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/inspect_field_conductivity_tensor.png"><img alt="../_images/inspect_field_conductivity_tensor.png" class="align-center" src="../_images/inspect_field_conductivity_tensor.png" style="width: 800px;" />
+</a>
+</section>
+<section id="numpy-arrays">
+<h2>Numpy arrays<a class="headerlink" href="#numpy-arrays" title="Link to this heading">#</a></h2>
+<p>We can’t only plot <code class="docutils literal notranslate"><span class="pre">FieldQuantity</span></code> instances of <code class="docutils literal notranslate"><span class="pre">mumaxplus</span></code>, but also <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> s. This can be useful when working with custom calculations, saved fields or manipulated quantities. Just pass the array as the first argument. The only requirement is that it has the same shape as a <code class="docutils literal notranslate"><span class="pre">FieldQuantity</span></code>, meaning components first, then z, y and x indices.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">vortex</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">length</span> <span class="o">/</span> <span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># vortex</span>
+<span class="n">m_initial</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">magnet</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+<span class="n">m_minimized</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="c1"># our custom calculation</span>
+<span class="n">m_diff</span> <span class="o">=</span> <span class="n">m_minimized</span> <span class="o">-</span> <span class="n">m_initial</span>
+
+<span class="n">plot_field</span><span class="p">(</span><span class="n">m_diff</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_numpy_array.png"><img alt="../_images/plot_field_numpy_array.png" class="align-center" src="../_images/plot_field_numpy_array.png" style="width: 600px;" />
+</a>
+<p>As you can see, we lose some information by using arrays. The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function no longer has information about cell sizes, the name of the quantity, units, geometry, etc. We could customize the plot ourselves (see the last section), but we can also pass an appropriate quantity first and pass the field array we actually want to plot via the <code class="docutils literal notranslate"><span class="pre">field</span></code> argument.
+This can also be used if you want to call <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> multiple times on the same field without always reevaluating that field.
+Let’s set the title to be more appropriate though.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_field</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="n">m_diff</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Magnetization difference in $z$-layer </span><span class="si">{</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="si">}</span><span class="se">\n</span><span class="s2">between initial and minimized states&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_field.png"><img alt="../_images/plot_field_field.png" class="align-center" src="../_images/plot_field_field.png" style="width: 600px;" />
+</a>
+<p>If you do want to set a geometry explicitly, you can do that via the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> argument.</p>
+</section>
+<section id="further-customization-and-bookkeeping">
+<h2>Further customization and bookkeeping<a class="headerlink" href="#further-customization-and-bookkeeping" title="Link to this heading">#</a></h2>
+<p>Lastly, we can customize the plot by passing <code class="docutils literal notranslate"><span class="pre">figsize</span></code>, <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">xlabel</span></code> and <code class="docutils literal notranslate"><span class="pre">ylabel</span></code>, along with the various keyword argument dictionaries as seen before. We can pass <code class="docutils literal notranslate"><span class="pre">ax</span></code> to integrate the plot within our own, and <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> returns the (created) Axes, so we can customize it further afterwards. If we do or do not want to show the figure when plotting, we can change the <code class="docutils literal notranslate"><span class="pre">show</span></code> argument. We can easily save it by passing a <code class="docutils literal notranslate"><span class="pre">file_name</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">MU0</span>
+
+<span class="c1"># make a magnet with exchange length and magnetostatic energy set to 1</span>
+<span class="c1"># as specified in the original problem statement</span>
+<span class="n">cs</span> <span class="o">=</span> <span class="n">length_in_lex</span> <span class="o">/</span> <span class="n">N</span>
+<span class="n">rescaled_world</span> <span class="o">=</span> <span class="n">World</span><span class="p">((</span><span class="n">cs</span><span class="p">,</span> <span class="n">cs</span><span class="p">,</span> <span class="n">cs</span><span class="p">))</span>
+<span class="n">rescaled_magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">rescaled_world</span><span class="p">,</span> <span class="n">Grid</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">)))</span>
+
+<span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">msat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="n">MU0</span><span class="p">)</span>  <span class="c1"># so Km = 1/2 µ0 Msat² = 1</span>
+<span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">aex</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># so l_ex = sqrt(aex / Km) = 1</span>
+<span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">ku1</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># 0.1 * Km as specified</span>
+<span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">anisU</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">vortex</span><span class="p">(</span><span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">length_in_lex</span> <span class="o">/</span> <span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># vortex</span>
+<span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_field</span><span class="p">(</span><span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">arrow_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                <span class="n">xlabel</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$x$ ($l_{\rm ex}$)&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$y$ ($l_{\rm ex}$)&quot;</span><span class="p">,</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Magnetization in</span><span class="se">\n</span><span class="s2">rescaled magnet&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">center</span> <span class="o">=</span> <span class="n">rescaled_magnet</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Center&quot;</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">center</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cs</span><span class="p">,</span> <span class="mi">7</span> <span class="o">*</span> <span class="n">cs</span><span class="p">]),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.05</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/plot_field_customized.png"><img alt="../_images/plot_field_customized.png" class="align-center" src="../_images/plot_field_customized.png" style="width: 400px;" />
+</a>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="precision.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Single and double floating-point precision</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../examples.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layers-and-axes">Layers and axes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspecting-components">Inspecting components</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arrows">Arrows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#color-bars">Color bars</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalar-and-tensor-fields">Scalar and tensor fields</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-arrays">Numpy arrays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-customization-and-bookkeeping">Further customization and bookkeeping</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2026-04-20, v1.2.0.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

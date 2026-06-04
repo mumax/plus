@@ -1,0 +1,653 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Single and double floating-point precision &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d4b325e0" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=db04a367"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/precision';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
+    <link rel="icon" href="../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The plot_field function" href="plot_field.html" />
+    <link rel="prev" title="Temperature" href="langevin.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <script>document.write(`<img src="../_static/nimble-plus.png" class="logo__image only-dark" alt="mumax⁺ - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../tutorial.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="langevin.html">Temperature</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Single and double floating-point precision</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-precision">Choosing a precision</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compilation">Compilation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#possible-errors">Possible errors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-error-floor">Example: error floor</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="single-and-double-floating-point-precision">
+<h1>Single and double floating-point precision<a class="headerlink" href="#single-and-double-floating-point-precision" title="Link to this heading">#</a></h1>
+<p>mumax⁺ can use either single (32-bit) or double (64-bit) floating-point precision.</p>
+<p>By default, single precision is used.</p>
+<section id="choosing-a-precision">
+<h2>Choosing a precision<a class="headerlink" href="#choosing-a-precision" title="Link to this heading">#</a></h2>
+<p>The choice of floating-point precision affects all of mumax⁺, and must therefore be made <strong>before</strong> the line</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mumaxplus</span>
+</pre></div>
+</div>
+<p>is reached.
+Two switches determine which precision will then be loaded, as listed below in descending order of priority.
+Both accept the values <code class="docutils literal notranslate"><span class="pre">SINGLE</span></code>/<code class="docutils literal notranslate"><span class="pre">1</span></code>/<code class="docutils literal notranslate"><span class="pre">32</span></code> for single precision and <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code>/<code class="docutils literal notranslate"><span class="pre">2</span></code>/<code class="docutils literal notranslate"><span class="pre">64</span></code> for double precision.</p>
+<ul>
+<li><p><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">--mumaxplus-fp-precision</span></code> <strong>command-line flag.</strong> Example:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>some_mumax_script.py<span class="w"> </span>--mumaxplus-fp-precision<span class="w"> </span>DOUBLE
+</pre></div>
+</div>
+</li>
+<li><p><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">MUMAXPLUS_FP_PRECISION</span></code> <strong>environment variable.</strong>
+If set globally on your system, this will also affect the compilation process, as explained below.
+It can also be set locally inside a single Python script by writing</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MUMAXPLUS_FP_PRECISION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;DOUBLE&quot;</span>
+</pre></div>
+</div>
+<p><strong>before</strong> the <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">mumaxplus</span></code> statement.</p>
+</li>
+</ul>
+<p>The precision ultimately used by mumax⁺ can be accessed as <code class="docutils literal notranslate"><span class="pre">mumaxplus.FP_PRECISION</span></code>, which will be either <code class="docutils literal notranslate"><span class="pre">&quot;SINGLE&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;DOUBLE&quot;</span></code>.</p>
+<section id="compilation">
+<h3>Compilation<a class="headerlink" href="#compilation" title="Link to this heading">#</a></h3>
+<p>Compiling mumax⁺ normally results in two binaries: one for single and one for double precision.
+However, if the environment variable <code class="docutils literal notranslate"><span class="pre">MUMAXPLUS_FP_PRECISION</span></code> is set, only one binary will be produced, corresponding to the desired precision.
+This can be useful to reduce compile time during development, if only one precision is needed.</p>
+</section>
+</section>
+<section id="possible-errors">
+<h2>Possible errors<a class="headerlink" href="#possible-errors" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">MUMAXPLUS_FP_PRECISION</span></code> to compile the source code for only one floating-point precision, and then asking for the opposite precision with <code class="docutils literal notranslate"><span class="pre">--mumaxplus-fp-precision</span></code> when running a script, will result in a <code class="docutils literal notranslate"><span class="pre">ModuleNotFoundError</span></code>.</p></li>
+<li><p>Since the choice of precision must be made before the <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">mumaxplus</span></code> statement, it is not possible to use single precision in one part of a script and double precision in another: these must be run in separate processes. Reloading mumax⁺ with a different floating-point precision during runtime may lead to a vast wealth of errors.</p></li>
+</ul>
+</section>
+<section id="example-error-floor">
+<h2>Example: error floor<a class="headerlink" href="#example-error-floor" title="Link to this heading">#</a></h2>
+<p>The floating-point precision used has a significant impact on the error floor.</p>
+<p>Below, we compare the numerical and analytical result of 10 precessions of one spin in an external magnetic field of 0.1 T, with damping. Depending on the time step, this results in a different error. The minimum attainable error is dependent on the floating-point precision used.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Show code</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MUMAXPLUS_FP_PRECISION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;SINGLE&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">acos</span><span class="p">,</span> <span class="n">atan</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sqrt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus.util</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">magnetic_moment_precession</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">initial_magnetization</span><span class="p">,</span> <span class="n">hfield_z</span><span class="p">,</span> <span class="n">damping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the analytical solution of the LLG equation for a single magnetic</span>
+<span class="sd">    moment and an applied field along the z direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">mz</span> <span class="o">=</span> <span class="n">initial_magnetization</span>
+    <span class="n">theta0</span> <span class="o">=</span> <span class="n">acos</span><span class="p">(</span><span class="n">mz</span><span class="p">)</span>
+    <span class="n">phi0</span> <span class="o">=</span> <span class="n">atan</span><span class="p">(</span><span class="n">my</span> <span class="o">/</span> <span class="n">mx</span><span class="p">)</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">GAMMALL_DEFAULT</span> <span class="o">*</span> <span class="n">hfield_z</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">damping</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">phi0</span> <span class="o">+</span> <span class="n">freq</span> <span class="o">*</span> <span class="n">time</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">atan</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">damping</span> <span class="o">*</span> <span class="n">freq</span> <span class="o">*</span> <span class="n">time</span><span class="p">)</span> <span class="o">*</span> <span class="n">tan</span><span class="p">(</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">theta0</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">single_system</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function simulates a single spin in a magnetic field of 0.1 T without damping.</span>
+
+<span class="sd">    Returns the absolute error between the simulation and the exact solution.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    method -- The used simulation method</span>
+<span class="sd">    dt     -- The time step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># --- Setup ---</span>
+    <span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">))</span>
+
+    <span class="n">magnetization</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">damping</span> <span class="o">=</span> <span class="mf">0.001</span>
+    <span class="n">hfield_z</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># External field strength</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="n">GAMMALL_DEFAULT</span> <span class="o">*</span> <span class="n">hfield_z</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">damping</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>  <span class="c1"># Time of 10 precessions</span>
+
+    <span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">Grid</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="n">magnet</span><span class="o">.</span><span class="n">enable_demag</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span> <span class="o">=</span> <span class="n">magnetization</span>
+    <span class="n">magnet</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">damping</span>
+    <span class="n">magnet</span><span class="o">.</span><span class="n">aex</span> <span class="o">=</span> <span class="mf">10e-12</span>
+    <span class="n">magnet</span><span class="o">.</span><span class="n">msat</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">MU0</span>
+    <span class="n">world</span><span class="o">.</span><span class="n">bias_magnetic_field</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hfield_z</span><span class="p">)</span>
+
+    <span class="c1"># --- Run the simulation ---</span>
+    <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">set_method</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">adaptive_timestep</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">timestep</span> <span class="o">=</span> <span class="n">dt</span>
+
+    <span class="n">world</span><span class="o">.</span><span class="n">timesolver</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">magnetization</span><span class="o">.</span><span class="n">average</span><span class="p">()</span>
+
+    <span class="c1"># --- Compare with exact solution ---</span>
+    <span class="n">exact</span> <span class="o">=</span> <span class="n">magnetic_moment_precession</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="n">magnetization</span><span class="p">,</span> <span class="n">hfield_z</span><span class="p">,</span> <span class="n">damping</span><span class="p">)</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">exact</span> <span class="o">-</span> <span class="n">output</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">error</span>
+
+
+<span class="n">method_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Heun&quot;</span><span class="p">,</span> <span class="s2">&quot;BogackiShampine&quot;</span><span class="p">,</span> <span class="s2">&quot;CashKarp&quot;</span><span class="p">,</span> <span class="s2">&quot;Fehlberg&quot;</span><span class="p">,</span> <span class="s2">&quot;DormandPrince&quot;</span><span class="p">]</span>
+<span class="n">exact_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Heun&quot;</span><span class="p">,</span> <span class="s2">&quot;Bogacki-Shampine&quot;</span><span class="p">,</span> <span class="s2">&quot;Cash-Karp&quot;</span><span class="p">,</span> <span class="s2">&quot;Fehlberg&quot;</span><span class="p">,</span> <span class="s2">&quot;Dormand-Prince&quot;</span><span class="p">]</span>
+<span class="n">RK_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;RK12&quot;</span><span class="p">,</span> <span class="s2">&quot;RK32&quot;</span><span class="p">,</span> <span class="s2">&quot;RKCK45&quot;</span><span class="p">,</span> <span class="s2">&quot;RKF45&quot;</span><span class="p">,</span> <span class="s2">&quot;RK45&quot;</span><span class="p">]</span>
+<span class="n">exact_order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">dts_lower</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2e-12</span><span class="p">,</span> <span class="mf">4e-12</span><span class="p">,</span> <span class="mf">8e-12</span><span class="p">,</span> <span class="mf">8e-12</span><span class="p">,</span> <span class="mf">8e-12</span><span class="p">]</span> <span class="c1"># Lower bounds for the time steps</span>
+<span class="n">dts_upper</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3e-11</span><span class="p">,</span> <span class="mf">5e-11</span><span class="p">,</span> <span class="mf">8e-11</span><span class="p">,</span> <span class="mf">5e-11</span><span class="p">,</span> <span class="mf">5e-11</span><span class="p">]</span> <span class="c1"># Upper bounds for the time steps</span>
+
+<span class="n">N_dens</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># Amount of datapoints between two powers of 10</span>
+<span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dts_lower</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dts_upper</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">N_dens</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dts_upper</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dts_lower</span><span class="p">[</span><span class="n">i</span><span class="p">]))))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">method_names</span><span class="p">)]</span> <span class="c1"># Time step arrays</span>
+
+
+<span class="c1"># --- Plotting ---</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mf">0.9e-12</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time step (s)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Absolute error after 10 precessions&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Theory&quot;</span><span class="p">)</span>  <span class="c1"># Labels for theoretical results</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Simulation&quot;</span><span class="p">)</span>  <span class="c1"># Labels for simulated results</span>
+
+<span class="c1"># --- Simulation Loops ---</span>
+<span class="n">orders</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">method</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">method_names</span><span class="p">):</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">dts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dts</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">single_system</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">error</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">err</span>
+
+    <span class="c1"># Find the order</span>
+    <span class="n">log_dts</span><span class="p">,</span> <span class="n">log_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dts</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">log_dts</span><span class="p">,</span> <span class="n">log_error</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">orders</span><span class="p">[</span><span class="n">exact_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">order</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">dts</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">error</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">log_dts</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:],</span> <span class="n">log_error</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]</span> <span class="o">-</span> <span class="n">log_dts</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]</span> <span class="o">*</span> <span class="n">exact_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># Only fit the end of the lines</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-14</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">]),</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">intercept</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-14</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">])</span><span class="o">**</span><span class="n">exact_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RK_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">exact_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details><p>With <code class="docutils literal notranslate"><span class="pre">SINGLE</span></code> precision, the error floor after 10 precessions is around <span class="math notranslate nohighlight">\(10^{-4}\)</span>:</p>
+<a class="reference internal image-reference" href="../_images/fp_precision_single.png"><img alt="../_images/fp_precision_single.png" class="align-center" src="../_images/fp_precision_single.png" style="width: 600px;" />
+</a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code> precision, however, the error floor reaches much lower:</p>
+<a class="reference internal image-reference" href="../_images/fp_precision_double.png"><img alt="../_images/fp_precision_double.png" class="align-center" src="../_images/fp_precision_double.png" style="width: 600px;" />
+</a>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="langevin.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Temperature</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="plot_field.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-precision">Choosing a precision</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compilation">Compilation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#possible-errors">Possible errors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-error-floor">Example: error floor</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2026-04-20, v1.2.0.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

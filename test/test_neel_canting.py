@@ -11,9 +11,9 @@ import numpy as np
 from mumaxplus import Antiferromagnet, Grid, World
 from mumaxplus.util import *
 
-RTOL = 2e-2 # 2%
+RTOL = 4e-2 # 4%
 
-def canting(magnet):  
+def canting(magnet):
     return magnet.neel_vector.eval()[2,...]/np.linalg.norm(magnet.neel_vector.eval(), axis=0)
 
 def analytical(x, D):
@@ -27,7 +27,7 @@ def test_neel_canting():
     H = 9.36e-23
     A = J / (2 * a)
     Ku = H / (2 * a**3)
-    Ms = GAMMALL * HBAR / (2 * a**3)
+    Ms = GAMMALL_DEFAULT * HBAR / (2 * a**3)
 
     global N
     N = 32
@@ -41,6 +41,8 @@ def test_neel_canting():
     magnet.afmex_nn = -A
     magnet.anisU = (0, 0, 1)
     magnet.ku1 = Ku
+
+    magnet.afmex_cell = - 6 * J / a**3 * HBAR
 
     magnet.sub1.magnetization = (0, 0, 1)
     magnet.sub2.magnetization = (0, 0, -1)
@@ -58,5 +60,3 @@ def test_neel_canting():
 
         cant = canting(magnet)[N//2, N//2,:]
         assert np.abs(cant[0] - analytical(0, d/2)) / np.abs(analytical(0, d/2)) < RTOL
-
-

@@ -4,7 +4,7 @@
 #include "elasticdamping.hpp"
 #include "elasticenergies.hpp"
 #include "elastodynamics.hpp"
-#include "elasticforce.hpp"
+#include "internalbodyforce.hpp"
 #include "magnet.hpp"
 #include "mumaxworld.hpp"
 #include "poyntingvector.hpp"
@@ -38,9 +38,14 @@ void wrap_magnet(py::module& m) {
       .def_readonly("C12", &Magnet::C12)
       .def_readonly("C44", &Magnet::C44)
       .def_readonly("eta", &Magnet::eta)
+      .def_readonly("stiffness_damping", &Magnet::stiffnessDamping)
+      .def_readonly("eta11", &Magnet::eta11)
+      .def_readonly("eta12", &Magnet::eta12)
+      .def_readonly("eta44", &Magnet::eta44)
       .def_readonly("rho", &Magnet::rho)
       .def_readonly("rigid_norm_strain", &Magnet::rigidNormStrain)
       .def_readonly("rigid_shear_strain", &Magnet::rigidShearStrain)
+      .def_readonly("boundary_traction", &Magnet::boundaryTraction)
 
       .def("stray_field_from_magnet",
           [](const Magnet* m, Magnet* magnet) {
@@ -53,16 +58,20 @@ void wrap_magnet(py::module& m) {
           py::return_value_policy::reference)
   ;
 
-  m.def("_demag_kernel", [](const Magnet* m) {
-    StrayFieldKernel demagKernel(m->grid(), m->grid(), m->world());
+  m.def("_demag_kernel", [](const Magnet* m, int order, double eps, double switchingradius) {
+    StrayFieldKernel demagKernel(m->grid(), m->grid(), m->world(), order, eps, switchingradius);
     return fieldToArray(demagKernel.field());
   });
 
   // Elasticity
   m.def("strain_tensor", &strainTensorQuantity);
+  m.def("strain_rate", &strainRateQuantity);
+  
+  m.def("elastic_stress", &elasticStressQuantity);
+  m.def("viscous_stress", &viscousStressQuantity);
   m.def("stress_tensor", &stressTensorQuantity);
 
-  m.def("elastic_force", &elasticForceQuantity);
+  m.def("internal_body_force", &internalBodyForceQuantity);
   m.def("effective_body_force", &effectiveBodyForceQuantity);
   m.def("elastic_damping", &elasticDampingQuantity);
   m.def("elastic_acceleration", &elasticAccelerationQuantity);

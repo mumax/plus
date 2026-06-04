@@ -42,6 +42,10 @@ class System {
   /** Return the position of the center of this system in the world. */
   real3 center() const;
 
+  /** Return the positions of the edges of this system in the world.
+   *  {xmin, xmax, ymin, ymax, zmin, zmax} */
+  std::array<real, 6> extent() const;
+
   /** Get the geometry of the system. */
   const GpuBuffer<bool>& geometry() const;
   /** Set the geometry of the system. */
@@ -56,7 +60,7 @@ class System {
   void checkIdxInRegions(int idx) const;
 
   /** Return the number of cells which lie within the geometry. */
-  int cellsingeo() const;
+  int cellsInGeo() const;
 
   /** Return a CuSystem which can be copied to the gpu and be used in cuda
    * kernels. */
@@ -68,8 +72,10 @@ class System {
  private:
   const World* world_;
   Grid grid_;
+
   mutable GpuBuffer<bool> geometry_;
   mutable GpuBuffer<unsigned int> regions_;
+  int cellsInGeo_;
 
   friend CuSystem;
 };

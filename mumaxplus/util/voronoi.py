@@ -1,7 +1,11 @@
+"""Create a Voronoi tessellator."""
+
 import numpy as _np
 import warnings as _w
 
-import _mumaxpluscpp as _cpp
+from .. import _cpp
+from mumaxplus.world import World
+from mumaxplus.grid import Grid
 
 class VoronoiTessellator:
 
@@ -10,10 +14,12 @@ class VoronoiTessellator:
         """Create a Voronoi tessellator instance.
         
         This class is used to generate a Voronoi tessellation, which can
-        be done using either the `generate` or the `coo_to_idx` method.
+        be done using either the :func:`generate` or the :func:`coo_to_idx` method.
 
-        **Important:** other methods in this class cannot be used unless
-        `generate` has been called. E.g. retrieving a list of region
+        Important
+        ---------
+        Other methods in this class cannot be used unless
+        :func:`generate` has been called. E.g. retrieving a list of region
         indices requires a specified world and grid.
 
         Parameters
@@ -35,24 +41,32 @@ class VoronoiTessellator:
         self.seed = seed if seed is not None else _np.random.randint(1234567)
         self._impl = _cpp.VoronoiTessellator(grainsize, self.seed, max_idx, region_of_center)
 
-    def generate(self, world, grid):
+    def generate(self, world, grid, make_2d=False):
         """Generates a Voronoi tessellation.
 
+        If make_2d is set to True (default: False) the VoronoiTesselator ignores the z-direction,
+        resulting in a tessellation where a region index is uniform in the z-direction.
+
+        **Important:** 2D grids are assumed to lie in the xy-plane.
+
         Returns an ndarray of shape (nz, ny, nx) which is filled
-        with region indices."""
+        with region indices.
+        """
 
         has_pbc = world.pbc_repetitions != (0,0,0)
-        self.tessellation = self._impl.generate(grid._impl, world.cellsize, has_pbc)
+        self.tessellation = self._impl.generate(grid._impl, world.cellsize, has_pbc, make_2d)
         return self.tessellation
     
     def coo_to_idx(self, x, y, z):
         """Returns the region index (int) of the given coordinate within the
         Voronoi tessellation.
 
-        **Important:** This method has no information about the used world and
+        Important
+        ---------
+        This method has no information about the used world and
         grid. E.g. this means that periodic boundary conditions will not apply.
-        This can be overriden by calling `generate` before assinging this function
-        to the `Magnet`'s regions parameter.
+        This can be overriden by calling :func:`generate` before assigning this function
+        to the ``Magnet``'s regions parameter.
         """
         return self._impl.coo_to_idx((x,y,z))
 
@@ -70,7 +84,7 @@ class VoronoiTessellator:
 
         from collections import defaultdict
         tessellation = self.tessellation
-        _, nz, ny, nx = tessellation.shape
+        nz, ny, nx = tessellation.shape
         
         idxs = tessellation.flatten()
         coords = _np.array(_np.meshgrid(range(nx), range(ny), range(nz), indexing='ij')

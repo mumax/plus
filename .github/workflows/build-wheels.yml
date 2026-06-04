@@ -1,0 +1,162 @@
+name: Build wheels
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g., v1.2.0)"
+        required: true
+
+jobs:
+  build-wheels:
+    name: Build (${{ matrix.os.name }}-${{ matrix.os.version }}, CUDA ${{ matrix.cuda }}, py${{ matrix.python }})
+    runs-on: ${{ matrix.os.name }}-${{ matrix.os.version }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - {name: "ubuntu", version: "22.04"}
+          - {name: "windows", version: "latest"}
+        cuda: ["12.4.1"]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build wheel auditwheel
+
+      # ================ LINUX ================
+      - name: Build wheel on Linux (CUDA ${{ matrix.cuda }})
+        if: runner.os == 'Linux'
+        run: |
+          docker run --rm -i \
+            -v $PWD:/src \
+            -w /src \
+            nvidia/cuda:${{ matrix.cuda }}-devel-${{ matrix.os.name }}${{ matrix.os.version }} \
+            bash -euxo pipefail << 'EOF'
+              export DEBIAN_FRONTEND=noninteractive
+
+              echo "=== System info ==="
+              uname -a
+              nvcc --version || true
+
+              echo "=== Installing tools ==="
+              apt-get update
+              apt-get install -y software-properties-common
+              add-apt-repository ppa:deadsnakes/ppa
+              apt-get update
+              apt-get install -y python${{ matrix.python }} python${{ matrix.python }}-venv python${{ matrix.python }}-dev python3-pip cmake tzdata patchelf
+
+              echo "=== Creating virtual environment ==="
+              python${{ matrix.python }} -m venv /venv
+              source /venv/bin/activate
+              python${{ matrix.python }} --version || true
+              pip install --upgrade pip
+              pip install build wheel auditwheel
+
+              echo "=== Starting wheel build ==="
+              python${{ matrix.python }} -m build --wheel
+
+              echo "=== dist contents ==="
+              find dist -maxdepth 2 -type f || echo "dist is empty"
+
+              echo "=== Running auditwheel ==="
+              export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+              auditwheel repair dist/*.whl -w repaired/
+              auditwheel show repaired/*.whl
+
+              echo "=== repaired contents ==="
+              find repaired -maxdepth 2 -type f || echo "repaired is empty"
+          EOF
+      
+      - name: Build source distribution tar.gz
+        if: runner.os == 'Linux' && matrix.python == '3.14'
+        run: |
+          echo "=== Creating clean build directory for .tar.gz --sdist ==="
+          mkdir clean_src
+          rsync -a --exclude build --exclude dist --exclude repaired --exclude '*.egg-info' ./ clean_src/
+          cd clean_src
+          python --version
+          python -m pip install --upgrade pip build
+          python -m build --sdist
+
+      # ================ WINDOWS ================
+      - name: Install CUDA Toolkit (Windows)
+        if: runner.os == 'Windows'
+        uses: Jimver/cuda-toolkit@v0.2.35
+        with:
+          cuda: ${{ matrix.cuda }}
+
+      - name: Build wheel on Windows (CUDA ${{ matrix.cuda }})
+        if: runner.os == 'Windows'
+        env:
+          CUDA_PATH: ${{ env.CUDA_PATH }}
+        run: |
+          cmake --version
+          nvcc --version
+          python --version
+          python -m pip install --upgrade pip build wheel
+          python -m build --wheel
+
+      # ================ UPLOAD ================
+      - name: Upload wheel artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: mumaxplus-${{ matrix.os.name }}-${{ matrix.os.version }}-cuda${{ matrix.cuda }}-py${{ matrix.python }}
+          path: |
+            dist/mumaxplus-*win*.whl
+            repaired/mumaxplus-*.whl
+            clean_src/dist/mumaxplus-*.tar.gz
+
+  publish-artifacts:
+    needs: build-wheels
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Collect release files
+        run: |
+          rm -rf dist dist-pypi dist-gh-release
+          mkdir dist-pypi dist-gh-release
+          find artifacts -type f -name "*.tar.gz" -exec cp {} dist-pypi/ \;
+          find artifacts -type f -name "*.whl" -exec cp {} dist-gh-release/ \;
+
+          echo "=== PyPI release files ==="
+          ls -lh dist-pypi
+          
+          echo "=== GitHub release files ==="
+          ls -lh dist-gh-release
+
+      - name: Publish .tar.gz to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: dist-pypi/
+
+      - name: Add wheels to release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+          files: dist-gh-release/*
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
