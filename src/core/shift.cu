@@ -5,16 +5,17 @@
 #include "gpubuffer.hpp"
 #include "shift.hpp"
 
-__global__ void k_calculateShiftDirection(int* result, CuField f) {
+__global__ void k_getSignOfLeftValue(int* result, CuField f) {
     const int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (idx == 0) {
         Grid grid = f.system.grid;
-        int3 center_idx = {0,
-            grid.size().y / 2,
-            grid.size().z / 2};
-        real3 centerValue = f.vectorAt(center_idx);
-        int dir = (centerValue.x < 0) ? -1 : 1;
+        int3 coo = {0,
+                    grid.size().y / 2,
+                    grid.size().z / 2};
+        // TODO: check if coo in geometry? What if not?
+        real3 value = f.vectorAt(coo);
+        int dir = (value.x < 0) ? -1 : 1;
         *result = dir;
     }
 }
@@ -36,8 +37,12 @@ __global__ void k_shift_field(CuField result,
 
     if (dst.x >= 0 && dst.x < grid.size().x && field.cellInGeometry(grid.coord2index(dst)))
         val = field.vectorAt(dst);
-    else
-        val = (dir == 1) ? leftValue : rightValue;
+    else {
+        if (dir == 1)
+            val = (leftValue != real3{0, 0, 0}) ? leftValue : field.vectorAt(src);
+        else
+            val = (rightValue != real3{0, 0, 0}) ? rightValue : field.vectorAt(src);
+    }
     result.setVectorInCell(idx, val);
 }
 
@@ -59,28 +64,27 @@ __global__ void k_shift_buffer(T* result, T* data, int ncells, int Nx, int Ny, i
         result[dstIdx] = (dir == 1) ? leftValue : rightValue;
 }
 
+real sgn(real value) {
+    return (value > 0.) ? 1. : -1.;
+}
+
 int calculateShiftDirection(const Field& field, real3 leftValue, real3 rightValue, int comp) {
     real av = field.average()[comp];
     real tolerance = 4.0 / field.grid().size().x;
 
-    int result = 0;
-    if (leftValue == real3{0,0,0} || rightValue == real3{0,0,0}) {
+    // If left insertion value is absent, deduce sign of left domain
+    if (leftValue == real3{0,0,0}) {
         GpuBuffer<int> d_result(1);
-        cudaLaunchReductionKernel(k_calculateShiftDirection, d_result.get(), field.cu());
+        cudaLaunchReductionKernel(k_getSignOfLeftValue, d_result.get(), field.cu());
 
         int result;
         checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(int),
-                                    cudaMemcpyDeviceToHost, getCudaStream()));
+                                       cudaMemcpyDeviceToHost, getCudaStream()));
         leftValue.x = real(result);
-        rightValue.x = -real(result);
     }
 
-    result = leftValue.x > 0.1 ? 1 : -1;
-
-    if (av < -tolerance)
-        return result;
-    else if (av > tolerance)
-        return -result;
+    if (abs(av) > tolerance)
+        return - sgn(leftValue.x) * sgn(av);
     else
         return 0;
 }

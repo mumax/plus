@@ -18,6 +18,7 @@ class Window:
     def insert_magnetization(self, boundary, value):
         """
         Set magnetization value at a given boundary.
+        If none are given (or set to zero), the current edge value is used.
 
         Parameters
         ----------
