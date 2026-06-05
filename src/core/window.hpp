@@ -39,7 +39,7 @@ class Window {
 
 
    // Get total amount shifted
-   real GetTotalShift() const { return -ext_pos_; }
+   real GetTotalShift() const { return ext_pos_; }
    real velocity() const { return ext_vel_; }
 
   private:

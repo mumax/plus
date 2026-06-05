@@ -29,13 +29,13 @@ __global__ void k_shift_field(CuField result,
     if (!field.cellInGeometry(idx)) { return; }
 
     Grid grid = field.system.grid;
-    int3 src = grid.index2coord(idx);
+    const int3 src = grid.index2coord(idx);
 
     real3 val;
-    src.x -= dir;
+    int3 dst = src - int3{dir, 0, 0};
 
-    if (src.x >= 0 && src.x < grid.size().x && field.cellInGeometry(grid.coord2index(src)))
-        val = field.vectorAt(src);
+    if (dst.x >= 0 && dst.x < grid.size().x && field.cellInGeometry(grid.coord2index(dst)))
+        val = field.vectorAt(dst);
     else
         val = (dir == 1) ? leftValue : rightValue;
     result.setVectorInCell(idx, val);
@@ -74,6 +74,7 @@ int calculateShiftDirection(const Field& field, real3 leftValue, real3 rightValu
         leftValue.x = real(result);
         rightValue.x = -real(result);
     }
+
     result = leftValue.x > 0.1 ? 1 : -1;
 
     if (av < -tolerance)

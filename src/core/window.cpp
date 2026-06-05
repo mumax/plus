@@ -52,13 +52,18 @@ template GpuBuffer<unsigned int> Window::centerOnExcitation<unsigned int>(const 
 
 Field Window::centerOnExcitation(const Field& field, int dir, int comp) {
     // TODO: this is only x
+    // TODO: create while-loope (dir != 0) for fast moving DWs (> 1 cell per time step)?
     real cs = field.world()->cellsize().x;
-    ext_pos_ += cs;
-    ext_vel_ = cs / field.world()->timesolver().timestep();
+
+    // Multiply dir by -1 because the field is moved to dir iff the window is moved to -dir
+    ext_pos_ += -1. * dir * cs;
+    ext_vel_ = -1. * dir * cs / field.world()->timesolver().timestep();
     // TODO: this "comp+1" doesn't seem right (because it's not)
+    // TODO: use current boundary value if none are given
     return shift(field, dir, comp, magValues_[comp], magValues_[comp + 1]);
 }
 
+// TODO: this function is unused as of now
 real Window::getDWPositionX(const Field& field) const {
     real av = field.average()[0];
     real cs = field.world()->cellsize().x;
