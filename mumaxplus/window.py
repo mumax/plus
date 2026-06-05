@@ -1,11 +1,9 @@
-import _mumaxpluscpp as _cpp
-
 class Window:
     """Simulation window of the world.
-    
+
     Each world already has its own Window. This Window can be accessed through
     the world.window property.
-    
+
     Windows should not be initialized by the end user.
     """
 

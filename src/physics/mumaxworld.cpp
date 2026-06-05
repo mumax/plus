@@ -341,7 +341,7 @@ void MumaxWorld::centerDomainWall(int comp) {
 
       auto mag = magnet->magnetization()->field();
       int dir = calculateShiftDirection(mag, window_->getMagValues()[0], window_->getMagValues()[1], comp);
-      
+
       int3 size = magnet->grid().size();
       if (dir != 0) {
         // Shift magnetization

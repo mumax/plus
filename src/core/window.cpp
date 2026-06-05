@@ -42,7 +42,7 @@ GpuBuffer<T> Window::centerOnExcitation(const GpuBuffer<T>& data, int dir, int n
         throw std::invalid_argument("Unsupported type in centerOnExcitation. "
                                     "Supported types are bool and unsigned int.");
     }
-    
+
     return shift(data, dir, ncells, nx, ny, left, right);
 }
 // Explicit instantiations

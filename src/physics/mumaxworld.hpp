@@ -273,5 +273,5 @@ class MumaxWorld : public World {
   std::map<std::string, std::unique_ptr<Altermagnet>> altermagnets_;
   std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
 
-  std::unique_ptr<Window> window_ = std::make_unique<Window>(); // Should this be a member of World?
-};                                                              // (I think no.)
+  std::unique_ptr<Window> window_ = std::make_unique<Window>();
+};

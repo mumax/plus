@@ -7,7 +7,7 @@ from .grid import Grid
 from .ferromagnet import Ferromagnet
 from .antiferromagnet import Antiferromagnet
 from .ncafm import NcAfm
-from .util.window import Window
+from .window import Window
 
 import warnings
 
@@ -337,7 +337,7 @@ class World:
         self._impl.unset_pbc()
 
     @property
-    def window(self):
+    def window(self) -> Window:
         """Simulation window for this world."""
         return Window(self._impl.window)
 

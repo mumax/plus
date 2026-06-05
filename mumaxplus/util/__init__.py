@@ -8,7 +8,6 @@ from .mfm import MFM
 from .show import get_rgb, get_rgba, plot_field, inspect_field, show_magnet_geometry, show_field_3D, show_regions
 from .shape import *
 from .voronoi import VoronoiTessellator
-from .window import Window
 
 __all__ = [
     # constants
@@ -28,8 +27,7 @@ __all__ = [
     "show_magnet_geometry",
     "show_field_3D",
     "show_regions",
-    # voronoi
+    # misc
     "VoronoiTessellator",
     "MFM",
-    "Window"
 ]
