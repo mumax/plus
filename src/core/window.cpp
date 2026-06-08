@@ -59,7 +59,7 @@ Field Window::centerOnExcitation(const Field& field, int dir, int comp) {
     ext_pos_ += -1. * dir * cs;
     ext_vel_ = -1. * dir * cs / field.world()->timesolver().timestep();
     // TODO: this "comp+1" doesn't seem right (because it's not)
-    return shift(field, dir, comp, magValues_[comp], magValues_[comp + 1]);
+    return shift(field, dir, comp, magValues_[0], magValues_[1]);
 }
 
 // TODO: this function is unused as of now

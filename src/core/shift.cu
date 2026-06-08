@@ -5,7 +5,7 @@
 #include "gpubuffer.hpp"
 #include "shift.hpp"
 
-__global__ void k_getSignOfLeftValue(int* result, CuField f) {
+__global__ void k_getSignOfLeftValue(int* result, CuField f, int comp) {
     const int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (idx == 0) {
@@ -15,8 +15,8 @@ __global__ void k_getSignOfLeftValue(int* result, CuField f) {
                     grid.size().z / 2};
         // TODO: check if coo in geometry? What if not?
         real3 value = f.vectorAt(coo);
-        int dir = (value.x < 0) ? -1 : 1;
-        *result = dir;
+        int sign = ((&value.x)[comp] < 0) ? -1 : 1;
+        *result = sign;
     }
 }
 
@@ -75,16 +75,16 @@ int calculateShiftDirection(const Field& field, real3 leftValue, real3 rightValu
     // If left insertion value is absent, deduce sign of left domain
     if (leftValue == real3{0,0,0}) {
         GpuBuffer<int> d_result(1);
-        cudaLaunchReductionKernel(k_getSignOfLeftValue, d_result.get(), field.cu());
+        cudaLaunchReductionKernel(k_getSignOfLeftValue, d_result.get(), field.cu(), comp);
 
         int result;
         checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(int),
                                        cudaMemcpyDeviceToHost, getCudaStream()));
-        leftValue.x = real(result);
+        (&leftValue.x)[comp] = real(result);
     }
 
     if (abs(av) > tolerance)
-        return - sgn(leftValue.x) * sgn(av);
+        return - sgn((&leftValue.x)[comp]) * sgn(av);
     else
         return 0;
 }
