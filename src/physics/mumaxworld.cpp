@@ -335,34 +335,50 @@ void MumaxWorld::centerDomainWall(int comp, int axis) {
   if (magnets_.size() > 1)
     throw std::runtime_error("Moving the simulation window is only possible when only one "
                              "magnet lives in the world.");
-  for (const auto& m : ferromagnets_) {
-    Ferromagnet* magnet = m.second.get();
-    timesolver_->setPostStepFunction([this, magnet, comp, axis]() {
+  if (magnets_.size() < 1)
+    throw std::runtime_error("Moving the simulation window is not possible when there is no "
+                             "magnet in the world.");
 
-      auto mag = magnet->magnetization()->field();
-      int dir = calculateShiftDirection(mag,
-                                        window_->getMagValues()[0],
-                                        window_->getMagValues()[1],
-                                        comp,
-                                        axis);
-      int3 size = magnet->grid().size();
-      if (dir != 0) {
-        // Shift magnetization
-        auto shifted = window_->centerOnExcitation(mag, dir, axis, comp);
-        magnet->magnetization()->set(shifted);
+  Magnet* magnet = magnets_.begin()->second;
+  timesolver_->setPostStepFunction([this, magnet, comp, axis]() {
+  const Field& mag = magnet->asHost() ? magnet->asHost()->sublattices()[0]->magnetization()->field()
+                                      : magnet->asFM()->magnetization()->field();
+  int dir = calculateShiftDirection(mag,
+                                    window_->getMagValues()[0],
+                                    window_->getMagValues()[1],
+                                    comp,
+                                    axis);
+    if (dir != 0) {
+      // Shift magnetization
+      auto shifted = window_->centerOnExcitation(mag, dir, axis, comp);
 
-        int ncells = magnet->system()->grid().ncells();
-        // Shift geometry
-        if (magnet->system()->geometry().size() != 0) {
-          auto shifted = window_->centerOnExcitation(magnet->system()->geometry(), dir, axis, ncells, size.x, size.y);
-          magnet->system()->setGeometry(shifted);
-        }
-        // Shift regions
-        if (magnet->system()->regions().size() != 0) {
-          auto shifted = window_->centerOnExcitation(magnet->system()->regions(), dir, axis, ncells, size.x, size.y);
-          magnet->system()->setRegions(shifted);
+      // Multi-sublattice systems
+      if (auto host = magnet->asHost()) {
+        auto sub0 = host->sublattices()[0];
+        sub0->magnetization()->set(shifted);
+        for (auto sub : host->getOtherSublattices(sub0)) {
+          auto shifted = window_->centerOnExcitation(sub->magnetization()->field(), dir, axis, comp);
+          sub->magnetization()->set(shifted);
         }
       }
-    });
-  }
+
+      // Ferromagnet
+      else
+        magnet->asFM()->magnetization()->set(shifted);
+
+      int ncells = magnet->system()->grid().ncells();
+      int3 size = magnet->grid().size();
+
+      // Shift geometry
+      if (magnet->system()->geometry().size() != 0) {
+        auto shifted = window_->centerOnExcitation(magnet->system()->geometry(), dir, axis, ncells, size.x, size.y);
+        magnet->system()->setGeometry(shifted);
+      }
+      // Shift regions
+      if (magnet->system()->regions().size() != 0) {
+        auto shifted = window_->centerOnExcitation(magnet->system()->regions(), dir, axis, ncells, size.x, size.y);
+        magnet->system()->setRegions(shifted);
+      }
+    }
+  });
 }

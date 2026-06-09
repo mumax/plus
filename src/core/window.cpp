@@ -52,6 +52,8 @@ template GpuBuffer<unsigned int> Window::centerOnExcitation<unsigned int>(const 
 
 Field Window::centerOnExcitation(const Field& field, int dir, int axis, int comp) {
     // TODO: create while-loope (dir != 0) for fast moving DWs (> 1 cell per time step)?
+    // TODO: allow for 2D shift
+    // TODO: allow for 3D shift?
     real3 cellsize = field.world()->cellsize();
     real cs = (&cellsize.x)[axis];
 
