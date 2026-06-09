@@ -5,14 +5,16 @@
 #include "gpubuffer.hpp"
 #include "shift.hpp"
 
-__global__ void k_getSignOfLeftValue(int* result, CuField f, int comp) {
+__global__ void k_getSignOfOuterValue(int* result, CuField f, int comp, int axis) {
     const int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (idx == 0) {
         Grid grid = f.system.grid;
-        int3 coo = {0,
+        int3 coo = {grid.size().x / 2,
                     grid.size().y / 2,
                     grid.size().z / 2};
+        (&coo.x)[axis] = 0;
+
         // TODO: check if coo in geometry? What if not?
         real3 value = f.vectorAt(coo);
         int sign = ((&value.x)[comp] < 0) ? -1 : 1;
@@ -23,6 +25,7 @@ __global__ void k_getSignOfLeftValue(int* result, CuField f, int comp) {
 __global__ void k_shift_field(CuField result,
                               CuField field,
                               int dir,
+                              int axis,
                               real3 leftValue,
                               real3 rightValue) {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -30,20 +33,26 @@ __global__ void k_shift_field(CuField result,
     if (!field.cellInGeometry(idx)) { return; }
 
     Grid grid = field.system.grid;
+    int3 gridsize = grid.size();
+
+    real3 value;
+
     const int3 src = grid.index2coord(idx);
 
-    real3 val;
-    int3 dst = src - int3{dir, 0, 0};
+    int3 direction{0, 0, 0};
+    (&direction.x)[axis] = dir;
 
-    if (dst.x >= 0 && dst.x < grid.size().x && field.cellInGeometry(grid.coord2index(dst)))
-        val = field.vectorAt(dst);
+    int3 dst = src - direction;
+
+    if ((&dst.x)[axis] >= 0 && (&dst.x)[axis] < (&gridsize.x)[axis] && field.cellInGeometry(grid.coord2index(dst)))
+        value = field.vectorAt(dst);
     else {
         if (dir == 1)
-            val = (leftValue != real3{0, 0, 0}) ? leftValue : field.vectorAt(src);
+            value = (leftValue != real3{0, 0, 0}) ? leftValue : field.vectorAt(src);
         else
-            val = (rightValue != real3{0, 0, 0}) ? rightValue : field.vectorAt(src);
+            value = (rightValue != real3{0, 0, 0}) ? rightValue : field.vectorAt(src);
     }
-    result.setVectorInCell(idx, val);
+    result.setVectorInCell(idx, value);
 }
 
 template <typename T>
@@ -68,42 +77,42 @@ real sgn(real value) {
     return (value > 0.) ? 1. : -1.;
 }
 
-int calculateShiftDirection(const Field& field, real3 leftValue, real3 rightValue, int comp) {
+int calculateShiftDirection(const Field& field, real3 leftValue, real3 rightValue, int comp, int axis) {
     real av = field.average()[comp];
-    real tolerance = 4.0 / field.grid().size().x;
+    int3 gridsize = field.grid().size();
+    real tolerance = 4.0 / (&gridsize.x)[axis];
 
     // If left insertion value is absent, deduce sign of left domain
     if (leftValue == real3{0,0,0}) {
         GpuBuffer<int> d_result(1);
-        cudaLaunchReductionKernel(k_getSignOfLeftValue, d_result.get(), field.cu(), comp);
+        cudaLaunchReductionKernel(k_getSignOfOuterValue, d_result.get(), field.cu(), comp, axis);
 
         int result;
         checkCudaError(cudaMemcpyAsync(&result, d_result.get(), 1 * sizeof(int),
                                        cudaMemcpyDeviceToHost, getCudaStream()));
         (&leftValue.x)[comp] = real(result);
     }
-
     if (abs(av) > tolerance)
         return - sgn((&leftValue.x)[comp]) * sgn(av);
     else
         return 0;
 }
 
-Field shift(const Field& field, int dir, int comp, real3 leftValue, real3 rightValue) {
+Field shift(const Field& field, int dir, int axis, int comp, real3 leftValue, real3 rightValue) {
     Field result(field.system(), 3);
-    cudaLaunch(field.grid().ncells(), k_shift_field, result.cu(), field.cu(), dir, leftValue, rightValue);
+    cudaLaunch(field.grid().ncells(), k_shift_field, result.cu(), field.cu(), dir, axis, leftValue, rightValue);
     return result;
 }
 
 template <typename T>
-GpuBuffer<T> shift(const GpuBuffer<T>& data, int direction, int ncells, int nx, int ny, T left, T right) {
+GpuBuffer<T> shift(const GpuBuffer<T>& data, int dir, int axis, int ncells, int nx, int ny, T left, T right) {
     GpuBuffer<T> result(data.size());
-    cudaLaunch(ncells, k_shift_buffer, result.get(), data.get(), ncells, nx, ny, direction, left, right);
+    cudaLaunch(ncells, k_shift_buffer, result.get(), data.get(), ncells, nx, ny, dir, left, right);
     cudaStreamSynchronize(getCudaStream());
 
     return result;
 }
 
 // Explicit instantiations
-template GpuBuffer<bool> shift<bool>(const GpuBuffer<bool>&, int, int, int, int, bool, bool);
-template GpuBuffer<unsigned int> shift<unsigned int>(const GpuBuffer<unsigned int>&, int, int, int, int, unsigned int, unsigned int);
+template GpuBuffer<bool> shift<bool>(const GpuBuffer<bool>&, int, int, int, int, int, bool, bool);
+template GpuBuffer<unsigned int> shift<unsigned int>(const GpuBuffer<unsigned int>&, int, int, int, int, int, unsigned int, unsigned int);

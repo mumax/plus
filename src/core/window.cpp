@@ -12,7 +12,7 @@ Window::Window() {
 
 
 template <typename T>
-GpuBuffer<T> Window::centerOnExcitation(const GpuBuffer<T>& data, int dir, int ncells, int nx, int ny) const {
+GpuBuffer<T> Window::centerOnExcitation(const GpuBuffer<T>& data, int dir, int axis, int ncells, int nx, int ny) const {
     // Determine boundaries based on dir
     // TODO: is this right?
     T left, right;
@@ -43,26 +43,25 @@ GpuBuffer<T> Window::centerOnExcitation(const GpuBuffer<T>& data, int dir, int n
                                     "Supported types are bool and unsigned int.");
     }
 
-    return shift(data, dir, ncells, nx, ny, left, right);
+    return shift(data, dir, axis, ncells, nx, ny, left, right);
 }
 // Explicit instantiations
-template GpuBuffer<bool> Window::centerOnExcitation<bool>(const GpuBuffer<bool>&, int, int, int, int) const;
-template GpuBuffer<unsigned int> Window::centerOnExcitation<unsigned int>(const GpuBuffer<unsigned int>&, int, int, int, int) const;
+template GpuBuffer<bool> Window::centerOnExcitation<bool>(const GpuBuffer<bool>&, int, int, int, int, int) const;
+template GpuBuffer<unsigned int> Window::centerOnExcitation<unsigned int>(const GpuBuffer<unsigned int>&, int, int, int, int, int) const;
 
 
-Field Window::centerOnExcitation(const Field& field, int dir, int comp) {
-    // TODO: this is only x
+Field Window::centerOnExcitation(const Field& field, int dir, int axis, int comp) {
     // TODO: create while-loope (dir != 0) for fast moving DWs (> 1 cell per time step)?
-    real cs = field.world()->cellsize().x;
+    real3 cellsize = field.world()->cellsize();
+    real cs = (&cellsize.x)[axis];
 
     // Multiply dir by -1 because the field is moved to dir iff the window is moved to -dir
     ext_pos_ += -1. * dir * cs;
     ext_vel_ = -1. * dir * cs / field.world()->timesolver().timestep();
-    // TODO: this "comp+1" doesn't seem right (because it's not)
-    return shift(field, dir, comp, magValues_[0], magValues_[1]);
+    return shift(field, dir, axis, comp, magValues_[0], magValues_[1]);
 }
 
-// TODO: this function is unused as of now
+// TODO: this function is unused as of now (and outdated)
 real Window::getDWPositionX(const Field& field) const {
     real av = field.average()[0];
     real cs = field.world()->cellsize().x;

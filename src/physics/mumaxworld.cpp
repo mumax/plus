@@ -331,32 +331,35 @@ void MumaxWorld::unsetPBC() {
 // --------------------------------------------------
 
 // Moving simulation window
-void MumaxWorld::centerDomainWall(int comp) {
+void MumaxWorld::centerDomainWall(int comp, int axis) {
   if (magnets_.size() > 1)
     throw std::runtime_error("Moving the simulation window is only possible when only one "
                              "magnet lives in the world.");
   for (const auto& m : ferromagnets_) {
     Ferromagnet* magnet = m.second.get();
-    timesolver_->setPostStepFunction([this, magnet, comp]() {
+    timesolver_->setPostStepFunction([this, magnet, comp, axis]() {
 
       auto mag = magnet->magnetization()->field();
-      int dir = calculateShiftDirection(mag, window_->getMagValues()[0], window_->getMagValues()[1], comp);
-
+      int dir = calculateShiftDirection(mag,
+                                        window_->getMagValues()[0],
+                                        window_->getMagValues()[1],
+                                        comp,
+                                        axis);
       int3 size = magnet->grid().size();
       if (dir != 0) {
         // Shift magnetization
-        auto shifted = window_->centerOnExcitation(mag, dir, comp);
+        auto shifted = window_->centerOnExcitation(mag, dir, axis, comp);
         magnet->magnetization()->set(shifted);
 
         int ncells = magnet->system()->grid().ncells();
         // Shift geometry
         if (magnet->system()->geometry().size() != 0) {
-          auto shifted = window_->centerOnExcitation(magnet->system()->geometry(), dir, ncells, size.x, size.y);
+          auto shifted = window_->centerOnExcitation(magnet->system()->geometry(), dir, axis, ncells, size.x, size.y);
           magnet->system()->setGeometry(shifted);
         }
         // Shift regions
         if (magnet->system()->regions().size() != 0) {
-          auto shifted = window_->centerOnExcitation(magnet->system()->regions(), dir, ncells, size.x, size.y);
+          auto shifted = window_->centerOnExcitation(magnet->system()->regions(), dir, axis, ncells, size.x, size.y);
           magnet->system()->setRegions(shifted);
         }
       }

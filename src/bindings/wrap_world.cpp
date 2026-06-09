@@ -148,6 +148,6 @@ void wrap_world(py::module& m) {
       // Moving simulation window
       .def_property_readonly("window", &MumaxWorld::window,
                              py::return_value_policy::reference)
-      .def("center_DW", &MumaxWorld::centerDomainWall, py::arg("comp"))
+      .def("center_DW", &MumaxWorld::centerDomainWall, py::arg("comp"), py::arg("axis"))
      ;
 }

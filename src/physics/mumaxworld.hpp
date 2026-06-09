@@ -262,7 +262,7 @@ class MumaxWorld : public World {
 
   // Moving simulation window
   Window& window() const { return *window_; }
-  void centerDomainWall(int comp=0);
+  void centerDomainWall(int comp, int axis);
 
 
  private:

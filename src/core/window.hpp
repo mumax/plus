@@ -31,8 +31,8 @@ class Window {
    std::array<unsigned int, 4> getRegValues() { return regValues_; }
 
    template <typename T>
-   GpuBuffer<T> centerOnExcitation(const GpuBuffer<T>& data, int dir, int ncells, int nx, int ny) const;
-   Field centerOnExcitation(const Field& field, int dir, int comp=0);
+   GpuBuffer<T> centerOnExcitation(const GpuBuffer<T>& data, int dir, int axis, int ncells, int nx, int ny) const;
+   Field centerOnExcitation(const Field& field, int dir, int axis, int comp);
 
    // Get DW position
    real getDWPositionX(const Field& field) const;

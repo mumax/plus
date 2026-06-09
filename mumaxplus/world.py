@@ -10,6 +10,7 @@ from .ncafm import NcAfm
 from .window import Window
 
 import warnings
+import numpy as np
 
 class World:
     """Construct a world with a given cell size."""
@@ -341,6 +342,12 @@ class World:
         """Simulation window for this world."""
         return Window(self._impl.window)
 
-    def center_DW(self, comp):
+    def center_DW(self, comp, axis=None):
         "BLABLA doc"
-        self._impl.center_DW(comp)
+        # If no axis is given, return first axis with most number of cells
+        if axis is None:
+            axis = np.argmax(self.bounding_grid.size) # bounding grid is safe if only 1 magnet
+            warnings.warn("There is no normal direction provided in the moving simulation window."
+                          + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"
+                          + " domain wall", UserWarning)
+        self._impl.center_DW(comp, axis)
