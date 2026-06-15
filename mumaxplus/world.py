@@ -358,6 +358,10 @@ class World:
         """Move the simulation window along with the domain wall. This function
         should be called before the `TimeSolver`.
 
+        Note
+        ----
+        The domain wall should be already centered for this function to work properly.
+
         Parameters
         ----------
         comp : int
@@ -370,18 +374,13 @@ class World:
             If axis is `None` (default), then the first axis with the most number of
             grid cells is chosen.
         """
-        if len(self.magnets) > 1:
-            raise RuntimeError("The moving window functionality only works if only 1 magnet exists.")
+        if len(self.magnets) != 1:
+            raise RuntimeError("The moving window functionality only works if exactly 1 magnet exists.")
 
         magnet = list(self.magnets.values())[0]
-        if isinstance(magnet, Ferromagnet):
-            av = magnet.magnetization.average()[comp]
-        else:
-            av = magnet.sub1.magnetization.average()[comp]
-
-        if np.abs(av) > 1e-5: raise ValueError( "It seems no domain wall is centered in the simulation" \
-                                + " space. `center_domain_wall` only works properly when this is the" \
-                                + " case. Please center your domain wall before calling this function.")
+        if np.any(magnet.geometry) or np.any(magnet.regions):
+            raise RuntimeError("The moving window functionality doesn't work well with geometry"
+                               " or regions as of yet.")
 
         # If no axis is given, return first axis with most number of cells
         if axis is None:
