@@ -4,8 +4,10 @@ from . import _cpp
 
 from .timesolver import TimeSolver
 from .grid import Grid
+from .magnet import Magnet
 from .ferromagnet import Ferromagnet
 from .antiferromagnet import Antiferromagnet
+from .altermagnet import Altermagnet
 from .ncafm import NcAfm
 from .window import Window
 
@@ -99,6 +101,11 @@ class World:
         return NcAfm._from_impl(magnet_impl)
 
     @property
+    def magnets(self) -> dict[str,Magnet]:
+        """Get a dictionairy of all magnet names."""
+        return {**self.ferromagnets, **self.antiferromagnets, **self.altermagnets, **self.ncafms}
+
+    @property
     def ferromagnets(self) -> dict[str,Ferromagnet]:
         """Get a dictionairy of :class:`Ferromagnet` names."""
         return {key: Ferromagnet._from_impl(impl) for key, impl in
@@ -109,6 +116,11 @@ class World:
         """Get a dictionairy of :class:`Antiferromagnet` names."""
         return {key: Antiferromagnet._from_impl(impl) for key, impl in
                 self._impl.antiferromagnets.items()}
+    @property
+    def altermagnets(self) -> dict[str,Altermagnet]:
+        """Get a dictionairy of :class:`Altermagnet` names."""
+        return {key: Altermagnet._from_impl(impl) for key, impl in
+                self._impl.altermagnets.items()}
 
     @property
     def ncafms(self):
@@ -342,12 +354,40 @@ class World:
         """Simulation window for this world."""
         return Window(self._impl.window)
 
-    def center_DW(self, comp, axis=None):
-        "BLABLA doc"
+    def center_domain_wall(self, comp, axis=None):
+        """Move the simulation window along with the domain wall. This function
+        should be called before the `TimeSolver`.
+
+        Parameters
+        ----------
+        comp : int
+            The magnetization direction of the domains. The average of this
+            magnetization component will be kept close to zero. Possible values
+            are 0 (x-component), 1 (y-component) and 2 (z-component).
+        axis : int
+            The axis along which the domain wall moves (i.e. the wall normal).
+            Possible values are 0 (x-direction), 1 (y-direction) and 2 (z-direction).
+            If axis is `None` (default), then the first axis with the most number of
+            grid cells is chosen.
+        """
+        if len(self.magnets) > 1:
+            raise RuntimeError("The moving window functionality only works if only 1 magnet exists.")
+
+        magnet = list(self.magnets.values())[0]
+        if isinstance(magnet, Ferromagnet):
+            av = magnet.magnetization.average()[comp]
+        else:
+            av = magnet.sub1.magnetization.average()[comp]
+
+        if np.abs(av) > 1e-5: raise ValueError( "It seems no domain wall is centered in the simulation" \
+                                + " space. `center_domain_wall` only works properly when this is the" \
+                                + " case. Please center your domain wall before calling this function.")
+
         # If no axis is given, return first axis with most number of cells
         if axis is None:
             axis = np.argmax(self.bounding_grid.size) # bounding grid is safe if only 1 magnet
-            warnings.warn("There is no normal direction provided in the moving simulation window."
-                          + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"
-                          + " domain wall", UserWarning)
-        self._impl.center_DW(comp, axis)
+            warnings.warn("There is no axis provided in the moving simulation window."
+                        + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"
+                        + " domain wall", UserWarning)
+
+        self._impl.center_domain_wall(comp, axis)

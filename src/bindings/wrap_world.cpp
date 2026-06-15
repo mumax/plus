@@ -120,7 +120,8 @@ void wrap_world(py::module& m) {
 
       .def_property_readonly("antiferromagnets", &MumaxWorld::antiferromagnets,
            "get a map of all antiferromagnets in this world")
-
+     .def_property_readonly("altermagnets", &MumaxWorld::altermagnets,
+           "get a map of all altermagnets in this world")
      .def_property_readonly("ncafms", &MumaxWorld::ncafms,
            "get a map of all non-collinear antiferromagnets in this world")
 
@@ -148,6 +149,6 @@ void wrap_world(py::module& m) {
       // Moving simulation window
       .def_property_readonly("window", &MumaxWorld::window,
                              py::return_value_policy::reference)
-      .def("center_DW", &MumaxWorld::centerDomainWall, py::arg("comp"), py::arg("axis"))
+      .def("center_domain_wall", &MumaxWorld::centerDomainWall, py::arg("comp"), py::arg("axis"))
      ;
 }

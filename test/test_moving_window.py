@@ -18,27 +18,26 @@ def set_parameters(magnet, comp):
     magnet.aex   = 13e-12
     magnet.alpha = 0.1
     magnet.ku1   = 5e5
-    axis = [0.0, 0.0, 0.0]
-    axis[comp] = 1.0
-    magnet.anisU = tuple(axis)
+    anisU = [0.0, 0.0, 0.0]
+    anisU[comp] = 1.0
+    magnet.anisU = tuple(anisU)
     magnet.xi   = 0.2
     magnet.pol = 1
 
 
-def dw_profile(magnet, comp, axis, width=5, minimize=True):
+def dw_profile(magnet, comp, axis, width=5, center=None, minimize=True):
     nz, ny, nx = magnet.grid.shape
 
     n = (nx, ny, nz)[axis]
-    center = int(0.5 * n)
-
-    m = np.zeros((3, nz, ny, nx))
-
-    np_axis = 2 - axis
+    if center is None:
+        center = int(0.5 * n)
 
     def slc(start, stop):
         s = [slice(None), slice(None), slice(None)]
-        s[np_axis] = slice(start, stop)
+        s[2 - axis] = slice(start, stop)
         return tuple(s)
+
+    m = np.zeros((3, nz, ny, nx))
 
     m[comp][slc(None, center - width)] = 1  # 'left' domain
     m[comp][slc(center + width, None)] = -1 # 'right' domain
@@ -69,6 +68,25 @@ class TestValidBoundary:
         with pytest.raises((ValueError, TypeError, Exception)):
             world.window.insert_magnetization(1.5, (1, 0, 0))
 
+class TestInitialConditions:
+    def test_multiple_magnets(self):
+        world = World((1, 1, 1))
+        magnet_1 = Ferromagnet(world, Grid((10, 10, 1)))
+        magnet_2 = Antiferromagnet(world, Grid((10, 10, 1), origin=(0, 0, 1)))
+        with pytest.raises((RuntimeError)):
+            world.center_domain_wall(0, 0)
+
+    def test_no_domain_wall(self):
+        world, magnet = make_ferromagnet()
+        with pytest.raises((ValueError)):
+            world.center_domain_wall(0, 0)
+
+    def test_off_center_domain_wall(self):
+        world, magnet = make_ferromagnet(nx=64, ny=1, nz=1)
+        dw_profile(magnet, 0, 0, center=20)
+        with pytest.raises((ValueError)):
+            world.center_domain_wall(0, 0)
+
 class TestShift:
     def setup_and_shift(self, comp=0, axis=0, nx=64, ny=1, nz=1, current=1e14):
         world, magnet = make_ferromagnet(nx, ny, nz)
@@ -79,7 +97,7 @@ class TestShift:
         jcur[axis] = current
         magnet.jcur = jcur
 
-        world.center_DW(comp, axis)
+        world.center_domain_wall(comp, axis)
         world.timesolver.run(runtime)
         return world.window.total_shift()
     
@@ -114,7 +132,6 @@ class TestShift:
     def test_opposite_current(self):
         shift_right = self.setup_and_shift(current=1e14)
         shift_left  = self.setup_and_shift(current=-1e14)
-
         assert np.sign(shift_right) != np.sign(shift_left)
 
 
@@ -133,7 +150,7 @@ class TestInsertion:
         left_init  = magnet.magnetization()[comp, :, :,  0].squeeze()
         right_init = magnet.magnetization()[comp, :, :, -1].squeeze()
         
-        world.center_DW(comp, axis)
+        world.center_domain_wall(comp, axis)
         
         magnet.jcur = (1e12, 0, 0)
         world.timesolver.run(runtime)
@@ -152,7 +169,7 @@ class TestInsertion:
         world.window.insert_magnetization(0, np.array([0, 0, left_init]))
         world.window.insert_magnetization(1, np.array([0, 0, right_init]))
         
-        world.center_DW(comp, axis)
+        world.center_domain_wall(comp, axis)
         magnet.jcur = (10e12, 0, 0)
         world.timesolver.run(runtime)
 
@@ -183,13 +200,13 @@ class TestAntiferromagnet:
 
         return world, magnet
 
-    def test_sublattices_shift_same_amount(self):
+    def test_same_shift(self):
         comp, axis = 0, 0
         world, magnet = self.setup(comp, axis)
         m1_before = magnet.sub1.magnetization()
         m2_before = magnet.sub2.magnetization()
 
-        world.center_DW(comp, axis)
+        world.center_domain_wall(comp, axis)
         world.timesolver.run(runtime)
 
         diff1 = np.abs(magnet.sub1.magnetization() - m1_before)
