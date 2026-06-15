@@ -72,6 +72,7 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("poisson_system", &Ferromagnet::poissonSystem)
       .def_readonly("B1", &Ferromagnet::B1)
       .def_readonly("B2", &Ferromagnet::B2)
+      .def_readonly("B_chiral", &Ferromagnet::BChiral)
       
       .def("reset_noise_generator", &Ferromagnet::resetNoiseGenerator)
       .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
