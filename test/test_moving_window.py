@@ -88,6 +88,16 @@ class TestInitialConditions:
         with pytest.raises((RuntimeError)):
             world.center_domain_wall(0, 0)
 
+    def test_origin(self):
+        origin = (5, 6, 7)
+        cellsize = (2e-9, 3e-9, 4e-9)
+        origin_phys = np.array(origin) * np.array(cellsize)
+        world = World(cellsize)
+        magnet = Ferromagnet(world, Grid((11, 12, 13), origin=origin))
+        #set_parameters(magnet, 0)
+        #dw_profile(magnet, 0, 0)
+        assert np.all(np.isclose(world.window.position(), origin_phys))
+
 class TestShift:
     def setup_and_shift(self, comp=0, axis=0, nx=64, ny=1, nz=1, current=1e14):
         world, magnet = make_ferromagnet(nx, ny, nz)
@@ -104,37 +114,42 @@ class TestShift:
     
     def test_axis0(self):
         shift = self.setup_and_shift(comp=0, axis=0, nx=64, ny=1, nz=1)
-        assert abs(shift) >= cs
+        assert abs(shift[0]) >= cs
+        assert shift[1] == 0.0
+        assert shift[2] == 0.0
 
     def test_axis1(self):
         shift = self.setup_and_shift(comp=0, axis=1, nx=1, ny=64, nz=1)
-        assert abs(shift) >= cs
+        assert abs(shift[1]) >= cs
+        assert shift[0] == 0.0
+        assert shift[2] == 0.0
 
     def test_axis2(self):
         shift = self.setup_and_shift(comp=0, axis=2, nx=1, ny=1, nz=64)
-        assert abs(shift) >= cs
+        assert abs(shift[2]) >= cs
+        assert shift[0] == 0.0
+        assert shift[1] == 0.0
 
     def test_comp0(self):
         shift = self.setup_and_shift(comp=0, axis=0)
-        assert abs(shift) >= cs
+        assert abs(shift[0]) >= cs
 
     def test_comp1(self):
         shift = self.setup_and_shift(comp=1, axis=0)
-        assert abs(shift) >= cs
+        assert abs(shift[0]) >= cs
 
     def test_comp2(self):
         shift = self.setup_and_shift(comp=2, axis=0)
-        assert abs(shift) >= cs
+        assert abs(shift[0]) >= cs
 
     def test_no_current(self):
         shift = self.setup_and_shift(comp=0, axis=0, current=0)
-        assert np.isclose(shift, 0.0)
+        assert np.all(np.isclose(shift, 0.0))
 
     def test_opposite_current(self):
-        shift_right = self.setup_and_shift(current=1e14)
-        shift_left  = self.setup_and_shift(current=-1e14)
-        assert np.sign(shift_right) != np.sign(shift_left)
-
+        shift_right = self.setup_and_shift(axis=0, current=1e14)
+        shift_left  = self.setup_and_shift(axis=0, current=-1e14)
+        assert np.sign(shift_right[0]) != np.sign(shift_left[0])
 
 class TestInsertion:
     def setup(self, comp, axis=0):

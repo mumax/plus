@@ -352,7 +352,10 @@ class World:
     @property
     def window(self) -> Window:
         """Simulation window for this world."""
-        return Window(self._impl.window)
+        origin = None
+        if self.bounding_grid.origin != (0, 0, 0):
+            origin = np.array(self.bounding_grid.origin) * np.array(self.cellsize)
+        return Window(self._impl.window, origin)
 
     def center_domain_wall(self, comp, axis=None):
         """Move the simulation window along with the domain wall. This function

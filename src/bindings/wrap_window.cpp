@@ -10,6 +10,7 @@ void wrap_window(py::module& m) {
 
     py::class_<Window>(m, "Window")
         .def(py::init<>())
+        .def("_set_origin", &Window::setOrigin, py::arg("origin"))
         .def("insert_magnetization", [](Window& self, int side, real3 value) {
             self.setMagValue(static_cast<Boundary>(side), value);
         }, py::arg("side"), py::arg("value"))

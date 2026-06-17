@@ -7,8 +7,10 @@ class Window:
     Windows should not be initialized by the end user.
     """
 
-    def __init__(self, impl):
+    def __init__(self, impl, origin=None):
         self._impl = impl
+        if origin is not None:
+            self._impl._set_origin(origin)
 
     def _check_boundary(self, boundary):
         if not isinstance(boundary, int) or boundary not in (0, 1):

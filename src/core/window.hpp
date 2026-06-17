@@ -2,7 +2,6 @@
 
 #include "datatypes.hpp"
 #include "field.hpp"
-#include "parameter.hpp"
 
 #include <vector>
 
@@ -16,6 +15,8 @@ class Window {
    Window();
    ~Window() = default;
 
+   // Set origin of the simulation window
+   void setOrigin(real3 origin) { ext_pos_ = origin; }
    // Set values to be inserted at the boundaries
    void setMagValue(Boundary side, real3 value) { magValues_[idx(side)] = value; }
    // Get values to be inserted at the boundaries
@@ -24,9 +25,9 @@ class Window {
    Field centerOnExcitation(const Field& field, int dir, int axis, int comp);
 
    // Get total amount shifted
-   real position() const { return ext_pos_; }
-   real velocity() const { return ext_vel_; }
-   real GetTotalShift() const { return total_dist_; }
+   real3 position() const { return ext_pos_; }
+   real3 velocity() const { return ext_vel_; }
+   real3 GetTotalShift() const { return total_dist_; }
 
   private:
    // Values to insert at the boundaries
@@ -34,11 +35,11 @@ class Window {
 
 
    // Current excitation position and velocity
-   real ext_pos_;
-   real ext_vel_;
+   real3 ext_pos_;
+   real3 ext_vel_;
 
    // Total distance travelled by excitation
-   real total_dist_;
+   real3 total_dist_;
 
    static constexpr size_t idx(Boundary b) { return static_cast<size_t>(b); }
 };
