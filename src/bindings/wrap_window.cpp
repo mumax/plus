@@ -14,14 +14,8 @@ void wrap_window(py::module& m) {
             self.setMagValue(static_cast<Boundary>(side), value);
         }, py::arg("side"), py::arg("value"))
 
-        .def("insert_geometry", [](Window& self, int side, bool value) {
-            self.setGeoValue(static_cast<Boundary>(side), value);
-        }, py::arg("side"), py::arg("value"))
+        .def("position", &Window::position)
+        .def("velocity", &Window::velocity)
+        .def("total_shift", &Window::GetTotalShift);
 
-        .def("insert_region_index", [](Window& self, int side, unsigned int value) {
-            self.setRegValue(static_cast<Boundary>(side), value);
-        }, py::arg("side"), py::arg("value"))
-
-        .def("total_shift", &Window::GetTotalShift)
-        .def("velocity", &Window::velocity);
-}
+    }

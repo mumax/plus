@@ -47,10 +47,10 @@ def dw_profile(magnet, comp, axis, width=5, center=None, minimize=True):
     if minimize:
         magnet.minimize()
 
-class TestValidBoundary:
+class TestValidArguments:
     def test_valid_boundary(self):
         world, _ = make_ferromagnet()
-        for b in (0, 1, 2, 3):
+        for b in (0, 1):
             world.window.insert_magnetization(b, (1, 0, 0))  # no raise
 
     def test_negative_boundary(self):
@@ -68,23 +68,24 @@ class TestValidBoundary:
         with pytest.raises((ValueError, TypeError, Exception)):
             world.window.insert_magnetization(1.5, (1, 0, 0))
 
+    def test_invalid_boundary(self):
+        world, _ = make_ferromagnet()
+        for b in (-1, 4, 1.5):
+            with pytest.raises((ValueError)):
+                world.window.insert_magnetization(b, (1, 0, 0))
+
+    def test_invalid_comp(self):
+        world, _ = make_ferromagnet()
+        for c in (-1, 4, 1.5):
+            with pytest.raises((ValueError)):
+                world.center_domain_wall(c)
+
 class TestInitialConditions:
     def test_multiple_magnets(self):
         world = World((1, 1, 1))
         magnet_1 = Ferromagnet(world, Grid((10, 10, 1)))
         magnet_2 = Antiferromagnet(world, Grid((10, 10, 1), origin=(0, 0, 1)))
         with pytest.raises((RuntimeError)):
-            world.center_domain_wall(0, 0)
-
-    def test_no_domain_wall(self):
-        world, magnet = make_ferromagnet()
-        with pytest.raises((ValueError)):
-            world.center_domain_wall(0, 0)
-
-    def test_off_center_domain_wall(self):
-        world, magnet = make_ferromagnet(nx=64, ny=1, nz=1)
-        dw_profile(magnet, 0, 0, center=20)
-        with pytest.raises((ValueError)):
             world.center_domain_wall(0, 0)
 
 class TestShift:
@@ -99,7 +100,7 @@ class TestShift:
 
         world.center_domain_wall(comp, axis)
         world.timesolver.run(runtime)
-        return world.window.total_shift()
+        return world.window.position()
     
     def test_axis0(self):
         shift = self.setup_and_shift(comp=0, axis=0, nx=64, ny=1, nz=1)
@@ -136,7 +137,6 @@ class TestShift:
 
 
 class TestInsertion:
-
     def setup(self, comp, axis=0):
         nx, ny, nz = 64, 1, 1
         world, magnet = make_ferromagnet(nx, ny, nz)

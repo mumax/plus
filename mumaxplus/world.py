@@ -360,7 +360,7 @@ class World:
 
         Note
         ----
-        The domain wall should be already centered for this function to work properly.
+        The domain wall should be centered already for this function to work properly.
 
         Parameters
         ----------
@@ -374,11 +374,14 @@ class World:
             If axis is `None` (default), then the first axis with the most number of
             grid cells is chosen.
         """
+        if comp not in (0, 1, 2):
+            raise ValueError("The component `comp` should be 0 (x), 1 (y) or 2 (z).")
+
         if len(self.magnets) != 1:
             raise RuntimeError("The moving window functionality only works if exactly 1 magnet exists.")
 
         magnet = list(self.magnets.values())[0]
-        if np.any(magnet.geometry) or np.any(magnet.regions):
+        if not np.any(magnet.geometry) or np.any(magnet.regions):
             raise RuntimeError("The moving window functionality doesn't work well with geometry"
                                " or regions as of yet.")
 

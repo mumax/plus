@@ -2,7 +2,6 @@
 #include "cudalaunch.hpp"
 #include "cudastream.hpp"
 #include "field.hpp"
-#include "gpubuffer.hpp"
 #include "shift.hpp"
 
 __global__ void k_getSignOfOuterValue(int* result, CuField f, int comp, int axis) {
@@ -55,24 +54,6 @@ __global__ void k_shift_field(CuField result,
     result.setVectorInCell(idx, value);
 }
 
-template <typename T>
-__global__ void k_shift_buffer(T* result, T* data, int ncells, int Nx, int Ny, int dir, T leftValue, T rightValue) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= Nx * Ny) return;
-
-    int row = idx / Nx;
-    int col = idx % Nx;
-
-    int srcCol = col + dir;
-    int srcIdx = row * Nx + srcCol;
-    int dstIdx = row * Nx + col;
-
-    if (srcCol >= 0 && srcCol < Nx)
-        result[dstIdx] = data[srcIdx];
-    else
-        result[dstIdx] = (dir == 1) ? leftValue : rightValue;
-}
-
 real sgn(real value) {
     return (value > 0.) ? 1. : -1.;
 }
@@ -103,16 +84,3 @@ Field shift(const Field& field, int dir, int axis, int comp, real3 leftValue, re
     cudaLaunch(field.grid().ncells(), k_shift_field, result.cu(), field.cu(), dir, axis, leftValue, rightValue);
     return result;
 }
-
-template <typename T>
-GpuBuffer<T> shift(const GpuBuffer<T>& data, int dir, int axis, int ncells, int nx, int ny, T left, T right) {
-    GpuBuffer<T> result(data.size());
-    cudaLaunch(ncells, k_shift_buffer, result.get(), data.get(), ncells, nx, ny, dir, left, right);
-    cudaStreamSynchronize(getCudaStream());
-
-    return result;
-}
-
-// Explicit instantiations
-template GpuBuffer<bool> shift<bool>(const GpuBuffer<bool>&, int, int, int, int, int, bool, bool);
-template GpuBuffer<unsigned int> shift<unsigned int>(const GpuBuffer<unsigned int>&, int, int, int, int, int, unsigned int, unsigned int);

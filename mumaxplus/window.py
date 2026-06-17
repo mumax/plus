@@ -11,8 +11,8 @@ class Window:
         self._impl = impl
 
     def _check_boundary(self, boundary):
-        if not isinstance(boundary, int) or boundary not in (0, 1, 2, 3):
-            raise ValueError(f"Invalid boundary: {boundary}. Must be one of (0, 1, 2, 3).")
+        if not isinstance(boundary, int) or boundary not in (0, 1):
+            raise ValueError(f"Invalid boundary: {boundary}. Must be one of (0, 1).")
 
 
     def insert_magnetization(self, boundary, value):
@@ -23,45 +23,24 @@ class Window:
         Parameters
         ----------
         boundary : int
-            Boundary index: 0 = Left, 1 = Right, 2 = Top, 3 = Bottom
+            Boundary index: 0 = Left/Bottom, 1 = Right/Top
         value : tuple of 3 floats
             Magnetization vector (x, y, z)
         """
         self._check_boundary(boundary)
         self._impl.insert_magnetization(boundary, value)
 
-    def insert_geometry(self, boundary, value):
-        """
-        Set geometry value at a given boundary.
+    @property
+    def position(self):
+        """Returns the current position of the simulation window."""
+        return self._impl.position
 
-        Parameters
-        ----------
-        boundary : int
-            Boundary index: 0 = Left, 1 = Right, 2 = Top, 3 = Bottom
-        value : bool
-        """
-        self._check_boundary(boundary)
-        self._impl.insert_geometry(boundary, value)
-
-    def insert_region_index(self, boundary, value):
-        """
-        Set region value at a given boundary.
-
-        Parameters
-        ----------
-        boundary : int
-            Boundary index: 0 = Left, 1 = Right, 2 = Top, 3 = Bottom
-        value : int
-        """
-        self._check_boundary(boundary)
-        self._impl.insert_region_index(boundary, value)
+    @property
+    def velocity(self):
+        """Returns the current velocity of the simulation window."""
+        return self._impl.velocity
 
     @property
     def total_shift(self):
         """Returns the total amount shifted by the simulation window."""
         return self._impl.total_shift
-
-    @property
-    def velocity(self):
-        """Returns the velocity of the simulation window."""
-        return self._impl.velocity
