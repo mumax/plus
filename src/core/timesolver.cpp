@@ -41,7 +41,6 @@ real TimeSolver::sensibleTimeStep() const {
   for (auto eq : eqs_)
     if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > globalMaxNorm)
       globalMaxNorm = maxNorm;
-
   if (globalMaxNorm == 0) // Sensible timestep cannot be calculated if torque is zero
     return sensibleTimestepDefault_;
   return sensibleFactor_ / globalMaxNorm;

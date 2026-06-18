@@ -85,7 +85,6 @@ class TimeSolver {
   std::function<void()> postStep_ = nullptr;
   std::vector<DynamicEquation> eqs_;
 
-
   //------------- THE INTERNAL STEPPER -----------------------------------------
 
   std::unique_ptr<Stepper> stepper_;
