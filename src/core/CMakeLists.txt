@@ -45,4 +45,4 @@ add_library(core STATIC
 target_include_directories(core PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 target_include_directories(core PUBLIC .)
 
-target_link_libraries(core PUBLIC cudautil)
+target_link_libraries(core PUBLIC cudautil physics)

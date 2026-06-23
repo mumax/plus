@@ -129,6 +129,7 @@ class MumaxWorld : public World {
     magnets_[name] = raw;
 
     handleNewStrayfield(raw);
+    window_->setOrigin(int3_to_real3(grid.origin()) * this->cellsize());
     return raw;
   }
 
@@ -273,5 +274,5 @@ class MumaxWorld : public World {
   std::map<std::string, std::unique_ptr<Altermagnet>> altermagnets_;
   std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
 
-  std::unique_ptr<Window> window_ = std::make_unique<Window>();
+  std::unique_ptr<Window> window_;
 };

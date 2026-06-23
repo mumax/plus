@@ -11,6 +11,7 @@
 #include "system.hpp"
 #include "timesolver.hpp"
 #include "wrappers.hpp"
+#include "window.hpp"
 
 /* Helper function to add any magnet instance to the world*/
 template<typename FuncType>

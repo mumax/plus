@@ -10,35 +10,37 @@ enum class Boundary {
   Right
 };
 
+class MumaxWorld;
 class Window {
   public:
-   Window();
+   explicit Window(MumaxWorld& world);
    ~Window() = default;
 
    // Set origin of the simulation window
-   void setOrigin(real3 origin) { ext_pos_ = origin; }
+   void setOrigin(real3 origin) { origin_ = origin; }
    // Set values to be inserted at the boundaries
    void setMagValue(Boundary side, real3 value) { magValues_[idx(side)] = value; }
    // Get values to be inserted at the boundaries
    std::array<real3, 2> getMagValues() { return magValues_; }
 
+   void move(int dir, int axis, int comp);
    Field centerOnExcitation(const Field& field, int dir, int axis, int comp);
 
    // Get total amount shifted
-   real3 position() const { return ext_pos_; }
-   real3 velocity() const { return ext_vel_; }
-   real3 GetTotalShift() const { return total_dist_; }
+   real3 position() const { return origin_ + position_; }
+   real3 velocity() const { return velocity_; }
+   real3 totalShift() const { return total_dist_; }
 
   private:
+   // Keep reference of the world to which this window belongs
+   MumaxWorld& world_;
+   real3 origin_;
    // Values to insert at the boundaries
    std::array<real3, 2> magValues_;
-
-
-   // Current excitation position and velocity
-   real3 ext_pos_;
-   real3 ext_vel_;
-
-   // Total distance travelled by excitation
+   // Current window position and velocity
+   real3 position_;
+   real3 velocity_;
+   // Total distance travelled by window
    real3 total_dist_;
 
    static constexpr size_t idx(Boundary b) { return static_cast<size_t>(b); }

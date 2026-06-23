@@ -26,12 +26,14 @@
 MumaxWorld::MumaxWorld(real3 cellsize)
     : World(cellsize),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::MumaxWorld(real3 cellsize, Grid mastergrid, int3 pbcRepetitions)
     : World(cellsize, mastergrid, pbcRepetitions),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::~MumaxWorld() {}
 
@@ -344,11 +346,11 @@ void MumaxWorld::centerDomainWall(int comp, int axis) {
   const Field& mag = magnet->asHost() ? magnet->asHost()->sublattices()[0]->magnetization()->field()
                                       : magnet->asFM()->magnetization()->field();
   int dir = calculateShiftDirection(mag,
+                                    comp, axis,
                                     window_->getMagValues()[0],
-                                    window_->getMagValues()[1],
-                                    comp,
-                                    axis);
+                                    window_->getMagValues()[1]);
     if (dir != 0) {
+      window_->move(dir, axis, comp);
       // Shift magnetization
       auto shifted = window_->centerOnExcitation(mag, dir, axis, comp);
 
