@@ -64,7 +64,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-06-11, v1.2.1"/>
   </head>
   
   
@@ -361,7 +361,7 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-1-google-colab">Option 1: Google Colab</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-2-installing-pre-built-wheels">Option 2: Installing pre-built wheels</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-2-installing-a-pre-built-wheel">Option 2: Installing a pre-built wheel</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3-installing-from-source">Option 3: Installing from source</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3a-installing-a-stable-release-from-pypi">Option 3a: Installing a stable release from PyPI</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3b-installing-a-custom-mumax">Option 3b: Installing a custom mumax⁺</a></li>
@@ -388,25 +388,22 @@ The following flowchart may guide you to the easiest option for your situation.<
 <h2>Option 1: Google Colab<a class="headerlink" href="#option-1-google-colab" title="Link to this heading">#</a></h2>
 <p>If you don’t have access to an NVIDIA GPU, you can run mumax⁺ online using Google Colab. Simply make a copy of <a class="reference external" href="https://colab.research.google.com/github/mumax/plus/blob/master/examples/colab.ipynb">this Jupyter notebook</a> and you’re good to go!</p>
 </section>
-<section id="option-2-installing-pre-built-wheels">
-<h2>Option 2: Installing pre-built wheels<a class="headerlink" href="#option-2-installing-pre-built-wheels" title="Link to this heading">#</a></h2>
+<section id="option-2-installing-a-pre-built-wheel">
+<h2>Option 2: Installing a pre-built wheel<a class="headerlink" href="#option-2-installing-a-pre-built-wheel" title="Link to this heading">#</a></h2>
 <p>If you prefer to use your own GPU for more demanding simulations, you must install the mumax⁺ Python package. Pre-built wheels provide the easiest method to do so on Linux or Windows if your system has</p>
 <ul class="simple">
 <li><p>Python 3.11-3.14</p></li>
 <li><p>an NVIDIA GPU with Compute Capability ≥5.2</p></li>
 <li><p>a CUDA driver of version ≥550.54.15 on Linux or ≥551.78 on Windows</p></li>
 </ul>
-<p>If these requirements are fulfilled, you can download the appropriate wheel for your system from the <a class="reference external" href="https://github.com/mumax/plus/releases/latest">most recent GitHub release</a>.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>To check which wheel you should/can download, run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">debug</span> <span class="pre">-v</span></code> to list all wheel tags that are compatible with your system.
-If none of these tags match any <code class="docutils literal notranslate"><span class="pre">.whl</span></code> filename on the GitHub release page, you will have to install mumax⁺ from source, as described in the next subsection.</p>
-</div>
-<p>The <code class="docutils literal notranslate"><span class="pre">.whl</span></code> you downloaded can then simply be installed in your Python environment with</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>wheel_name.whl
+<p>If these requirements are fulfilled, the following command will automatically install mumax⁺ and its required dependencies in your active Python environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>mumaxplus<span class="w"> </span>-f<span class="w"> </span>https://github.com/mumax/plus/releases/expanded_assets/v1.2.1
 </pre></div>
 </div>
-<p>All dependencies of mumax⁺ are then automatically installed in that environment.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some optional dependencies of mumax⁺ (e.g., for 3D plotting) are not installed by default to preserve disk space. Replace <code class="docutils literal notranslate"><span class="pre">mumaxplus</span></code> in the command above by <code class="docutils literal notranslate"><span class="pre">mumaxplus[all]</span></code> to enable all functionality.</p>
+</div>
 </section>
 <section id="option-3-installing-from-source">
 <h2>Option 3: Installing from source<a class="headerlink" href="#option-3-installing-from-source" title="Link to this heading">#</a></h2>
@@ -474,6 +471,10 @@ location.</p>
 </pre></div>
 </div>
 <p>This will install any Python dependencies of mumax⁺ and build mumax⁺ from source.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some optional dependencies of mumax⁺ (e.g., for 3D plotting) are not installed by default to preserve disk space. Use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mumaxplus[all]</span></code> to enable all functionality.</p>
+</div>
 </section>
 <section id="option-3b-installing-a-custom-mumax">
 <h3>Option 3b: Installing a custom mumax⁺<a class="headerlink" href="#option-3b-installing-a-custom-mumax" title="Link to this heading">#</a></h3>
@@ -597,7 +598,7 @@ See <a class="reference external" href="tutorial/precision.html">this tutorial p
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-1-google-colab">Option 1: Google Colab</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-2-installing-pre-built-wheels">Option 2: Installing pre-built wheels</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-2-installing-a-pre-built-wheel">Option 2: Installing a pre-built wheel</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3-installing-from-source">Option 3: Installing from source</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3a-installing-a-stable-release-from-pypi">Option 3a: Installing a stable release from PyPI</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3b-installing-a-custom-mumax">Option 3b: Installing a custom mumax⁺</a></li>
@@ -630,7 +631,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-06-11, v1.2.1.
   <br/>
 </p>
   </div>

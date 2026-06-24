@@ -8,7 +8,7 @@ mumax⁺ can be installed in various ways, listed as the various options below i
 
 If you don't have access to an NVIDIA GPU, you can run mumax⁺ online using Google Colab. Simply make a copy of [this Jupyter notebook](https://colab.research.google.com/github/mumax/plus/blob/master/examples/colab.ipynb) and you're good to go!
 
-## Option 2: Installing pre-built wheels
+## Option 2: Installing a pre-built wheel
 
 If you prefer to use your own GPU for more demanding simulations, you must install the mumax⁺ Python package. Pre-built wheels provide the easiest method to do so on Linux or Windows if your system has
 
@@ -16,19 +16,14 @@ If you prefer to use your own GPU for more demanding simulations, you must insta
 - an NVIDIA GPU with Compute Capability &geq;5.2
 - a CUDA driver of version &geq;550.54.15 on Linux or &geq;551.78 on Windows
 
-If these requirements are fulfilled, you can download the appropriate wheel for your system from the [most recent GitHub release](https://github.com/mumax/plus/releases/latest).
-
-> [!TIP]
-> To check which wheel you should/can download, run `pip debug -v` to list all wheel tags that are compatible with your system.
-> If none of these tags match any `.whl` filename on the GitHub release page, you will have to install mumax⁺ from source, as described in the next subsection.
-
-The `.whl` you downloaded can then simply be installed in your Python environment with
+If these requirements are fulfilled, the following command will automatically install mumax⁺ and its required dependencies in your active Python environment:
 
 ```bash
-pip install wheel_name.whl
+pip install mumaxplus -f https://github.com/mumax/plus/releases/expanded_assets/v1.2.1
 ```
 
-All dependencies of mumax⁺ are then automatically installed in that environment.
+> [!NOTE]
+> Some optional dependencies of mumax⁺ (e.g., for 3D plotting) are not installed by default to preserve disk space. Replace `mumaxplus` in the command above by `mumaxplus[all]` to enable all functionality.
 
 ## Option 3: Installing from source
 
@@ -89,6 +84,9 @@ pip install mumaxplus
 ```
 
 This will install any Python dependencies of mumax⁺ and build mumax⁺ from source.
+
+> [!NOTE]
+> Some optional dependencies of mumax⁺ (e.g., for 3D plotting) are not installed by default to preserve disk space. Use `pip install mumaxplus[all]` to enable all functionality.
 
 ### Option 3b: Installing a custom mumax⁺
 
