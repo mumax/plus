@@ -50,8 +50,6 @@ def sine_displacement(magnet, i_comp, j_comp, B1=0, B2=0, Bc=0):
     i_comp direction. Then calculates and compares analytical and numerical
     magnetoelastic field.
     """
-    magnet.enable_elastodynamics = True  # just in case
-
     magnet.B1 = B1
     magnet.B2 = B2
     magnet.B_chiral = Bc
