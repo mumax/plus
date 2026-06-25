@@ -197,9 +197,6 @@ def test_random():
     magnet.B2 = B2
     magnet.B_chiral = Bc
 
-    L = N*cellsize[0]
-    k = P*2*math.pi/L
-
     def displacement_func(x, y, z):
         return tuple(np.random.rand(3))
 
@@ -220,4 +217,40 @@ def test_random():
             B2 * (strain[i+ip1+2,...] * m[ip1,...] + 
                   strain[i+ip2+2,...] * m[ip2,...]))
 
-    assert max_semirelative_error(B_num, B_anal) < RTOL
+    assert max_semirelative_error(B_num, B_anal) < 1e-6
+
+
+def test_rigid_magnetoelastic_field():
+    """Test with a random magnetization and rigid norm and shear strain.
+    """
+    nx, ny, nz = N, 4, 2  # any shape would do
+
+    world = World(cellsize)
+    magnet =  Ferromagnet(world, Grid((nx, ny, nz)))
+
+    magnet.msat = msat
+    B1, B2, Bc = B, 0.5*B, 0.3*B
+    magnet.B1 = B1
+    magnet.B2 = B2
+    magnet.B_chiral = Bc
+
+    norm_strain = np.random.rand(3, nz, ny, nx)
+    shear_strain = np.random.rand(3, nz, ny, nx)
+    magnet.rigid_norm_strain = norm_strain
+    magnet.rigid_shear_strain = shear_strain
+    
+    B_num = magnet.magnetoelastic_field.eval()
+    B_anal = np.zeros(shape=B_num.shape)
+
+    m = magnet.magnetization.eval()
+    for i in range(3):
+        ip1 = (i+1)%3
+        ip2 = (i+2)%3
+
+        B_anal[i,...] = - 2  / msat * (
+            B1 *  norm_strain[i,...] * m[i,...] + 
+            Bc * (-norm_strain[ip1,...] + norm_strain[ip2,...]) * m[i,...] +
+            B2 * (shear_strain[i+ip1-1,...] * m[ip1,...] + 
+                  shear_strain[i+ip2-1,...] * m[ip2,...]))
+
+    assert max_semirelative_error(B_num, B_anal) < 1e-6
