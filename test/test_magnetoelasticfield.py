@@ -45,14 +45,16 @@ def create_magnet(d_comp, m_comp):
     return magnet
 
 
-def sine_displacement(magnet, i_comp, j_comp, B1, B2):
-    """Creates the displacement following a sine in the d_comp direction
-    and cosine in another direction it then calculates the magnetoelasticforce.
+def sine_displacement(magnet, i_comp, j_comp, B1=0, B2=0, Bc=0):
+    """Creates a displacement in the j_comp direction following a sine along the
+    i_comp direction. Then calculates and compares analytical and numerical
+    magnetoelastic field.
     """
     magnet.enable_elastodynamics = True  # just in case
 
     magnet.B1 = B1
     magnet.B2 = B2
+    magnet.B_chiral = Bc
 
     L = N*cellsize[i_comp]
     k = P*2*math.pi/L
@@ -90,64 +92,93 @@ def sine_displacement(magnet, i_comp, j_comp, B1, B2):
 
         B_anal[i,...] = - 2  / msat * (
             B1 *  strain_anal[i,...] * m[i,...] + 
+            Bc * (-strain_anal[ip1,...] + strain_anal[ip2,...]) * m[i,...] +
             B2 * (strain_anal[i+ip1+2,...] * m[ip1,...] + 
                   strain_anal[i+ip2+2,...] * m[ip2,...]))
 
     assert max_semirelative_error(B_num, B_anal) < RTOL
 
-def test_x_Exx_B1():
+# --- B1 ---
+
+def test_mx_Exx_B1():
     m_comp, i, j = 0, 0, 0
-    B1, B2 = B, 0
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B1=B)
 
-def test_y_Eyy_B1():
+def test_my_Eyy_B1():
     m_comp, i, j = 1, 1, 1
-    B1, B2 = B, 0
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B1=B)
 
-def test_z_Ezz_B1():
+def test_mz_Ezz_B1():
     m_comp, i, j = 2, 2, 2
-    B1, B2 = B, 0
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B1=B)
 
-def test_y_Exy_B2():
+# --- B2 ---
+
+def test_my_Exy_B2():
     m_comp, i, j = 1, 0, 1
-    B1, B2 = 0, B
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B2=B)
 
-def test_z_Exz_B2():
+def test_mz_Exz_B2():
     m_comp, i, j = 2, 0, 2
-    B1, B2 = 0, B
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B2=B)
 
-def test_x_Exy_B2():
+def test_mx_Exy_B2():
     m_comp, i, j = 0, 0, 1
-    B1, B2 = 0, B
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B2=B)
 
-def test_z_Eyz_B2():
+def test_mz_Eyz_B2():
     m_comp, i, j = 2, 1, 2
-    B1, B2 = 0, B
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B2=B)
 
-def test_x_Exz_B2():
+def test_mx_Exz_B2():
     m_comp, i, j = 0, 0, 2
-    B1, B2 = 0, B
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B2=B)
 
-def test_y_Eyz_B2():
+def test_my_Eyz_B2():
     m_comp, i, j = 1, 1, 2
-    B1, B2 = 0, B
     magnet = create_magnet(i, m_comp)
-    sine_displacement(magnet, i, j, B1, B2)
+    sine_displacement(magnet, i, j, B2=B)
+
+# --- Bc ---
+
+def test_mx_Eyy_Bc():
+    m_comp, i, j = 0, 1, 1
+    magnet = create_magnet(i, m_comp)
+    sine_displacement(magnet, i, j, Bc=B)
+
+def test_mx_Ezz_Bc():
+    m_comp, i, j = 0, 2, 2
+    magnet = create_magnet(i, m_comp)
+    sine_displacement(magnet, i, j, Bc=B)
+
+def test_my_Exx_Bc():
+    m_comp, i, j = 1, 0, 0
+    magnet = create_magnet(i, m_comp)
+    sine_displacement(magnet, i, j, Bc=B)
+
+def test_my_Ezz_Bc():
+    m_comp, i, j = 1, 2, 2
+    magnet = create_magnet(i, m_comp)
+    sine_displacement(magnet, i, j, Bc=B)
+
+def test_mz_Exx_Bc():
+    m_comp, i, j = 2, 0, 0
+    magnet = create_magnet(i, m_comp)
+    sine_displacement(magnet, i, j, Bc=B)
+
+def test_mz_Eyy_Bc():
+    m_comp, i, j = 2, 1, 1
+    magnet = create_magnet(i, m_comp)
+    sine_displacement(magnet, i, j, Bc=B)
+
 
 def test_random():
     """Test with a random magnetization and displacement.
@@ -163,9 +194,10 @@ def test_random():
     magnet.enable_elastodynamics = True
 
     magnet.msat = msat
-    B1, B2 = B, 0.5*B
+    B1, B2, Bc = B, 0.5*B, 0.3*B
     magnet.B1 = B1
     magnet.B2 = B2
+    magnet.B_chiral = Bc
 
     L = N*cellsize[0]
     k = P*2*math.pi/L
@@ -186,6 +218,7 @@ def test_random():
 
         B_anal[i,...] = - 2  / msat * (
             B1 *  strain[i,...] * m[i,...] + 
+            Bc * (-strain[ip1,...] + strain[ip2,...]) * m[i,...] +
             B2 * (strain[i+ip1+2,...] * m[ip1,...] + 
                   strain[i+ip2+2,...] * m[ip2,...]))
 
