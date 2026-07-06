@@ -352,10 +352,7 @@ class World:
     @property
     def window(self) -> Window:
         """Simulation window for this world."""
-        origin = None
-        if self.bounding_grid.origin != (0, 0, 0):
-            origin = np.array(self.bounding_grid.origin) * np.array(self.cellsize)
-        return Window(self._impl.window, origin)
+        return Window(self._impl.window)
 
     def center_domain_wall(self, comp, axis=None):
         """Move the simulation window along with the domain wall. This function
@@ -376,6 +373,10 @@ class World:
             Possible values are 0 (x-direction), 1 (y-direction) and 2 (z-direction).
             If axis is `None` (default), then the first axis with the most number of
             grid cells is chosen.
+
+        warning
+        -------
+        `center_domain_wall` will not work properly with non-uniform parameters.
         """
         if comp not in (0, 1, 2):
             raise ValueError("The component `comp` should be 0 (x), 1 (y) or 2 (z).")
@@ -384,7 +385,7 @@ class World:
             raise RuntimeError("The moving window functionality only works if exactly 1 magnet exists.")
 
         magnet = list(self.magnets.values())[0]
-        if not np.any(magnet.geometry) or np.any(magnet.regions):
+        if not np.all(magnet.geometry) or np.any(magnet.regions):
             raise RuntimeError("The moving window functionality doesn't work well with geometry"
                                " or regions as of yet.")
 
@@ -394,5 +395,11 @@ class World:
             warnings.warn("There is no axis provided in the moving simulation window."
                         + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"
                         + " domain wall", UserWarning)
+
+        av = magnet.magnetization.average() if isinstance(magnet, Ferromagnet) else magnet.sub1.magnetization.average()
+        if np.abs(av[comp]) > 1e-2:
+            raise RuntimeError(f"The domain wall does not seem centered (average {('x', 'y', 'z')[comp]}-"
+                              + f"component is {av[comp]:.2e}). `center_domain_wall` only works properly "
+                              + "if the wall is initialized near the center of the magnet.")
 
         self._impl.center_domain_wall(comp, axis)

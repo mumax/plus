@@ -53,21 +53,6 @@ class TestValidArguments:
         for b in (0, 1):
             world.window.insert_magnetization(b, (1, 0, 0))  # no raise
 
-    def test_negative_boundary(self):
-        world, _ = make_ferromagnet()
-        with pytest.raises((ValueError, Exception)):
-            world.window.insert_magnetization(-1, (1, 0, 0))
-
-    def test_boundary_4(self):
-        world, _ = make_ferromagnet()
-        with pytest.raises((ValueError, Exception)):
-            world.window.insert_magnetization(4, (1, 0, 0))
-
-    def test_non_integer_boundary(self):
-        world, _ = make_ferromagnet()
-        with pytest.raises((ValueError, TypeError, Exception)):
-            world.window.insert_magnetization(1.5, (1, 0, 0))
-
     def test_invalid_boundary(self):
         world, _ = make_ferromagnet()
         for b in (-1, 4, 1.5):
@@ -79,8 +64,23 @@ class TestValidArguments:
         for c in (-1, 4, 1.5):
             with pytest.raises((ValueError)):
                 world.center_domain_wall(c)
-
 class TestInitialConditions:
+    def test_geometry(self):
+        w, g = World((1, 1, 1)), Grid((10, 10, 10))
+        geo = np.ones(g.shape)
+        geo[0, 0, 0] = 0
+        magnet = Ferromagnet(w, g, geometry=geo)
+        with pytest.raises((RuntimeError)):
+            w.center_domain_wall(0, 0)
+
+    def test_regions(self):
+        w, g = World((1, 1, 1)), Grid((10, 10, 10))
+        reg = np.zeros(g.shape)
+        reg[0, 0, 0] = 1
+        magnet = Ferromagnet(w, g, regions=reg)
+        with pytest.raises((RuntimeError)):
+            w.center_domain_wall(0, 0)
+
     def test_multiple_magnets(self):
         world = World((1, 1, 1))
         magnet_1 = Ferromagnet(world, Grid((10, 10, 1)))
@@ -94,9 +94,13 @@ class TestInitialConditions:
         origin_phys = np.array(origin) * np.array(cellsize)
         world = World(cellsize)
         magnet = Ferromagnet(world, Grid((11, 12, 13), origin=origin))
-        #set_parameters(magnet, 0)
-        #dw_profile(magnet, 0, 0)
-        assert np.all(np.isclose(world.window.position(), origin_phys))
+        assert np.all(np.isclose(world.window.position, origin_phys, atol=cs/10))
+
+    def test_offset_domain_wall(self):
+        world, magnet = make_ferromagnet(nx=100)
+        dw_profile(magnet, 0, 0, center=20)
+        with pytest.raises((RuntimeError)):
+            world.center_domain_wall(0, 0)
 
 class TestShift:
     def setup_and_shift(self, comp=0, axis=0, nx=64, ny=1, nz=1, current=1e14):
@@ -110,7 +114,7 @@ class TestShift:
 
         world.center_domain_wall(comp, axis)
         world.timesolver.run(runtime)
-        return world.window.position()
+        return world.window.position
     
     def test_axis0(self):
         shift = self.setup_and_shift(comp=0, axis=0, nx=64, ny=1, nz=1)
@@ -144,12 +148,23 @@ class TestShift:
 
     def test_no_current(self):
         shift = self.setup_and_shift(comp=0, axis=0, current=0)
-        assert np.all(np.isclose(shift, 0.0))
+        assert np.all(np.isclose(shift, 0.0, atol=cs/10))
 
     def test_opposite_current(self):
         shift_right = self.setup_and_shift(axis=0, current=1e14)
         shift_left  = self.setup_and_shift(axis=0, current=-1e14)
         assert np.sign(shift_right[0]) != np.sign(shift_left[0])
+
+    def test_zero_average(self):
+        world, magnet = make_ferromagnet(128, 1, 1)
+        set_parameters(magnet, 0)
+        dw_profile(magnet, 0, 0)
+
+        world.center_domain_wall(0, 0)
+        magnet.jcur = (1e12, 0, 0)
+        world.timesolver.run(runtime)
+        av = magnet.magnetization.average()[0]
+        assert np.abs(av) < 1e-2
 
 class TestInsertion:
     def setup(self, comp, axis=0):
@@ -173,7 +188,7 @@ class TestInsertion:
         left  = magnet.magnetization()[comp, :, :,  0].squeeze()
         right = magnet.magnetization()[comp, :, :, -1].squeeze()
 
-        assert np.allclose((left_init, right_init), (left, right), atol=1e-4) # reduce atol when edge charges can be removed
+        assert np.allclose((left_init, right_init), (left, right), atol=cs/10)
 
     def test_insertion_values(self):
         comp, axis = 2, 0
@@ -190,8 +205,7 @@ class TestInsertion:
 
         left  = magnet.magnetization()[comp, :, :,  0].squeeze()
         right = magnet.magnetization()[comp, :, :, -1].squeeze()
-        assert np.allclose((left_init, right_init), (left, right), atol=1e-4) # reduce atol when edge charges can be removed
-
+        assert np.allclose((left_init, right_init), (left, right), atol=cs/10)
 
 class TestAntiferromagnet:
 
@@ -227,4 +241,4 @@ class TestAntiferromagnet:
         diff1 = np.abs(magnet.sub1.magnetization() - m1_before)
         diff2 = np.abs(magnet.sub2.magnetization() - m2_before)
 
-        assert np.allclose(diff1, diff2)
+        assert np.allclose(diff1, diff2, atol=cs/10)
