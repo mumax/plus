@@ -56,6 +56,7 @@ class TimeSolver {
   void enableAdaptiveTimeStep() { fixedTimeStep_ = false; }
   void disableAdaptiveTimeStep() { fixedTimeStep_ = true; }
   void setPostStepFunction(std::function<void()> func) { postStep_ = func; }
+  void clearPostStepFunction() { postStep_ = nullptr; }
 
   //------------- EXECUTING THE SOLVER -----------------------------------------
 

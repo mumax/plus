@@ -22,3 +22,7 @@ void Window::move(int dir, int axis, int comp) {
 Field Window::centerOnExcitation(const Field& field, int dir, int axis, int comp) {
     return shift(field, dir, comp, axis, magValues_[0], magValues_[1]);
 }
+
+void Window::disableMotion() {
+    world_.timesolver().clearPostStepFunction();
+}

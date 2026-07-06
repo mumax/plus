@@ -14,7 +14,6 @@ class Window:
         if not isinstance(boundary, int) or boundary not in (0, 1):
             raise ValueError(f"Invalid boundary: {boundary}. Must be one of (0, 1).")
 
-
     def insert_magnetization(self, boundary, value):
         """
         Set magnetization value at a given boundary.
@@ -32,6 +31,10 @@ class Window:
         """
         self._check_boundary(boundary)
         self._impl.insert_magnetization(boundary, value)
+
+    def disable_motion(self):
+        """Disable the motion of the simulation window."""
+        self._impl.disable_motion()
 
     @property
     def position(self):

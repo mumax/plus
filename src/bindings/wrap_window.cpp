@@ -10,6 +10,6 @@ void wrap_window(py::module& m) {
 
         .def_property_readonly("position", &Window::position)
         .def_property_readonly("velocity", &Window::velocity)
-        .def_property_readonly("total_shift", &Window::totalShift);
-
+        .def_property_readonly("total_shift", &Window::totalShift)
+        .def("disable_motion", &Window::disableMotion);
     }

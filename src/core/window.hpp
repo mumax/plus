@@ -25,6 +25,7 @@ class Window {
 
    void move(int dir, int axis, int comp);
    Field centerOnExcitation(const Field& field, int dir, int axis, int comp);
+   void disableMotion();
 
    // Get total amount shifted
    real3 position() const { return origin_ + position_; }
