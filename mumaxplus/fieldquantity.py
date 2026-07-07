@@ -1,7 +1,6 @@
 """FieldQuantity implementation."""
 
 import numpy as _np
-import pyovf
 from .grid import Grid
 from pathlib import Path
 
@@ -140,6 +139,7 @@ class FieldQuantity:
         Warning
         -------
         self.name returns a string with colons (:). To avoid issues on Windows, these colons are changed to underscores (_)."""
+        import pyovf
         cx, cy, cz = self._impl.system.cellsize
         ovf = pyovf.create(_np.moveaxis(self.eval(), 0, -1), xstepsize=cx, ystepsize=cy, zstepsize=cz, title=self.name)
         ovf.TotalSimTime = self._impl.system.time
@@ -156,6 +156,7 @@ class FieldQuantity:
         ----------
         name : str (default="")
             The name of the OVF file. If the name is empty (the default), it will look for the most recently saved file with this FieldQuantity name."""
+        import pyovf
         if name == "":
             name_replace = self.name.replace(":", "_")
             files = Path(".").glob(f"{name_replace}*.ovf")
