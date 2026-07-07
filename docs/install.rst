@@ -31,7 +31,7 @@ If these requirements are fulfilled, the following command will automatically in
    pip install mumaxplus -f https://github.com/mumax/plus/releases/expanded_assets/v1.2.1
 
 .. note::
-   Some optional dependencies of mumax⁺ (e.g., for 3D plotting) are not installed by default to preserve disk space. Replace ``mumaxplus`` in the command above by ``mumaxplus[all]`` to enable all functionality.
+   Some optional dependencies of mumax⁺ (e.g., 3D plotting or OVF file support) are not installed by default to preserve disk space. Replace ``mumaxplus`` in the command above by ``mumaxplus[all]`` to enable all functionality.
 
 Option 3: Installing from source
 --------------------------------
@@ -96,7 +96,7 @@ If you only need the latest stable version of mumax⁺, you should now be able t
 This will install any Python dependencies of mumax⁺ and build mumax⁺ from source.
 
 .. note::
-   Some optional dependencies of mumax⁺ (e.g., for 3D plotting) are not installed by default to preserve disk space. Use ``pip install mumaxplus[all]`` to enable all functionality.
+   Some optional dependencies of mumax⁺ (e.g., 3D plotting or OVF file support) are not installed by default to preserve disk space. Use ``pip install mumaxplus[all]`` to enable all functionality.
 
 Option 3b: Installing a custom mumax⁺
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
