@@ -18,26 +18,30 @@ If you don't have access to an NVIDIA GPU, you can run mumax⁺ online using Goo
 Option 2: Installing a pre-built wheel
 --------------------------------------
 
-If you prefer to use your own GPU for more demanding simulations, you must install the mumax⁺ Python package. Pre-built wheels provide the easiest method to do so on Linux or Windows if your system has
+If you prefer to use your own GPU for more demanding simulations, you must install the mumax⁺ Python package.
+If your system has
 
 - Python 3.11-3.14
 - an NVIDIA GPU with Compute Capability ≥5.2
 - a CUDA driver of version ≥550.54.15 on Linux or ≥551.78 on Windows
 
-If these requirements are fulfilled, the following command will automatically install mumax⁺ and its required dependencies in your active Python environment:
-
-.. code-block:: bash
-
-   pip install mumaxplus -f https://github.com/mumax/plus/releases/expanded_assets/v1.2.1
+then you can simply run ``pip install mumaxplus`` to automatically install mumax⁺ and its required dependencies in your active Python environment.
 
 .. note::
    Some optional dependencies of mumax⁺ (e.g., for 3D plotting) are not installed by default to preserve disk space. Replace ``mumaxplus`` in the command above by ``mumaxplus[all]`` to enable all functionality.
 
-Option 3: Installing from source
+.. tip::
+   To install older mumax⁺ versions (≥1.2.0), you can use a variation of the following command:
+
+   .. code-block:: bash
+
+      pip install mumaxplus -f https://github.com/mumax/plus/releases/expanded_assets/v1.2.0
+
+Option 3: Building from source
 --------------------------------
 
 mumax⁺ should work on any NVIDIA GPU.
-If no wheel is available for your system/GPU (or you want to contribute to mumax⁺ development), you will have to install mumax⁺ from source.
+If no wheel is available for your system/GPU (or you want to contribute to mumax⁺ development), you will have to build mumax⁺ from source.
 
 For this, you must install the following tools yourself.
 Take care to avoid **version conflicts** between these different types of software and your hardware: open the dropdowns for more details.
@@ -91,7 +95,7 @@ If you only need the latest stable version of mumax⁺, you should now be able t
 
 .. code-block:: bash
 
-   pip install mumaxplus
+   pip install --no-binary=mumaxplus mumaxplus
 
 This will install any Python dependencies of mumax⁺ and build mumax⁺ from source.
 

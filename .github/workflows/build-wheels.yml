@@ -138,6 +138,7 @@ jobs:
           rm -rf dist dist-pypi dist-gh-release
           mkdir dist-pypi dist-gh-release
           find artifacts -type f -name "*.tar.gz" -exec cp {} dist-pypi/ \;
+          find artifacts -type f -name "*.whl" -exec cp {} dist-pypi/ \;
           find artifacts -type f -name "*.whl" -exec cp {} dist-gh-release/ \;
 
           echo "=== PyPI release files ==="
