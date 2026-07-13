@@ -703,7 +703,7 @@ class Ferromagnet(Magnet):
 
         Notes
         -----
-        Materials of the cubic point group 23 (or B20 compounds) can have an additional chiral magnetoelastic coupling, with the following energy density [1]_.
+        Materials of the cubic point group 23 (or B20 compounds) can have a chiral magnetoelastic coupling, with the following energy density [1]_.
 
         .. math:: \mathcal{E} = B_\text{chiral} \sum_{i, j, k} \epsilon_{ijk} \varepsilon_{ii} m_j^2
 
