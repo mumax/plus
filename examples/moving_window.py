@@ -63,9 +63,10 @@ timepoints = np.linspace(0, tmax, 100)
 outputquantities = {"mag": lambda: magnet.magnetization(),
                     "pos": lambda: world.window.position[0]}
 
-output = world.timesolver.solve(timepoints, outputquantities)
+output = world.timesolver.solve(timepoints, outputquantities, tqdm=True)
 
 # ----------- Create movie -----------
+print("Creating animation...")
 fig, axes = plt.subplots(2, 1, figsize=(10, 7))
 
 # Time trace subplot
@@ -84,6 +85,10 @@ ax_trace.grid()
 ax_image = axes[1]
 plot_field(output["mag"][0], ax=ax_image, arrow_size=8)
 
+ax_image.set_xlim(0, int(length/cs))
+ticks = ax_image.get_xticks()
+ticks = ticks[ticks <= int(length/cs)] # remove matplotlibs invisible tick at 300
+
 ax_image.set_title("$t$ = 0.000 ns")
 ax_image.set_xlabel("$x$ (nm)")
 ax_image.set_ylabel("$y$ (nm)")
@@ -98,6 +103,9 @@ def update(frame):
     ax_image.set_xlabel("$x$ (nm)")
     ax_image.set_ylabel("$y$ (nm)")
 
+    # update x-ticks
+    ax_image.set_xticks(ticks)
+    ax_image.set_xticklabels([f"{t + output["pos"][frame] * 1e9:.0f}" for t in ticks])
     ax_image.set_title(f"$t$ = {output['time'][frame] * 1e9:.3f} ns")
 
     # Update time trace
