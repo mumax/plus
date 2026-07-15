@@ -55,7 +55,7 @@ magnet.xi   = 0.2
 magnet.pol = 1
 
 # Center the simulation window, keeping component 0 (x) close to zero.
-# We expect motion alongt the x axis.
+# We expect motion along the x axis.
 world.center_domain_wall(comp=0, axis=0)
 
 tmax = 0.5e-9
