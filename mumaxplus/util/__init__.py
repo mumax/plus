@@ -29,5 +29,5 @@ __all__ = [
     "show_regions",
     # misc
     "VoronoiTessellator",
-    "MFM",
+    "MFM"
 ]

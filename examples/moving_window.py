@@ -1,7 +1,7 @@
 """
 In this example we move a domain wall in a ferromagnet using a Zhang-Li STT. We let the simulation
 window move together with the wall, keeping the domain wall centered in the simulation space.
-Using this, we can virtually simulate an infitly long magnetic nanowire using a limited number
+Using this, we can virtually simulate an infinitely long magnetic nanowire using a limited number
 of simulation cells.
 
 Note:
@@ -55,15 +55,31 @@ magnet.xi   = 0.2
 magnet.pol = 1
 
 # Center the simulation window, keeping component 0 (x) close to zero.
-# We expect motion alongt he x axis.
+# We expect motion alongt the x axis.
 world.center_domain_wall(comp=0, axis=0)
 
 tmax = 2e-9
+tmax = 5e-10
 timepoints = np.linspace(0, tmax, 100)
-outputquantities = {"mag": lambda: magnet.magnetization(),
-                    "pos": lambda: world.window.position[0]}
+
+
+def DW_pos(field):
+    mx = field[0, 0, int(width / cs/2), :]
+    sign = np.sign(mx)
+    # find cell where magnetization component crosses zero
+    i = np.where(np.diff(sign) != 0)[0][0]
+    # linearly interpolate
+    m1, m2 = mx[i], mx[i + 1]
+    return (i - m1 / (m2 - m1)) * cs
+
+
+outputquantities = {"mag": magnet.magnetization,
+                    "window position": lambda: world.window.position[0],
+                    "wall position": lambda: world.window.position[0] + DW_pos(magnet.magnetization())}
 
 output = world.timesolver.solve(timepoints, outputquantities, tqdm=True)
+
+p0 = output["wall position"][0]
 
 # ----------- Create movie -----------
 print("Creating animation...")
@@ -72,13 +88,16 @@ fig, axes = plt.subplots(2, 1, figsize=(10, 7))
 # Time trace subplot
 ax_trace = axes[0]
 lines = {}
-lines["pos"], = ax_trace.plot([], [], '-')
+keys = ["window position", "wall position"]
+for key in keys:
+    lines[key], = ax_trace.plot([], [], '-', label=key)
 
-ax_trace.set_title("Domain wall position")
 ax_trace.set_xlim(0, tmax * 1e9)
-ax_trace.set_ylim(min(0, min(output["pos"]) * 1e9), max(0, max(output["pos"]) * 1e9))
+ax_trace.set_ylim(min(0, min(output["window position"]) * 1e9),
+                  max(0, max(output["wall position"] - p0) * 1e9))
 ax_trace.set_xlabel("Time $t$ (ns)")
 ax_trace.set_ylabel("position (nm)")
+ax_trace.legend()
 ax_trace.grid()
 
 # Magnetization image subplot
@@ -87,7 +106,7 @@ plot_field(output["mag"][0], ax=ax_image, arrow_size=8)
 
 ax_image.set_xlim(0, int(length/cs))
 ticks = ax_image.get_xticks()
-ticks = ticks[ticks <= int(length/cs)] # remove matplotlibs invisible tick at 300
+ticks = ticks[ticks <= int(length/cs)] # remove matplotlib's invisible tick at 300
 
 ax_image.set_title("$t$ = 0.000 ns")
 ax_image.set_xlabel("$x$ (nm)")
@@ -105,11 +124,15 @@ def update(frame):
 
     # update x-ticks
     ax_image.set_xticks(ticks)
-    ax_image.set_xticklabels([f"{t + output["pos"][frame] * 1e9:.0f}" for t in ticks])
+    ax_image.set_xticklabels([f"{t + output["window position"][frame] * 1e9:.0f}" for t in ticks])
     ax_image.set_title(f"$t$ = {output['time'][frame] * 1e9:.3f} ns")
 
     # Update time trace
-    lines["pos"].set_data(np.array(output["time"][:frame+1]) * 1e9, np.array(output["pos"][:frame+1]) * 1e9)
+    lines["window position"].set_data(np.array(output["time"][:frame+1]) * 1e9,
+                                      np.array(output["window position"][:frame+1]) * 1e9)
+    lines["wall position"].set_data(np.array(output["time"][:frame+1]) * 1e9,
+                                    np.array(output["wall position"][:frame+1] - p0) * 1e9)
+
     return [ax_image] + list(lines.values())
 
 # Animation parameters

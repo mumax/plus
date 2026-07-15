@@ -102,29 +102,29 @@ class World:
 
     @property
     def magnets(self) -> dict[str,Magnet]:
-        """Get a dictionairy of all magnet names."""
+        """Get a dictionary of all magnet names."""
         return {**self.ferromagnets, **self.antiferromagnets, **self.altermagnets, **self.ncafms}
 
     @property
     def ferromagnets(self) -> dict[str,Ferromagnet]:
-        """Get a dictionairy of :class:`Ferromagnet` names."""
+        """Get a dictionary of :class:`Ferromagnet` names."""
         return {key: Ferromagnet._from_impl(impl) for key, impl in
                 self._impl.ferromagnets.items()}
     
     @property
     def antiferromagnets(self) -> dict[str,Antiferromagnet]:
-        """Get a dictionairy of :class:`Antiferromagnet` names."""
+        """Get a dictionary of :class:`Antiferromagnet` names."""
         return {key: Antiferromagnet._from_impl(impl) for key, impl in
                 self._impl.antiferromagnets.items()}
     @property
     def altermagnets(self) -> dict[str,Altermagnet]:
-        """Get a dictionairy of :class:`Altermagnet` names."""
+        """Get a dictionary of :class:`Altermagnet` names."""
         return {key: Altermagnet._from_impl(impl) for key, impl in
                 self._impl.altermagnets.items()}
 
     @property
     def ncafms(self):
-        """Get a dictionairy of non-collinear antiferromagnets by name."""
+        """Get a dictionary of non-collinear antiferromagnets by name."""
         return {key: NcAfm._from_impl(impl) for key, impl in
                 self._impl.ncafms.items()}
     
@@ -377,6 +377,10 @@ class World:
         warning
         -------
         `center_domain_wall` will not work properly with non-uniform parameters.
+
+        See Also
+        --------
+        Window.disable_motion
         """
         if comp not in (0, 1, 2):
             raise ValueError("The component `comp` should be 0 (x), 1 (y) or 2 (z).")
@@ -397,7 +401,7 @@ class World:
                         + " domain wall", UserWarning)
 
         av = magnet.magnetization.average() if isinstance(magnet, Ferromagnet) else magnet.sub1.magnetization.average()
-        if np.abs(av[comp]) > 1e-2:
+        if np.abs(av[comp]) > 4 / magnet.grid.size[0]:
             raise RuntimeError(f"The domain wall does not seem centered (average {('x', 'y', 'z')[comp]}-"
                               + f"component is {av[comp]:.2e}). `center_domain_wall` only works properly "
                               + "if the wall is initialized near the center of the magnet.")

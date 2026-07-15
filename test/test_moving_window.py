@@ -103,7 +103,8 @@ class TestInitialConditions:
             world.center_domain_wall(0, 0)
 
     def test_zero_average(self):
-        world, magnet = make_ferromagnet(128, 1, 1)
+        Nx = 128
+        world, magnet = make_ferromagnet(Nx, 1, 1)
         set_parameters(magnet, 0)
         dw_profile(magnet, 0, 0)
 
@@ -111,7 +112,7 @@ class TestInitialConditions:
         magnet.jcur = (1e12, 0, 0)
         world.timesolver.run(runtime)
         av = magnet.magnetization.average()[0]
-        assert np.abs(av) < 1e-2
+        assert np.abs(av) < 4 / Nx
 
 class TestShift:
     def setup_and_shift(self, comp=0, axis=0, nx=64, ny=1, nz=1, current=1e14):
@@ -167,20 +168,21 @@ class TestShift:
         assert np.sign(shift_right[0]) != np.sign(shift_left[0])
 
     def test_disable_motion(self):
-        world, magnet = make_ferromagnet(64, 1, 1)
+        Nx = 64
+        world, magnet = make_ferromagnet(Nx, 1, 1)
         set_parameters(magnet, 0)
         dw_profile(magnet, 0, 0)
         magnet.jcur = (1e14, 0, 0)
 
         world.center_domain_wall(0, 0)
         world.timesolver.run(runtime)
-        assert magnet.magnetization.average()[0] < 1e-2
+        assert magnet.magnetization.average()[0] < 4 / Nx
 
         world.window.disable_motion()
 
         world.timesolver.run(runtime)
         av = magnet.magnetization.average()[0]
-        assert np.abs(av) > 1e-2
+        assert np.abs(av) > 4 / Nx
 
 class TestInsertion:
     def setup(self, comp, axis=0):

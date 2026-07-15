@@ -14,10 +14,10 @@ class Window:
         if not isinstance(boundary, int) or boundary not in (0, 1):
             raise ValueError(f"Invalid boundary: {boundary}. Must be one of (0, 1).")
 
-    def insert_magnetization(self, boundary, value):
+    def insert_magnetization(self, boundary, value=(0, 0, 0)):
         """
         Set magnetization value at a given boundary.
-        If unset (or set to zero), the current edge value is used.
+        If set to zero (default), the current edge value is used.
 
         For multi-sublattice magnets, the magnetization value of `sub1` should
         be provided.
@@ -33,7 +33,12 @@ class Window:
         self._impl.insert_magnetization(boundary, value)
 
     def disable_motion(self):
-        """Disable the motion of the simulation window."""
+        """Disable the motion of the simulation window.
+
+        See Also
+        --------
+        World.center_domain_wall
+        """
         self._impl.disable_motion()
 
     @property
