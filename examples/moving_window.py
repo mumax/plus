@@ -58,10 +58,8 @@ magnet.pol = 1
 # We expect motion alongt the x axis.
 world.center_domain_wall(comp=0, axis=0)
 
-tmax = 2e-9
-tmax = 5e-10
+tmax = 0.5e-9
 timepoints = np.linspace(0, tmax, 100)
-
 
 def DW_pos(field):
     mx = field[0, 0, int(width / cs/2), :]
@@ -71,7 +69,6 @@ def DW_pos(field):
     # linearly interpolate
     m1, m2 = mx[i], mx[i + 1]
     return (i - m1 / (m2 - m1)) * cs
-
 
 outputquantities = {"mag": magnet.magnetization,
                     "window position": lambda: world.window.position[0],
@@ -106,7 +103,6 @@ plot_field(output["mag"][0], ax=ax_image, arrow_size=8)
 
 ax_image.set_xlim(0, int(length/cs))
 ticks = ax_image.get_xticks()
-ticks = ticks[ticks <= int(length/cs)] # remove matplotlib's invisible tick at 300
 
 ax_image.set_title("$t$ = 0.000 ns")
 ax_image.set_xlabel("$x$ (nm)")
@@ -123,8 +119,12 @@ def update(frame):
     ax_image.set_ylabel("$y$ (nm)")
 
     # update x-ticks
-    ax_image.set_xticks(ticks)
-    ax_image.set_xticklabels([f"{t + output["window position"][frame] * 1e9:.0f}" for t in ticks])
+    shift = output["window position"][frame] * 1e9
+    tick_positions = (ticks - shift)
+    mask = (0 <= tick_positions) & (tick_positions <= int(length/cs))
+
+    ax_image.set_xticks(tick_positions[mask])
+    ax_image.set_xticklabels([f"{t:.0f}" for t in ticks[mask]])
     ax_image.set_title(f"$t$ = {output['time'][frame] * 1e9:.3f} ns")
 
     # Update time trace
