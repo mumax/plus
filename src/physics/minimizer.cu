@@ -43,16 +43,7 @@ Minimizer::Minimizer(const MumaxWorld* world,
                      real stopMaxMagDiff,
                      int nMagDiffSamples)
     : stopMaxMagDiff_(stopMaxMagDiff) {
-  // Total number of ferromagnets (FM instances or sublattices)
-  size_t N = world->ferromagnets().size() + 2 * world->antiferromagnets().size();
-  
-  nMagDiffSamples_ = nMagDiffSamples * N;
-
-  t0.resize(N);
-  t1.resize(N);
-  m0.resize(N);
-  m1.resize(N);
-
+  // Find all ferromagnets (FM instances or sublattices)
   for (const auto pair : world->magnets()) {
     if (auto host = pair.second->asHost()) {
       for (auto sub : host->sublattices())
@@ -64,6 +55,14 @@ Minimizer::Minimizer(const MumaxWorld* world,
 
   for (auto magnet : magnets_)
     torques_.push_back(relaxTorqueQuantity(magnet));
+
+  size_t N = magnets_.size();
+  nMagDiffSamples_ = nMagDiffSamples * N;
+
+  t0.resize(N);
+  t1.resize(N);
+  m0.resize(N);
+  m1.resize(N);
     
   stepsizes_.assign(N, 1e-14);
 }
