@@ -93,7 +93,7 @@ __global__ void k_step(CuField mField,
   mField.setVectorInCell(idx, m);
 }
 
-static inline real BarzilianBorweinStepSize(Field& dm, Field& dtorque, int n) {
+static inline real BarzilaiBorweinStepSize(Field& dm, Field& dtorque, int n) {
   real nom, div;
   if (n % 2 == 0) {
     nom = dotSum(dm, dm);
@@ -134,7 +134,7 @@ void Minimizer::step() {
     Field dm = add(real(+1), m1[i], real(-1), m0[i]);
     Field dt = add(real(-1), t1[i], real(+1), t0[i]);  // TODO: check sign difference
 
-    stepsizes_[i] = BarzilianBorweinStepSize(dm, dt, nsteps_);
+    stepsizes_[i] = BarzilaiBorweinStepSize(dm, dt, nsteps_);
 
     addMagDiff(maxVecNorm(dm));
   }
