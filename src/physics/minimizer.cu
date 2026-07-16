@@ -87,6 +87,7 @@ __global__ void k_step(CuField mField,
   real3 m0 = m0Field.vectorAt(idx);
   real3 t = torqueField.vectorAt(idx);
 
+  // The explicit form of the implicit iteration scheme of eq. (8) in Exl et al.
   real t2 = dt * dt * dot(t, t);
   real3 m = ((4 - t2) * m0 + 4 * dt * t) / (4 + t2);
 
@@ -132,7 +133,9 @@ void Minimizer::step() {
 
   for (size_t i = 0; i < magnets_.size(); i++) {
     Field dm = add(real(+1), m1[i], real(-1), m0[i]);
-    Field dt = add(real(-1), t1[i], real(+1), t0[i]);  // TODO: check sign difference
+    Field dt = add(real(-1), t1[i], real(+1), t0[i]);  // opposite sign
+    // The Barzilai-Borwein step uses the difference in steepest ascend,
+    // while relax torque is the steepest *descend* direction.
 
     stepsizes_[i] = BarzilaiBorweinStepSize(dm, dt, nsteps_);
 
