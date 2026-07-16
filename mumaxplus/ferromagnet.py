@@ -708,7 +708,9 @@ class Ferromagnet(Magnet):
 
         .. math:: \mathcal{E} = B_\text{chiral} \sum_{i, j, k} \epsilon_{ijk} \varepsilon_{ii} m_j^2
 
-        This comes from equations (8.12) and (8.16) in Ref. [1], where
+        Here :math:`\epsilon_{ijk}` is the Levi-Civita symbol and
+        :math:`\varepsilon_{ii}` denotes the normal strain components.
+        This energy density comes from equations (8.12) and (8.16) in Ref. [1], where
         B_chiral corresponds to :math:`\lambda_{12}`. Magnetoelastic coupling constants
         B1 and B2 correspond to :math:`\lambda_{11}` and :math:`2 \lambda_{44}` respectively.
         These lambdas are not the usual magnetostrictive coefficients.
