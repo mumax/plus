@@ -16,20 +16,24 @@
 #include "minimizer.hpp"
 #include "ncafm.hpp"
 #include "relaxer.hpp"
+#include "shift.hpp"
 #include "system.hpp"
 #include "thermalnoise.hpp"
 #include "timesolver.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 
 MumaxWorld::MumaxWorld(real3 cellsize)
     : World(cellsize),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::MumaxWorld(real3 cellsize, Grid mastergrid, int3 pbcRepetitions)
     : World(cellsize, mastergrid, pbcRepetitions),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::~MumaxWorld() {}
 
@@ -327,3 +331,42 @@ void MumaxWorld::unsetPBC() {
 }
 
 // --------------------------------------------------
+// Moving simulation window
+
+void MumaxWorld::centerDomainWall(int comp, int axis) {
+  if (magnets_.size() > 1)
+    throw std::runtime_error("Moving the simulation window is only possible when only one "
+                             "magnet lives in the world.");
+  if (magnets_.size() < 1)
+    throw std::runtime_error("Moving the simulation window is not possible when there is no "
+                             "magnet in the world.");
+
+  Magnet* magnet = magnets_.begin()->second;
+  timesolver_->setPostStepFunction([this, magnet, comp, axis]() {
+  const Field& mag = magnet->asHost() ? magnet->asHost()->sublattices()[0]->magnetization()->field()
+                                      : magnet->asFM()->magnetization()->field();
+  int dir = calculateShiftDirection(mag,
+                                    comp, axis,
+                                    window_->getMagValues()[0],
+                                    window_->getMagValues()[1]);
+    if (dir != 0) {
+      window_->move(dir, axis, comp);
+      // Shift magnetization
+      auto shifted = window_->centerOnExcitation(mag, dir, axis, comp);
+
+      // Multi-sublattice systems
+      if (auto host = magnet->asHost()) {
+        auto sub0 = host->sublattices()[0];
+        sub0->magnetization()->set(shifted);
+        for (auto sub : host->getOtherSublattices(sub0)) {
+          auto shifted = window_->centerOnExcitation(sub->magnetization()->field(), dir, axis, comp);
+          sub->magnetization()->set(shifted);
+        }
+      }
+
+      // Ferromagnet
+      else
+        magnet->asFM()->magnetization()->set(shifted);
+    }
+  });
+}

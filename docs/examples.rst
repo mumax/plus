@@ -13,3 +13,4 @@ Here we show some example Python scripts to run mumax⁺ simulations.
    examples/DW_SAW
    examples/voronoi
    examples/Bloch_wall_altermagnet
+   examples/moving_window
