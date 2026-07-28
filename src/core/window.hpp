@@ -3,6 +3,7 @@
 #include "datatypes.hpp"
 #include "field.hpp"
 
+#include <array>
 #include <vector>
 
 enum class Boundary {
