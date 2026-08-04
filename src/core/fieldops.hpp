@@ -5,12 +5,18 @@
 
 #include "field.hpp"
 
+/// y = a1*x1 + a2*x2
+void add(Field& y, real a1, const Field& x1, real a2, const Field& x2);
 /// a1*x1 + a2*x2
 Field add(real a1, const Field& x1, real a2, const Field& x2);
 
+/// y = a1*x1 + a2*x2
+void add(Field& y, real3 a1, const Field& x1, real3 a2, const Field& x2);
 /// a1*x1 + a2*x2
 Field add(real3 a1, const Field& x1, real3 a2, const Field& x2);
 
+/// positional y = a1*x1 + a2*x2
+void add(Field& y, const Field& a1, const Field& x1, const Field& a2, const Field& x2);
 /// positional a1*x1 + a2*x2
 Field add(const Field& a1, const Field& x1, const Field& a2, const Field& x2);
 

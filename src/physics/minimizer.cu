@@ -131,8 +131,10 @@ void Minimizer::step() {
     t1[i] = torques_[i].eval();
 
   for (size_t i = 0; i < magnets_.size(); i++) {
-    Field dm = add(real(+1), m1[i], real(-1), m0[i]);
-    Field dt = add(real(-1), t1[i], real(+1), t0[i]);  // opposite sign
+    // Reuse m0 and t0 for efficiency, but declare alias for clarity
+    Field &dm = m0[i], &dt = t0[i];
+    add(dm, real(+1), m1[i], real(-1), m0[i]);
+    add(dt, real(-1), t1[i], real(+1), t0[i]);  // opposite sign
     // The Barzilai-Borwein step uses the difference in steepest ascend,
     // while relax torque is the steepest *descend* direction.
 
