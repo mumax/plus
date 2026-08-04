@@ -113,14 +113,14 @@ void Minimizer::step() {
 
     m0[i] = magnets_[i]->magnetization()->eval();
 
-    if (nsteps_ == 0)
+    if (nsteps_ == 0) {
       t0[i] = torques_[i].eval();
-    else
+      m1[i] = Field(magnets_[i]->system(), 3);
+    } else {
       t0[i] = t1[i];
+    }
 
-    m1[i] = Field(magnets_[i]->system(), 3);
     int ncells = m1[i].grid().ncells();
-
     cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(), stepsizes_[i]);
   }
   
