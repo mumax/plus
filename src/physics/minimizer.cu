@@ -139,8 +139,8 @@ void Minimizer::step() {
   for (size_t i = 0; i < magnets_.size(); i++) {
     add(dm[i], real(+1), m1[i], real(-1), m0[i]);
     add(dt[i], real(-1), t1[i], real(+1), t0[i]);  // opposite sign
-    // The Barzilai-Borwein step uses the difference in steepest ascend,
-    // while relax torque is the steepest *descend* direction.
+    // The Barzilai-Borwein step uses the difference in steepest ascent,
+    // while relax torque is the steepest *descent* direction.
 
     magDiff = std::max(magDiff, maxVecNorm(dm[i]));
   }
