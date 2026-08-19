@@ -1,0 +1,624 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Time Integration &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4b5c67ef" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'diagrams/timeintegration';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
+    <script src="../_static/js/svg-pan-zoom.min.js"></script>
+    <script src="../_static/js/setup-pan-zoom.js"></script>
+    <link rel="icon" href="../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Domain" href="domain.html" />
+    <link rel="prev" title="Strayfield" href="strayfield.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <img src="../_static/nimble-plus.png" class="logo__image only-dark pst-js-only" alt="mumax⁺ - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/geometry.html">Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/langevin.html">Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../class_diagrams.html">Class Diagrams</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quantities.html">Quantities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="magnetics.html">Magnetics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strayfield.html">Strayfield</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utilities</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Time Integration</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="time-integration">
+<h1>Time Integration<a class="headerlink" href="#time-integration" title="Link to this heading">#</a></h1>
+<p>UML diagram of <code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code>, <code class="docutils literal notranslate"><span class="pre">DynamicEquation</span></code>, <code class="docutils literal notranslate"><span class="pre">Relaxer</span></code>, <code class="docutils literal notranslate"><span class="pre">RKmethod</span></code>, <code class="docutils literal notranslate"><span class="pre">RungeKuttaStepper</span></code>, <code class="docutils literal notranslate"><span class="pre">RungeKuttaStepper::RungeKuttaStageExecutor</span></code>, <code class="docutils literal notranslate"><span class="pre">Stepper</span></code>, <code class="docutils literal notranslate"><span class="pre">TimeSolver</span></code>.</p>
+<p class="plantuml">
+<img src="../_images/plantuml-33608cdb67b13a6614c258e0e5706c60dad8413f.svg" alt="&#64;startuml
+!theme vibrant
+package Legend {
+  class Class
+  abstract class Abstract
+  enum Enum
+  class Visibility {
+    +public field
+    +public method()
+    -private field
+    -private method()
+    #protected field
+  }
+  Class -[hidden]-&gt; Extension
+  Abstract -[hidden]-&gt; Extension
+  Enum -[hidden]-&gt; Extension
+  Visibility &lt;|-- Extension : Extension
+  Visibility o-- Aggregation : Aggregation
+  Visibility +.. Nested : Nested
+  Visibility --&gt; Dependency : Dependency
+  Visibility ..&gt; WeakDependency : Weak dependency
+}
+abstract &quot;Stepper&quot; as C_0012141159885130425810
+abstract C_0012141159885130425810 {
++setParentTimeSolver(TimeSolver *) : void
+{abstract} +step() = 0 : void
+__
+#solver_ : TimeSolver *
+}
+class &quot;RungeKuttaStepper&quot; as C_0006522646547419731424
+class C_0006522646547419731424 {
++nStages() const : int
++step() : void
+__
+-butcher_ : ButcherTableau
+}
+class &quot;RungeKuttaStepper::RungeKuttaStageExecutor&quot; as C_0007748372366276514134
+class C_0007748372366276514134 {
++RungeKuttaStageExecutor(DynamicEquation, const RungeKuttaStepper &amp;) : void
++getError() const : real
++resetX() : void
++setFinalX() : void
++setStageK(int) : void
++setStageX(int) : void
+__
+-butcher : const ButcherTableau &amp;
+-eq_ : DynamicEquation
+-k : std::vector&lt;Field&gt;
+-noise : std::optional&lt;Field&gt;
+-stepper : const RungeKuttaStepper &amp;
+-x : const Variable &amp;
+-x0 : Field
+}
+enum &quot;RKmethod&quot; as C_0015559461378317421161
+enum C_0015559461378317421161 {
+HEUN
+BOGACKI_SHAMPINE
+CASH_KARP
+FEHLBERG
+DORMAND_PRINCE
+}
+class &quot;ButcherTableau&quot; as C_0014259824911774652212
+class C_0014259824911774652212 {
+{static} +get(RKmethod) : const ButcherTableau &amp;
++isConsistent() const : bool
+__
+{static} +BogackiShampine : const ButcherTableau
+{static} +CashKarp : const ButcherTableau
+{static} +DormandPrince : const ButcherTableau
+{static} +Fehlberg : const ButcherTableau
+{static} +Heun : const ButcherTableau
++nodes : const std::vector&lt;real&gt;
++order1 : const int
++order2 : const int
++rkMatrix : const std::vector&lt;std::vector&lt;real&gt;&gt;
++weights1 : const std::vector&lt;real&gt;
++weights2 : const std::vector&lt;real&gt;
+}
+class &quot;DynamicEquation&quot; as C_0017651127052601681353
+class C_0017651127052601681353 {
++grid() const : Grid
++ncomp() const : int
++system() const : std::shared_ptr&lt;const System&gt;
+__
++noiseTerm : std::shared_ptr&lt;FieldQuantity&gt;
++rhs : std::shared_ptr&lt;FieldQuantity&gt;
++x : const Variable *
+}
+class &quot;TimeSolver&quot; as C_0007801327922661580961
+class C_0007801327922661580961 {
++adaptTimeStep(real corr) : void
++disableAdaptiveTimeStep() : void
++enableAdaptiveTimeStep() : void
++equations() const : const std::vector&lt;DynamicEquation&gt; &amp;
++getRungeKuttaMethod() : RKmethod
++hasAdaptiveTimeStep() const : bool
++headroom() const : real
++lowerBound() const : real
++maxError() const : real
++run(real duration) : void
++runwhile(std::function&lt;bool ()&gt;) : void
++sensibleFactor() const : real
++sensibleTimeStep() const : real
++sensibleTimestepDefault() const : real
++setEquations(std::vector&lt;DynamicEquation&gt; eq) : void
++setHeadroom(real headroom) : void
++setLowerBound(real lowerBound) : void
++setMaxError(real maxError) : void
++setRungeKuttaMethod(const std::string &amp; method) : void
++setRungeKuttaMethod(RKmethod) : void
++setSensibleFactor(real factor) : void
++setSensibleTimestepDefault(real dt) : void
++setTime(real time) : void
++setTimeStep(real dt) : void
++setUpperBound(real upperBound) : void
++step() : void
++steps(unsigned int nsteps) : void
++time() const : real
++timestep() const : real
++upperBound() const : real
+__
+-eqs_ : std::vector&lt;DynamicEquation&gt;
+-fixedTimeStep_ : bool
+-headroom_ : real
+-lowerBound_ : real
+-maxError_ : real
+-method_ : RKmethod
+-sensibleFactor_ : real
+-sensibleTimestepDefault_ : real
+-stepper_ : std::unique_ptr&lt;Stepper&gt;
+-time_ : real
+-timestep_ : real
+-upperBound_ : real
+}
+class &quot;Relaxer&quot; as C_0004731565546749197697
+class C_0004731565546749197697 {
+-calcEnergy() : real
+-calcTorque(std::vector&lt;FM_FieldQuantity&gt;) : real
++exec() : void
+-getEquation(const Magnet *) : std::vector&lt;DynamicEquation&gt;
+-getTorque() : std::vector&lt;FM_FieldQuantity&gt;
+__
+-magnets_ : std::vector&lt;const Magnet *&gt;
+-threshold_ : std::vector&lt;real&gt;
+-timesolver_ : TimeSolver &amp;
+-tol_ : real
+-world_ : const MumaxWorld *
+}
+C_0012141159885130425810 --&gt; C_0007801327922661580961 : #solver_
+C_0006522646547419731424 ..&gt; C_0007801327922661580961
+C_0006522646547419731424 ..&gt; C_0015559461378317421161
+C_0006522646547419731424 o-- C_0014259824911774652212 : -butcher_
+C_0012141159885130425810 &lt;|-- C_0006522646547419731424
+C_0007748372366276514134 --+ C_0006522646547419731424
+C_0007748372366276514134 --&gt; C_0014259824911774652212 : -butcher
+C_0007748372366276514134 --&gt; C_0006522646547419731424 : -stepper
+C_0007748372366276514134 o-- C_0017651127052601681353 : -eq_
+C_0014259824911774652212 ..&gt; C_0015559461378317421161
+C_0014259824911774652212 --&gt; C_0014259824911774652212 : +Heun
+C_0014259824911774652212 --&gt; C_0014259824911774652212 : +BogackiShampine
+C_0014259824911774652212 --&gt; C_0014259824911774652212 : +CashKarp
+C_0014259824911774652212 --&gt; C_0014259824911774652212 : +Fehlberg
+C_0014259824911774652212 --&gt; C_0014259824911774652212 : +DormandPrince
+C_0007801327922661580961 o-- C_0017651127052601681353 : -eqs_
+C_0007801327922661580961 o-- C_0012141159885130425810 : -stepper_
+C_0007801327922661580961 o-- C_0015559461378317421161 : -method_
+C_0004731565546749197697 ..&gt; C_0017651127052601681353
+C_0004731565546749197697 --&gt; C_0007801327922661580961 : -timesolver_
+
+'Generated with clang-uml, version 0.6.2
+'LLVM version clang version 19.1.7 (https://github.com/conda-forge/clangdev-feedstock 3c5e7de432e909e225d8040e72a44724afb0c446)
+&#64;enduml
+"/></p>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="strayfield.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Strayfield</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="domain.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Domain</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2026-06-08, v1.2.1.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
