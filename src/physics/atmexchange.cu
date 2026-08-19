@@ -65,7 +65,7 @@ __global__ void k_atmExchangeField(CuField hField,
   real s = sin(angle.valueAt(idx));
   real c2 = c * c;
   real s2 = s * s;
-  real cs2 = 2 * c * s;
+  real cs2 = 4 * c * s;
 
   real3 h{0, 0, 0};
 
@@ -113,7 +113,7 @@ __global__ void k_atmExchangeField(CuField hField,
 
     if (rel_coo.x != 0) { Aex = aex_1 * c2 + aex_2 * s2; }
     else { Aex = aex_1 * s2 + aex_2 * c2; }
-    h += Aex * dot(normal, w2) * (m_ - m);
+    h += 2 * Aex * dot(normal, w2) * (m_ - m);
   }
 
   // MIXED DERIVATIVE
