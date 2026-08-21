@@ -53,3 +53,13 @@ repos:
         entry: clang-format
         args: ["-i", "-style=Chromium"]
 
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest test/
+        language: system
+        pass_filenames: false
+        always_run: true
+        fail_fast: true
+        stages: [pre-push]
