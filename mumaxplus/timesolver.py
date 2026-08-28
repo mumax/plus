@@ -83,8 +83,9 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_timestep,
-        sensible_timestep_default, upper_bound
+        headroom, lower_bound, sensible_timestep, sensible_timestep_default,
+        upper_bound
+        displacement_max_error, magnetization_max_error, velocity_max_error
         """
         if self.adaptive_timestep:
             sensible_dt = self.sensible_timestep  # calculate once
@@ -239,7 +240,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, sensible_factor, upper_bound
+        headroom, lower_bound, sensible_factor, sensible_timestep,
+        sensible_timestep_default, upper_bound
         magnetization_max_error, velocity_max_error
         """
 
@@ -259,7 +261,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, sensible_factor, upper_bound
+        headroom, lower_bound, sensible_factor, sensible_timestep,
+        sensible_timestep_default, upper_bound
         displacement_max_error, magnetization_max_error
         """
 
@@ -278,7 +281,7 @@ class TimeSolver:
 
         See Also
         --------
-        lower_bound, max_error, sensible_factor, sensible_timestep,
+        lower_bound, sensible_factor, sensible_timestep,
         sensible_timestep_default, upper_bound
         displacement_max_error, magnetization_max_error, velocity_max_error
         """
@@ -298,8 +301,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, max_error, sensible_factor, sensible_timestep,
-        sensible_timestep_default, upper_bound
+        headroom, sensible_factor, sensible_timestep, sensible_timestep_default,
+        upper_bound
         displacement_max_error, magnetization_max_error, velocity_max_error
         """
         return self._impl.lower_bound
@@ -318,7 +321,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_factor, sensible_timestep,
+        headroom, lower_bound, sensible_factor, sensible_timestep,
         sensible_timestep_default
         displacement_max_error, magnetization_max_error, velocity_max_error
         """
@@ -338,8 +341,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_timestep,
-        sensible_timestep_default, upper_bound
+        headroom, lower_bound, sensible_timestep, sensible_timestep_default,
+        upper_bound
         displacement_max_error, magnetization_max_error, velocity_max_error
         """
         return self._impl.sensible_factor
@@ -358,7 +361,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_timestep, upper_bound
+        headroom, lower_bound, sensible_factor, sensible_timestep, upper_bound
         """
         return self._impl.sensible_timestep_default
 
@@ -372,6 +375,7 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_timestep_default, upper_bound
+        headroom, lower_bound, sensible_factor, sensible_timestep_default,
+        upper_bound
         """
         return self._impl.sensible_timestep
