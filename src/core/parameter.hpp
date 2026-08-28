@@ -106,7 +106,7 @@ __device__ inline real CuParameter::valueAt(int3 coo) const {
 
 __device__ inline real CuParameter::harmonicMean(int idx1, int idx2) const {
   if (idx1 == idx2) { return valueAt(idx1); }
-  else { return harmonicMean(valueAt(idx1), valueAt(idx2)); }
+  else { return ::harmonicMean(valueAt(idx1), valueAt(idx2)); }
 }
 
 
@@ -161,6 +161,10 @@ struct CuVectorParameter {
  public:
   explicit CuVectorParameter(const VectorParameter*);
   __device__ bool isUniform() const;
+
+  __device__ real valueAt(int idx, int comp = 0) const;
+  __device__ real valueAt(int3 coo, int comp = 0) const;
+
   __device__ real3 vectorAt(int idx) const;
   __device__ real3 vectorAt(int3 coo) const;
 };
@@ -189,6 +193,25 @@ inline CuVectorParameter::CuVectorParameter(const VectorParameter* p)
 
 __device__ inline bool CuVectorParameter::isUniform() const {
   return !xValuesPtr;
+}
+
+__device__ inline real CuVectorParameter::valueAt(int idx, int comp) const {
+  real sv, dv;  // static and dynamic values
+  if (comp == 0) {  // x
+    sv = isUniform() ? uniformValue.x : xValuesPtr[idx];
+    dv = xDynamicValuesPtr ? xDynamicValuesPtr[idx] : 0.;
+  } else if (comp == 1) {  // y
+    sv = isUniform() ? uniformValue.y : yValuesPtr[idx];
+    dv = yDynamicValuesPtr ? yDynamicValuesPtr[idx] : 0.;
+  } else {  // z  comp == 2 (no safety checks)
+    sv = isUniform() ? uniformValue.z : zValuesPtr[idx];
+    dv = zDynamicValuesPtr ? zDynamicValuesPtr[idx] : 0.;
+  }
+  return sv + dv;
+}
+
+__device__ inline real CuVectorParameter::valueAt(int3 coo, int comp) const {
+  return valueAt(system.grid.coord2index(coo), comp);
 }
 
 __device__ inline real3 CuVectorParameter::vectorAt(int idx) const {

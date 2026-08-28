@@ -1,45 +1,55 @@
 """World imlementation."""
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .timesolver import TimeSolver
 from .grid import Grid
+from .magnet import Magnet
 from .ferromagnet import Ferromagnet
 from .antiferromagnet import Antiferromagnet
+from .altermagnet import Altermagnet
+from .ncafm import NcAfm
+from .window import Window
 
 import warnings
+import numpy as np
 
 class World:
-    """Construct a world with a given cell size.
-
-    Parameters
-    ----------
-    cellsize : tuple[float] of size 3
-        A tuple of three floating pointing numbers which represent the dimensions
-        of the cells in the x, y, and z direction.
-
-    pbc_repetitions : tuple[int] of size 3, default=(0,0,0)
-        The number of repetitions for everything inside mastergrid in the
-        x, y and z directions to create periodic boundary conditions.
-        The number of repetitions determines the cutoff range for the
-        demagnetization.
-    
-    mastergrid : Grid, default=Grid((0,0,0))
-        Mastergrid defines a periodic simulation box. If it has zero size in
-        a direction, then it is considered to be infinitely large
-        (no periodicity) in that direction.
-        A 0 in `mastergrid` should correspond to a 0 in `pbc_repetitions`.
-        All subsequently added magnets need to fit inside this mastergrid.
-
-    ``pbc_repetitions`` and ``mastergrid`` can be changed later using ``set_pbc``.
-
-    See Also
-    --------
-    cellsize, pbc_repetitions, mastergrid
-    """
-
+    """Construct a world with a given cell size."""
     def __init__(self, cellsize,
-                 pbc_repetitions=(0,0,0), mastergrid=Grid((0,0,0))):
+                 pbc_repetitions=(0,0,0), mastergrid:Grid=Grid((0,0,0))):
+        
+        """
+        Parameters
+        ----------
+        cellsize : tuple[float] of size 3
+            A tuple of three floating pointing numbers which represent the dimensions
+            of the cells in the x, y, and z direction.
+
+        pbc_repetitions : tuple[int] of size 3, default=(0,0,0)
+            The number of repetitions for everything inside mastergrid in the
+            x, y and z directions to create periodic boundary conditions.
+            The number of repetitions determines the cutoff range for the
+            demagnetization.
+        
+        mastergrid : Grid, default=Grid((0,0,0))
+            Mastergrid defines a periodic simulation box. If it has zero size in
+            a direction, then it is considered to be infinitely large
+            (no periodicity) in that direction.
+            A 0 in `mastergrid` should correspond to a 0 in `pbc_repetitions`.
+            All subsequently added magnets need to fit inside this mastergrid.
+
+            
+        Note
+        ----
+        ``pbc_repetitions`` and ``mastergrid`` can be changed later using :func:`set_pbc`.
+
+            
+        See Also
+        --------
+        cellsize, pbc_repetitions, mastergrid
+        """
+        
         if len(cellsize) != 3:
             raise ValueError("'cellsize' should have three dimensions.")
         if len(pbc_repetitions) != 3:
@@ -60,37 +70,63 @@ class World:
         return world
 
     @property
-    def timesolver(self):
-        """Time solver for this world."""
+    def timesolver(self) -> TimeSolver:
+        """:class:`TimeSolver` for this world."""
         return TimeSolver(self._impl.timesolver)
 
-    def get_ferromagnet(self, name):
-        """Get a ferromagnet by its name.
+    def get_ferromagnet(self, name) -> Ferromagnet:
+        """Get a :class:`Ferromagnet` by its name.
+
         Raises KeyError if there is no magnet with the given name."""
         magnet_impl = self._impl.get_ferromagnet(name)
         if magnet_impl is None:
             raise KeyError(f"No magnet named {name}")
         return Ferromagnet._from_impl(magnet_impl)
     
-    def get_antiferromagnet(self, name):
-        """Get an antiferromagnet by its name.
+    def get_antiferromagnet(self, name) -> Antiferromagnet:
+        """Get an :class:`Antiferromagnet` by its name.
+        
         Raises KeyError if there is no magnet with the given name."""
         magnet_impl = self._impl.get_antiferromagnet(name)
         if magnet_impl is None:
             raise KeyError(f"No magnet named {name}")
         return Antiferromagnet._from_impl(magnet_impl)
 
+    def get_ncafm(self, name):
+        """Get a non-collinear antiferromagnet by its name.
+        Raises KeyError if there is no magnet with the given name."""
+        magnet_impl = self._impl.get_ncafm(name)
+        if magnet_impl is None:
+            raise KeyError(f"No magnet named {name}")
+        return NcAfm._from_impl(magnet_impl)
+
     @property
-    def ferromagnets(self):
-        """Get a dictionairy of ferromagnets by name."""
+    def magnets(self) -> dict[str,Magnet]:
+        """Get a dictionary of all magnet names."""
+        return {**self.ferromagnets, **self.antiferromagnets, **self.altermagnets, **self.ncafms}
+
+    @property
+    def ferromagnets(self) -> dict[str,Ferromagnet]:
+        """Get a dictionary of :class:`Ferromagnet` names."""
         return {key: Ferromagnet._from_impl(impl) for key, impl in
                 self._impl.ferromagnets.items()}
     
     @property
-    def antiferromagnets(self):
-        """Get a dictionairy of antiferromagnets by name."""
+    def antiferromagnets(self) -> dict[str,Antiferromagnet]:
+        """Get a dictionary of :class:`Antiferromagnet` names."""
         return {key: Antiferromagnet._from_impl(impl) for key, impl in
                 self._impl.antiferromagnets.items()}
+    @property
+    def altermagnets(self) -> dict[str,Altermagnet]:
+        """Get a dictionary of :class:`Altermagnet` names."""
+        return {key: Altermagnet._from_impl(impl) for key, impl in
+                self._impl.altermagnets.items()}
+
+    @property
+    def ncafms(self):
+        """Get a dictionary of non-collinear antiferromagnets by name."""
+        return {key: NcAfm._from_impl(impl) for key, impl in
+                self._impl.ncafms.items()}
     
     def minimize(self, tol=1e-6, nsamples=10):
         """Minimize the total energy.
@@ -141,7 +177,7 @@ class World:
         self._impl.relax(tol)
 
     @property
-    def RelaxTorqueThreshold(self):
+    def RelaxTorqueThreshold(self) -> float:
         """Threshold torque used for relaxing the system (default = -1).
 
         If set to a negative value (default behaviour),
@@ -164,7 +200,7 @@ class World:
         self._impl.RelaxTorqueThreshold = value
 
     @property
-    def cellsize(self):
+    def cellsize(self) -> tuple[float]:
         """Return the cell size of the world.
 
         Returns
@@ -176,7 +212,7 @@ class World:
         return self._impl.cellsize
 
     @property
-    def bias_magnetic_field(self):
+    def bias_magnetic_field(self) -> tuple[float]:
         """Return a uniform magnetic field which extends over the whole world."""
         return self._impl.bias_magnetic_field
 
@@ -186,14 +222,14 @@ class World:
         self._impl.bias_magnetic_field = value
 
     @property
-    def mastergrid(self):
+    def mastergrid(self) -> Grid:
         """The master grid of the world.
 
         Mastergrid defines a periodic simulation box. If it has zero size in a
         direction, then it is considered to be infinitely large (no periodicity) in
         that direction.
 
-        It is advised to set ``mastergrid`` using ``set_pbc``.
+        It is advised to set ``mastergrid`` using :func:`set_pbc`.
 
         See Also
         --------
@@ -217,7 +253,7 @@ class World:
         self._impl.mastergrid = mastergrid._impl
 
     @property
-    def pbc_repetitions(self):
+    def pbc_repetitions(self) -> tuple[int]:
         """The number of repetitions for everything inside mastergrid in the
         x, y and z directions to create periodic boundary conditions. The number of
         repetitions determines the cutoff range for the demagnetization.
@@ -227,7 +263,7 @@ class World:
         but not in the y direction. That row is then copied once up and once down,
         creating a 5x1x3 grid.
 
-        It is advised to set ``pbc_repetitions`` using ``set_pbc``.
+        It is advised to set ``pbc_repetitions`` using :func:`set_pbc`.
 
         See Also
         --------
@@ -255,8 +291,8 @@ class World:
         self._impl.pbc_repetitions = value
 
     @property
-    def bounding_grid(self):
-        """Returns Grid which is the minimum bounding box of all magnets
+    def bounding_grid(self) -> Grid:
+        """Returns :class:`Grid` which is the minimum bounding box of all magnets
         currently in the world.
         """
         return Grid._from_impl(self._impl.bounding_grid)
@@ -312,3 +348,62 @@ class World:
         set_pbc
         """
         self._impl.unset_pbc()
+
+    @property
+    def window(self) -> Window:
+        """Simulation window for this world."""
+        return Window(self._impl.window)
+
+    def center_domain_wall(self, comp, axis=None):
+        """Move the simulation window along with the domain wall. This function
+        should be called before the `TimeSolver`.
+
+        Note
+        ----
+        The domain wall should be centered already for this function to work properly.
+
+        Parameters
+        ----------
+        comp : int
+            The magnetization direction of the domains. The average of this
+            magnetization component will be kept close to zero. Possible values
+            are 0 (x-component), 1 (y-component) and 2 (z-component).
+        axis : int
+            The axis along which the domain wall moves (i.e. the wall normal).
+            Possible values are 0 (x-direction), 1 (y-direction) and 2 (z-direction).
+            If axis is `None` (default), then the first axis with the most number of
+            grid cells is chosen.
+
+        warning
+        -------
+        `center_domain_wall` will not work properly with non-uniform parameters.
+
+        See Also
+        --------
+        Window.disable_motion
+        """
+        if comp not in (0, 1, 2):
+            raise ValueError("The component `comp` should be 0 (x), 1 (y) or 2 (z).")
+
+        if len(self.magnets) != 1:
+            raise RuntimeError("The moving window functionality only works if exactly 1 magnet exists.")
+
+        magnet = list(self.magnets.values())[0]
+        if not np.all(magnet.geometry) or np.any(magnet.regions):
+            raise RuntimeError("The moving window functionality doesn't work well with geometry"
+                               " or regions as of yet.")
+
+        # If no axis is given, return first axis with most number of cells
+        if axis is None:
+            axis = np.argmax(self.bounding_grid.size) # bounding grid is safe if only 1 magnet
+            warnings.warn("There is no axis provided in the moving simulation window."
+                        + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"
+                        + " domain wall", UserWarning)
+
+        av = magnet.magnetization.average() if isinstance(magnet, Ferromagnet) else magnet.sub1.magnetization.average()
+        if np.abs(av[comp]) > 4 / magnet.grid.size[0]:
+            raise RuntimeError(f"The domain wall does not seem centered (average {('x', 'y', 'z')[comp]}-"
+                              + f"component is {av[comp]:.2e}). `center_domain_wall` only works properly "
+                              + "if the wall is initialized near the center of the magnet.")
+
+        self._impl.center_domain_wall(comp, axis)

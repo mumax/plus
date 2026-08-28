@@ -21,13 +21,13 @@
 #include "world.hpp"
 #include "system.hpp"
 
-class Antiferromagnet;
+class HostMagnet;
 
 class Ferromagnet : public Magnet {
  public:
   Ferromagnet(std::shared_ptr<System> system_ptr,
               std::string name,
-              Antiferromagnet* hostMagnet_ = nullptr);
+              HostMagnet* hostMagnet_ = nullptr);
 
   Ferromagnet(MumaxWorld* world,
               Grid grid,
@@ -39,17 +39,22 @@ class Ferromagnet : public Magnet {
   const Variable* magnetization() const;
 
   bool isSublattice() const;
-  const Antiferromagnet* hostMagnet() const;  // TODO: right amount of const?
+
+  const HostMagnet* hostMagnet() const { return hostMagnet_; }
 
   void minimize(real tol = 1e-6, int nSamples = 10);
   void relax(real tol);
 
+  int getThermalSeed() const { return thermalSeed; }
+  void setThermalSeed(int value) { thermalSeed = value;
+                                   curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
+                                  }
+  void resetNoiseGenerator();
+
  private:
   NormalizedVariable magnetization_;
 
-  // TODO: what type of pointer?
-  // TODO: Magnet or Antiferromagnet?
-  Antiferromagnet* hostMagnet_;
+  HostMagnet* hostMagnet_;
 
  public:
   mutable PoissonSystem poissonSystem;
@@ -77,7 +82,9 @@ class Ferromagnet : public Magnet {
   Parameter kc2;
   Parameter kc3;
   Parameter alpha;
+  Parameter gamma;
   Parameter temperature;
+  int thermalSeed;
   Parameter Lambda;
   Parameter freeLayerThickness;
   Parameter epsilonPrime;
@@ -86,6 +93,7 @@ class Ferromagnet : public Magnet {
   Parameter appliedPotential;
   Parameter conductivity;
   Parameter amrRatio;
+  Parameter frozenSpins;
   real RelaxTorqueThreshold;
   
   curandGenerator_t randomGenerator;
@@ -95,4 +103,5 @@ class Ferromagnet : public Magnet {
   // Magnetoelasticity
   Parameter B1;  // First magnetoelastic coupling constant
   Parameter B2;  // Second magnetoelastic coupling constant
+  Parameter BChiral;  // Chiral magnetoelastic coupling constant
 };

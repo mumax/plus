@@ -310,7 +310,7 @@ Field operator*(const Field& a, const Field& x) {
 // --------------------------------------------------
 // fieldGetRGB
 
-const float pi = 3.1415926535897931f;
+__device__ const float pi = 3.1415926535897931f;
 
 /// Transform 3D vector with norm<=1 to its RGB representation
 __device__ real3 getRGB(real3 vec) {
@@ -318,8 +318,9 @@ __device__ real3 getRGB(real3 vec) {
   // double precision colors.
 
   // HSL
+  // no z in saturation so color sphere is continuous!
   float H = atan2f(vec.y, vec.x);
-  float S = norm(vec);
+  float S = sqrt(vec.x * vec.x + vec.y * vec.y);  // norm(vec);
   float L = 0.5f + 0.5f * vec.z;
 
   // HSL to RGB
@@ -363,8 +364,9 @@ __device__ real3 getRGB(real3 vec) {
 __global__ void k_fieldGetRGB(CuField dst, const CuField src) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!dst.cellInGeometry(idx)) {
+    if (dst.cellInGrid(idx))
     // not in geometry, so make grey instead
-    dst.setVectorInCell(idx, real3{0.5, 0.5, 0.5});
+      dst.setVectorInCell(idx, real3{0.5, 0.5, 0.5});
   } else {
     dst.setVectorInCell(idx, getRGB(src.vectorAt(idx)));
   }

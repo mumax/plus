@@ -1,20 +1,36 @@
-API Reference
-=============
+:nosearch:
+
+API
+===
 
 .. currentmodule:: mumaxplus
 
-.. autosummary:: 
-    :toctree: _api
-    
-    World
-    Grid
-    Ferromagnet
-    Antiferromagnet
-    TimeSolver
-    Variable
-    PoissonSystem
-    Parameter
-    FieldQuantity
-    ScalarQuantity
-    StrayField
-    DmiTensor
+.. toctree::
+   :maxdepth: 2
+
+.. autosummary::
+   :toctree: _api/mumaxplus
+
+   World
+   Grid
+   Magnet
+   Ferromagnet
+   Antiferromagnet
+   NcAfm
+   Altermagnet
+   TimeSolver
+   ScalarQuantity
+   FieldQuantity
+   Variable
+   Parameter
+   InterParameter
+   StrayField
+   PoissonSystem
+   DmiTensor
+   BoundaryTraction
+   Window
+
+.. toctree::
+   :maxdepth: 1
+
+   util

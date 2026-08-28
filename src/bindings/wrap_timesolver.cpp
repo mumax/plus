@@ -30,6 +30,8 @@ void wrap_timesolver(py::module& m) {
       .def_property("velocity_max_error", &TimeSolver::velocityMaxError,
                                           &TimeSolver::setVelocityMaxError)
       .def_property("sensible_factor", &TimeSolver::sensibleFactor, &TimeSolver::setSensibleFactor)
+      .def_property("sensible_timestep_default", &TimeSolver::sensibleTimestepDefault,
+                                                 &TimeSolver::setSensibleTimestepDefault)
       .def_property("upper_bound", &TimeSolver::upperBound, &TimeSolver::setUpperBound)
       .def("step", &TimeSolver::step)
       .def("steps", &TimeSolver::steps)

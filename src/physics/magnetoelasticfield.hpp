@@ -8,6 +8,8 @@ class Field;
 
 // Assure that the magnetoelastic field and force are 0
 bool magnetoelasticAssuredZero(const Ferromagnet*);
+bool dynamicMagnetoelasticAssuredZero(const Ferromagnet*);
+bool rigidMagnetoelasticAssuredZero(const Ferromagnet*);
 
 Field evalMagnetoelasticField(const Ferromagnet*);
 Field evalMagnetoelasticEnergyDensity(const Ferromagnet*);

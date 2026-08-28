@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import neelskyrmion, show_field
+from mumaxplus.util import neelskyrmion
 
 # NUMERICAL PARAMETERS RELEVANT FOR THE SPECTRUM ANALYSIS
 fmax = 50E9           # maximum frequency (in Hz) of the sinc pulse

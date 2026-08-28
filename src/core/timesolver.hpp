@@ -38,6 +38,7 @@ class TimeSolver {
   real velocityMaxError() const { return velocityMaxError_; }
   real getMaxError(MaxError) const;  // get approprate max error, given enum of Variable
   real sensibleFactor() const { return sensibleFactor_; }
+  real sensibleTimestepDefault() const { return sensibleTimestepDefault_; }
   real time() const { return time_; }
   real timestep() const { return timestep_; }
   real upperBound() const { return upperBound_; }
@@ -54,11 +55,14 @@ class TimeSolver {
   void setDisplacementMaxError(real maxError) { displacementMaxError_ = maxError; }
   void setVelocityMaxError(real maxError) { velocityMaxError_ = maxError; }
   void setSensibleFactor(real factor) { sensibleFactor_ = factor; }
+  void setSensibleTimestepDefault(real dt);
   void setTime(real time) { time_ = time; }
   void setTimeStep(real dt) { timestep_ = dt; }
   void setUpperBound(real upperBound) { upperBound_ = upperBound; }
   void enableAdaptiveTimeStep() { fixedTimeStep_ = false; }
   void disableAdaptiveTimeStep() { fixedTimeStep_ = true; }
+  void setPostStepFunction(std::function<void()> func) { postStep_ = func; }
+  void clearPostStepFunction() { postStep_ = nullptr; }
 
   //------------- EXECUTING THE SOLVER -----------------------------------------
 
@@ -66,6 +70,7 @@ class TimeSolver {
   void steps(unsigned int nsteps);
   void runwhile(std::function<bool(void)>);
   void run(real duration);
+  void postStep() { if (postStep_) return postStep_(); }
 
   //------------- HELPER FUNCTIONS FOR ADAPTIVE TIMESTEPPING -------------------
 
@@ -82,10 +87,12 @@ class TimeSolver {
   real displacementMaxError_ = 1e-18;  // TODO: may need to change default value
   real velocityMaxError_ = 1e-7;  // TODO: may need to change default value
   real sensibleFactor_ = 0.01;
+  real sensibleTimestepDefault_ = 1e-14;
   real time_ = 0.0;
   real timestep_ = 0.0;
   real upperBound_ = 2.0;
   bool fixedTimeStep_ = false;
+  std::function<void()> postStep_ = nullptr;
   std::vector<DynamicEquation> eqs_;
 
   //------------- THE INTERNAL STEPPER -----------------------------------------

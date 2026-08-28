@@ -1,7 +1,7 @@
 """This script creates the magnetoelastic dispersion relation in AFM when the 
 wave propagation and the magnetization form an angle theta as described in
 mumax+: extensible GPU-accelerated micromagnetics and beyond.
-https://arxiv.org/abs/2411.18194
+https://arxiv.org/abs/2411.18194v2
 
 This script will take a few minutes, then save the data.
 """
@@ -11,7 +11,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from mumaxplus import World, Grid, Antiferromagnet
 import os.path
-from mumaxplus.util.constants import *
+from mumaxplus.util.constants import GAMMALL_DEFAULT, MU0
 
 # angle between magnetization and wave propagation
 theta = np.pi/6
@@ -23,7 +23,7 @@ aex = 2.48e-12
 A_c = -9.93e5 * a**2
 A_nn = 0
 K = 611e3
-alpha = 2e-3
+alpha = 1e-4
 Bdc = 2
 
 # magnetoelastic parameters
@@ -34,7 +34,7 @@ B2 = B
 C11 = 200e9
 C44 = 70e9
 C12 = C11 - 2*C44  # assume isotropic
-eta = 2e11
+eta = 1e12
 
 # time settings
 fmax = 5e12/(2*np.pi)        # maximum frequency (in Hz) of the sinc pulse
@@ -106,11 +106,11 @@ def simulation(theta):
     u = np.zeros(shape=(nt, 3, nz, ny, nx))
     
     # add magnetic field and external force excitation in the middle of the magnet
-    Fac = 1e16  # force pulse strength
-    Bac = 1e3  # magnetic pulse strength
+    Fac = 1e9  # force pulse strength
+    Bac = 1e0  # magnetic pulse strength
 
-    mask = np.zeros(shape=(1, 1, nx))
     # Put signal at the center of the simulation box
+    mask = np.zeros(shape=(1, 1, nx))
     mask[:, :, nx // 2 - 1:nx // 2 + 1] = 1
     Fac_dir = np.array([Fac, Fac, Fac])/np.sqrt(3)
     Bac_dir = np.array([Bac, Bac, Bac])/np.sqrt(3)
@@ -191,11 +191,11 @@ ax.plot(k*1e-9, -w_t/(2*np.pi)*1e-12, color="darkorange", lw=linewidth, label="e
 ax.plot(k*1e-9, -w_l/(2*np.pi)*1e-12, color="darkorange", lw=linewidth)
 
 # spin wave frequencies
-w_ext = GAMMALL * Bdc
-w_ani = GAMMALL * 2*K / msat
-w_ex = GAMMALL * 2*aex/msat * k**2
-w_c = GAMMALL * 4*A_c/(a**2 * msat)
-w_nn = GAMMALL * A_nn/msat * k**2
+w_ext = GAMMALL_DEFAULT * Bdc
+w_ani = GAMMALL_DEFAULT * 2*K / msat
+w_ex = GAMMALL_DEFAULT * 2*aex/msat * k**2
+w_c = GAMMALL_DEFAULT * 4*A_c/(a**2 * msat)
+w_nn = GAMMALL_DEFAULT * A_nn/msat * k**2
 
 # spin waves
 w_mag = np.sqrt((w_ani + w_ex - w_nn)*(w_ani + w_ex - 2*w_c + w_nn))
@@ -209,7 +209,7 @@ ax.plot(k*1e-9, omega_magn3/(2*np.pi)*1e-12, color="green", lw=linewidth)
 ax.plot(k*1e-9, omega_magn4/(2*np.pi)*1e-12, color="green", lw=linewidth)
 
 # Magnetoelastic waves
-J = GAMMALL * B**2 / (rho*msat)
+J = GAMMALL_DEFAULT * B**2 / (rho*msat)
 w = np.linspace(ymin*(2*np.pi)*1e12, ymax*(2*np.pi)*1e12, 2000)
 k, w = np.meshgrid(k,w)
 

@@ -30,6 +30,7 @@ __global__ void k_ZhangLi(CuField torque,
                                      const CuParameter polParam,
                                      const CuParameter xiParam,
                                      const CuParameter alphaParam,
+                                     const CuParameter frozenSpins,
                                      const CuVectorParameter jcurParam,
                                      const Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -37,10 +38,12 @@ __global__ void k_ZhangLi(CuField torque,
   const Grid grid = torque.system.grid;
   const real3 cellsize = torque.system.cellsize;
 
-  // When outside the geometry, set to zero and return early
-  if (!torque.cellInGeometry(idx)) {
-    if (torque.cellInGrid(idx))
-      torque.setVectorInCell(idx, real3{0, 0, 0});
+  // Don't do anything outside of the grid.
+  if (!torque.cellInGrid(idx)) return;
+  
+  // When outside the geometry or frozen, set to zero and return early
+  if (!torque.cellInGeometry(idx) || (frozenSpins.valueAt(idx) != 0)) {
+    torque.setVectorInCell(idx, real3{0, 0, 0});
     return;
   }
 
@@ -102,17 +105,21 @@ __global__ void k_Slonczewski(CuField torque,
                                      const CuParameter polParam,
                                      const CuParameter lambdaParam,
                                      const CuParameter alphaParam,
+                                     const CuParameter gammaParam,
                                      const CuVectorParameter jcurParam,
                                      const CuParameter epsilonPrime,
                                      const CuVectorParameter fixedLayer,
                                      const CuParameter freeLayerThickness,
+                                     const CuParameter frozenSpins,
                                      const bool fixedLayerOnTop) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  // When outside the geometry, set to zero and return early
-  if (!torque.cellInGeometry(idx)) {
-    if (torque.cellInGrid(idx))
-      torque.setVectorInCell(idx, real3{0, 0, 0});
+  // Don't do anything outside of the grid.
+  if (!torque.cellInGrid(idx)) return;
+  
+  // When outside the geometry or frozen, set to zero and return early
+  if (!torque.cellInGeometry(idx) || (frozenSpins.valueAt(idx) != 0)) {
+    torque.setVectorInCell(idx, real3{0, 0, 0});
     return;
   }
 
@@ -124,8 +131,9 @@ __global__ void k_Slonczewski(CuField torque,
   const real msat = msatParam.valueAt(idx);
   const real pol = polParam.valueAt(idx);
   const real alpha = alphaParam.valueAt(idx);
+  const real gamma = gammaParam.valueAt(idx);
 
-  const real3 p = fixedLayer.vectorAt(idx);
+  const real3 p = normalized(fixedLayer.vectorAt(idx));
   const real lambda = lambdaParam.valueAt(idx);
   const real eps_p = epsilonPrime.valueAt(idx);
   real d = freeLayerThickness.valueAt(idx);
@@ -145,7 +153,7 @@ __global__ void k_Slonczewski(CuField torque,
   const real3 pxm = cross(p, m);
   const real3 mxpxm = cross(m, pxm);
   const real3 t = ((eps  + eps_p * alpha) * mxpxm 
-                   + (eps_p - eps  * alpha) * pxm) * (B / (1 + alpha * alpha)) * GAMMALL;
+                   + (eps_p - eps  * alpha) * pxm) * (B / (1 + alpha * alpha)) * gamma;
 
   torque.setVectorInCell(idx, t);
 }
@@ -164,22 +172,24 @@ Field evalSpinTransferTorque(const Ferromagnet* magnet) {
   auto pol = magnet->pol.cu();
   auto xi = magnet->xi.cu();
   auto alpha = magnet->alpha.cu();
+  auto gamma = magnet->gamma.cu();
   auto jcur = magnet->jcur.cu();
   auto lambda = magnet->Lambda.cu();
   auto epsilonPrime = magnet->epsilonPrime.cu();
   auto fixedLayer = magnet->fixedLayer.cu();
   auto freeLayerThickness = magnet->freeLayerThickness.cu();
   bool fixedLayerOnTop = magnet->fixedLayerOnTop;
+  auto frozenSpins = magnet->frozenSpins.cu();
 
   auto cellsize = magnet->world()->cellsize();
 
   // Either Zhang Li xor Slonczewski, can't have both TODO: should that be possible?
   if (SlonczewskiSTTAssuredZero(magnet))
-    cudaLaunch(ncells, k_ZhangLi, torque.cu(), m, msat, pol, xi, alpha, jcur,
-               magnet->world()->mastergrid());
+    cudaLaunch(ncells, k_ZhangLi, torque.cu(), m, msat, pol, xi, alpha,
+               frozenSpins, jcur, magnet->world()->mastergrid());
   else
-    cudaLaunch(ncells, k_Slonczewski, torque.cu(), m, msat, pol, lambda, alpha,
-             jcur, epsilonPrime, fixedLayer, freeLayerThickness, fixedLayerOnTop);
+    cudaLaunch(ncells, k_Slonczewski, torque.cu(), m, msat, pol, lambda, alpha, gamma,
+             jcur, epsilonPrime, fixedLayer, freeLayerThickness, frozenSpins, fixedLayerOnTop);
   return torque;
 }
 

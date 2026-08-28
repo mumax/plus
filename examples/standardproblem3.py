@@ -9,7 +9,7 @@ import numpy as np
 from tqdm import tqdm
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import vortex, show_field_3D
+from mumaxplus.util import vortex, show_field_3D, plot_field
 
 # A cube with edge length, L, expressed in units lex = (A/Km)1/2
 # where Km is a magnetostatic energy density, Km = 1/2 µ0 Msat² (SI)
@@ -49,7 +49,7 @@ for L in tqdm(L_array):
     flower_E_tots.append(magnet.total_energy.eval())
 
     # vortex
-    magnet.magnetization = vortex((L/2, L/2, L/2), L/12, -1, 1)
+    magnet.magnetization = vortex(magnet.center, L/12, -1, 1)
     magnet.minimize()
     vortex_E_tots.append(magnet.total_energy.eval())
 
@@ -70,16 +70,29 @@ plt.show()
 
 # show states at phase transition
 show_states = True
-quiver = True  #  with(out) arrows
+enable_quiver = True  #  3D plot with(out) arrows
+
+def plot_sliced_field(qty):
+    """Plot the 3 planar slices (approximately) through the middle of the cube."""
+    fig, axs = plt.subplots(ncols=3, figsize=(15, 4.8))
+    for i, c in enumerate("zyx"):
+        plot_field(qty, ax=axs[i], arrow_size=4, out_of_plane_axis=c, layer=N//2,
+                xlabel=f"${'xyz'[0-i]}$"+r" ($l_{\rm ex}$)",
+                ylabel=f"${'xyz'[1-i]}$"+r" ($l_{\rm ex}$)")
+    fig.tight_layout()
+    plt.show()
+
 if show_states:
     world, magnet = setup_magnet(L_cross)
 
     # flower
     magnet.magnetization = (1, 0, 0.01)  # right, with slight symmetry breaking    
     magnet.minimize()
-    show_field_3D(magnet.magnetization, quiver=quiver)
+    show_field_3D(magnet.magnetization, enable_quiver=enable_quiver)
+    plot_sliced_field(magnet.magnetization)
 
     # vortex
-    magnet.magnetization = vortex((L/2, L/2, L/2), L/12, -1, 1)
+    magnet.magnetization = vortex(magnet.center, L_cross/12, -1, 1)
     magnet.minimize()
-    show_field_3D(magnet.magnetization, quiver=quiver)
+    show_field_3D(magnet.magnetization, enable_quiver=enable_quiver)
+    plot_sliced_field(magnet.magnetization)

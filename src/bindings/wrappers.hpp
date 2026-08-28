@@ -13,13 +13,20 @@ class Field;
 
 void setArrayInField(Field&, py::array_t<real>);
 
+void wrap_altermagnet(py::module& m);
 void wrap_antiferromagnet(py::module& m);
+void wrap_altermagnetfieldquantity(py::module& m);
+void wrap_altermagnetscalarquantity(py::module& m);
 void wrap_antiferromagnetfieldquantity(py::module& m);
 void wrap_antiferromagnetscalarquantity(py::module& m);
 void wrap_ferromagnet(py::module& m);
+void wrap_ncafm(py::module& m);
+void wrap_ncafmfieldquantity(py::module& m);
+void wrap_ncafmscalarquantity(py::module& m);
 void wrap_magnet(py::module& m);
 void wrap_magnetfieldquantity(py::module& m);
 void wrap_magnetscalarquantity(py::module& m);
+void wrap_mfm(py::module& m);
 void wrap_field(py::module& m);
 void wrap_grid(py::module& m);
 void wrap_parameter(py::module& m);
@@ -36,3 +43,5 @@ void wrap_linsolver(py::module& m);
 void wrap_system(py::module& m);
 void wrap_dmitensor(py::module& m);
 void wrap_voronoi(py::module& m);
+void wrap_window(py::module& m);
+void wrap_traction(py::module& m);

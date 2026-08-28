@@ -2,11 +2,11 @@
 It then shows an animation of the displacement and kinetic and potential energy."""
 
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mumaxplus import World, Grid, Ferromagnet
 from mumaxplus.util.config import gaussian_spherical_IP
+from mumaxplus.util.formulary import Rayleigh_damping_coefficients
 
 J_to_eV = 6.24150907e18
 
@@ -58,11 +58,35 @@ magnet = Ferromagnet(world, grid)
 magnet.enable_elastodynamics = True
 
 magnet.msat = 0
-magnet.rho = 8e3
-magnet.C11 = 283e9
-magnet.C44 = 58e9
-magnet.C12 = 166e9
-magnet.eta = 1e12
+rho = 8e3
+magnet.rho = rho
+C11, C44, C12 = 283e9, 58e9, 166e9
+magnet.C11, magnet.C44, magnet.C12 = C11, C44, C12
+
+# --------------------
+"""Add Rayleigh damping
+
+The stiffness part of Rayleigh damping is automatically enabled by default via
+the `Magnet.stiffness_damping` property. That Parameter is ignored when any part
+of the viscosity tensor is set, like we explicitly do here in this example.
+"""
+
+# lowest relevant frequency has a wavelength similar to the length of the system
+lowest_freq = np.sqrt(min(C11, C44) / rho) / (2 * max(length, width))
+# highest relevant frequency has a wavelength of a few cells
+highest_freq = np.sqrt(max(C11, C44) / rho) / (4 * min(cx, cy))
+damping_ratio = 0.01  # 1%
+
+mass_coef, stiffness_coef = Rayleigh_damping_coefficients(lowest_freq, damping_ratio,
+                                                          highest_freq, damping_ratio)
+# mass damping with phenomenological damping
+eta = mass_coef * rho
+magnet.eta = eta
+
+# stiffness damping with viscosity
+eta11, eta44, eta12 = stiffness_coef * C11, stiffness_coef * C44, stiffness_coef * C12
+magnet.eta11, magnet.eta44, magnet.eta12 = eta11, eta44, eta12
+# --------------------
 
 magnet.elastic_displacement = gaussian_spherical_IP(
         magnet.center, 1e-15, np.pi/5, length/4, width/4)

@@ -1,14 +1,16 @@
 name: mumaxplus
 channels:
   - conda-forge
+  - defaults
 dependencies:
   # required
-  - python=3.8
+  - python=3.13
   - conda-build
   - pytest
+  - pytest-repeat
   - matplotlib
   - numpy
-  - cmake=3.16.3
+  - cmake=4.0.0
   - scipy
 
   # code checks
@@ -19,18 +21,31 @@ dependencies:
   - isort # check that imports are in the right order
   - pre-commit
   - pip
-  - pip:
-      - clang-format
 
   # optional
   - ipython
   - jupyter
   - ipywidgets
   - pyvista
+  - trimesh
+  - networkx
+  - rtree
+  - vtk
   - pillow  # should be contained in matplotlib
   - pandas
 
   # documentation generation
+  - clang
+  - plantuml
   - sphinx
-  - sphinx_rtd_theme
+  - sphinx-book-theme
   - numpydoc
+  - sphinxcontrib-video
+  - sphinx-copybutton
+  - sphinx-design
+
+  # pip blocks
+  - pip:
+      - clang-format            # code checks
+      - pyovf                   # optional
+      - sphinxcontrib.plantuml  # documentation generation

@@ -17,7 +17,7 @@
 
 Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr, 
                          std::string name,
-                         Antiferromagnet* hostMagnet)
+                         HostMagnet* hostMagnet)
     : Magnet(system_ptr, name),
       hostMagnet_(hostMagnet),
       magnetization_(system(), 3, name + ":magnetization", "", MaxError::MAGNETIZATION),
@@ -26,14 +26,15 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
       interExch(system(), 0.0, name + ":inter_exchange", "J/m"),
       scaleExch(system(), 1.0, name + ":scale_exchange", ""),
       ku1(system(), 0.0, name + ":ku1", "J/m3"),
-      ku2(system(), 0.0, name + "ku2", "J/m3"),
+      ku2(system(), 0.0, name + ":ku2", "J/m3"),
       kc1(system(), 0.0, name + ":kc1", "J/m3"),
       kc2(system(), 0.0, name + ":kc2", "J/m3"),
-      kc3(system(), 0.0, name + "kc3", "J/m3"),
+      kc3(system(), 0.0, name + ":kc3", "J/m3"),
       alpha(system(), 0.0, name + ":alpha", ""),
+      gamma(system(), 1.7595E11, name + ":gamma", "rad/Ts"),
       temperature(system(), 0.0, name + ":temperature", "K"),
       xi(system(), 0.0, name + ":xi", ""),
-      Lambda(system(), 0.0, name + ":lambda", ""),
+      Lambda(system(), 1.0, name + ":lambda", ""),
       freeLayerThickness(system(), grid().size().z * cellsize().z,
                          name + ":free_layer_thickness", "m"),
       fixedLayerOnTop(true),
@@ -53,11 +54,13 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
       appliedPotential(system(), std::nanf("0"), name + ":applied_potential", "V"),
       conductivity(system(), 0.0, name + ":conductivity", "S/m"),
       amrRatio(system(), 0.0, name + ":amr_ratio", ""),
+      frozenSpins(system(), 0.0, name + ":frozen_spins", ""),
       RelaxTorqueThreshold(-1.0),
       poissonSystem(this), 
       // magnetoelasticity
       B1(system(), 0.0, name + ":B1", "J/m3"),
-      B2(system(), 0.0, name + ":B1", "J/m3") {
+      B2(system(), 0.0, name + ":B2", "J/m3"),
+      BChiral(system(), 0.0, name + ":BChiral", "J/m3") {
     {// Initialize random magnetization
     // TODO: this can be done much more efficient somewhere else
     int nvalues = 3 * this->grid().ncells();
@@ -76,8 +79,8 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
   // Initialize CUDA RNG
   // TODO: move the generator to somewhere else
   curandCreateGenerator(&randomGenerator, CURAND_RNG_PSEUDO_DEFAULT);
-  curandSetPseudoRandomGeneratorSeed(randomGenerator,
-  static_cast<int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+  thermalSeed = static_cast<int>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+  curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
 }
 
 Ferromagnet::Ferromagnet(MumaxWorld* world,
@@ -90,17 +93,17 @@ Ferromagnet::Ferromagnet(MumaxWorld* world,
 Ferromagnet::~Ferromagnet() {
   curandDestroyGenerator(randomGenerator);
 }
-
+void Ferromagnet::resetNoiseGenerator() {
+  curandDestroyGenerator(randomGenerator);
+  curandCreateGenerator(&randomGenerator, CURAND_RNG_PSEUDO_DEFAULT);
+  curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
+}
 const Variable* Ferromagnet::magnetization() const {
   return &magnetization_;
 }
 
 bool Ferromagnet::isSublattice() const {
   return !(hostMagnet_ == nullptr);
-}
-
-const Antiferromagnet* Ferromagnet::hostMagnet() const {
-  return hostMagnet_;
 }
 
 void Ferromagnet::minimize(real tol, int nSamples) {

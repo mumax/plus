@@ -30,7 +30,7 @@ def get_next_power_of_2(x):
         y *= 2
     return y
 
-def get_gridsize(L, d, t, l_ex=l_ex):
+def get_gridsize(L, d, t):
     """Cell length should at least be < l_ex/2. The number of cells is best
     a power of 2 for FFT. This results in cell sizes between 0.25*l_ex and
     0.5*l_ex."""
@@ -42,7 +42,7 @@ for d in tqdm(d_array):
     L = L_p_d * d  # dimensionless length L = length/l_ex
     t = t_p_d * d  # dimensionless thickness t = thickness/l_ex
 
-    nx, ny, nz = get_gridsize(L, d, t, l_ex=l_ex)
+    nx, ny, nz = get_gridsize(L, d, t)
     world = World(cellsize=(L*l_ex/nx, d*l_ex/ny, t*l_ex/nz))
     magnet = Ferromagnet(world, Grid((nx, ny, nz)))
     magnet.msat = msat
@@ -95,7 +95,7 @@ mx_ax.plot(d_array, mx_list, marker="s", c="g")
 my_ax.plot(d_array, my_list, marker="s", c="r")
 mx_ax.set_ylabel("$m_x$")
 my_ax.set_ylabel("$m_y$")
-my_ax.set_xlabel("$d/l_ex$")
+my_ax.set_xlabel("$d/l_{ex}$")
 
 # coercivity
 if calculate_coercivity:
@@ -106,4 +106,5 @@ if calculate_coercivity:
     ax.set_ylabel(r"$H_C/M_{\rm sat}$")
     ax.legend()
 
+plt.tight_layout()
 plt.show()

@@ -12,5 +12,11 @@ void wrap_variable(py::module& m) {
         Field tmp(v->system(), v->ncomp());
         setArrayInField(tmp, data);
         v->set(std::move(tmp));
+      })
+      .def("set_in_region", [](const Variable* v, unsigned int idx, real value) {
+                                v->setInRegion(idx, value);
+      })
+      .def("set_in_region", [](const Variable* v, unsigned int idx, real3 value) {
+                                v->setInRegion(idx, value);
       });
 }

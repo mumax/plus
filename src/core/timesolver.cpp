@@ -51,16 +51,52 @@ real TimeSolver::getMaxError(MaxError maxError) const {
 real TimeSolver::sensibleTimeStep() const {
   if (eqs_.empty())
     return 0.0;  // Timestep is irrelevant if there are no equations to solve
-  real globalMaxNorm = 0;
-  for (auto eq : eqs_)
-    if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > globalMaxNorm)
-      globalMaxNorm = maxNorm;
-  return sensibleFactor_ / globalMaxNorm;
+
+  // find global maxima
+  real maxRhs = 0;
+  real maxNoise = 0;
+  for (auto eq : eqs_) {
+    if (real maxNorm = maxVecNorm(eq.rhs->eval()); maxNorm > maxRhs)
+      maxRhs = maxNorm;
+
+    if (eq.noiseTerm && !eq.noiseTerm->assuredZero()) {
+      // TODO: replace by expected maximum prefactor of noise, depending on the
+      // number of cells, without curand noise generation?
+      real eqMaxNoise = maxVecNorm(eq.noiseTerm->eval());
+      if (eqMaxNoise > maxNoise) maxNoise = eqMaxNoise;
+    }
+  }
+
+  if (maxNoise == 0) {
+    // Sensible timestep cannot be calculated if torque is zero
+    if (maxRhs == 0) return sensibleTimestepDefault();
+    // with RHS but no noise
+    return sensibleFactor() / maxRhs;
+  }
+  // negligible RHS compared to noise
+  // valid for small values in the binomial approximation:
+  // sqrt(1 + 4 fR/N²) ≈ 1 + 2 fR/N²
+  // but values still larger than numerical noise (~1e-7)
+  real smallNumber = 1e-3;
+  if (2 * sensibleFactor() * maxRhs / (maxNoise * maxNoise) < smallNumber) {
+    // return solution of dt = sensibleFactor / (maxNoise / sqrt(dt))
+    return pow(sensibleFactor() / maxNoise , 2);
+  }
+  // RHS and noise
+  // returns solution of dt = sensibleFactor / (maxRhs + maxNoise/sqrt(dt))
+  real D = pow(maxNoise, 2) + 4 * maxRhs * sensibleFactor();  // discriminant
+  return pow((sqrt(D) - maxNoise) / (2 * maxRhs), 2);
 }
 
 void TimeSolver::setEquations(std::vector<DynamicEquation> eqs) {
   eqs_ = eqs;
   if (!fixedTimeStep_) timestep_ = sensibleTimeStep();
+}
+
+void TimeSolver::setSensibleTimestepDefault(real dt) {
+  if (dt < 0)
+    throw std::runtime_error("The sensible timestep should be larger than zero.");
+  sensibleTimestepDefault_ = dt;
 }
 
 void TimeSolver::adaptTimeStep(real correctionFactor) {
@@ -82,11 +118,11 @@ void TimeSolver::adaptTimeStep(real correctionFactor) {
 
 void TimeSolver::step() {
   if (timestep_ <= 0)
-    std::runtime_error(
+    throw std::runtime_error(
         "Timesolver can not make a step because the timestep is smaller than "
         "or equal to zero.");
-
   stepper_->step();
+  postStep();
 }
 
 void TimeSolver::steps(unsigned int nSteps) {
@@ -114,5 +150,6 @@ void TimeSolver::run(real duration) {
   real oldTimestep = timestep();
   setTimeStep(stoptime - time_);
   step();
+  postStep();
   if (fixedTimeStep_) setTimeStep(oldTimestep);
 }
