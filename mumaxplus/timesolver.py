@@ -211,7 +211,7 @@ class TimeSolver:
 
     @property
     def magnetization_max_error(self) -> float:
-        """Return the maximum error per step the solver can tollerate for the
+        """Return the maximum error per step the solver can tolerate for the
         magnetization-torque equations of motion (rad).
         
         The default value is 1e-5.
@@ -232,7 +232,7 @@ class TimeSolver:
     
     @property
     def displacement_max_error(self) -> float:
-        """Return the maximum error per step the solver can tollerate for the
+        """Return the maximum error per step the solver can tolerate for the
         displacement-velocity equations of motion (m).
         
         The default value is 1e-18.
@@ -252,7 +252,7 @@ class TimeSolver:
 
     @property
     def velocity_max_error(self) -> float:
-        """Return the maximum error per step the solver can tollerate for the
+        """Return the maximum error per step the solver can tolerate for the
         velocity-acceleration equations of motion (m/s).
         
         The default value is 1e-7.
