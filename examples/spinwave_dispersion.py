@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util.constants import GAMMALL
+from mumaxplus.util.constants import GAMMALL_DEFAULT
 
 # Ferromagnetic spinwave dispersion relation
 
@@ -29,7 +29,6 @@ Bz = 0.2           # bias field along the z direction
 A = 13E-12         # exchange constant
 Ms = 800E3         # saturation magnetization
 alpha = 0.05       # damping parameter
-gamma = GAMMALL    # gyromagnetic ratio
 
 # Create the world
 grid_size = (nx, 1, 1)
@@ -109,9 +108,9 @@ plt.imshow(np.abs(mx_fft)**2, extent=extent,
 
 # Plot the analytical derived dispersion relation
 k = np.linspace(-2e8, 2e8, 1000)
-freq_theory = A * gamma * k**2 / (np.pi * Ms) + gamma * Bz / (2 * np.pi)
+freq_theory = A * GAMMALL_DEFAULT * k**2 / (np.pi * Ms) + GAMMALL_DEFAULT * Bz / (2 * np.pi)
 plt.plot(k, freq_theory, 'r--', lw=1)
-plt.axhline(gamma * Bz / (2 * np.pi), c='g', ls='--', lw=1)
+plt.axhline(GAMMALL_DEFAULT * Bz / (2 * np.pi), c='g', ls='--', lw=1)
 
 plt.xlim([-2e8, 2e8])
 plt.ylim([0, fmax])

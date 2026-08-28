@@ -41,13 +41,13 @@ class DmiTensor:
     antisymmetric in it's magnetic indices (:math:`D_{ijk} = - D_{ikj}`) and hence can be
     fully described by only 9 elements.
 
-    ``DmiTensor`` has 9 Parameter properties: ``xxy``, ``xxz``, ``xyz``, ``yxy``,
-    ``yxz``, ``yyz``, ``zxy``, ``zxz``, and ``zyz``. These 9 parameters fully define the
+    :func:`DmiTensor` has 9 Parameter properties: :attr:`xxy`, :attr:`xxz`, :attr:`xyz`, :attr:`yxy`,
+    :attr:`yxz`, :attr:`yyz`, :attr:`zxy`, :attr:`zxz`, and :attr:`zyz`. These 9 parameters fully define the
     dmi tensor of a ferromagnet. The parameters can be set separately, or can be set
     through one of the following methods:
 
-    - ``DmiTensor.set_interfacial_dmi``
-    - ``DmiTensor.set_bulk_dmi``
+    - :func:`DmiTensor.set_interfacial_dmi`
+    - :func:`DmiTensor.set_bulk_dmi`
     
     Neumann boundary conditions are determined by
     
@@ -81,13 +81,15 @@ class DmiTensor:
     def __init__(self, impl):
         """Create a DmiTensor from a cpp DmiTensor instance.
 
-        .. warning: The end user should not create DmiTensor instances. Each Ferromagnet
-                    already has a DmiTensor as an attribute which can be used to set
-                    the DMI parameters. See ``Ferromagnet.dmi_tensor``.
+        warning
+        -------
+        The end user should not create DmiTensor instances. Each Ferromagnet
+        already has a DmiTensor as an attribute which can be used to set
+        the DMI parameters. See :attr:`Ferromagnet.dmi_tensor`.
 
         Parameters
         ----------
-        impl: _mumaxpluscpp.dmi_tensor
+        impl: _mumaxpluscpp.DmiTensor
         """
         self._impl = impl
 
@@ -117,7 +119,7 @@ class DmiTensor:
         value
             The interfacial DMI strength. This value is used to set individual DMI
             parameters of the DMI tensor. The value can be anything which can be used in
-            ``Parameter.set``.
+            :func:`Parameter.set`.
         """
         self.make_zero()
         self.xxz.set(value)
@@ -138,7 +140,7 @@ class DmiTensor:
         value
             The bulk DMI strength. This value is used to set individual DMI parameters
             of the DMI tensor. The value can be anything which can be used in
-            ``Parameter.set``.
+            :func:`Parameter.set`.
         """
         self.make_zero()
         self.xyz.set(value)
@@ -146,8 +148,8 @@ class DmiTensor:
         self.zxy.set(value)
 
     @property
-    def xxy(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_xxy` (unit: J/m2).
+    def xxy(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_xxy` (J/m²).
 
         Returns
         -------
@@ -161,8 +163,8 @@ class DmiTensor:
         self.xxy.set(value)
 
     @property
-    def xyz(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_xyz` (unit: J/m2).
+    def xyz(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_xyz` (J/m²).
 
         Returns
         -------
@@ -176,8 +178,8 @@ class DmiTensor:
         self.xyz.set(value)
 
     @property
-    def xxz(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_xxz` (unit: J/m2).
+    def xxz(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_xxz` (J/m²).
 
         Returns
         -------
@@ -190,8 +192,8 @@ class DmiTensor:
         self.xxz.set(value)
 
     @property
-    def yxy(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_yxy` (unit: J/m2).
+    def yxy(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_yxy` (J/m²).
 
         Returns
         -------
@@ -204,8 +206,8 @@ class DmiTensor:
         self.yxy.set(value)
 
     @property
-    def yyz(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_yyz` (unit: J/m2).
+    def yyz(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_yyz` (J/m²).
 
         Returns
         -------
@@ -218,8 +220,8 @@ class DmiTensor:
         self.yyz.set(value)
 
     @property
-    def yxz(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_yxz` (unit: J/m2).
+    def yxz(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_yxz` (J/m²).
 
         Returns
         -------
@@ -232,8 +234,8 @@ class DmiTensor:
         self.yxz.set(value)
 
     @property
-    def zxy(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_zxy` (unit: J/m2).
+    def zxy(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_zxy` (J/m²).
 
         Returns
         -------
@@ -246,8 +248,8 @@ class DmiTensor:
         self.zxy.set(value)
 
     @property
-    def zyz(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_zyz` (unit: J/m2).
+    def zyz(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_zyz` (J/m²).
 
         Returns
         -------
@@ -260,8 +262,8 @@ class DmiTensor:
         self.zyz.set(value)
 
     @property
-    def zxz(self):
-        """Dzyaloshinskii-Moriya interaction strength parameter `D_zxz` (unit: J/m2).
+    def zxz(self) -> Parameter:
+        """Dzyaloshinskii-Moriya interaction strength parameter `D_zxz` (J/m²).
 
         Returns
         -------

@@ -8,10 +8,10 @@
 #include <cfloat>
 #include <stdexcept>
 
-#include "antiferromagnet.hpp"
 #include "ferromagnet.hpp"
 #include "fieldquantity.hpp"
 #include "gpubuffer.hpp"
+#include "hostmagnet.hpp"
 #include "mumaxworld.hpp"
 #include "relaxer.hpp"
 #include "strayfield.hpp"
@@ -129,8 +129,20 @@ const Ferromagnet* Magnet::asFM() const {
   return dynamic_cast<const Ferromagnet*>(this);
 }
 
+const HostMagnet* Magnet::asHost() const {
+  return dynamic_cast<const HostMagnet*>(this);
+}
+
 const Antiferromagnet* Magnet::asAFM() const {
   return dynamic_cast<const Antiferromagnet*>(this);
+}
+
+const Altermagnet* Magnet::asATM() const {
+  return dynamic_cast<const Altermagnet*>(this);
+}
+
+const NcAfm* Magnet::asNcAfm() const {
+  return dynamic_cast<const NcAfm*>(this);
 }
 
 const StrayField* Magnet::getStrayField(const Magnet* magnet) const {

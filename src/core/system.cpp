@@ -1,8 +1,10 @@
 #include "system.hpp"
 
 #include <algorithm>
+#include <array>
 #include <stdexcept>
 #include <set>
+#include <string>
 
 #include "datatypes.hpp"
 #include "gpubuffer.hpp"
@@ -31,6 +33,11 @@ System::System(const World* world, Grid grid, GpuBuffer<bool> geometry, GpuBuffe
     std::set<unsigned int> uni(regionsVec.begin(), regionsVec.end()); // The order is of no importance
     uniqueRegions = std::vector<unsigned int>(uni.begin(), uni.end());
   }
+  if (geometry.size() != 0) {
+    std::vector<bool> v = geometry_.getData();
+    cellsInGeo_ = grid_.ncells() - std::count(v.begin(), v.end(), false);
+  }
+  else { cellsInGeo_ = grid_.ncells(); }
 }
 
 const World* System::world() const {
@@ -62,6 +69,12 @@ real3 System::center() const {
   return (corner2 + corner1) / 2;
 }
 
+std::array<real, 6> System::extent() const {
+  real3 minEdge = origin() - 0.5 * cellsize();
+  real3 maxEdge = minEdge + int3_to_real3(grid().size()) * cellsize();
+  return {minEdge.x, maxEdge.x, minEdge.y, maxEdge.y, minEdge.z, maxEdge.z};
+}
+
 const GpuBuffer<bool>& System::geometry() const {
   return geometry_;
 }
@@ -77,9 +90,8 @@ void System::checkIdxInRegions(int idx) const {
   }
 }
 
-int System::cellsingeo() const {
-  std::vector<bool> v = geometry_.getData();
-  return grid_.ncells() - std::count(v.begin(), v.end(), false);
+int System::cellsInGeo() const {
+  return cellsInGeo_;
 }
 
 CuSystem System::cu() const {

@@ -52,9 +52,7 @@ real evalKineticEnergy(const Magnet* magnet) {
     return 0.0;
 
   real edens = kineticEnergyDensityQuantity(magnet).average()[0];
-  int ncells = magnet->grid().ncells();
-  real cellVolume = magnet->world()->cellVolume();
-  return ncells * edens * cellVolume;
+  return energyFromEnergyDensity(magnet, edens);
 }
 
 M_FieldQuantity kineticEnergyDensityQuantity(const Magnet* magnet) {
@@ -98,8 +96,8 @@ Field evalElasticEnergyDensity(const Magnet* magnet) {
   }
 
   int ncells = elField.grid().ncells();
-  Field stress = evalStressTensor(magnet);
   Field strain = evalStrainTensor(magnet);
+  Field stress = evalStressTensor(magnet, &strain);
   cudaLaunch(ncells, k_elasticEnergyDensity, elField.cu(), stress.cu(), strain.cu());
   return elField;
 }
@@ -109,9 +107,7 @@ real evalElasticEnergy(const Magnet* magnet) {
     return 0.0;
 
   real edens = elasticEnergyDensityQuantity(magnet).average()[0];
-  int ncells = magnet->grid().ncells();
-  real cellVolume = magnet->world()->cellVolume();
-  return ncells * edens * cellVolume;
+  return energyFromEnergyDensity(magnet, edens);
 }
 
 M_FieldQuantity elasticEnergyDensityQuantity(const Magnet* magnet) {

@@ -1,3 +1,4 @@
+#include "altermagnet.hpp"
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
 #include "ferromagnet.hpp"
@@ -25,21 +26,30 @@ __global__ void k_neelvector(CuField neel,
     neel.setVectorInCell(idx, (ms1 * m1 - ms2 * m2) / (ms1 + ms2));
 }
 
-Field evalNeelvector(const Antiferromagnet* magnet) {
+Field evalNeelvector(const HostMagnet* magnet) {
   // Calculate a weighted Neel vector (dimensionless) to account for ferrimagnets
+  if (magnet->sublattices().size() != 2)
+    throw std::runtime_error("Cannot compute the Néel vector if the magnet has no two sublattices");
+
   Field neel(magnet->system(), 3);
 
-  if (magnet->sub1()->msat.assuredZero() && magnet->sub2()->msat.assuredZero()) {
+  if (magnet->sublattices()[0]->msat.assuredZero() && magnet->sublattices()[1]->msat.assuredZero()) {
     neel.makeZero();
     return neel;
   }
+  auto sub1 = magnet->sublattices()[0];
+  auto sub2 = magnet->sublattices()[1];
   cudaLaunch(neel.grid().ncells(), k_neelvector, neel.cu(),
-             magnet->sub1()->magnetization()->field().cu(),
-             magnet->sub2()->magnetization()->field().cu(),
-             magnet->sub1()->msat.cu(), magnet->sub2()->msat.cu());
+             sub1->magnetization()->field().cu(),
+             sub2->magnetization()->field().cu(),
+             sub1->msat.cu(), sub2->msat.cu());
   return neel;
 }
 
 AFM_FieldQuantity neelVectorQuantity(const Antiferromagnet* magnet) {
     return AFM_FieldQuantity(magnet, evalNeelvector, 3, "neel_vector", "");
+}
+
+ATM_FieldQuantity neelVectorQuantity(const Altermagnet* magnet) {
+    return ATM_FieldQuantity(magnet, evalNeelvector, 3, "neel_vector", "");
 }

@@ -15,10 +15,13 @@
 #include "system.hpp"
 #include "traction.hpp"
 
+class Altermagnet;
 class Antiferromagnet;
 class Ferromagnet;
 class FieldQuantity;
+class HostMagnet;
 class MumaxWorld;
+class NcAfm;
 class System;
 
 class Magnet {
@@ -43,7 +46,10 @@ class Magnet {
 
   // Cast Magnet instance to child instances
   const Ferromagnet* asFM() const;
+  const HostMagnet* asHost() const;
   const Antiferromagnet* asAFM() const;
+  const Altermagnet* asATM() const;
+  const NcAfm* asNcAfm() const;
 
   const StrayField* getStrayField(const Magnet*) const;
   std::vector<const StrayField*> getStrayFields() const;
@@ -90,7 +96,6 @@ class Magnet {
   Parameter eta12;
   Parameter eta44;
   Parameter rho;  // Mass density
-
 
   // Delete copy constructor and copy assignment operator to prevent shallow copies
   Magnet(const Magnet&) = delete;

@@ -7,6 +7,10 @@
 #include "voronoi.hpp"
 #include "wrappers.hpp"
 
+#ifdef _MSC_VER  // On Windows, ssize_t is undefined, so declare it manually
+  #include <BaseTsd.h>
+  typedef SSIZE_T ssize_t;
+#endif
 
 void wrap_voronoi(py::module& m) {
     py::class_<VoronoiTessellator>(m, "VoronoiTessellator")
@@ -19,8 +23,12 @@ void wrap_voronoi(py::module& m) {
                 py::arg("region_of_center"))
         .def("coo_to_idx", &VoronoiTessellator::regionOf)
         // TODO: create template function (wrap_system.cpp)
-        .def("generate", [](VoronoiTessellator& t, Grid grid, real3 cellsize, const bool pbc) {
-            std::vector<unsigned int> tess = t.generate(grid, cellsize, pbc);
+        .def("generate", [](VoronoiTessellator& t,
+                            const Grid grid,
+                            const real3 cellsize,
+                            const bool pbc,
+                            const bool make2D) {
+            std::vector<unsigned int> tess = t.generate(grid, cellsize, pbc, make2D);
 
             size_t n = tess.size();
             unsigned int* raw = new unsigned int[n];

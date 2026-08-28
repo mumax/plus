@@ -61,6 +61,8 @@ class TimeSolver {
   void setUpperBound(real upperBound) { upperBound_ = upperBound; }
   void enableAdaptiveTimeStep() { fixedTimeStep_ = false; }
   void disableAdaptiveTimeStep() { fixedTimeStep_ = true; }
+  void setPostStepFunction(std::function<void()> func) { postStep_ = func; }
+  void clearPostStepFunction() { postStep_ = nullptr; }
 
   //------------- EXECUTING THE SOLVER -----------------------------------------
 
@@ -68,6 +70,7 @@ class TimeSolver {
   void steps(unsigned int nsteps);
   void runwhile(std::function<bool(void)>);
   void run(real duration);
+  void postStep() { if (postStep_) return postStep_(); }
 
   //------------- HELPER FUNCTIONS FOR ADAPTIVE TIMESTEPPING -------------------
 
@@ -89,6 +92,7 @@ class TimeSolver {
   real timestep_ = 0.0;
   real upperBound_ = 2.0;
   bool fixedTimeStep_ = false;
+  std::function<void()> postStep_ = nullptr;
   std::vector<DynamicEquation> eqs_;
 
   //------------- THE INTERNAL STEPPER -----------------------------------------

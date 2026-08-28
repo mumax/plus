@@ -2,7 +2,7 @@
 
 import numpy as _np
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .fieldquantity import FieldQuantity
 
@@ -11,19 +11,19 @@ class Parameter(FieldQuantity):
     """Represent a physical material parameter, e.g. the exchange stiffness."""
 
     def __init__(self, impl):
-        """Initialize a python Parameter from a c++ Parameter instance.
+        """Initialize a python Parameter from a C++ Parameter instance.
 
         Parameters should only have to be initialized within the mumax⁺
         module and not by the end user.
         """
-        self._impl = impl
+        super().__init__(impl)
 
     def __repr__(self):
         """Return Parameter string representation."""
         return super().__repr__().replace("FieldQuantity", "Parameter")
 
     @property
-    def is_uniform(self):
+    def is_uniform(self) -> bool:
         """Return True if a Parameter instance is uniform, otherwise False.
         
         See Also
@@ -33,12 +33,12 @@ class Parameter(FieldQuantity):
         return self._impl.is_uniform
 
     @property
-    def is_dynamic(self):
+    def is_dynamic(self) -> bool:
         """Return True if a Parameter instance has time dependent terms."""
         return self._impl.is_dynamic
 
     @property
-    def uniform_value(self):
+    def uniform_value(self) -> float:
         """Return the uniform value of the Parameter instance if it exists.
         
         See Also
@@ -64,15 +64,15 @@ class Parameter(FieldQuantity):
         If mask is None, then the value of the time-dependent term will be the same for
         every grid cell and the final parameter value will be:
 
-        - uniform_value + term(t)
-        - cell_value + term(t)
+        * uniform_value + term(t)
+        * cell_value + term(t)
 
         where t is a time value in seconds.
         If mask is not None, then the value of the time-dependent term will be
         multiplied by the mask values and the parameter instance will be estimated as:
 
-        - uniform_value + term(t) * mask
-        - cell_value + term(t) * cell_mask_value
+        * uniform_value + term(t) * mask
+        * cell_value + term(t) * cell_mask_value
 
         Parameter can have multiple time-dependent terms. All their values will be
         weighted by their mask values and summed, prior to being added to the static
@@ -82,7 +82,7 @@ class Parameter(FieldQuantity):
         ----------
         term : callable
             Time-dependent function that will be added to the static parameter values.
-            Possible signatures are (float)->float and (float)->tuple(float).
+            Possible signatures are (float)→float and (float)→tuple(float).
         mask : ndarray or callable, optional
             A numpy array, or a callable function taking coordinates x, y and
             z as arguments, defining how the magnitude of the time-dependent
@@ -155,19 +155,24 @@ class Parameter(FieldQuantity):
 
         To set the values of an inhomogeneous parameter, use a numpy array or a function
         which returns the parameter value as a function of the position, i.e.
-        (x: float, y: float, z: float) -> float or
-        (x: float, y: float, z: float) -> sequence[float] of size 3.
+
+        | (x: float, y: float, z: float) → float or
+        | (x: float, y: float, z: float) → sequence[float] of size 3.
 
         To assign time-dependant terms using this method use either a single-argument
-        function, i.e. (float t) -> float or (t: float) -> sequence[float] of size 3;
+        function, i.e. (float t) → float or (t: float) → sequence[float] of size 3;
         or a tuple of size two consisting of a time-dependent term as its first entry
         and the mask of the function as its second entry, i.e.
-        ((float t) -> float, numpy.ndarray) or ((float t) -> [float], numpy.ndarray).
+        ((float t) → float, numpy.ndarray) or ((float t) → [float], numpy.ndarray).
 
         Parameters
         ----------
         value: float, tuple of floats, numpy array, or callable
             The new value for the parameter.
+
+        See Also
+        --------
+        :func:`set_in_region`
         """
         self._reset_fields_default()
 
@@ -191,12 +196,50 @@ class Parameter(FieldQuantity):
 
     def set_in_region(self, region_idx, value):
         """
-        Set a uniform, static value in a specified region.
+        Set a static parameter value in a specified region.
+
+        Parameters
+        ----------
+        region_idx : int
+            The index of the region the parameter must be set in.
+        value : float, tuple of floats, or callable
+            Value to assign within the specified region. The value may be either a
+            uniform scalar or vector matching the number of parameter components, or
+            a callable that takes grid coordinates and returns a compatible value.
+
+        See Also
+        --------
+        :func:`set`
         """
-        assert (isinstance(value, (float, int)) or
-            (isinstance(value, tuple) and len(value) == 3)
-            ), "The value should be uniform and static."
-        self._impl.set_in_region(region_idx, value)
+
+        # uniform value
+        if isinstance(value, (float, int)) or (
+           (isinstance(value, tuple) or isinstance(value, _np.ndarray)) and len(value) == 3):
+            self._impl.set_in_region(region_idx, value)
+
+        # evaluate value based on function
+        elif callable(value):
+            regions = self._impl.system.regions
+            mask = (regions == region_idx)
+            x, y, z = self.meshgrid
+
+            field = self.eval().copy()
+            data = value(x[mask], y[mask], z[mask])
+
+            if self.ncomp == 1:
+                if isinstance(data, (tuple, list)):
+                    raise ValueError("Function must return a scalar value.")
+                field[0][mask] = data
+            else:
+                if len(data) != self.ncomp:
+                    raise ValueError(f"Function must return values with {self.ncomp} components, "+
+                                     f"got {len(data)} instead.")
+                for c in range(self.ncomp):
+                    field[c][mask] = data[c]
+            self._impl.set(field)
+
+        else:
+            raise TypeError("Value must be uniform or returned by a function.")
 
     def _set_func(self, func):
         X, Y, Z = self.meshgrid
@@ -207,8 +250,8 @@ class Parameter(FieldQuantity):
 
     def _reset_fields_default(self):
         if isinstance(self._impl, _cpp.Parameter):
-            self._impl.set(0)
+            self._impl.set(0.0)
         elif isinstance(self._impl, _cpp.VectorParameter):
-            self._impl.set((0, 0, 0))
+            self._impl.set((0.0, 0.0, 0.0))
 
         self.remove_time_terms()

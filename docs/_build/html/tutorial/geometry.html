@@ -1,0 +1,622 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Geometry &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4b5c67ef" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/geometry';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
+    <script src="../_static/js/svg-pan-zoom.min.js"></script>
+    <script src="../_static/js/setup-pan-zoom.js"></script>
+    <link rel="icon" href="../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Shapes" href="shapes.html" />
+    <link rel="prev" title="Setting a magnetization configuration" href="magnetization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <img src="../_static/nimble-plus.png" class="logo__image only-dark pst-js-only" alt="mumax⁺ - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../tutorial.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="langevin.html">Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../class_diagrams.html">Class Diagrams</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../diagrams/quantities.html">Quantities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diagrams/magnetics.html">Magnetics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diagrams/strayfield.html">Strayfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diagrams/timeintegration.html">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diagrams/domain.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diagrams/utilities.html">Utilities</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Geometry</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-arrays">1. Numpy arrays</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-grid">1.1 The full grid</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eliminating-pixels">1.2 Eliminating pixels</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">2. Functions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle">2.1 Circle</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sawtooth">2.2 Sawtooth</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shapes">3. Shapes</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sphere">3.1 Sphere</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="geometry">
+<h1>Geometry<a class="headerlink" href="#geometry" title="Link to this heading">#</a></h1>
+<p>This tutorial will teach you how to set your geometry for your magnets. The <code class="docutils literal notranslate"><span class="pre">geometry</span></code> parameter can accept numpy arrays and functions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ferromagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mumaxplus.util.shape</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">shape</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+</pre></div>
+</div>
+<p>We will first define the constants of our world and grid. The grid is comprised of 128 x 64 x 1 cells of each 1 x 1 x 1 nm³.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span>
+<span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span> <span class="o">=</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span>
+<span class="n">center</span> <span class="o">=</span> <span class="n">cx</span><span class="o">*</span><span class="p">(</span><span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cy</span><span class="o">*</span><span class="p">(</span><span class="n">ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cz</span><span class="o">*</span><span class="p">(</span><span class="n">nz</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>Now we create a function to visualise the geometry. In the final images empty space will be shown as white while the magnetic material will be gray.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">show_2D_geom</span><span class="p">(</span><span class="n">magnet</span><span class="p">):</span>
+    <span class="n">geom</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">]</span>
+    <span class="n">im_extent</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">cx</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span> <span class="p">(</span><span class="n">nx</span><span class="o">*</span><span class="n">cx</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">cx</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">cy</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="o">*</span><span class="n">cy</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">cy</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greys&quot;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">im_extent</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;x (nm)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;y (nm)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="numpy-arrays">
+<h2>1. Numpy arrays<a class="headerlink" href="#numpy-arrays" title="Link to this heading">#</a></h2>
+<p>Here we will be looking at setting the geometry with a numpy array. The array should have the same dimensions as our grid and should contain booleans.</p>
+<section id="the-full-grid">
+<h3>1.1 The full grid<a class="headerlink" href="#the-full-grid" title="Link to this heading">#</a></h3>
+<p>If we want our magnet to be the entire grid we do not have to specify a geometry.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">))</span>
+<span class="n">grid</span>  <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">))</span>
+
+<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="o">=</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">)</span>
+
+<span class="n">show_2D_geom</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/magnet_full.png"><img alt="../_images/magnet_full.png" class="align-center" src="../_images/magnet_full.png" style="width: 600px;" />
+</a>
+</section>
+<section id="eliminating-pixels">
+<h3>1.2 Eliminating pixels<a class="headerlink" href="#eliminating-pixels" title="Link to this heading">#</a></h3>
+<p>If we want to remove some pixels from the magnet we can create an array as big as our grid and set some values to 0 (or <code class="docutils literal notranslate"><span class="pre">False</span></code>). Note that the array should have a shape of (nz, ny, nx).
+Let’s now remove a row of cells at the center of the magnet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">))</span>
+<span class="n">grid</span>  <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">))</span>
+
+<span class="n">geom_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nz</span><span class="p">,</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">))</span>
+<span class="n">geom_array</span><span class="p">[:,</span><span class="n">ny</span><span class="o">//</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nz</span><span class="p">,</span><span class="n">nx</span><span class="p">))</span>
+
+<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="o">=</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geom_array</span><span class="p">)</span>
+
+<span class="n">show_2D_geom</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/magnet_remove_line.png"><img alt="../_images/magnet_remove_line.png" class="align-center" src="../_images/magnet_remove_line.png" style="width: 600px;" />
+</a>
+</section>
+</section>
+<section id="functions">
+<h2>2. Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<p>We can also create our own functions to form geometries. The input of every function should be (x,y,z) where x, y and z are real space coordinates. The output of the function should be a boolean.</p>
+<section id="circle">
+<h3>2.1 Circle<a class="headerlink" href="#circle" title="Link to this heading">#</a></h3>
+<p>Here we create a circle with a radius of 20nm at the center of the grid.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">))</span>
+<span class="n">grid</span>  <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">))</span>
+
+<span class="n">geomfunc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mf">20e-9</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="o">=</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geomfunc</span><span class="p">)</span>
+
+<span class="n">show_2D_geom</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/magnet_cylinder.png"><img alt="../_images/magnet_cylinder.png" class="align-center" src="../_images/magnet_cylinder.png" style="width: 600px;" />
+</a>
+</section>
+<section id="sawtooth">
+<h3>2.2 Sawtooth<a class="headerlink" href="#sawtooth" title="Link to this heading">#</a></h3>
+<p>Here we will cut a sawtooth pattern out of a magnet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">))</span>
+<span class="n">grid</span>  <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">))</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="mf">25e-9</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mf">20e-9</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">saw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">p</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">x</span><span class="o">/</span><span class="n">p</span><span class="p">))</span> <span class="o">+</span> <span class="n">a</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="n">cy</span>
+    <span class="k">return</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">func</span>
+
+<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="o">=</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">saw</span><span class="p">)</span>
+
+<span class="n">show_2D_geom</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/magnet_sawtooth.png"><img alt="../_images/magnet_sawtooth.png" class="align-center" src="../_images/magnet_sawtooth.png" style="width: 600px;" />
+</a>
+</section>
+</section>
+<section id="shapes">
+<h2>3. Shapes<a class="headerlink" href="#shapes" title="Link to this heading">#</a></h2>
+<p>Let’s end this tutoial by using the <code class="docutils literal notranslate"><span class="pre">Shape</span></code> class to generate a geometry. For more information on different shapes and shape manipulations see <a class="reference internal" href="shapes.html"><span class="doc">Shapes</span></a>.</p>
+<section id="sphere">
+<h3>3.1 Sphere<a class="headerlink" href="#sphere" title="Link to this heading">#</a></h3>
+<p>Here we create a spherical magnet with a diameter of 60nm.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">))</span>
+<span class="n">grid</span>  <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">))</span>
+
+<span class="n">circ</span> <span class="o">=</span> <span class="n">shape</span><span class="o">.</span><span class="n">Sphere</span><span class="p">(</span><span class="n">diam</span><span class="o">=</span><span class="mf">20e-9</span><span class="p">)</span>
+<span class="n">circ</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">)</span>
+<span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="o">=</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">circ</span><span class="p">)</span>
+
+<span class="n">show_2D_geom</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/magnet_sphere.png"><img alt="../_images/magnet_sphere.png" class="align-center" src="../_images/magnet_sphere.png" style="width: 600px;" />
+</a>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="magnetization.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Setting a magnetization configuration</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="shapes.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Shapes</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-arrays">1. Numpy arrays</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-grid">1.1 The full grid</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eliminating-pixels">1.2 Eliminating pixels</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">2. Functions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle">2.1 Circle</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sawtooth">2.2 Sawtooth</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shapes">3. Shapes</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sphere">3.1 Sphere</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2026-06-08, v1.2.1.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

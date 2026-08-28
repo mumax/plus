@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "altermagnet.hpp"
 #include "antiferromagnet.hpp"
 #include "datatypes.hpp"
 #include "dynamicequation.hpp"
@@ -13,21 +14,26 @@
 #include "grid.hpp"
 #include "magnet.hpp"
 #include "minimizer.hpp"
+#include "ncafm.hpp"
 #include "relaxer.hpp"
+#include "shift.hpp"
 #include "system.hpp"
 #include "thermalnoise.hpp"
 #include "timesolver.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 
 MumaxWorld::MumaxWorld(real3 cellsize)
     : World(cellsize),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::MumaxWorld(real3 cellsize, Grid mastergrid, int3 pbcRepetitions)
     : World(cellsize, mastergrid, pbcRepetitions),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::~MumaxWorld() {}
 
@@ -57,49 +63,39 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid,
                                         GpuBuffer<bool> geometry,
                                         GpuBuffer<unsigned int> regions,
                                         std::string name) {
-  // Create name if not given.
-  static int idxUnnamed = 1;
-  if (name.length() == 0) {
-    name = "ferromagnet_" + std::to_string(idxUnnamed++);
-  }
-
-  // Check if Ferromagnet can be added to this world.
-  checkAddibility(grid, name);
-
-  // Create the magnet and add it to this world
-  ferromagnets_[name] =
-      std::make_unique<Ferromagnet>(this, grid, name, geometry, regions);
-
-  Ferromagnet* newMagnet = ferromagnets_[name].get();
-  magnets_[name] = newMagnet;
-  
-  handleNewStrayfield(newMagnet);
+  auto mag = addMagnetTempl<Ferromagnet>(ferromagnets_, grid, geometry, regions, name, "ferromagnet");
   resetTimeSolverEquations();
-  return newMagnet;
+  return mag;
 }
 
 Antiferromagnet* MumaxWorld::addAntiferromagnet(Grid grid,
                                                 GpuBuffer<bool> geometry,
                                                 GpuBuffer<unsigned int> regions,
                                                 std::string name) {
-  // Create name if not given.
-  static int idxUnnamed = 1;
-  if (name.length() == 0) {
-    name = "antiferromagnet_" + std::to_string(idxUnnamed++);
-  }                
-
-  // Check if Antiferromagnet can be added to this world.
-  checkAddibility(grid, name);
-
-  // Create the magnet and add it to this world
-  antiferromagnets_[name] =
-      std::make_unique<Antiferromagnet>(this, grid, name, geometry, regions);
-  Antiferromagnet* newMagnet = antiferromagnets_[name].get();
-  magnets_[name] = newMagnet;
-
-  handleNewStrayfield(newMagnet);
+  auto mag = addMagnetTempl<Antiferromagnet>(antiferromagnets_, grid, geometry, regions, name, "antiferromagnet");
+  hostmagnets_[mag->name()] = mag;
   resetTimeSolverEquations();
-  return newMagnet;
+  return mag;
+}
+
+Altermagnet* MumaxWorld::addAltermagnet(Grid grid,
+                                        GpuBuffer<bool> geometry,
+                                        GpuBuffer<unsigned int> regions,
+                                        std::string name) {
+  auto mag = addMagnetTempl<Altermagnet>(altermagnets_, grid, geometry, regions, name, "altermagnet");
+  hostmagnets_[mag->name()] = mag;
+  resetTimeSolverEquations();
+  return mag;
+}
+
+NcAfm* MumaxWorld::addNcAfm(Grid grid,
+                            GpuBuffer<bool> geometry,
+                            GpuBuffer<unsigned int> regions,
+                            std::string name) {
+  auto mag = addMagnetTempl<NcAfm>(ncafms_, grid, geometry, regions, name, "ncafm");
+  hostmagnets_[mag->name()] = mag;
+  resetTimeSolverEquations();
+  return mag;
 }
 
 void MumaxWorld::handleNewStrayfield(Magnet* newMagnet) {
@@ -122,17 +118,19 @@ Magnet* MumaxWorld::getMagnet(std::string name) const {
 }
 
 Ferromagnet* MumaxWorld::getFerromagnet(std::string name) const {
-  auto namedMagnet = ferromagnets_.find(name);
-  if (namedMagnet == ferromagnets_.end())
-    return nullptr;
-  return namedMagnet->second.get();
+    return getMagnetTempl(ferromagnets_, name);
 }
 
 Antiferromagnet* MumaxWorld::getAntiferromagnet(std::string name) const {
-  auto namedMagnet = antiferromagnets_.find(name);
-  if (namedMagnet == antiferromagnets_.end())
-    return nullptr;
-  return namedMagnet->second.get();
+    return getMagnetTempl(antiferromagnets_, name);
+}
+
+Altermagnet* MumaxWorld::getAltermagnet(std::string name) const {
+    return getMagnetTempl(altermagnets_, name);
+}
+
+NcAfm* MumaxWorld::getNcAfm(std::string name) const {
+    return getMagnetTempl(ncafms_, name);
 }
 
 const std::map<std::string, Magnet*> MumaxWorld::magnets() const {
@@ -140,19 +138,19 @@ const std::map<std::string, Magnet*> MumaxWorld::magnets() const {
 }
 
 const std::map<std::string, Ferromagnet*> MumaxWorld::ferromagnets() const {
-  std::map<std::string, Ferromagnet*> sharedFerromagnets;
-  for (const auto& pair : ferromagnets_) {
-    sharedFerromagnets[pair.first] = pair.second.get();
-  }
-  return sharedFerromagnets;
+    return getMagnetPointers<Ferromagnet*>(ferromagnets_);
 }
 
 const std::map<std::string, Antiferromagnet*> MumaxWorld::antiferromagnets() const {
-  std::map<std::string, Antiferromagnet*> sharedAntiferromagnets;
-  for (const auto& pair : antiferromagnets_) {
-    sharedAntiferromagnets[pair.first] = pair.second.get();
-  }
-  return sharedAntiferromagnets;
+    return getMagnetPointers<Antiferromagnet*>(antiferromagnets_);
+}
+
+const std::map<std::string, Altermagnet*> MumaxWorld::altermagnets() const {
+    return getMagnetPointers<Altermagnet*>(altermagnets_);
+}
+
+const std::map<std::string, NcAfm*> MumaxWorld::ncafms() const {
+    return getMagnetPointers<NcAfm*>(ncafms_);
 }
 
 void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
@@ -166,8 +164,8 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
     equations.push_back(eq);
   }
 
-  for (const auto& namedMagnet : antiferromagnets_) {
-    const Antiferromagnet* magnet = namedMagnet.second.get();
+  for (const auto& namedMagnet : hostmagnets_) {
+    const HostMagnet* magnet = namedMagnet.second;
     for (const Ferromagnet* sub : magnet->sublattices()) {
       DynamicEquation eq(
         sub->magnetization(),
@@ -333,3 +331,42 @@ void MumaxWorld::unsetPBC() {
 }
 
 // --------------------------------------------------
+// Moving simulation window
+
+void MumaxWorld::centerDomainWall(int comp, int axis) {
+  if (magnets_.size() > 1)
+    throw std::runtime_error("Moving the simulation window is only possible when only one "
+                             "magnet lives in the world.");
+  if (magnets_.size() < 1)
+    throw std::runtime_error("Moving the simulation window is not possible when there is no "
+                             "magnet in the world.");
+
+  Magnet* magnet = magnets_.begin()->second;
+  timesolver_->setPostStepFunction([this, magnet, comp, axis]() {
+  const Field& mag = magnet->asHost() ? magnet->asHost()->sublattices()[0]->magnetization()->field()
+                                      : magnet->asFM()->magnetization()->field();
+  int dir = calculateShiftDirection(mag,
+                                    comp, axis,
+                                    window_->getMagValues()[0],
+                                    window_->getMagValues()[1]);
+    if (dir != 0) {
+      window_->move(dir, axis, comp);
+      // Shift magnetization
+      auto shifted = window_->centerOnExcitation(mag, dir, axis, comp);
+
+      // Multi-sublattice systems
+      if (auto host = magnet->asHost()) {
+        auto sub0 = host->sublattices()[0];
+        sub0->magnetization()->set(shifted);
+        for (auto sub : host->getOtherSublattices(sub0)) {
+          auto shifted = window_->centerOnExcitation(sub->magnetization()->field(), dir, axis, comp);
+          sub->magnetization()->set(shifted);
+        }
+      }
+
+      // Ferromagnet
+      else
+        magnet->asFM()->magnetization()->set(shifted);
+    }
+  });
+}

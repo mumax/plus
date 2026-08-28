@@ -71,6 +71,15 @@ inline __host__ std::ostream& operator<<(std::ostream& os, const int3 a) {
   return os;
 }
 
+// explicit conversion functions because implicit is impossible
+__CUDAOP__ real3 int3_to_real3(const int3& a) {
+  return real3{static_cast<real>(a.x), static_cast<real>(a.y), static_cast<real>(a.z)};
+}
+
+__CUDAOP__ int3 real3_to_int3(const real3& a) {
+  return int3{static_cast<int>(a.x), static_cast<int>(a.y), static_cast<int>(a.z)};
+}
+
 __CUDAOP__ void operator+=(real3& a, const real3& b) {
   a.x += b.x;
   a.y += b.y;

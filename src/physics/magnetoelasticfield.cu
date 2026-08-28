@@ -23,7 +23,8 @@ bool dynamicMagnetoelasticAssuredZero(const Ferromagnet* magnet) {
   }
 
   return (!enableElastodynamics || magnet->msat.assuredZero() ||
-          (magnet->B1.assuredZero() && magnet->B2.assuredZero()));
+          (magnet->B1.assuredZero() && magnet->B2.assuredZero() &&
+           magnet->BChiral.assuredZero()));
 }
 
 bool rigidMagnetoelasticAssuredZero(const Ferromagnet* magnet) {
@@ -38,7 +39,8 @@ bool rigidMagnetoelasticAssuredZero(const Ferromagnet* magnet) {
   }
 
   return (!appliedStrain || magnet->msat.assuredZero() ||
-          (magnet->B1.assuredZero() && magnet->B2.assuredZero()));
+          (magnet->B1.assuredZero() && magnet->B2.assuredZero() &&
+           magnet->BChiral.assuredZero()));
 }
 
 __global__ void k_dynamicMagnetoelasticField(CuField hField,
@@ -46,6 +48,7 @@ __global__ void k_dynamicMagnetoelasticField(CuField hField,
                                              const CuField strain,
                                              const CuParameter B1,
                                              const CuParameter B2,
+                                             const CuParameter BChiral,
                                              const CuParameter msat) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = hField.system;
@@ -66,7 +69,9 @@ __global__ void k_dynamicMagnetoelasticField(CuField hField,
     if (ip2 >= 3) ip2 -= 3;
 
     hField.setValueInCell(idx, i, - 2 / msat.valueAt(idx) *
-      (B1.valueAt(idx) *  strain.valueAt(idx, i)       * mField.valueAt(idx, i)   + 
+      ((B1.valueAt(idx) * strain.valueAt(idx, i) +
+        BChiral.valueAt(idx) * (- strain.valueAt(idx, ip1) + strain.valueAt(idx, ip2))
+       ) * mField.valueAt(idx, i) + 
        B2.valueAt(idx) * (strain.valueAt(idx, i+ip1+2) * mField.valueAt(idx, ip1) + 
                           strain.valueAt(idx, i+ip2+2) * mField.valueAt(idx, ip2))));
   }
@@ -78,6 +83,7 @@ __global__ void k_rigidMagnetoelasticField(CuField hField,
                                            const CuVectorParameter shearStrain,
                                            const CuParameter B1,
                                            const CuParameter B2,
+                                           const CuParameter BChiral,
                                            const CuParameter msat) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const CuSystem system = hField.system;
@@ -98,7 +104,9 @@ __global__ void k_rigidMagnetoelasticField(CuField hField,
     if (ip2 >= 3) ip2 -= 3;
 
     hField.setValueInCell(idx, i, - 2 / msat.valueAt(idx) *
-    (B1.valueAt(idx) *  normStrain.valueAt(idx, i)        * mField.valueAt(idx, i)   + 
+    ((B1.valueAt(idx) * normStrain.valueAt(idx, i) +
+      BChiral.valueAt(idx) * (- normStrain.valueAt(idx, ip1) + normStrain.valueAt(idx, ip2))
+     ) * mField.valueAt(idx, i) + 
      B2.valueAt(idx) * (shearStrain.valueAt(idx, i+ip1-1) * mField.valueAt(idx, ip1) + 
                         shearStrain.valueAt(idx, i+ip2-1) * mField.valueAt(idx, ip2))));
   }
@@ -115,6 +123,7 @@ Field evalMagnetoelasticField(const Ferromagnet* magnet) {
   CuField mField = magnet->magnetization()->field().cu();
   CuParameter B1 = magnet->B1.cu();
   CuParameter B2 = magnet->B2.cu();
+  CuParameter BChiral = magnet->BChiral.cu();
   CuParameter msat = magnet->msat.cu();
 
   if (!rigidMagnetoelasticAssuredZero(magnet)) {  // maybe use rigid strain
@@ -123,13 +132,13 @@ Field evalMagnetoelasticField(const Ferromagnet* magnet) {
       CuVectorParameter shearStrain = magnet->hostMagnet()->rigidShearStrain.cu();
 
       cudaLaunch(ncells, k_rigidMagnetoelasticField, hField.cu(), mField,
-                normStrain, shearStrain, B1, B2, msat);
+                normStrain, shearStrain, B1, B2, BChiral, msat);
     } else {  // independent magnet
       CuVectorParameter normStrain = magnet->rigidNormStrain.cu();
       CuVectorParameter shearStrain = magnet->rigidShearStrain.cu();
 
       cudaLaunch(ncells, k_rigidMagnetoelasticField, hField.cu(), mField,
-                normStrain, shearStrain, B1, B2, msat);
+                normStrain, shearStrain, B1, B2, BChiral, msat);
     }
 
     return hField;
@@ -144,7 +153,7 @@ Field evalMagnetoelasticField(const Ferromagnet* magnet) {
   }
 
   cudaLaunch(ncells, k_dynamicMagnetoelasticField, hField.cu(), mField,
-            strain.cu(), B1, B2, msat);
+            strain.cu(), B1, B2, BChiral, msat);
   return hField;
 }
 
@@ -160,9 +169,7 @@ real evalMagnetoelasticEnergy(const Ferromagnet* magnet) {
     return 0.0;
 
   real edens = magnetoelasticEnergyDensityQuantity(magnet).average()[0];
-  int ncells = magnet->grid().ncells();
-  real cellVolume = magnet->world()->cellVolume();
-  return ncells * edens * cellVolume;
+  return energyFromEnergyDensity(magnet, edens);
 }
 
 FM_FieldQuantity magnetoelasticFieldQuantity(const Ferromagnet* magnet) {

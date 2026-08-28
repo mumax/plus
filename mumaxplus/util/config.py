@@ -3,8 +3,8 @@
 import numpy as _np
 import math as _math
 
-def twodomain(m1, mw, m2, wallposition, wallthickness=0.):
-    """Return a two-domain state magnetization configuration
+def twodomain(m1, mw, m2, wallposition, wallthickness=0.) -> callable:
+    """Create a two-domain state magnetization configuration
     with a domain wall which is perpendicular to the x-axis.
 
     Parameters
@@ -22,6 +22,12 @@ def twodomain(m1, mw, m2, wallposition, wallthickness=0.):
         the wall with a Gaussian distribution.
         If given, wallposition corresponds to the center
         of the domain wall. If <= 0, there is no wall.
+
+    Returns
+    -------
+    two-domains : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing m_x, m_y and m_z.
     """
 
     def func(x, y, z):
@@ -39,8 +45,8 @@ def twodomain(m1, mw, m2, wallposition, wallthickness=0.):
     return func
 
 
-def vortex(position, diameter, circulation, polarization):
-    """Return a vortex magnetization configuration.
+def vortex(position, diameter, circulation, polarization) -> callable:
+    """Create a vortex magnetization configuration.
 
     Parameters
     ----------
@@ -52,6 +58,12 @@ def vortex(position, diameter, circulation, polarization):
         Circulation of the vortex.
     polarization: 1 or -1
         The polarization of the vortex center.
+
+    Returns
+    -------
+    vortex : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing m_x, m_y and m_z.
     """
     if circulation != 1 and circulation != -1:
         raise ValueError("The circulation should be 1 or -1.")
@@ -81,8 +93,8 @@ def vortex(position, diameter, circulation, polarization):
     return func
 
 
-def antivortex(position, diameter, circulation, polarization):
-    """Return a antivortex magnetization configuration.
+def antivortex(position, diameter, circulation, polarization) -> callable:
+    """Create an antivortex magnetization configuration.
 
     Parameters
     ----------
@@ -94,6 +106,12 @@ def antivortex(position, diameter, circulation, polarization):
         Circulation of the antivortex.
     polarization: 1 or -1
         The polarization of the center of the antivortex.
+
+    Returns
+    -------
+    antivortex : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing m_x, m_y and m_z.
     """
     if circulation != 1 and circulation != -1:
         raise ValueError("The circulation should be 1 or -1.")
@@ -123,8 +141,8 @@ def antivortex(position, diameter, circulation, polarization):
     return func
 
 
-def neelskyrmion(position, radius, charge, polarization):
-    """Return a Neel skyrmion magnetization configuration.
+def neelskyrmion(position, radius, charge, polarization) -> callable:
+    """Create a Neel skyrmion magnetization configuration.
 
     Parameters
     ----------
@@ -136,6 +154,12 @@ def neelskyrmion(position, radius, charge, polarization):
         The charge of the skyrmion.
     polarization: 1 or -1
         The polarization of the skyrmion.
+
+    Returns
+    -------
+    Neel-skyrmion : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing m_x, m_y and m_z.
     """
     if charge != 1 and charge != -1:
         raise ValueError("The charge should be 1 or -1.")
@@ -159,8 +183,8 @@ def neelskyrmion(position, radius, charge, polarization):
     return func
 
 
-def blochskyrmion(position, radius, charge, polarization):
-    """Return a Bloch skyrmion magnetization configuration.
+def blochskyrmion(position, radius, charge, polarization) -> callable:
+    """Create a Bloch skyrmion magnetization configuration.
 
     Parameters
     ----------
@@ -172,6 +196,12 @@ def blochskyrmion(position, radius, charge, polarization):
         The charge of the skyrmion.
     polarization: 1 or -1
         The polarization of the skyrmion.
+
+    Returns
+    -------
+    Bloch-skyrmion : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing m_x, m_y and m_z.
     """
     if charge != 1 and charge != -1:
         raise ValueError("The charge should be 1 or -1.")
@@ -197,11 +227,12 @@ def blochskyrmion(position, radius, charge, polarization):
 # --------------------------------------------------
 # elastic displacement initial states
 
-def gaussian_spherical_OoP(position, amplitude, sigma_x, sigma_y):
-    """Return an out-of-xy-plane gaussian distribution centered on the specified
+def gaussian_spherical_OoP(position, amplitude, sigma_x, sigma_y) -> callable:
+    r"""Create an out-of-xy-plane gaussian distribution centered on the specified
     position with given standard deviations.
     
-    (0, 0, A exp(- (x - x0)²/2σx² * (y - y0)/2σy²))
+    .. math:: 
+        A \exp\left(- \frac{(x - x_0)^2}{2\sigma_x^2} \frac{(y - y_0)^2}{2\sigma_y^2}\right) (0, 0, 1)
 
     Parameters
     ----------
@@ -213,6 +244,12 @@ def gaussian_spherical_OoP(position, amplitude, sigma_x, sigma_y):
         The standard deviation in the x-direction of the Gaussian distribution.
     sigma_y : float
         The standard deviation in the y-direction of the Gaussian distribution.
+
+    Returns
+    -------
+    Gaussian : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing u_x, u_y and u_z.
     """
     
     x0, y0, _ = position
@@ -224,14 +261,15 @@ def gaussian_spherical_OoP(position, amplitude, sigma_x, sigma_y):
     
     return func
 
-def gaussian_spherical_IP(position, amplitude, angle, sigma_x, sigma_y):
-    """Return an in-xy-plane vector field with uniform orientation specified by
+def gaussian_spherical_IP(position, amplitude, angle, sigma_x, sigma_y) -> callable:
+    r"""Create an in-xy-plane vector field with uniform orientation specified by
     the given angle. The amplitude is modified by a gaussian distribution
     centered on the specified position with given standard deviations.
     
-    (A cos(θ) exp(- (x - x0)²/2σx² * (y - y0)/2σy²),
-     A sin(θ) exp(- (x - x0)²/2σx² * (y - y0)/2σy²),
-     0)
+    .. math ::
+
+        A \exp\left(- \frac{(x - x_0)^2}{2\sigma_x^2} \frac{(y - y_0)^2}{2\sigma_y^2}\right)
+        (\cos(\theta), \sin(\theta), 0)
 
     Parameters
     ----------
@@ -245,6 +283,12 @@ def gaussian_spherical_IP(position, amplitude, angle, sigma_x, sigma_y):
         The standard deviation in the x-direction of the Gaussian distribution.
     sigma_y : float
         The standard deviation in the y-direction of the Gaussian distribution.
+    
+    Returns
+    -------
+    Gaussian : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing u_x, u_y and u_z.
     """
     
     x0, y0, _ = position
@@ -257,15 +301,16 @@ def gaussian_spherical_IP(position, amplitude, angle, sigma_x, sigma_y):
 
     return func
 
-def gaussian_uniform_IP(amplitude, theta, gausspos, sigma, phi):
-    """Return an in-xy-plane vector field with uniform orientation specified by
+def gaussian_uniform_IP(amplitude, theta, gausspos, sigma, phi) -> callable:
+    r"""Create an in-xy-plane vector field with uniform orientation specified by
     the given angle theta. The amplitude is modified by a one-dimensional
     Gaussian distribution centered on gausspos, which varies along the
     transverse direction in the xy-plane specified by angle phi.
 
-    (A cos(θ) exp(-(x'-x0)²/2σ²),
-     A sin(θ) exp(-(x'-x0)²/2σ²),
-     0)
+    .. math:: 
+        A \exp\left(-\frac{(x'-x_0)^2}{2\sigma^2}\right)
+        (\cos(\theta) ,\sin(\theta), 0)
+    
     with x0 = gausspos and x' = x*cos(ϕ) + y*sin(ϕ)
     
     Parameters
@@ -280,6 +325,12 @@ def gaussian_uniform_IP(amplitude, theta, gausspos, sigma, phi):
         The gaussian standard deviation.
     phi : float
         The angle in radians of the transverse direction.
+    
+    Returns
+    -------
+    Gaussian : callable
+        a function which takes x-, y- and z-coordinates and returns a 3-tuple
+        containing u_x, u_y and u_z.
     """
 
     denom = 2 * sigma*sigma

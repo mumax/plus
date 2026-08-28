@@ -1,16 +1,14 @@
 """FieldQuantity implementation."""
 
 import numpy as _np
-
+import pyovf
 from .grid import Grid
+from pathlib import Path
 
 
 class FieldQuantity:
-    """A functor representing a physical field quantity.
-
-    The class wraps the C++ FieldQuantity class.
-    """
-
+    """A functor representing a physical field quantity."""
+    _ovf_counts = {} # It keeps resetting to 0 if it is in the __init__
     def __init__(self, impl):
         self._impl = impl
 
@@ -22,12 +20,12 @@ class FieldQuantity:
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return instance's name."""
         return self._impl.name
 
     @property
-    def unit(self):
+    def unit(self) -> str:
         """Return the unit of the quantity.
 
         Returns
@@ -38,7 +36,7 @@ class FieldQuantity:
         return self._impl.unit
 
     @property
-    def ncomp(self):
+    def ncomp(self) -> int:
         """Return the number of components of the quantity.
 
         In most cases this would be either 1 (scalar field) or 3 (vector fields).
@@ -51,7 +49,7 @@ class FieldQuantity:
         return self._impl.ncomp
 
     @property
-    def grid(self):
+    def grid(self) -> Grid:
         """Return grid on which the quantity will be evaluated.
 
         Returns
@@ -80,15 +78,25 @@ class FieldQuantity:
         """Evaluate the quantity."""
         return self.eval()
 
-    def average(self):
+    def average(self) -> float:
         """Evaluate the quantity and return the average of each component."""
         # TODO add return type.
         return self._impl.average()
 
     def get_rgb(self):
         """Evaluate the vector field quantity and return its rgb representation
-        as a numpy ndarray of the same shape (ncomp, nz, ny, nx)."""
-        assert self.ncomp == 3 or self.ncomp == 6, \
+        as a numpy ndarray of the same shape (3, nz, ny, nx).
+        
+        Note
+        ----
+        The final color scheme is different from mumax³. In this case, the
+        saturation does not depend on the z-component anymore, meaning the z=0 plane
+        remains unchanged, but other colors will appear slightly less saturated.
+        This ensures that the color sphere is continuous everywhere, particularly
+        when crossing the xz- or yz-plane with a normalized length less than 1,
+        where the colors will fade through gray.
+        """
+        assert self.ncomp == 3, \
             "The rgb representation can only be calculated for vector fields."
         return self._impl.get_rgb().get()  # Field to ndarray
 
@@ -116,3 +124,49 @@ class FieldQuantity:
             self._impl.exec()
         stop = time.time()
         return (stop - start) / ntimes
+
+    def save_ovf(self, name=""):
+        """Save the FieldQuantity as an OVF file.
+
+        Parameters
+        ----------
+        name : str (default="")
+            The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used appended with an integer of 6 digits.
+            
+        Warning
+        -------
+        The shape of the array in the OVF file is (nz, ny, nx, ncomp) and not (ncomp, nz, ny, nx) in order to have the correct metadata.
+        
+        Warning
+        -------
+        self.name returns a string with colons (:). To avoid issues on Windows, these colons are changed to underscores (_)."""
+        cx, cy, cz = self._impl.system.cellsize
+        ovf = pyovf.create(_np.moveaxis(self.eval(), 0, -1), xstepsize=cx, ystepsize=cy, zstepsize=cz, title=self.name)
+        ovf.TotalSimTime = self._impl.system.time
+        if name == "":
+            count = self._ovf_counts.get(self.name, 0)
+            name = self.name.replace(":", "_") + f"_{count:06d}.ovf"
+            self._ovf_counts[self.name] = count + 1
+        pyovf.write(name, ovf)
+
+    def load_ovf(self, name=""):
+        """Load an OVF file as a FieldQuantity.
+
+        Parameters
+        ----------
+        name : str (default="")
+            The name of the OVF file. If the name is empty (the default), it will look for the most recently saved file with this FieldQuantity name."""
+        if name == "":
+            name_replace = self.name.replace(":", "_")
+            files = Path(".").glob(f"{name_replace}*.ovf")
+            try:
+                name = str(max(filter(lambda f: f.stem[-6:].isnumeric(), files), key=lambda f: int(f.stem[-6:])))
+            except ValueError:
+                raise FileNotFoundError(F"No files matching '_{name_replace}*.ovf' found.")
+        ovf = pyovf.read(name)
+        if self.ncomp == 1:
+            data = _np.array([ovf.data])
+        else:
+            # _np.ascontiguousarray is used so data is the transformed array. Otherwise the C++ layer still uses ovf.data
+            data = _np.ascontiguousarray(_np.moveaxis(ovf.data, -1, 0))
+        self.set(data)
