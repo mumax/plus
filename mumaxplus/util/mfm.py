@@ -1,5 +1,5 @@
 """Create a magnetic force microscopy instance."""
-import _mumaxpluscpp as _cpp
+from .. import _cpp
 from mumaxplus import FieldQuantity, Grid, World, Magnet
 
 class MFM(FieldQuantity):

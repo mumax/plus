@@ -1,4 +1,5 @@
 from mumaxplus import Ferromagnet, Grid, World
+from mumaxplus.util import get_rgb
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -29,8 +30,7 @@ world.timesolver.steps(500)
 # --------------------------------------------------
 # show magnetization 3x3 times to see no boundaries
 
-# 3x1x128x128 to 128x128x3
-rgb = np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], (1, 2, 0))
+rgb = get_rgb(magnet.magnetization, layer=0)  # 3x1x128x128 to 128x128x3
 rgb = np.tile(rgb, (3, 3, 1))  # tile to 3x3
 
 fig, ax = plt.subplots()

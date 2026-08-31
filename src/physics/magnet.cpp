@@ -137,6 +137,10 @@ const Antiferromagnet* Magnet::asAFM() const {
   return dynamic_cast<const Antiferromagnet*>(this);
 }
 
+const Altermagnet* Magnet::asATM() const {
+  return dynamic_cast<const Altermagnet*>(this);
+}
+
 const NcAfm* Magnet::asNcAfm() const {
   return dynamic_cast<const NcAfm*>(this);
 }

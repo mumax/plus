@@ -1,3 +1,4 @@
+#include "altermagnet.hpp" // to recycle angle field calculation
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
 #include "dmi.hpp" // used for Neumann BC
@@ -50,8 +51,11 @@ __global__ void k_afmExchangeFieldSite(CuField hField,
         hField.setVectorInCell(idx, real3{0, 0, 0});
       return;
     }
-    if (msat.valueAt(idx) == 0. || msat2.valueAt(idx) == 0.) {
+    if (msat.valueAt(idx) == 0.) {  // total field is 0
       hField.setVectorInCell(idx, real3{0, 0, 0});
+      return;
+    }
+    if (msat2.valueAt(idx) == 0.) {  // no addition to the field
       return;
     }
 
@@ -298,18 +302,21 @@ __global__ void k_angle(CuField angleField,
                                                   mField2.vectorAt(idx))));
 }
 
-Field evalAngleField(const Antiferromagnet* magnet) {
+Field evalAngleField(const HostMagnet* magnet) {
+  if (magnet->sublattices().size() != 2)
+    throw std::runtime_error("Cannot compute the angle field if the magnet has no two sublattices");
+
   Field angleField(magnet->system(), 1);
 
   cudaLaunch(angleField.grid().ncells(), k_angle, angleField.cu(),
-            magnet->sub1()->magnetization()->field().cu(),
-            magnet->sub2()->magnetization()->field().cu(),
+            magnet->sublattices()[0]->magnetization()->field().cu(),
+            magnet->sublattices()[1]->magnetization()->field().cu(),
             magnet->afmex_cell.cu(),
-            magnet->sub1()->msat.cu(), magnet->sub2()->msat.cu());
+            magnet->sublattices()[0]->msat.cu(), magnet->sublattices()[1]->msat.cu());
   return angleField;
 }
 
-real evalMaxAngle(const Antiferromagnet* magnet) {
+real evalMaxAngle(const HostMagnet* magnet) {
   return maxAbsValue(evalAngleField(magnet));
 }
 
@@ -317,6 +324,14 @@ AFM_FieldQuantity angleFieldQuantity(const Antiferromagnet* magnet) {
   return AFM_FieldQuantity(magnet, evalAngleField, 1, "angle_field", "rad");
 }
 
+ATM_FieldQuantity angleFieldQuantity(const Altermagnet* magnet) {
+  return ATM_FieldQuantity(magnet, evalAngleField, 1, "angle_field", "rad");
+}
+
 AFM_ScalarQuantity maxAngle(const Antiferromagnet* magnet) {
   return AFM_ScalarQuantity(magnet, evalMaxAngle, "max_angle", "rad");
+}
+
+ATM_ScalarQuantity maxAngle(const Altermagnet* magnet) {
+  return ATM_ScalarQuantity(magnet, evalMaxAngle, "max_angle", "rad");
 }

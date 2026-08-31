@@ -18,5 +18,7 @@ verification of MuMax3 <https://doi.org/10.1063/1.4899186>`_.
    :width: 45%
 
 .. image:: ../images/voronoi.png
-   :align: center
+   :width: 45%
+
+.. image:: ../images/voronoi_regions.png
    :width: 45%

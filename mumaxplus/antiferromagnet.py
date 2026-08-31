@@ -3,7 +3,7 @@
 import numpy as _np
 import warnings
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .dmitensor import DmiTensor, DmiTensorGroup
 from .magnet import Magnet

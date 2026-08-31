@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 #include "afmexchange.hpp"
+#include "atmexchange.hpp"
 #include "anisotropy.hpp"
 #include "conductivitytensor.hpp"
 #include "demag.hpp"
@@ -41,6 +42,7 @@ void wrap_ferromagnet(py::module& m) {
 
       .def_readonly("msat", &Ferromagnet::msat)
       .def_readonly("alpha", &Ferromagnet::alpha)
+      .def_readonly("gamma", &Ferromagnet::gamma)
       .def_readonly("aex", &Ferromagnet::aex)
       .def_readonly("inter_exchange", &Ferromagnet::interExch)
       .def_readonly("scale_exchange", &Ferromagnet::scaleExch)
@@ -60,6 +62,7 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("pol", &Ferromagnet::pol)
       .def_readonly("jcur", &Ferromagnet::jcur)
       .def_readonly("temperature", &Ferromagnet::temperature)
+      .def_property("thermal_seed", &Ferromagnet::getThermalSeed, &Ferromagnet::setThermalSeed)
       .def_readonly("dmi_tensor", &Ferromagnet::dmiTensor)
       .def_readonly("applied_potential", &Ferromagnet::appliedPotential)
       .def_readonly("conductivity", &Ferromagnet::conductivity)
@@ -69,7 +72,9 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("poisson_system", &Ferromagnet::poissonSystem)
       .def_readonly("B1", &Ferromagnet::B1)
       .def_readonly("B2", &Ferromagnet::B2)
+      .def_readonly("B_chiral", &Ferromagnet::BChiral)
       
+      .def("reset_noise_generator", &Ferromagnet::resetNoiseGenerator)
       .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Ferromagnet::relax, py::arg("tol"));
 
@@ -99,6 +104,10 @@ void wrap_ferromagnet(py::module& m) {
   m.def("homogeneous_exchange_energy", &homoAfmExchangeEnergyQuantity);
   m.def("inhomogeneous_exchange_energy", &inHomoAfmExchangeEnergyQuantity);
 
+  m.def("anisotropic_exchange_field", &atmExchangeFieldQuantity);
+  m.def("anisotropic_exchange_energy_density", &atmExchangeEnergyDensityQuantity);
+  m.def("anisotropic_exchange_energy", &atmExchangeEnergyQuantity);
+  
   m.def("homogeneous_dmi_field", &homoDmiFieldQuantity);
   m.def("homogeneous_dmi_energy_density", &homoDmiEnergyDensityQuantity);
   m.def("homogeneous_dmi_energy", &homoDmiEnergyQuantity);
@@ -113,9 +122,9 @@ void wrap_ferromagnet(py::module& m) {
 
   m.def("effective_field", &effectiveFieldQuantity);
   m.def("total_energy_density",
-        py::overload_cast<const Ferromagnet*>(&totalEnergyDensityQuantity));
+      [](const Ferromagnet* m) {return totalEnergyDensityQuantity(m); });
   m.def("total_energy",
-        py::overload_cast<const Ferromagnet*>(&totalEnergyQuantity));
+      [](const Ferromagnet* m) {return totalEnergyQuantity(m);});
 
   m.def("conductivity_tensor", &conductivityTensorQuantity);
   m.def("electrical_potential", &electricalPotentialQuantity);

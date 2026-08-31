@@ -5,10 +5,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 
 from mumaxplus import World, Grid, Ferromagnet
-from mumaxplus.util import twodomain
+from mumaxplus.util import twodomain, plot_field
 
 # simulation time
 run = 10e-9
@@ -16,14 +15,16 @@ steps = 1000
 dt = run/steps
 
 # simulation grid parameters
-nx, ny, nz = 256, 512, 1
-cx, cy, cz = 2.4e-9, 2.4e-9, 1e-9
+# Use a very large y cell size and periodic boundary conditions to replicate a
+# wider track while only simulating a thin strip
+nx, ny, nz = 256, 8, 1
+cx, cy, cz = 2.4e-9, 4 * 2.4e-9, 1e-9
+mastergrid, pbc_repetitions = Grid((0, ny, 0)), (0, 4, 0)
 
 # create a world and a magnet
 cellsize = (cx, cy, cz)
-grid = Grid((nx, ny, nz))
-world = World(cellsize)
-magnet = Ferromagnet(world, grid)
+world = World(cellsize, mastergrid=mastergrid, pbc_repetitions=pbc_repetitions)
+magnet = Ferromagnet(world, Grid((nx, ny, nz)))
 
 # setting magnet parameters
 magnet.msat = 6e5
@@ -59,17 +60,9 @@ magnet.rigid_norm_strain.add_time_term(lambda t: (np.cos(w*t), 0., 0.),
                                        lambda x,y,z: (-E*np.sin(k*x), 0., 0.))
 
 # plot the initial and final magnetization
-fig, axs = plt.subplots(nrows=1, ncols=2, sharex="all", sharey="all")
-ax1, ax2 = axs
-im_extent = (-0.5*cx*1e6, (nx*cx - 0.5*cx)*1e6, -0.5*cy*1e6, (ny*cy - 0.5*cy)*1e6)
-
-# initial magnetization
-ax1.imshow(np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], axes=(1,2,0)), origin="lower", extent=im_extent, aspect="equal")
-ax1.set_title("Initial magnetization")
-ax2.set_title("Final magnetization")
-ax1.set_xlabel("x (µm)")
-ax2.set_xlabel("x (µm)")
-ax1.set_ylabel("y (µm)")
+fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex="all", sharey="all")
+plot_field(magnet.magnetization, ax=ax1, title="Initial magnetization",
+           xlabel="", show=False, enable_quiver=False)
 
 # function to estimate the position of the DW
 def DW_position(magnet):
@@ -77,26 +70,17 @@ def DW_position(magnet):
     return m_av*nx*cx / 2 + nx*cx/2
 
 # run the simulation and save the DW postion
-DW_pos = np.zeros(shape=(steps+1))
-DW_pos[0] = DW_position(magnet)
-time = np.zeros(shape=(steps+1))
-time[0] = world.timesolver.time
-
 print("running...")
-for i in tqdm(range(1, steps+1)):
-    world.timesolver.run(dt)
-    DW_pos[i] = DW_position(magnet)
-    time[i] = world.timesolver.time
+quantity_dict = {"DW_pos": lambda: DW_position(magnet)}
+output = world.timesolver.solve(np.linspace(0, run, steps+1), quantity_dict, tqdm=True)
 print("done!")
 
 # final magnetization
-ax2.imshow(np.transpose(magnet.magnetization.get_rgb()[:,0,:,:], axes=(1,2,0)),
-           origin="lower", extent=im_extent, aspect="equal")
+plot_field(magnet.magnetization, ax=ax2, title="Final magnetization", show=True,
+           enable_quiver=False)
 
-plt.show()
-
-# plot DW position in function of time
-plt.plot(time*1e9, DW_pos*1e6)
+# plot DW position as a function of time
+plt.plot(np.array(output["time"])*1e9, np.array(output["DW_pos"])*1e6)
 plt.xlabel("Time (ns)")
 plt.ylabel("Domain wall position (µm)")
 plt.title("Domain wall position in time")

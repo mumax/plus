@@ -5,8 +5,12 @@ add_library(physics STATIC
     afmexchange.hpp
     anisotropy.cu 
     anisotropy.hpp 
+    altermagnet.cpp
+    altermagnet.hpp
     antiferromagnet.cpp
     antiferromagnet.hpp
+    atmexchange.cu
+    atmexchange.hpp
     conductivitytensor.cu
     conductivitytensor.hpp
     constants.hpp
@@ -102,3 +106,33 @@ target_link_libraries(physics PUBLIC core linsolver)
 
 link_directories(${CUDA_LIBRARY_DIR})
 target_link_libraries(physics PRIVATE cufft curand)
+
+
+# On Windows, the cufft and curand DLLs (also required by mumax³) are not found by default.
+# Therefore, we look for them in the installed NVIDIA CUDA Toolkit and copy them next to the .pyd.
+if (WIN32)
+    find_package(CUDAToolkit REQUIRED)
+
+    file(GLOB CUDA_RUNTIME_DLLS
+        "${CUDAToolkit_BIN_DIR}/cufft64_*.dll"
+        "${CUDAToolkit_BIN_DIR}/curand64_*.dll"
+        "${CUDAToolkit_BIN_DIR}/x64/cufft64_*.dll"
+        "${CUDAToolkit_BIN_DIR}/x64/curand64_*.dll"
+    ) # CUDA 13.0 and higher puts them below the /x64 directory.
+
+    message(STATUS "CUDAToolkit_BIN_DIR=${CUDAToolkit_BIN_DIR}")
+    message(STATUS "CUDA_RUNTIME_DLLS=${CUDA_RUNTIME_DLLS}")
+
+    if (CUDA_RUNTIME_DLLS)
+        foreach(dll IN LISTS CUDA_RUNTIME_DLLS)
+            get_filename_component(dllname "${dll}" NAME)
+            add_custom_command(TARGET physics POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${dll}"
+                    "$<TARGET_FILE_DIR:${MUMAX_MODULE_NAME}>/${dllname}"
+            )
+        endforeach()
+    else()
+        message(WARNING "No CUDA cufft and curand DLLs found in ${CUDAToolkit_BIN_DIR}")
+    endif()
+endif()

@@ -25,10 +25,10 @@ def simulations(request):
             m = randommag()
             saveas(m, "m.ovf")
             
-            // default in mumax³ is false, these tests use both
+            // default in mumax3 is false, these tests use both
             openbc = {openbc}
 
-            // The dmi is included in the exchange in mumax³
+            // The dmi is included in the exchange in mumax3
             // because Aex is set to zero here, b_exch is the dmi field
             saveas(b_exch, "b_exch_dmi.ovf")      
             saveas(edens_exch, "edens_exch_dmi.ovf") 

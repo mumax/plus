@@ -12,3 +12,4 @@ Here we show some example Python scripts to run mumax⁺ simulations.
    examples/magnetoelastics
    examples/DW_SAW
    examples/voronoi
+   examples/Bloch_wall_altermagnet

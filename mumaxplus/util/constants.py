@@ -5,9 +5,8 @@ The values of these constants might differ from what you find elsewhere. These
 values are from before the SI unit redefinition of 2019/05/20, in order to stay
 consistent with decades of other code and standard problems.
 """
-
 # Gyromagnetic ratio in rad/Ts
-GAMMALL = 1.7595E11
+GAMMALL_DEFAULT = 1.7595E11
 # Vacuum permeability in H/m
 MU0 = 1.25663706212E-6
 # Boltzmann constant in J/K

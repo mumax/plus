@@ -4,6 +4,7 @@
 #include <array>
 #include <stdexcept>
 #include <set>
+#include <string>
 
 #include "datatypes.hpp"
 #include "gpubuffer.hpp"

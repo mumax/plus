@@ -2,7 +2,7 @@
 
 import numpy as _np
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .magnet import Magnet
 from .dmitensor import DmiTensor
@@ -238,6 +238,18 @@ class Ferromagnet(Magnet):
         self.alpha.set(value)
 
     @property
+    def gamma(self) -> Parameter:
+        """Gyromagnetic ratio (rad/Ts).
+
+        Default = 1.7595e11 rad/Ts
+        """
+        return Parameter(self._impl.gamma)
+
+    @gamma.setter
+    def gamma(self, value):
+        self.gamma.set(value)
+
+    @property
     def aex(self) -> Parameter:
         """Exchange constant (J/m)."""
         return Parameter(self._impl.aex)
@@ -411,6 +423,8 @@ class Ferromagnet(Magnet):
     @property
     def Lambda(self) -> Parameter:
         """Slonczewski Λ parameter.
+
+        Default = 1.0
         
         See Also
         --------
@@ -424,8 +438,8 @@ class Ferromagnet(Magnet):
     
     @property
     def free_layer_thickness(self) -> Parameter:
-        """Slonczewski free layer thickness (m). If set to zero (default),
-        then the thickness will be deduced from the mesh size.
+        """Slonczewski free layer thickness (m). By default, the thickness is
+        equal to the mesh size in the z-direction.
         
         See Also
         --------
@@ -531,18 +545,39 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        thermal_noise
+        reset_noise_generator, thermal_noise, thermal_seed
         """
         return Parameter(self._impl.temperature)
 
     @temperature.setter
     def temperature(self, value):
-        if self.grid.ncells % 2:
-            raise ValueError("The CUDA random number generator used to generate"
-                             + " a random noise field only works for an even"
-                             + " number of grid cells.\n"
-                             + "The used number of grid cells is {}.".format(self.grid.ncells))
         self.temperature.set(value)
+
+    @property
+    def thermal_seed(self) -> int:
+        """Return seed of the thermal noise generator.
+
+        If not set, a random seed is generated based on the current time.
+        Resetting the seed does not reset the generator. Use :func:`reset_noise_generator` instead.
+
+        See Also
+        --------
+        reset_noise_generator, temperature, thermal_noise
+        """
+        return self._impl.thermal_seed
+
+    @thermal_seed.setter
+    def thermal_seed(self, value):
+        self._impl.thermal_seed = value
+
+    def reset_noise_generator(self):
+        """Destroys and creates a new noise generator with the existing thermal seed.
+
+        See Also
+        --------
+        temperature, thermal_noise, thermal_seed
+        """
+        self._impl.reset_noise_generator()
 
     @property
     def dmi_tensor(self) -> DmiTensor:
@@ -618,7 +653,7 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        B2
+        B2, B_chiral
         """
         return Parameter(self._impl.B1)
 
@@ -643,7 +678,7 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        B1
+        B1, B_chiral
         """
         return Parameter(self._impl.B2)
 
@@ -661,6 +696,36 @@ class Ferromagnet(Magnet):
             warnings.warn("The second magnetoelastic coupling constant B2"
                           + " is set to a positive value, instead of negative (or zero)."
                           + " Make sure this is intentional!", UserWarning)
+
+    @property
+    def B_chiral(self) -> Parameter:
+        r"""Chiral magnetoelastic coupling constant (J/m³).
+
+        Notes
+        -----
+        Materials of the cubic point group 23 (or B20 compounds) can have a
+        chiral magnetoelastic coupling, with the following energy density.
+
+        .. math:: \mathcal{E} = B_\text{chiral} \sum_{i, j, k} \epsilon_{ijk} \varepsilon_{ii} m_j^2
+
+        Here :math:`\epsilon_{ijk}` is the Levi-Civita symbol and
+        :math:`\varepsilon_{ii}` denotes the normal strain components.
+        This energy density comes from equations (8.12) and (8.16) in Ref. [1], where
+        B_chiral corresponds to :math:`\lambda_{12}`. Magnetoelastic coupling constants
+        B1 and B2 correspond to :math:`\lambda_{11}` and :math:`2 \lambda_{44}` respectively.
+        These lambdas are not the usual magnetostrictive coefficients.
+
+        .. [1] L\ . Franke, “Elastic Coupling at Quantum Phase Transitions and in Chiral Magnets,” Das Karlsruher Institut für Technologie, Karlsruhe, 2025. doi: 10.5445/IR/1000184834.
+        
+        See Also
+        --------
+        B1, B2
+        """
+        return Parameter(self._impl.B_chiral)
+
+    @B_chiral.setter
+    def B_chiral(self, value):
+        self.B_chiral.set(value)
 
     # ----- POISSON SYSTEM ----------------------
 
@@ -944,7 +1009,7 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        temperature
+        reset_noise_generator, temperature, thermal_seed
         """
         return FieldQuantity(_cpp.thermal_noise(self._impl))
 
@@ -1033,6 +1098,42 @@ class Ferromagnet(Magnet):
         return ScalarQuantity(_cpp.homogeneous_exchange_energy(self._impl))
 
     @property
+    def anisotropic_exchange_field(self) -> FieldQuantity:
+        """Effective field of the anisotropic exchange interaction (T).
+        This field is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_energy_density, anisotropic_exchange_energy
+        """
+        return FieldQuantity(_cpp.anisotropic_exchange_field(self._impl))
+    
+    @property
+    def anisotropic_exchange_energy_density(self) -> FieldQuantity:
+        """Energy density related to the anisotropic exchange interaction (J/m³).
+        This energy density is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_field, anisotropic_exchange_energy
+        """
+        return FieldQuantity(_cpp.anisotropic_exchange_energy_density(self._impl))
+
+    @property
+    def anisotropic_exchange_energy(self) -> ScalarQuantity:
+        """Energy related to the anisotropic exchange interaction (J).
+        This energy is related to the altermagnetic exchange interaction
+        between neighbouring cells.
+        
+        See Also
+        --------
+        anisotropic_exchange_field, anisotropic_exchange_energy_density
+        """
+        return ScalarQuantity(_cpp.anisotropic_exchange_energy(self._impl))
+
+    @property
     def homogeneous_dmi_field(self):
         """Effective field of the homogeneous DMI (T)."""
         return FieldQuantity(_cpp.homogeneous_dmi_field(self._impl))
@@ -1057,7 +1158,7 @@ class Ferromagnet(Magnet):
 
         See Also
         --------
-        B1, B2
+        B1, B2, B_chiral
         Magnet.strain_tensor, Magnet.rigid_norm_strain, Magnet.rigid_shear_strain
         magnetoelastic_force
         """
@@ -1089,7 +1190,7 @@ class Ferromagnet(Magnet):
 
         See Also
         --------
-        B1, B2
+        B1, B2, B_chiral
         Magnet.effective_body_force, magnetoelastic_field
         """
         return FieldQuantity(_cpp.magnetoelastic_force(self._impl))

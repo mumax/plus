@@ -4,6 +4,7 @@
 #include <string>
 
 #include "fieldquantity.hpp"
+#include "strayfieldkernel.hpp"
 
 class Parameter;
 class Magnet;
@@ -64,6 +65,9 @@ class StrayFieldExecutor {
 
   /** Return the switching radius of the executor. */
   virtual double switchingradius() const = 0;
+
+  /** Return the StrayFieldKernel */
+  virtual const StrayFieldKernel& kernel() const = 0;
 
  protected:
   /** Source of the stray field*/
@@ -151,6 +155,9 @@ class StrayField : public FieldQuantity {
 
   /** Return true if one can be sure that the stray field is exactly zero. */
   bool assuredZero() const;
+
+  /** Return the StrayFieldKernel */
+  const StrayFieldKernel& kernel() const { return executor_->kernel();}
 
  private:
   std::shared_ptr<const System> system_;

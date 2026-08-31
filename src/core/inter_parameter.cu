@@ -3,6 +3,7 @@
 #include "reduce.hpp"
 
 #include <algorithm>
+#include <string>
 
 InterParameter::InterParameter(std::shared_ptr<const System> system,
                                real value, std::string name, std::string unit)

@@ -1,18 +1,22 @@
 #include "wrappers.hpp"
 
-PYBIND11_MODULE(_mumaxpluscpp, m) {
+PYBIND11_MODULE(MUMAX_MODULE_NAME, m) {
+  m.attr("FP_PRECISION") = FP_PRECISION;
   wrap_fieldquantity(m);
+  wrap_altermagnetfieldquantity(m);
   wrap_antiferromagnetfieldquantity(m);
   wrap_ferromagnetfieldquantity(m);
   wrap_ncafmfieldquantity(m);
   wrap_magnetfieldquantity(m);
   wrap_scalarquantity(m);
+  wrap_altermagnetscalarquantity(m);
   wrap_antiferromagnetscalarquantity(m);
   wrap_ferromagnetscalarquantity(m);
   wrap_ncafmscalarquantity(m);
   wrap_magnetscalarquantity(m);
   wrap_magnet(m);
   wrap_mfm(m);
+  wrap_altermagnet(m);
   wrap_antiferromagnet(m);
   wrap_ferromagnet(m);
   wrap_ncafm(m);
@@ -28,5 +32,6 @@ PYBIND11_MODULE(_mumaxpluscpp, m) {
   wrap_system(m);
   wrap_dmitensor(m);
   wrap_voronoi(m);
+  wrap_window(m);
   wrap_traction(m);
 }

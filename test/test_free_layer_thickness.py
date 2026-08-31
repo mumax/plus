@@ -9,13 +9,13 @@ from mumaxplus import Ferromagnet, Grid, World
 RTOL = 1e-5  # 0.001%
 
 # Arbitrary parameters, resulting in a non-zero Slonczewski torque
-magnetization = (np.random.uniform(), np.random.uniform(), np.random.uniform())
+magnetization = np.random.normal(size=3)
 magnetization /= np.linalg.norm(magnetization)
 msat = 4.3
 jcur = (0,0,5.4)
 pol = 0.6
 fixed_layer = (1,0,1)
-free_layer_thickness = 1e-9
+# Lambda = 1  # default
 
 
 def relative_error(result, wanted):
@@ -32,7 +32,8 @@ def test_free_layer():
     magnet_wanted.jcur = jcur
     magnet_wanted.pol = pol
     magnet_wanted.fixed_layer = fixed_layer
-    magnet_wanted.free_layer_thickness = free_layer_thickness
+    # If the free_layer_thickness is unset, then the thickness of the free layer
+    # is deduced from the mesh thickness (2e-9 m in this case).
     magnet_wanted.magnetization = magnetization
 
     torque_wanted = magnet_wanted.spin_transfer_torque.eval()[:,0,0,0]
@@ -45,10 +46,12 @@ def test_free_layer():
     magnet_result.jcur = jcur
     magnet_result.pol = pol
     magnet_result.fixed_layer = fixed_layer
-    magnet_result.free_layer_thickness = free_layer_thickness
+    # Adding empty layers to the system should not change the result 
+    # if we set the freeLayerThickness by hand.
+    magnet_result.free_layer_thickness = 2e-9  # 2 magnetic layers
     magnet_result.magnetization = magnetization
 
-    torque_result = magnet_wanted.spin_transfer_torque.eval()[:,0,0,0]
+    torque_result = magnet_result.spin_transfer_torque.eval()[:,0,0,0]
 
     err = relative_error(torque_result, torque_wanted)
     assert err < RTOL

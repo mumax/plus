@@ -17,6 +17,7 @@ API
    Ferromagnet
    Antiferromagnet
    NcAfm
+   Altermagnet
    TimeSolver
    ScalarQuantity
    FieldQuantity
@@ -27,6 +28,7 @@ API
    PoissonSystem
    DmiTensor
    BoundaryTraction
+   Window
 
 .. toctree::
    :maxdepth: 1

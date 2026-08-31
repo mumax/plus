@@ -1,6 +1,7 @@
 #include "effectivefield.hpp"
 
 #include "afmexchange.hpp"
+#include "atmexchange.hpp"
 #include "anisotropy.hpp"
 #include "antiferromagnet.hpp"
 #include "demag.hpp"
@@ -28,6 +29,8 @@ Field evalEffectiveField(const Ferromagnet* magnet) {
       if (!homoAfmExchangeAssuredZero(magnet)) {h += evalHomogeneousAfmExchangeField(magnet);}
       // Homogeneous (local) DMI term
       if (!homoDmiAssuredZero(magnet)) {h += evalHomoDmiField(magnet);}
+      // ATM anisotropic exchange
+      if (!atmExchangeAssuredZero(magnet)) {h += evalAtmExchangeField(magnet);}
   return h;
 }
 

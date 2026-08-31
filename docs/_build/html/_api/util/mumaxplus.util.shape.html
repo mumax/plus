@@ -16,36 +16,46 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-  
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d4b325e0" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=051bfb12"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_api/util/mumaxplus.util.shape';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../../_static/google-analytics.js?v=27e7bdd4"></script>
+    <script src="../../_static/js/svg-pan-zoom.min.js"></script>
+    <script src="../../_static/js/setup-pan-zoom.js"></script>
     <link rel="icon" href="../../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -53,7 +63,8 @@
     <link rel="prev" title="formulary" href="mumaxplus.util.formulary.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2025-07-10, v1.1.0"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
   </head>
   
   
@@ -69,19 +80,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -89,7 +89,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -97,8 +96,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -114,7 +113,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -144,7 +144,7 @@
     
     
     <img src="../../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
-    <script>document.write(`<img src="../../_static/nimble-plus.png" class="logo__image only-dark" alt="mumax⁺ - Home"/>`);</script>
+    <img src="../../_static/nimble-plus.png" class="logo__image only-dark pst-js-only" alt="mumax⁺ - Home"/>
   
   
 </a></div>
@@ -183,21 +183,17 @@
           
           
           
-          <a href="https://arxiv.org/abs/2411.18194" title="Paper on arXiv" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">Paper on arXiv</span></a>
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
         </li>
 </ul></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
@@ -211,6 +207,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
@@ -236,10 +233,13 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/geometry.html">Geometry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/shapes.html">Shapes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/regions.html">Regions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorial/langevin.html">Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
 </ul>
 </details></li>
 </ul>
@@ -249,6 +249,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../class_diagrams.html">Class Diagrams</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../diagrams/quantities.html">Quantities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagrams/magnetics.html">Magnetics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagrams/strayfield.html">Strayfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagrams/timeintegration.html">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagrams/domain.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagrams/utilities.html">Utilities</a></li>
 </ul>
 </details></li>
 </ul>
@@ -259,9 +271,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -296,7 +313,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -310,25 +327,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -440,6 +449,18 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball"><code class="docutils literal notranslate"><span class="pre">Superball</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line2D"><code class="docutils literal notranslate"><span class="pre">Line2D</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line2D.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull"><code class="docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
@@ -476,6 +497,10 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ImageShape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ObjShape"><code class="docutils literal notranslate"><span class="pre">ObjShape</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ObjShape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -492,11 +517,11 @@ document.write(`
 <p>Classes for common shapes and their manipulation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Shape">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Shape</span></span><a class="headerlink" href="#mumaxplus.util.shape.Shape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Shape</span></span><a class="headerlink" href="#mumaxplus.util.shape.Shape" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape_func=&lt;function</span> <span class="pre">Shape.&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.__init__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">Shape.&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.__init__" title="Link to this definition">#</a></dt>
 <dd><p>Base class for all shapes using constructive solid geometry (CSG).
 This mutable class holds and manipulates a given shape function.</p>
 <dl class="field-list simple">
@@ -624,10 +649,11 @@ outside this box is ignored.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>min_point</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Smallest x, y and z coordinates of the bounding box (inclusive).</p></li>
 <li><p><strong>max_point</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Largest x, y and z coordinates of the bounding box (exclusive).</p></li>
-<li><p><strong>direction.</strong> (<em>Setting any coordinate to None will not repeat the shape in this</em>)</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Setting any coordinate to None will not repeat the shape in this direction.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -689,7 +715,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Empty">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Empty</span></span><a class="headerlink" href="#mumaxplus.util.shape.Empty" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Empty</span></span><a class="headerlink" href="#mumaxplus.util.shape.Empty" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Empty.__init__">
@@ -701,7 +727,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Universe">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Universe</span></span><a class="headerlink" href="#mumaxplus.util.shape.Universe" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Universe</span></span><a class="headerlink" href="#mumaxplus.util.shape.Universe" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Universe.__init__">
@@ -713,7 +739,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipsoid">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ellipsoid</span></span><a class="headerlink" href="#mumaxplus.util.shape.Ellipsoid" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Ellipsoid</span></span><a class="headerlink" href="#mumaxplus.util.shape.Ellipsoid" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipsoid.__init__">
@@ -725,7 +751,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Sphere">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sphere</span></span><a class="headerlink" href="#mumaxplus.util.shape.Sphere" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Sphere</span></span><a class="headerlink" href="#mumaxplus.util.shape.Sphere" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Ellipsoid" title="mumaxplus.util.shape.Ellipsoid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Sphere.__init__">
@@ -737,7 +763,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipse">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ellipse</span></span><a class="headerlink" href="#mumaxplus.util.shape.Ellipse" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Ellipse</span></span><a class="headerlink" href="#mumaxplus.util.shape.Ellipse" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Ellipse.__init__">
@@ -749,7 +775,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Circle">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Circle</span></span><a class="headerlink" href="#mumaxplus.util.shape.Circle" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Circle</span></span><a class="headerlink" href="#mumaxplus.util.shape.Circle" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Ellipse" title="mumaxplus.util.shape.Ellipse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ellipse</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Circle.__init__">
@@ -761,7 +787,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cone">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cone</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cone" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Cone</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cone" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cone.__init__">
@@ -773,7 +799,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cylinder">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cylinder</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cylinder" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Cylinder</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cylinder" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cylinder.__init__">
@@ -785,7 +811,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cuboid">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cuboid</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cuboid" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Cuboid</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cuboid" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cuboid.__init__">
@@ -797,7 +823,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cube">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cube</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cube" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Cube</span></span><a class="headerlink" href="#mumaxplus.util.shape.Cube" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Cuboid" title="mumaxplus.util.shape.Cuboid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cuboid</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cube.__init__">
@@ -809,7 +835,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Rectangle">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Rectangle</span></span><a class="headerlink" href="#mumaxplus.util.shape.Rectangle" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Rectangle</span></span><a class="headerlink" href="#mumaxplus.util.shape.Rectangle" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Rectangle.__init__">
@@ -821,7 +847,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Square">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Square</span></span><a class="headerlink" href="#mumaxplus.util.shape.Square" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Square</span></span><a class="headerlink" href="#mumaxplus.util.shape.Square" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Rectangle" title="mumaxplus.util.shape.Rectangle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectangle</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Square.__init__">
@@ -833,7 +859,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.XRange">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">XRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.XRange" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">XRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.XRange" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.XRange.__init__">
@@ -845,7 +871,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.YRange">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">YRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.YRange" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">YRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.YRange" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.YRange.__init__">
@@ -857,7 +883,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.ZRange">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ZRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.ZRange" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ZRange</span></span><a class="headerlink" href="#mumaxplus.util.shape.ZRange" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.ZRange.__init__">
@@ -869,7 +895,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Torus">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Torus</span></span><a class="headerlink" href="#mumaxplus.util.shape.Torus" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Torus</span></span><a class="headerlink" href="#mumaxplus.util.shape.Torus" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Torus.__init__">
@@ -879,20 +905,112 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>major_diam</strong> (<em>float</em>) – Distance between opposite centers of the tube.</p></li>
-<li><p><strong>minor_diam</strong> (<em>When major_diam =</em>) – Diameter of the tube.</p></li>
-<li><p><strong>high.</strong> (<em>The torus is major_diam + minor_diam wide and minor_diam</em>)</p></li>
-<li><p><strong>minor_diam</strong></p></li>
-<li><p><strong>hole.</strong> (<em>there will be no</em>)</p></li>
+<li><p><strong>minor_diam</strong> (<em>float</em>) – Diameter of the tube.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The torus is major_diam + minor_diam wide and minor_diam high.
+When major_diam = minor_diam, there will be no hole.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Superball">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Superball</span></span><a class="headerlink" href="#mumaxplus.util.shape.Superball" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Superball.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Superball.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Superball with given diameter and shape parameter <cite>p</cite>.</p>
+<p>A superball is defined by the inequality:</p>
+<div class="math notranslate nohighlight">
+\[|x/r|^{2p} + |y/r|^{2p} + |z/r|^{2p} ≤ 1\]</div>
+<p>where r is the radius (not diameter) and p controls the shape:</p>
+<ul class="simple">
+<li><p>p &gt; 1 gives a rounded cube</p></li>
+<li><p>p = 1 gives a sphere</p></li>
+<li><p>p = 0.5 gives an octahedron</p></li>
+<li><p>p &lt;= 0 gives empty space</p></li>
+</ul>
+<p>For consistency with other shapes, diameter (2r) is used as parameter
+instead of radius.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Line2D">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Line2D</span></span><a class="headerlink" href="#mumaxplus.util.shape.Line2D" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Line2D.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linecap</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Line2D.__init__" title="Link to this definition">#</a></dt>
+<dd><p>2D line segment between points <cite>p1</cite> and <cite>p2</cite>, with given diameter and
+cap. This is the 2D equivalent of <a class="reference internal" href="#mumaxplus.util.shape.Line" title="mumaxplus.util.shape.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a>, resulting in a uniform
+fill along the z-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p1</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 2</em><em> or </em><em>3</em>) – The two endpoints of the line segment, <cite>(x1, y1)</cite> and <cite>(x2, y2)</cite>.
+If the size is 3, the z-values are simply ignored.</p></li>
+<li><p><strong>p2</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 2</em><em> or </em><em>3</em>) – The two endpoints of the line segment, <cite>(x1, y1)</cite> and <cite>(x2, y2)</cite>.
+If the size is 3, the z-values are simply ignored.</p></li>
+<li><p><strong>diam</strong> (<em>float</em>) – Inclusive diameter or width of the line, with <cite>diam &gt; 0.0</cite>.</p></li>
+<li><p><strong>linecap</strong> (<em>str</em>) – <p>The line cap can be ‘infinite’, ‘round’ or ‘flat’.</p>
+<ul>
+<li><p>’infinite’: line extends indefinitely beyond the two specified points.</p></li>
+<li><p>’round’: the line segment ends in circles at the two specified points.</p></li>
+<li><p>’flat’: the line segment ends in a flat plane at the two specified points.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.util.shape.Line" title="mumaxplus.util.shape.Line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Line</span></code></a></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Line">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Line</span></span><a class="headerlink" href="#mumaxplus.util.shape.Line" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.Line.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linecap</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Line.__init__" title="Link to this definition">#</a></dt>
+<dd><p>3D line segment between points <cite>p1</cite> and <cite>p2</cite>, with given diameter and cap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p1</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – The two endpoints of the line segment, <cite>(x1, y1, z1)</cite> and <cite>(x2, y2, z2)</cite>.</p></li>
+<li><p><strong>p2</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – The two endpoints of the line segment, <cite>(x1, y1, z1)</cite> and <cite>(x2, y2, z2)</cite>.</p></li>
+<li><p><strong>diam</strong> (<em>float</em>) – Inclusive diameter of the line, with <cite>diam &gt; 0.0</cite>.</p></li>
+<li><p><strong>linecap</strong> (<em>str</em>) – <p>The line cap can be ‘infinite’, ‘round’ or ‘flat’.</p>
+<ul>
+<li><p>’infinite’: line extends indefinitely beyond the two specified points.</p></li>
+<li><p>’round’: the line segment ends in circles at the two specified points.</p></li>
+<li><p>’flat’: the line segment ends in a flat plane at the two specified points.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.util.shape.Line2D" title="mumaxplus.util.shape.Line2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Line2D</span></code></a></p>
+</div>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.DelaunayHull">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DelaunayHull</span></span><a class="headerlink" href="#mumaxplus.util.shape.DelaunayHull" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DelaunayHull</span></span><a class="headerlink" href="#mumaxplus.util.shape.DelaunayHull" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.DelaunayHull.__init__">
@@ -901,7 +1019,7 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 vertices of a convex polyhedron.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>points</strong> (<em>ndarray</em><em> of </em><em>double</em><em>, </em><em>shape</em><em> (</em><em>npoints</em><em>, </em><em>3</em><em>)</em>)</p>
+<dd class="field-odd"><p><strong>points</strong> (ndarray of double, <code class="docutils literal notranslate"><span class="pre">shape</span> <span class="pre">(npoints,</span> <span class="pre">3)</span></code>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -910,7 +1028,7 @@ vertices of a convex polyhedron.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Tetrahedron">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tetrahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Tetrahedron" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Tetrahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Tetrahedron" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Tetrahedron.__init__">
@@ -923,7 +1041,7 @@ with the given diameter.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Octahedron">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Octahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Octahedron" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Octahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Octahedron" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Octahedron.__init__">
@@ -936,7 +1054,7 @@ with the given diameter.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Dodecahedron">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Dodecahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Dodecahedron" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Dodecahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Dodecahedron" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Dodecahedron.__init__">
@@ -949,7 +1067,7 @@ with the given diameter.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Icosahedron">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Icosahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Icosahedron" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Icosahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Icosahedron" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Icosahedron.__init__">
@@ -962,7 +1080,7 @@ with the given diameter.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Icosidodecahedron">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Icosidodecahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Icosidodecahedron" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Icosidodecahedron</span></span><a class="headerlink" href="#mumaxplus.util.shape.Icosidodecahedron" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.DelaunayHull" title="mumaxplus.util.shape.DelaunayHull"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Icosidodecahedron.__init__">
@@ -975,7 +1093,7 @@ diameter.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Polygon">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Polygon</span></span><a class="headerlink" href="#mumaxplus.util.shape.Polygon" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Polygon</span></span><a class="headerlink" href="#mumaxplus.util.shape.Polygon" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Polygon.__init__">
@@ -983,7 +1101,7 @@ diameter.</p>
 <dd><p>A polygon in the xy-plane, with a given list of vertices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertices</strong> (<em>float ndarray</em><em> of </em><em>size</em><em> (</em><em>N</em><em>, </em><em>2</em><em>) or </em><em>(</em><em>N</em><em>, </em><em>3</em><em>)</em>) – If the size is (N, 3), the z-values are simply ignored.</p>
+<dd class="field-odd"><p><strong>vertices</strong> (<em>float ndarray</em><em> of </em><a class="reference internal" href="../mumaxplus/mumaxplus.Grid.html#mumaxplus.Grid.size" title="mumaxplus.Grid.size"><em>size</em></a><em> (</em><em>N</em><em>, </em><em>2</em><em>) or </em><em>(</em><em>N</em><em>, </em><em>3</em><em>)</em>) – If the size is (N, 3), the z-values are simply ignored.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -992,7 +1110,7 @@ diameter.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.RegularPolygon">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegularPolygon</span></span><a class="headerlink" href="#mumaxplus.util.shape.RegularPolygon" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RegularPolygon</span></span><a class="headerlink" href="#mumaxplus.util.shape.RegularPolygon" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Polygon" title="mumaxplus.util.shape.Polygon"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polygon</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.RegularPolygon.__init__">
@@ -1005,7 +1123,7 @@ with given diameter. One point is located at (diam/2, 0).</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.ImageShape">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ImageShape</span></span><a class="headerlink" href="#mumaxplus.util.shape.ImageShape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ImageShape</span></span><a class="headerlink" href="#mumaxplus.util.shape.ImageShape" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.ImageShape.__init__">
@@ -1023,6 +1141,43 @@ stretched image are treated as outside of the shape (False).</p>
 pixel of the image. z-coordinate can be given but is ignored.</p></li>
 <li><p><strong>max_point</strong> (<em>tuple</em><em> of </em><em>length 2</em><em> or </em><em>3</em>) – x and y world coordinates to be mapped to the center of the top right
 pixel of the image. z-coordinate can be given but is ignored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.ObjShape">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ObjShape</span></span><a class="headerlink" href="#mumaxplus.util.shape.ObjShape" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mumaxplus.util.shape.Shape" title="mumaxplus.util.shape.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.util.shape.ObjShape.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repair</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate_z_up</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.ObjShape.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Use a .obj file as a shape. Exactly two parameters of (min_point,
+max_point, center, scale, size) must be provided to define the bounding
+box. The object will be stretched to fill that box unless keep_aspect
+is True. The inside of the object returns True, otherwise False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<em>string</em>) – Filename of the 3D object to use.</p></li>
+<li><p><strong>min_point</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Smallest x, y and z coordinates of the object’s bounding box.</p></li>
+<li><p><strong>max_point</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Largest x, y and z coordinates of the object’s bounding box.</p></li>
+<li><p><strong>center</strong> (<em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Center of the object’s bounding box.</p></li>
+<li><p><strong>scale</strong> (<em>float</em><em> or </em><em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Scaling factor to apply. If a tuple, scaling for each axis.</p></li>
+<li><p><strong>size</strong> (<em>float</em><em> or </em><em>tuple</em><em>[</em><em>float</em><em>] of </em><em>size 3</em>) – Size of the object’s bounding box, in meters. Overrides scale.</p></li>
+<li><p><strong>keep_aspect</strong> (<em>bool</em><em> (</em><em>default=False</em><em>)</em>) – If True, the object will fit tightly inside the bounding box
+defined by the previous parameters, but it will not be distorted
+to fill said bounding box completely along all axes. Hence, when
+keep_aspect is True, the values passed to min_point, max_point and
+scale/size may not fully correspond to the resultant bounding box.</p></li>
+<li><p><strong>repair</strong> (<em>bool</em><em> (</em><em>default=False</em><em>)</em>) – Attempts to interpret the object as a single solid, attempting
+basic repairs in case the mesh is not watertight.</p></li>
+<li><p><strong>rotate_z_up</strong> (<em>bool</em><em> (</em><em>default=True</em><em>)</em>) – If your .obj file uses the Y-axis as the out-of-plane direction,
+you can set <cite>rotate_z_up=True</cite> to rotate your 3D object correctly
+in mumax, where the Z-axis represents the out-of-plane direction.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1068,14 +1223,16 @@ pixel of the image. z-coordinate can be given but is ignored.</p></li>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape"><code class="docutils literal notranslate"><span class="pre">Shape</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Shape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
@@ -1166,6 +1323,18 @@ pixel of the image. z-coordinate can be given but is ignored.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Torus.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball"><code class="docutils literal notranslate"><span class="pre">Superball</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Superball.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line2D"><code class="docutils literal notranslate"><span class="pre">Line2D</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line2D.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.Line.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull"><code class="docutils literal notranslate"><span class="pre">DelaunayHull</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.DelaunayHull.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
@@ -1202,6 +1371,10 @@ pixel of the image. z-coordinate can be given but is ignored.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ImageShape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ObjShape"><code class="docutils literal notranslate"><span class="pre">ObjShape</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.util.shape.ObjShape.__init__"><code class="docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -1228,7 +1401,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-10, v1.1.0.
+  Last updated on 2026-06-08, v1.2.1.
   <br/>
 </p>
   </div>
@@ -1246,8 +1419,8 @@ By the DyNaMat group, Ghent University, Belgium.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

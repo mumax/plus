@@ -170,6 +170,8 @@ class Shape:
         max_point : tuple[float] of size 3
             Largest x, y and z coordinates of the bounding box (exclusive).
         
+        Notes
+        -----
         Setting any coordinate to None will not repeat the shape in this direction.
         """
         for min_p, max_p in zip(min_point, max_point):
@@ -407,7 +409,9 @@ class Torus(Shape):
             Distance between opposite centers of the tube.
         minor_diam : float
             Diameter of the tube.
-
+            
+        Notes
+        -----
         The torus is major_diam + minor_diam wide and minor_diam high.
         When major_diam = minor_diam, there will be no hole.
         """
@@ -445,6 +449,161 @@ class Superball(Shape):
                 return norm <= 1
             super().__init__(shape_func)
 
+class Line2D(Shape):
+    def __init__(self, p1, p2, diam, linecap):
+        """2D line segment between points `p1` and `p2`, with given diameter and
+        cap. This is the 2D equivalent of :class:`Line`, resulting in a uniform
+        fill along the z-axis.
+
+        Parameters
+        ----------
+        p1, p2 : tuple[float] of size 2 or 3
+            The two endpoints of the line segment, `(x1, y1)` and `(x2, y2)`.
+            If the size is 3, the z-values are simply ignored.
+        diam : float
+            Inclusive diameter or width of the line, with `diam > 0.0`.
+        linecap : str
+            The line cap can be 'infinite', 'round' or 'flat'.
+
+            - 'infinite': line extends indefinitely beyond the two specified points.
+            - 'round': the line segment ends in circles at the two specified points.
+            - 'flat': the line segment ends in a flat plane at the two specified points.
+
+        See Also
+        --------
+        Line
+        """
+
+        if diam <= 0: 
+            raise ValueError("`diam` should be strictly greater than 0.")
+
+        radSq = (diam / 2) ** 2
+        x1, y1 = p1[0], p1[1]
+        x2, y2 = p2[0], p2[1]
+
+        if x1 == x2 and y1 == y2:
+            raise ValueError("Points `p1` and `p2` should be different.")
+
+        dx, dy = x2-x1, y2-y1
+        lenSq = dx*dx + dy*dy
+
+        match linecap:
+            case "infinite":
+                def infinite_func(x, y, z):
+                    return radSq >= pow((x-x1)*(y-y2) - (x-x2)*(y-y1), 2) / lenSq
+                super().__init__(infinite_func)
+
+            case "flat":
+                def flat_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy) / lenSq
+
+                    # If param is not in [0,1], then point is beyond line segment
+                    valid = (0 <= param) & (param <= 1)
+                    # still continue for numpy array support
+
+                    xx, yy = x1 + param*dx, y1 + param*dy  # closest point on line
+                    dxx, dyy = x-xx, y-yy
+
+                    return valid & (dxx*dxx + dyy*dyy <= radSq)
+
+                super().__init__(flat_func)
+
+            case "round":
+                def round_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy) / lenSq
+
+                    # closest point on the line segment
+                    param = _np.clip(param, 0, 1)
+                    xx, yy = x1+param*dx, y1+param*dy
+
+                    dxx, dyy = x - xx, y - yy
+
+                    return dxx*dxx + dyy*dyy <= radSq
+
+                super().__init__(round_func)
+
+            case _:
+                raise ValueError(f"Line capping method \"{linecap}\" is not implemented.")
+
+class Line(Shape):
+    def __init__(self, p1, p2, diam, linecap):
+        """3D line segment between points `p1` and `p2`, with given diameter and cap.
+
+        Parameters
+        ----------
+        p1, p2 : tuple[float] of size 3
+            The two endpoints of the line segment, `(x1, y1, z1)` and `(x2, y2, z2)`.
+        diam : float
+            Inclusive diameter of the line, with `diam > 0.0`.
+        linecap : str
+            The line cap can be 'infinite', 'round' or 'flat'.
+
+            - 'infinite': line extends indefinitely beyond the two specified points.
+            - 'round': the line segment ends in circles at the two specified points.
+            - 'flat': the line segment ends in a flat plane at the two specified points.
+
+        See Also
+        --------
+        Line2D
+        """
+
+        if diam <= 0: 
+            raise ValueError("`diam` should be strictly greater than 0.")
+
+        radSq = (diam / 2) ** 2
+        x1, y1, z1 = p1[0], p1[1], p1[2]
+        x2, y2, z2 = p2[0], p2[1], p2[2]
+
+        if x1 == x2 and y1 == y2 and z1 == z2:
+            raise ValueError("Points `p1` and `p2` should be different.")
+
+        dx, dy, dz = x2-x1, y2-y1, z2-z1
+        lenSq = dx*dx + dy*dy + dz*dz
+
+        match linecap:
+            case "infinite":
+                def infinite_func(x, y, z):
+                    dx1, dy1, dz1 = x-x1, y-y1, z-z1
+                    dx2, dy2, dz2 = x-x2, y-y2, z-z2
+                    cross1, cross2, cross3 = dy1*dz2-dy2*dz1, dx1*dz2-dx2*dz1, dx1*dy2-dx2*dy1
+
+                    return radSq >= (cross1*cross1 + cross2*cross2 + cross3*cross3) / lenSq
+
+                super().__init__(infinite_func)
+
+            case "flat":
+                def flat_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy + (z-z1)*dz) / lenSq
+
+                    # If param is not in [0,1], then point is beyond line segment
+                    valid = (0 <= param) & (param <= 1)
+                    # still continue for numpy array support
+
+                    # closest point on line
+                    xx, yy, zz = x1 + param*dx, y1 + param*dy, z1 + param*dz
+                    dxx, dyy, dzz = x-xx, y-yy, z-zz
+
+                    return valid & (dxx*dxx + dyy*dyy + dzz*dzz <= radSq)
+
+                super().__init__(flat_func)
+
+            case "round":
+                def round_func(x, y, z):
+                    param = ((x-x1)*dx + (y-y1)*dy + (z-z1)*dz) / lenSq
+
+                    # closest point on the line segment
+                    param = _np.clip(param, 0, 1)
+                    xx, yy, zz = x1+param*dx, y1+param*dy, z1+param*dz
+
+                    dxx, dyy, dzz = x - xx, y - yy, z - zz
+
+                    return dxx*dxx + dyy*dyy + dzz*dzz <= radSq
+
+                super().__init__(round_func)
+
+            case _:
+                raise ValueError(f"Line capping method \"{linecap}\" is not implemented.")
+
 # =========================
 # Convex polyhedra
 
@@ -455,7 +614,7 @@ class DelaunayHull(Shape):
         
         Parameters
         ----------
-        points : ndarray of double, shape (npoints, 3)
+        points : ndarray of double, ``shape (npoints, 3)``
         """
         hull = _Delaunay(points)
         def shape_func(x, y, z):
@@ -597,6 +756,98 @@ class ImageShape(Shape):
 
         super().__init__(shape_func)
 
+
+# =========================
+# ObjShape
+
+class ObjShape(Shape):
+    def __init__(self, fname: str,
+                 min_point: tuple = None, max_point: tuple = None,
+                 center: tuple = None, scale: tuple|float = None, size: tuple|float = None,
+                 keep_aspect: bool = False, repair: bool = False, rotate_z_up: bool = True):
+        """Use a .obj file as a shape. Exactly two parameters of (min_point,
+        max_point, center, scale, size) must be provided to define the bounding
+        box. The object will be stretched to fill that box unless keep_aspect
+        is True. The inside of the object returns True, otherwise False.
+
+        Parameters
+        ----------
+        fname : string
+            Filename of the 3D object to use.
+        min_point : tuple[float] of size 3
+            Smallest x, y and z coordinates of the object's bounding box.
+        max_point : tuple[float] of size 3
+            Largest x, y and z coordinates of the object's bounding box.
+        center : tuple[float] of size 3
+            Center of the object's bounding box.
+        scale : float or tuple[float] of size 3
+            Scaling factor to apply. If a tuple, scaling for each axis.
+        size : float or tuple[float] of size 3
+            Size of the object's bounding box, in meters. Overrides scale.
+        keep_aspect : bool (default=False)
+            If True, the object will fit tightly inside the bounding box
+            defined by the previous parameters, but it will not be distorted
+            to fill said bounding box completely along all axes. Hence, when
+            keep_aspect is True, the values passed to min_point, max_point and
+            scale/size may not fully correspond to the resultant bounding box.
+        repair : bool (default=False)
+            Attempts to interpret the object as a single solid, attempting
+            basic repairs in case the mesh is not watertight.
+        rotate_z_up : bool (default=True)
+            If your .obj file uses the Y-axis as the out-of-plane direction,
+            you can set `rotate_z_up=True` to rotate your 3D object correctly
+            in mumax, where the Z-axis represents the out-of-plane direction.
+        """
+        import pyvista as pv # Only attempt import if this shape is used, since this is an optional dependency
+        import trimesh
+        
+        ## Load the mesh in the correct orientation
+        mesh = trimesh.load(fname)
+        if repair: trimesh.repair.fill_holes(mesh)
+        if rotate_z_up: # Rotate Y-up to Z-up
+            rotation_matrix = trimesh.transformations.rotation_matrix(_np.pi/2, [1, 0, 0]) # 90° rotation around X-axis
+            mesh.apply_transform(rotation_matrix)
+        mesh_size = mesh.bounds[1] - mesh.bounds[0]
+        
+        ## Parse the positioning arguments
+        toarray = lambda arg: _np.asarray(arg) if arg is not None else None
+        min_point, max_point, center, scale, size = toarray(min_point), toarray(max_point), toarray(center), toarray(scale), toarray(size)
+        if size is not None:
+            if scale is not None: raise ValueError("You can either specify 'scale' or 'size', not both at the same time.")
+            scale = size / mesh_size
+        if (min_point is not None) + (max_point is not None) + (center is not None) + (scale is not None) != 2:
+            raise ValueError("Exactly 2 arguments of 'min_point', 'max_point', 'center' and 'scale'/'size' should be provided.")
+        match (min_point, max_point, center, scale): # Reduce parameters to just (min_point, max_point)
+            case (_, _, None, None): pass
+            case (None, None, _, _): min_point, max_point = center - scale*mesh_size/2, center + scale*mesh_size/2
+            case (_, None, _, None): max_point = min_point + (center - min_point)*2
+            case (None, _, _, None): min_point = max_point - (max_point - center)*2
+            case (_, None, None, _): max_point = min_point + scale*mesh_size
+            case (None, _, None, _): min_point = max_point - scale*mesh_size
+        if keep_aspect:
+            center = (min_point + max_point)/2
+            scale = min((max_point - min_point)/mesh_size) # Isotropic scaling, defined by smallest factor needed to fit in box
+            min_point, max_point = center - scale*mesh_size/2, center + scale*mesh_size/2
+        
+        ## Move the mesh to the desired position
+        mesh.apply_scale((max_point - min_point)/(mesh.bounds[1] - mesh.bounds[0]))
+        mesh.apply_translation(min_point - mesh.bounds[0])
+
+        ## Use PyVista mesh in hape_func
+        mesh_pv = pv.wrap(mesh) # PyVista provides far more efficient checks than trimesh
+        def shape_func(x, y, z):
+            if hasattr(x, "__iter__"): # ndarray
+                x_, y_, z_ = x.flatten(), y.flatten(), z.flatten()
+                points = _np.stack([x_,y_,z_], axis=-1)
+            else:
+                points = _np.asarray([[x, y, z]])
+            cloud = pv.PolyData(points)
+            result = cloud.select_interior_points(mesh_pv, check_surface=False)
+            bools = result["selected_points"].astype(bool)
+            return _np.reshape(bools, x.shape) if hasattr(x, "__iter__") else bools[0]
+
+        super().__init__(shape_func)
+
 # ==================================================
 # TODO List of Mumax3 shapes to add
 # Layers
@@ -647,7 +898,7 @@ if __name__=="__main__":
         plt.show()
 
 
-    shape = Superball(1, 4)
+    shape = Line((-0.9, -0.8, -0.7), (0.5, 0.6, 0.7), 0.1, "infinite")
     shape.mirror_xy()
 
     res = 201

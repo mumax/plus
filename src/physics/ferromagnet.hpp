@@ -45,6 +45,12 @@ class Ferromagnet : public Magnet {
   void minimize(real tol = 1e-6, int nSamples = 10);
   void relax(real tol);
 
+  int getThermalSeed() const { return thermalSeed; }
+  void setThermalSeed(int value) { thermalSeed = value;
+                                   curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
+                                  }
+  void resetNoiseGenerator();
+
  private:
   NormalizedVariable magnetization_;
 
@@ -76,7 +82,9 @@ class Ferromagnet : public Magnet {
   Parameter kc2;
   Parameter kc3;
   Parameter alpha;
+  Parameter gamma;
   Parameter temperature;
+  int thermalSeed;
   Parameter Lambda;
   Parameter freeLayerThickness;
   Parameter epsilonPrime;
@@ -95,4 +103,5 @@ class Ferromagnet : public Magnet {
   // Magnetoelasticity
   Parameter B1;  // First magnetoelastic coupling constant
   Parameter B2;  // Second magnetoelastic coupling constant
+  Parameter BChiral;  // Chiral magnetoelastic coupling constant
 };

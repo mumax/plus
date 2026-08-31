@@ -1,3 +1,4 @@
+#include "altermagnet.hpp"
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
 #include "ferromagnet.hpp"
@@ -25,6 +26,10 @@ FM_FieldQuantity fullMagnetizationQuantity(const Ferromagnet* magnet) {
 
 AFM_FieldQuantity fullMagnetizationQuantity(const Antiferromagnet* magnet) {
     return AFM_FieldQuantity(magnet, evalHMFullMag, 3, "full_magnetization", "A/m");
+}
+
+ATM_FieldQuantity fullMagnetizationQuantity(const Altermagnet* magnet) {
+    return ATM_FieldQuantity(magnet, evalHMFullMag, 3, "full_magnetization", "A/m");
 }
 
 NcAfm_FieldQuantity fullMagnetizationQuantity(const NcAfm* magnet) {

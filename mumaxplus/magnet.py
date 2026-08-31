@@ -3,7 +3,7 @@
 import numpy as _np
 from abc import ABC, abstractmethod
 
-import _mumaxpluscpp as _cpp
+from . import _cpp
 
 from .fieldquantity import FieldQuantity
 from .grid import Grid
@@ -64,7 +64,10 @@ class Magnet(ABC):
             x, y, z = [(grid.origin[i] + idxs[i]) * cs[i] for i in [0, 1, 2]]
 
             # evaluate the input function for each position in this meshgrid
-            return _np.vectorize(input, otypes=[T])(x, y, z)
+            try:
+                return input(x, y, z) # If input function is already vectorized
+            except Exception:
+                return _np.vectorize(input, otypes=[T])(x, y, z)
 
         # When here, the input is not None, not callable, so it should be an
         # ndarray or at least should be convertable to ndarray
@@ -341,7 +344,7 @@ class Magnet(ABC):
         η = β * C
 
         This parameter is completely **ignored** when any component of the viscosity
-        tensor (:attr:`eta11`, :attr:`et12` or :attr:`eta44`) has been set.
+        tensor (:attr:`eta11`, :attr:`eta12` or :attr:`eta44`) has been set.
 
         See Also
         --------

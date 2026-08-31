@@ -81,7 +81,7 @@ class TestDemag:
         nx, ny, nz = 126, 64, 8
         world = World((1e-9, 1e-9, 1e-9))
         magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-        mumaxplus_result = _cpp._demag_kernel(magnet._impl, 11, 5e-10, 5e-9)[0,nz:,ny:, nx:] # Nxx component
+        mumaxplus_result = _cpp._demag_kernel(magnet._impl, 11, 5e-10, 5e-9)[0,nz:,ny:, nx:] # Nxx 
 
         # avoid fake errors when both values are super small
         mask = ~((np.abs(self.exact_Nxx) < 5e-15) & (np.abs(mumaxplus_result) < 5e-15))

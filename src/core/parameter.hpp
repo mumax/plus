@@ -106,7 +106,7 @@ __device__ inline real CuParameter::valueAt(int3 coo) const {
 
 __device__ inline real CuParameter::harmonicMean(int idx1, int idx2) const {
   if (idx1 == idx2) { return valueAt(idx1); }
-  else { return harmonicMean(valueAt(idx1), valueAt(idx2)); }
+  else { return ::harmonicMean(valueAt(idx1), valueAt(idx2)); }
 }
 
 

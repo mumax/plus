@@ -40,6 +40,7 @@ py::array_t<T> get_data(const System* system, Getter getter, T default_value) {
 void wrap_system(py::module& m) {
   py::class_<System, std::shared_ptr<System>>(m, "System")
       .def_property_readonly("grid", &System::grid)
+      .def_property_readonly("time", [](const System& s) {return s.world()->time();})
       .def_property_readonly("cellsize", &System::cellsize)
       .def("cell_position", &System::cellPosition)
       .def_property_readonly("origin", &System::origin)
