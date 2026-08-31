@@ -84,4 +84,5 @@ plt.plot([B_pin, B_pin], [min(mx_list), max(mx_list)], c="k", ls="--", label="an
 plt.xlabel("$B_x$ (T)")
 plt.ylabel(r"$\langle m_x \rangle$")
 plt.legend()
+plt.tight_layout()
 plt.show()
