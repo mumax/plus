@@ -35,7 +35,7 @@ Khard = 1e6
 Ms_soft = 0.25 / MU0
 Ms_hard = 1 / MU0
 
-# choose combination of soft and hard parameters for phase 1
+# choose combination of soft and hard parameters for phases 1 and 2
 A1, K1, Ms1 = Asoft, Ksoft, Ms_soft
 A2, K2, Ms2 = Ahard, Khard, Ms_hard
 
