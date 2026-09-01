@@ -20,7 +20,7 @@ Minimizer::Minimizer(const Ferromagnet* magnet,
       t1(1),
       m0(1),
       m1(1) {
-  stepsizes_ = {1e-14};  // TODO: figure out how to make descent guess
+  stepsize_ = 1e-14;  // TODO: figure out how to make descent guess
   // TODO: check if input arguments are sane
 }
 
@@ -34,7 +34,7 @@ Minimizer::Minimizer(const HostMagnet* magnet,
       t1(magnets_.size()),
       m0(magnets_.size()),
       m1(magnets_.size()) {
-  stepsizes_.assign(magnets_.size(), 1e-14);
+  stepsize_ = 1e-14;
   for (auto sub : magnets_)
     torques_.push_back(relaxTorqueQuantity(sub));
 }
@@ -43,16 +43,7 @@ Minimizer::Minimizer(const MumaxWorld* world,
                      real stopMaxMagDiff,
                      int nMagDiffSamples)
     : stopMaxMagDiff_(stopMaxMagDiff) {
-  // Total number of ferromagnets (FM instances or sublattices)
-  size_t N = world->ferromagnets().size() + 2 * world->antiferromagnets().size();
-  
-  nMagDiffSamples_ = nMagDiffSamples * N;
-
-  t0.resize(N);
-  t1.resize(N);
-  m0.resize(N);
-  m1.resize(N);
-
+  // Find all ferromagnets (FM instances or sublattices)
   for (const auto pair : world->magnets()) {
     if (auto host = pair.second->asHost()) {
       for (auto sub : host->sublattices())
@@ -64,8 +55,15 @@ Minimizer::Minimizer(const MumaxWorld* world,
 
   for (auto magnet : magnets_)
     torques_.push_back(relaxTorqueQuantity(magnet));
-    
-  stepsizes_.assign(N, 1e-14);
+
+  nMagDiffSamples_ = nMagDiffSamples;
+  stepsize_ = 1e-14;
+
+  size_t N = magnets_.size();
+  t0.resize(N);
+  t1.resize(N);
+  m0.resize(N);
+  m1.resize(N);
 }
       
 void Minimizer::exec() {
@@ -87,21 +85,26 @@ __global__ void k_step(CuField mField,
   real3 m0 = m0Field.vectorAt(idx);
   real3 t = torqueField.vectorAt(idx);
 
+  // The explicit form of the implicit iteration scheme of eq. (8) in Exl et al.
   real t2 = dt * dt * dot(t, t);
   real3 m = ((4 - t2) * m0 + 4 * dt * t) / (4 + t2);
 
   mField.setVectorInCell(idx, m);
 }
 
-static inline real BarzilianBorweinStepSize(Field& dm, Field& dtorque, int n) {
-  real nom, div;
-  if (n % 2 == 0) {
-    nom = dotSum(dm, dm);
-    div = dotSum(dm, dtorque);
-  } else {
-    nom = dotSum(dm, dtorque);
-    div = dotSum(dtorque, dtorque);
+static inline real BarzilaiBorweinStepSize(std::vector<Field>& dm,
+                                           std::vector<Field>& dtorque, int n) {
+  real nom = 0, div = 0;
+  for (size_t i = 0; i < dm.size(); i++) {
+    if (n % 2 == 0) {
+      nom += dotSum(dm[i], dm[i]);
+      div += dotSum(dm[i], dtorque[i]);
+    } else {
+      nom += dotSum(dm[i], dtorque[i]);
+      div += dotSum(dtorque[i], dtorque[i]);
+    }
   }
+
   if (div == 0.0)
     return 1e-14;  // TODO: figure out safe stepsize
 
@@ -113,15 +116,15 @@ void Minimizer::step() {
 
     m0[i] = magnets_[i]->magnetization()->eval();
 
-    if (nsteps_ == 0)
+    if (nsteps_ == 0) {
       t0[i] = torques_[i].eval();
-    else
+      m1[i] = Field(magnets_[i]->system(), 3);
+    } else {
       t0[i] = t1[i];
+    }
 
-    m1[i] = Field(magnets_[i]->system(), 3);
     int ncells = m1[i].grid().ncells();
-
-    cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(), stepsizes_[i]);
+    cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(), stepsize_);
   }
   
   for (size_t i = 0; i < magnets_.size(); i++)
@@ -130,14 +133,21 @@ void Minimizer::step() {
   for (size_t i = 0; i < magnets_.size(); i++)
     t1[i] = torques_[i].eval();
 
+  // Reuse m0 and t0 for efficiency, but declare alias for clarity
+  std::vector<Field> &dm = m0, &dt = t0;
+  real magDiff = 0;
   for (size_t i = 0; i < magnets_.size(); i++) {
-    Field dm = add(real(+1), m1[i], real(-1), m0[i]);
-    Field dt = add(real(-1), t1[i], real(+1), t0[i]);  // TODO: check sign difference
+    add(dm[i], real(+1), m1[i], real(-1), m0[i]);
+    add(dt[i], real(-1), t1[i], real(+1), t0[i]);  // opposite sign
+    // The Barzilai-Borwein step uses the difference in steepest ascent,
+    // while relax torque is the steepest *descent* direction.
 
-    stepsizes_[i] = BarzilianBorweinStepSize(dm, dt, nsteps_);
-
-    addMagDiff(maxVecNorm(dm));
+    magDiff = std::max(magDiff, maxVecNorm(dm[i]));
   }
+
+  stepsize_ = BarzilaiBorweinStepSize(dm, dt, nsteps_);
+  addMagDiff(magDiff);
+
   nsteps_ += 1;
 }
 
