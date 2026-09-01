@@ -30,6 +30,7 @@ pybind11_add_module(${MUMAX_MODULE_NAME}
     wrap_poissonsystem.cpp
     wrap_linsolver.cpp
     wrap_voronoi.cpp
+    wrap_window.cpp
     wrap_traction.cpp
 )
 

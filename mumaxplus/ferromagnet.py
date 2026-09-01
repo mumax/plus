@@ -653,7 +653,7 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        B2
+        B2, B_chiral
         """
         return Parameter(self._impl.B1)
 
@@ -678,7 +678,7 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        B1
+        B1, B_chiral
         """
         return Parameter(self._impl.B2)
 
@@ -696,6 +696,36 @@ class Ferromagnet(Magnet):
             warnings.warn("The second magnetoelastic coupling constant B2"
                           + " is set to a positive value, instead of negative (or zero)."
                           + " Make sure this is intentional!", UserWarning)
+
+    @property
+    def B_chiral(self) -> Parameter:
+        r"""Chiral magnetoelastic coupling constant (J/m³).
+
+        Notes
+        -----
+        Materials of the cubic point group 23 (or B20 compounds) can have a
+        chiral magnetoelastic coupling, with the following energy density.
+
+        .. math:: \mathcal{E} = B_\text{chiral} \sum_{i, j, k} \epsilon_{ijk} \varepsilon_{ii} m_j^2
+
+        Here :math:`\epsilon_{ijk}` is the Levi-Civita symbol and
+        :math:`\varepsilon_{ii}` denotes the normal strain components.
+        This energy density comes from equations (8.12) and (8.16) in Ref. [1], where
+        B_chiral corresponds to :math:`\lambda_{12}`. Magnetoelastic coupling constants
+        B1 and B2 correspond to :math:`\lambda_{11}` and :math:`2 \lambda_{44}` respectively.
+        These lambdas are not the usual magnetostrictive coefficients.
+
+        .. [1] L\ . Franke, “Elastic Coupling at Quantum Phase Transitions and in Chiral Magnets,” Das Karlsruher Institut für Technologie, Karlsruhe, 2025. doi: 10.5445/IR/1000184834.
+        
+        See Also
+        --------
+        B1, B2
+        """
+        return Parameter(self._impl.B_chiral)
+
+    @B_chiral.setter
+    def B_chiral(self, value):
+        self.B_chiral.set(value)
 
     # ----- POISSON SYSTEM ----------------------
 
@@ -1128,7 +1158,7 @@ class Ferromagnet(Magnet):
 
         See Also
         --------
-        B1, B2
+        B1, B2, B_chiral
         Magnet.strain_tensor, Magnet.rigid_norm_strain, Magnet.rigid_shear_strain
         magnetoelastic_force
         """
@@ -1160,7 +1190,7 @@ class Ferromagnet(Magnet):
 
         See Also
         --------
-        B1, B2
+        B1, B2, B_chiral
         Magnet.effective_body_force, magnetoelastic_field
         """
         return FieldQuantity(_cpp.magnetoelastic_force(self._impl))

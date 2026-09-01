@@ -21,13 +21,10 @@ A0  = -5e-13
 A12 = A0/2
 
 length = 256e-9
-width = 64e-9
 
 # ----------- Create altermagnet -----------
 
 Nx = int(length / cs)
-Ny = int(width / cs)
-
 world  = World((cs, cs, cs))
 grid   = Grid((Nx, 1, 1))
 magnet = Altermagnet(world, grid)

@@ -55,6 +55,7 @@ from .timesolver import TimeSolver
 from .traction import BoundaryTraction
 from .variable import Variable
 from .world import World
+from .window import Window
 from . import util
 
 FP_PRECISION = {1: "SINGLE", 2: "DOUBLE"}.get(_cpp.FP_PRECISION, "UNKNOWN") # Use _cpp value, as that is certainly the correct one
@@ -77,6 +78,7 @@ __all__ = [
     "TimeSolver",
     "Variable",
     "World",
+    "Window",
     "PoissonSystem",
     "util",
     "FP_PRECISION"
