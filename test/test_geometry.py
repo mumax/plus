@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from mumaxplus.util.shape import Cuboid
 
 from mumaxplus import Ferromagnet, Grid, World
 
@@ -52,3 +53,44 @@ class TestGeometry:
         geomfunc = lambda x, y: True
         with pytest.raises(TypeError):
             magnet = Ferromagnet(world=world, grid=grid, geometry=geomfunc)
+
+    def test_overlap_success(self):
+        cs = 1e-9
+        world = World(cellsize=(cs, cs, cs))
+        grid = Grid((20, 20, 1))
+
+        bigside = 10*cs
+        smallside = 5*cs
+        planeside = 4*cs
+
+        bigCube = Cuboid(bigside, bigside, 2*bigside).translate(bigside, bigside, bigside)
+        smallCube = Cuboid(smallside, smallside, smallside).translate(8*cs, 8*cs, smallside)
+        plane = Cuboid(planeside, planeside, cs).translate(6*cs, 6*cs, 5*cs)
+        diff = bigCube - smallCube
+
+        magnet1 = Ferromagnet(world, grid, geometry=diff)
+        magnet2 = Ferromagnet(world, grid, geometry=plane) # or Ferromagnet(world, Grid((4, 4, 1), origin=(6, 6, 5))
+
+        assert magnet1 is not None
+        assert magnet2 is not None
+
+    def test_overlap_fail(self):
+        cs = 1e-9
+        world = World(cellsize=(cs, cs, cs))
+        grid = Grid((20, 20, 1))
+    
+        bigside = 10 * cs
+        smallside = 5 * cs
+    
+        bigCube = Cuboid(bigside, bigside, cs).translate(bigside, bigside, 0)
+        smallCube = Cuboid(smallside, smallside, cs).translate(8 * cs, 8 * cs, 0)
+        smallCubeShift = Cuboid(smallside, smallside, cs).translate(8 * cs, 9 * cs, 0)
+        diff = bigCube - smallCube
+    
+        magnet = Ferromagnet(world, grid, geometry=diff)
+    
+        with pytest.raises(Exception):
+            Ferromagnet(world, grid, geometry=smallCubeShift)
+
+
+
