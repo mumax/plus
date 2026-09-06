@@ -117,8 +117,8 @@ class Antiferromagnet(Magnet):
         self.sub1.enable_demag = value
         self.sub2.enable_demag = value
 
-    def minimize(self, tol=1e-6, nsamples=20, tol_el=1e-6, nsamples_el=10,
-                stepsize_el=1e-14, stepsize_el_fallback=1e-30,max_steps=200000, rigid_body_modes_interval=1, rigid_body_modes_delay=0,
+    def minimize(self, tol=1e-6, nsamples=20, tol_el=1e-6, nsamples_el=20,
+                stepsize_el=1e-30, stepsize_el_fallback=1e-30,max_steps=200000, rigid_body_modes_interval=1, rigid_body_modes_delay=0,
                 rigid_body_modes_method=0):
         """Minimize the total energy.
 
@@ -135,7 +135,7 @@ class Antiferromagnet(Magnet):
         tol : int / float (default=1e-6)
             The maximum allowed difference between consecutive magnetization
             evaluations when advancing toward an energy minimum.
-        nsamples : int (default=10)
+        nsamples : int (default=20)
             The number of consecutive magnetization evaluations that must not
             differ by more than the tolerance "tol".
         tol_el : int / float (default=1e-6)

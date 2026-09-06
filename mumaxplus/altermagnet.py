@@ -118,8 +118,8 @@ class Altermagnet(Magnet):
         self.sub1.enable_demag = value
         self.sub2.enable_demag = value
 
-    def minimize(self, tol=1e-6, nsamples=20, tol_el=1e-6, nsamples_el=10,
-                stepsize_el=1e-14, stepsize_el_fallback=1e-30,max_steps=200000, rigid_body_modes_interval=1, rigid_body_modes_delay=0,
+    def minimize(self, tol=1e-6, nsamples=20, tol_el=1e-6, nsamples_el=20,
+                stepsize_el=1e-30, stepsize_el_fallback=1e-30,max_steps=200000, rigid_body_modes_interval=1, rigid_body_modes_delay=0,
                 rigid_body_modes_method=0):
         """Minimize the total energy.
 
@@ -144,7 +144,7 @@ class Altermagnet(Magnet):
             The maximum allowed difference between consecutive elastic
             displacement evaluations when advancing toward mechanical
             equilibrium. Ignored if elastodynamics is disabled.
-        nsamples_el : int (default=10)
+        nsamples_el : int (default=20)
             The number of consecutive elastic displacement evaluations that
             must not differ by more than the tolerance "tol_el". Ignored if
             elastodynamics is disabled.

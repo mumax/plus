@@ -142,14 +142,14 @@ class NcAfm(Magnet):
         tol : int / float (default=1e-6)
             The maximum allowed difference between consecutive magnetization
             evaluations when advancing toward an energy minimum.
-        nsamples : int (default=10)
+        nsamples : int (default=30)
             The number of consecutive magnetization evaluations that must not
             differ by more than the tolerance "tol".
         tol_el : int / float (default=1e-6)
             The maximum allowed difference between consecutive elastic
             displacement evaluations when advancing toward mechanical
             equilibrium. Ignored if elastodynamics is disabled.
-        nsamples_el : int (default=10)
+        nsamples_el : int (default=30)
             The number of consecutive elastic displacement evaluations that
             must not differ by more than the tolerance "tol_el". 
         stepsize_el : int / float (default=1e-30)
@@ -168,6 +168,7 @@ class NcAfm(Magnet):
         rigid_body_modes_delay : int (default=0)
             The number of steps to wait before rigid-body-mode removal
             begins, regardless of "rigid_body_modes_interval". 
+        
 
 
         See Also
