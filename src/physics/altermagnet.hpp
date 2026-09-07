@@ -35,7 +35,7 @@ class Altermagnet : public HostMagnet {
  const Ferromagnet* sub2() const;
  
 void minimize(real tol = 1e-6, int nSamples = 20,
-              real tolEl = 1e-6, int nSamplesEl = 10,
+              real tolEl = 1e-6, int nSamplesEl = 20,
               real stepsizeEl = 1e-30, real stepsizeElFallback = 1e-30,
               int maxSteps = 200000, int rigidBodyModesInterval = 1, int rigidBodyModesDelay = 0,
               int rigidBodyModesMethod = 0);
