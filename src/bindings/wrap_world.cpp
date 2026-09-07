@@ -129,12 +129,12 @@ void wrap_world(py::module& m) {
                              
       .def("minimize", &MumaxWorld::minimize,
            py::arg("tol"), py::arg("nsamples"),
-           py::arg("tol_el") = 1e-6, py::arg("nsamples_el") = 10,
-           py::arg("stepsize_el") = 1e-30, py::arg("stepsize_el_fallback") = 1e-30,
-           py::arg("max_steps") = 200000,
-           py::arg("rigid_body_modes_interval") = 1,
-           py::arg("rigid_body_modes_delay") = 0,
-           py::arg("rigid_body_modes_method") = 0)
+           py::arg("tol_el"), py::arg("nsamples_el"),
+           py::arg("stepsize_el"), py::arg("stepsize_el_fallback"),
+           py::arg("max_steps"),
+           py::arg("rigid_body_modes_interval"),
+           py::arg("rigid_body_modes_delay"),
+           py::arg("rigid_body_modes_method"))
       .def("relax", &MumaxWorld::relax, py::arg("tol"))
 
       // PBC
