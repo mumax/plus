@@ -187,14 +187,11 @@ void Minimizer::exec() {
   // Optional one-time exact cleanup of the initial displacement's rigid
   // rotation. Method 0's per-step removal is a small-rotation
   // (linearized) approximation; if the hand-off state already carries a
-  // large rotation, that approximation is invalid until it's been
-  // reduced. This uses the exact quaternion alignment to remove it once,
-  // up front, so the linearized method only ever has to track small
-  // residual drift from then on.
+  // large rotation, first do a quaternion rotation once
   if (cleanInitialRotationExact_) {
     for (size_t i = 0; i < elMagnets_.size(); i++) {
       Field u0init = elMagnets_[i]->elasticDisplacement()->eval();
-      removeRigidBodyModesQuaternion(u0init, rigidGeoms4_[i], elMagnets_[i]);
+      removeRigidBodyModesQuaternion(u0init, rigidGeoms4_[i], elMagnets_[i], true);
       elMagnets_[i]->elasticDisplacement()->set(u0init);
     }
   }

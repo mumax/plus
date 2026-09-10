@@ -28,10 +28,10 @@ class Magnet;
 // ---------------------------------------------------------------------------
 
 struct RigidBodyGeometry4 {
-  double3 com0;      // reference (undeformed) mass-weighted center of mass
-  double3 com0Unweighted;      // geometric centroid reference (no rho)
-  double totalRho;   // total mass (sum of rho) in geometry
-  double ncellsInGeometry;
+  real3 com0;      // reference (undeformed) mass-weighted center of mass
+  real3 com0Unweighted;      // geometric centroid reference (no rho)
+  real totalRho;   // total mass (sum of rho) in geometry
+  real ncellsInGeometry;
   double S0[3][3];   // Sum w*(r0-com0)(r0-com0)^T -- reference shape covariance
   double S0Unweighted[3][3];  // unweighted reference shape covariance
 };
@@ -39,8 +39,8 @@ struct RigidBodyGeometry4 {
 struct QuatAlignResult {
   double q[4];      // optimal unit quaternion [q0 (scalar), q1, q2, q3]
   double R[3][3];   // rotation matrix equivalent to q
-  double3 T;        // translation: x_current ~= R*r0 + T
-  double3 com;      // current (deformed) mass-weighted center of mass
+  real3 T;        // translation: x_current ~= R*r0 + T
+  real3 com;      // current (deformed) mass-weighted center of mass
   double eigenGap;  // (largest - second largest) eigenvalue of N: near 0
                     // means the rotation axis is poorly determined by this
                     // mass/displacement configuration, not a method failure.

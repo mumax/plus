@@ -1,7 +1,8 @@
 #pragma once
+#include "datatypes.hpp"   // for real3, real
 
-#include "datatypes.hpp"
-#include "system.hpp"
+struct ComResult { real3 com; real weightSum; };
+struct Mat3x3 { double m[3][3]; };
 
 // f64 cell position — for accumulation kernels where cancellation matters.
 __device__ inline double3 cellPositionDeviceD(const CuSystem& system, int idx) {
@@ -19,17 +20,7 @@ __device__ inline real3 cellPositionDevice(const CuSystem& system, int idx) {
                real(coord.z) * system.cellsize.z};
 }
 
-__host__ __device__ inline double3 addD3(double3 a, double3 b) {
-  return double3{a.x + b.x, a.y + b.y, a.z + b.z};
-}
-__host__ __device__ inline double3 subD3(double3 a, double3 b) {
-  return double3{a.x - b.x, a.y - b.y, a.z - b.z};
-}
-__host__ __device__ inline double3 crossD3(double3 a, double3 b) {
-  return double3{a.y * b.z - a.z * b.y,
-                 a.z * b.x - a.x * b.z,
-                 a.x * b.y - a.y * b.x};
-}
+
 
 __host__ __device__ inline real3 toReal3(double3 v) {
   return real3{real(v.x), real(v.y), real(v.z)};
@@ -37,3 +28,5 @@ __host__ __device__ inline real3 toReal3(double3 v) {
 __host__ __device__ inline double3 toDouble3(real3 v) {
   return double3{double(v.x), double(v.y), double(v.z)};
 }
+
+
