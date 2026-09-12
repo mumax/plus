@@ -30,12 +30,12 @@ void addElasticIfPresent(const Magnet* magnet,
                          std::vector<const Magnet*>& elMagnets,
                          std::vector<M_FieldQuantity>& forces,
                          std::vector<RigidBodyGeometry>& rigidGeoms,
-                         std::vector<RigidBodyGeometry4>& rigidGeoms4) {
+                         std::vector<RigidBodyGeomQ>& rigidGeoms4) {
   if (!elasticityAssuredZero(magnet)) {
     elMagnets.push_back(magnet);
     forces.push_back(effectiveBodyForceQuantity(magnet));
     rigidGeoms.push_back(computeRigidBodyGeometry(magnet));
-    rigidGeoms4.push_back(computeRigidBodyGeometry4(magnet));
+    rigidGeoms4.push_back(computeRigidBodyGeometryQ(magnet));
   }
 }
 }
@@ -185,13 +185,13 @@ void Minimizer::exec() {
   
 
   // Optional one-time exact cleanup of the initial displacement's rigid
-  // rotation. Method 0's per-step removal is a small-rotation
+  // rotation. rigidbodymode.cu's per-step removal is a small-rotation
   // (linearized) approximation; if the hand-off state already carries a
   // large rotation, first do a quaternion rotation once
   if (cleanInitialRotationExact_) {
     for (size_t i = 0; i < elMagnets_.size(); i++) {
       Field u0init = elMagnets_[i]->elasticDisplacement()->eval();
-      removeRigidBodyModesQuaternion(u0init, rigidGeoms4_[i], elMagnets_[i], true);
+      removeRigidBodyModesQ(u0init, rigidGeoms4_[i], elMagnets_[i], true);
       elMagnets_[i]->elasticDisplacement()->set(u0init);
     }
   }

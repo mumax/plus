@@ -49,7 +49,7 @@ __device__ inline void blockReduceSum(T sdata, int tid) {
 }
 
 // Warp-shuffle, no risk of divergence
-//warps are 32 threads on all current CUDA GPUs
+// warps are 32 threads on all current CUDA GPUs
 constexpr int warp_size = 32;
 template <typename T, int WIDTH = 32>
 __device__ __forceinline__ T warpReduceSum(T val) {
@@ -97,7 +97,7 @@ __device__ __forceinline__ void blockReduceSum(T (&accumulators)[N_accums]) {
   }
 }
 
-//pass 1: center of mass (COM)
+// pass 1: center of mass (COM)
 // level 1: grid-stride load + two-level warp-shuffle tree reduce, one partial per block.
 // level 2: single block combines the level-1 partials in double, same warp-shuffle tree.
 

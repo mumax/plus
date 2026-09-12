@@ -6,7 +6,7 @@
 #include "field.hpp"
 #include "quantityevaluator.hpp"
 #include "rigidbodymodes.hpp"
-#include "rigidbodymodes4.hpp"   
+#include "rigidbodymodesQ.hpp"   
 
 class Ferromagnet;
 class HostMagnet;
@@ -82,7 +82,7 @@ class Minimizer {
   std::vector<const Magnet*> elMagnets_;
   std::vector<M_FieldQuantity> forces_;
   std::vector<RigidBodyGeometry> rigidGeoms_;
-  std::vector<RigidBodyGeometry4> rigidGeoms4_;
+  std::vector<RigidBodyGeomQ> rigidGeoms4_;
   std::vector<Field> f0, f1, u0, u1;
   std::vector<real> elStepsizes_;
   std::deque<real> lastElDiffs_;

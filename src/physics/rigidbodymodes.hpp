@@ -13,7 +13,7 @@ struct RigidModeMoments {
 
 struct RigidBodyGeometry {
   real3 com;
-  real3 comUnweighted;    // plain geometric centroid (no rho anywhere)
+  real3 comUnweighted;    // geometric centroid (no rho)
   real totalRho;
   real ncellsInGeometry;
   double I[3][3];              

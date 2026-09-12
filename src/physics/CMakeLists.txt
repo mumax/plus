@@ -78,8 +78,8 @@ add_library(physics STATIC
     rigidbodymodes_common.cuh
     rigidbodymodes.cu
     rigidbodymodes.hpp
-    rigidbodymodes4.cu
-    rigidbodymodes4.hpp
+    rigidbodymodesQ.cu
+    rigidbodymodesQ.hpp
     straintensor.cu
     straintensor.hpp
     stresstensor.cu
