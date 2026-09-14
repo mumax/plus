@@ -307,7 +307,11 @@ __global__ void k_geometriesOverlap(bool* result,
     int z = i / (overlapCells.x * overlapCells.y);
     int3 coo{overlapOrigin.x + x, overlapOrigin.y + y, overlapOrigin.z + z};
 
-    if (geometry1[grid1.coord2index(coo)] && geometry2[grid2.coord2index(coo)]) {
+    // Should always be true if there is no geometry
+    bool in1 = geometry1 ? geometry1[grid1.coord2index(coo)] : true;
+    bool in2 = geometry2 ? geometry2[grid2.coord2index(coo)] : true;
+
+    if (in1 && in2) {
       found = true;
       break;  // Once one overlap is found we can stop
     }
