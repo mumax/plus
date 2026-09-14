@@ -294,21 +294,20 @@ bool isUniformField(const Field& f) {
 __global__ void k_geometriesOverlap(bool* result,
                                      Grid grid1, bool const* geometry1,
                                      Grid grid2, bool const* geometry2,
-                                     int3 lo, int3 n, int ncells) {
+                                     int3 overlapOrigin, int3 overlapCells,
+                                     int ncells) {
   __shared__ bool sdata[BLOCKDIM];
   int tid = threadIdx.x;
 
   bool found = false;
   for (int i = tid; i < ncells; i += BLOCKDIM) {
     // unravel flat index i into a 3D offset within [0, n)
-    int x = i % n.x;
-    int y = (i / n.x) % n.y;
-    int z = i / (n.x * n.y);
-    int3 coo{lo.x + x, lo.y + y, lo.z + z};
+    int x = i % overlapCells.x;
+    int y = (i / overlapCells.x) % overlapCells.y;
+    int z = i / (overlapCells.x * overlapCells.y);
+    int3 coo{overlapOrigin.x + x, overlapOrigin.y + y, overlapOrigin.z + z};
 
-    bool in1 = !geometry1 || geometry1[grid1.coord2index(coo)];
-    bool in2 = !geometry2 || geometry2[grid2.coord2index(coo)];
-    if (in1 && in2) {
+    if (geometry1[grid1.coord2index(coo)] && geometry2[grid2.coord2index(coo)]) {
       found = true;
       break;  // Once one overlap is found we can stop
     }
@@ -330,12 +329,12 @@ __global__ void k_geometriesOverlap(bool* result,
 
 bool geometriesOverlap(Grid grid1, bool const* geometry1,
                        Grid grid2, bool const* geometry2,
-                       int3 lo, int3 n) {
-  int ncells = n.x * n.y * n.z;
+                       int3 overlapOrigin, int3 overlapCells) {
+  int ncells = overlapCells.x * overlapCells.y * overlapCells.z;
 
   GpuBuffer<bool> d_result(1);
   cudaLaunchReductionKernel(k_geometriesOverlap, d_result.get(),
-                            grid1, geometry1, grid2, geometry2, lo, n, ncells);
+                            grid1, geometry1, grid2, geometry2, overlapOrigin, overlapCells, ncells);
 
   bool result;
   checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(bool),

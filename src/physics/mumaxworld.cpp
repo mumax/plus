@@ -392,14 +392,18 @@ bool MumaxWorld::overlaps(Grid grid1, const GpuBuffer<bool>& geometry1,
   int3 o2 = grid2.origin(), s2 = grid2.size();
 
   // Overlapping box
-  int3 lo{std::max(o1.x, o2.x), std::max(o1.y, o2.y), std::max(o1.z, o2.z)};
-  int3 hi{std::min(o1.x + s1.x, o2.x + s2.x),
+  int3 overlapOrigin{std::max(o1.x, o2.x),
+                     std::max(o1.y, o2.y),
+                     std::max(o1.z, o2.z)};
+  int3 overlapMaximum{std::min(o1.x + s1.x, o2.x + s2.x),
           std::min(o1.y + s1.y, o2.y + s2.y),
           std::min(o1.z + s1.z, o2.z + s2.z)};
-  int3 n{hi.x - lo.x, hi.y - lo.y, hi.z - lo.z};
+  int3 overlapCells{overlapMaximum.x - overlapOrigin.x,
+         overlapMaximum.y - overlapOrigin.y,
+         overlapMaximum.z - overlapOrigin.z};
 
   // Check all cells in the overlapping box on GPU
   return geometriesOverlap(grid1, hasGeo1 ? geometry1.get() : nullptr,
                            grid2, hasGeo2 ? geometry2.get() : nullptr,
-                           lo, n);
+                           overlapOrigin, overlapCells);
 }
