@@ -117,7 +117,7 @@ class Antiferromagnet(Magnet):
         self.sub1.enable_demag = value
         self.sub2.enable_demag = value
 
-    def minimize(self, tol=1e-6, nsamples=20):
+    def minimize(self, tol=1e-6, nsamples=10):
         """Minimize the total energy.
 
         Fast energy minimization, but less robust than :func:`relax`
@@ -129,7 +129,7 @@ class Antiferromagnet(Magnet):
             The maximum allowed difference between consecutive magnetization
             evaluations when advancing toward an energy minimum.
 
-        nsamples : int (default=20)
+        nsamples : int (default=10)
             The number of consecutive magnetization evaluations that must not
             differ by more than the tolerance "tol".
 
