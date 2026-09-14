@@ -9,6 +9,7 @@
 #include "reduce.hpp"
 #include "rungekutta.hpp"
 #include "stepper.hpp"
+#include "variable.hpp"
 
 std::unique_ptr<TimeSolver> TimeSolver::Factory::create() {
   return std::unique_ptr<TimeSolver>(new TimeSolver());
@@ -32,6 +33,19 @@ void TimeSolver::setRungeKuttaMethod(const std::string& method) {
 
 RKmethod TimeSolver::getRungeKuttaMethod() {
   return method_;
+}
+
+real TimeSolver::getMaxError(MaxError maxError) const {
+  switch (maxError) {
+    case MaxError::MAGNETIZATION:
+      return this->magnetizationMaxError();
+    case MaxError::DISPLACEMENT:
+      return this->displacementMaxError();
+    case MaxError::VELOCITY:
+      return this->velocityMaxError();
+    default:
+      return this->magnetizationMaxError();
+  }
 }
 
 real TimeSolver::sensibleTimeStep() const {
