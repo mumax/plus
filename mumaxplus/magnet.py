@@ -64,7 +64,10 @@ class Magnet(ABC):
             x, y, z = [(grid.origin[i] + idxs[i]) * cs[i] for i in [0, 1, 2]]
 
             # evaluate the input function for each position in this meshgrid
-            return _np.vectorize(input, otypes=[T])(x, y, z)
+            try:
+                return input(x, y, z) # If input function is already vectorized
+            except Exception:
+                return _np.vectorize(input, otypes=[T])(x, y, z)
 
         # When here, the input is not None, not callable, so it should be an
         # ndarray or at least should be convertable to ndarray

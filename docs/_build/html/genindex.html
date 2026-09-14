@@ -15,46 +15,52 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d4b325e0" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=4b5c67ef" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=db04a367"></script>
+    <script src="_static/documentation_options.js?v=60f8217a"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
     <script src="_static/google-analytics.js?v=27e7bdd4"></script>
+    <script src="_static/js/svg-pan-zoom.min.js"></script>
+    <script src="_static/js/setup-pan-zoom.js"></script>
     <link rel="icon" href="_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2026-04-20, v1.2.0"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
   </head>
   
   
@@ -70,19 +76,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -90,7 +85,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -98,8 +92,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -117,7 +111,8 @@
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -147,7 +142,7 @@
     
     
     <img src="_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
-    <script>document.write(`<img src="_static/nimble-plus.png" class="logo__image only-dark" alt="mumax⁺ - Home"/>`);</script>
+    <img src="_static/nimble-plus.png" class="logo__image only-dark pst-js-only" alt="mumax⁺ - Home"/>
   
   
 </a></div>
@@ -192,15 +187,11 @@
 </ul></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
@@ -240,6 +231,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/geometry.html">Geometry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/shapes.html">Shapes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/regions.html">Regions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
@@ -259,6 +251,17 @@
 </ul>
 </details></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="class_diagrams.html">Class Diagrams</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diagrams/quantities.html">Quantities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagrams/magnetics.html">Magnetics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagrams/strayfield.html">Strayfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagrams/timeintegration.html">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagrams/domain.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagrams/utilities.html">Utilities</a></li>
+</ul>
+</details></li>
+</ul>
 
     </div>
 </nav></div>
@@ -266,9 +269,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -303,7 +311,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -317,24 +325,16 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
+</button>
 
 </div></div>
       
@@ -447,6 +447,8 @@ document.write(`
         <li><a href="_api/util/mumaxplus.util.mfm.html#mumaxplus.util.mfm.MFM.__init__">(MFM method)</a>
 </li>
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.__init__">(NcAfm method)</a>
+</li>
+        <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.ObjShape.__init__">(ObjShape method)</a>
 </li>
         <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Octahedron.__init__">(Octahedron method)</a>
 </li>
@@ -979,10 +981,12 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.kc3">kc3 (Ferromagnet property)</a>
 </li>
-      <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.kinetic_energy">kinetic_energy (Magnet property)</a>
+      <li><a href="_api/mumaxplus/mumaxplus.StrayField.html#mumaxplus.StrayField.kernel">kernel (StrayField property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.kinetic_energy">kinetic_energy (Magnet property)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.kinetic_energy_density">kinetic_energy_density (Magnet property)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.formulary.html#mumaxplus.util.formulary.Km">Km() (in module mumaxplus.util.formulary)</a>
@@ -1222,20 +1226,22 @@ document.write(`
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.ObjShape">ObjShape (class in mumaxplus.util.shape)</a>
+</li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Octahedron">Octahedron (class in mumaxplus.util.shape)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.octupole_vector">octupole_vector (NcAfm property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.StrayField.html#mumaxplus.StrayField.order">order (StrayField property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Grid.html#mumaxplus.Grid.origin">origin (Grid property)</a>
 
       <ul>
         <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.origin">(Magnet property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.other_sublattice">other_sublattice() (Altermagnet method)</a>
 
       <ul>
@@ -1304,17 +1310,19 @@ document.write(`
         <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.relax">(World method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.RelaxTorqueThreshold">RelaxTorqueThreshold (Ferromagnet property)</a>
 
       <ul>
         <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.RelaxTorqueThreshold">(World property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Parameter.html#mumaxplus.Parameter.remove_time_terms">remove_time_terms() (Parameter method)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.repeat">repeat() (Shape method)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.reset_noise_generator">reset_noise_generator() (Ferromagnet method)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.rho">rho (Magnet property)</a>
 </li>
@@ -1360,6 +1368,8 @@ document.write(`
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.TimeSolver.html#mumaxplus.TimeSolver.sensible_factor">sensible_factor (TimeSolver property)</a>
 </li>
+      <li><a href="_api/mumaxplus/mumaxplus.TimeSolver.html#mumaxplus.TimeSolver.sensible_timestep">sensible_timestep (TimeSolver property)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.TimeSolver.html#mumaxplus.TimeSolver.sensible_timestep_default">sensible_timestep_default (TimeSolver property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.InterParameter.html#mumaxplus.InterParameter.set">set() (InterParameter method)</a>
@@ -1404,10 +1414,10 @@ document.write(`
       </ul></li>
       <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.show_field_3D">show_field_3D() (in module mumaxplus.util.show)</a>
 </li>
-      <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.show_magnet_geometry">show_magnet_geometry() (in module mumaxplus.util.show)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.show_magnet_geometry">show_magnet_geometry() (in module mumaxplus.util.show)</a>
+</li>
       <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.show_regions">show_regions() (in module mumaxplus.util.show)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.SIprefix_to_mul">SIprefix_to_mul() (in module mumaxplus.util.show)</a>
@@ -1485,6 +1495,8 @@ document.write(`
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Tetrahedron">Tetrahedron (class in mumaxplus.util.shape)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.thermal_noise">thermal_noise (Ferromagnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.thermal_seed">thermal_seed (Ferromagnet property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.TimeSolver.html#mumaxplus.TimeSolver.time">time (TimeSolver property)</a>
 </li>
@@ -1705,7 +1717,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-04-20, v1.2.0.
+  Last updated on 2026-06-08, v1.2.1.
   <br/>
 </p>
   </div>
@@ -1723,8 +1735,8 @@ By the DyNaMat group, Ghent University, Belgium.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

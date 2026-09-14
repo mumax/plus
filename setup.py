@@ -82,17 +82,9 @@ class CMakeBuild(build_ext):
             )
 
 setup(
-    name="mumaxplus",
-    version="1.2.0",
-    author="Jeroen Mulkers",
-    author_email="jeroen.mulkers@gmail.com",
-    maintainer="Diego De Gusem, Ian Lateur, Lars Moreels",
-    maintainer_email="diego.degusem@ugent.be, ian.lateur@ugent.be, lars.moreels@ugent.be",
-    description="Finite difference micromagnetic solver",
     long_description="",
     packages=find_packages(include=["mumaxplus", "mumaxplus.*"]),
     ext_modules=[CMakeExtension("_mumaxpluscpp_single"), CMakeExtension("_mumaxpluscpp_double")],
     cmdclass=dict(build_ext=CMakeBuild),
-    install_requires=["numpy", "matplotlib"],
     zip_safe=False,
 )

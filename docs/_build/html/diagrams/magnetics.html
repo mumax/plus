@@ -1,0 +1,783 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Magnetics &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4b5c67ef" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'diagrams/magnetics';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
+    <script src="../_static/js/svg-pan-zoom.min.js"></script>
+    <script src="../_static/js/setup-pan-zoom.js"></script>
+    <link rel="icon" href="../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Strayfield" href="strayfield.html" />
+    <link rel="prev" title="Quantities" href="quantities.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <img src="../_static/nimble-plus.png" class="logo__image only-dark pst-js-only" alt="mumax⁺ - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/geometry.html">Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/langevin.html">Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../class_diagrams.html">Class Diagrams</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quantities.html">Quantities</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Magnetics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strayfield.html">Strayfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timeintegration.html">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utilities</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Magnetics</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="magnetics">
+<h1>Magnetics<a class="headerlink" href="#magnetics" title="Link to this heading">#</a></h1>
+<p>UML diagram of <code class="docutils literal notranslate"><span class="pre">Altermagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">Antiferromagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">BoundaryTraction</span></code>, <code class="docutils literal notranslate"><span class="pre">CuBoundaryTraction</span></code>, <code class="docutils literal notranslate"><span class="pre">CuDmiTensor</span></code>, <code class="docutils literal notranslate"><span class="pre">DmiTensor</span></code>, <code class="docutils literal notranslate"><span class="pre">Ferromagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">HostMagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">Magnet</span></code>, <code class="docutils literal notranslate"><span class="pre">Minimizer</span></code>, <code class="docutils literal notranslate"><span class="pre">MumaxWorld</span></code>, <code class="docutils literal notranslate"><span class="pre">NcAfm</span></code>.</p>
+<p class="plantuml">
+<img src="../_images/plantuml-b2e34a26735629e521bcfea50f45adf48a28f1c7.svg" alt="&#64;startuml
+!theme vibrant
+package Legend {
+  class Class
+  class Visibility {
+    +public field
+    +public method()
+    -private field
+    -private method()
+  }
+  Class -[hidden]-&gt; Extension
+  Visibility &lt;|-- Extension : Extension
+  Visibility o-- Aggregation : Aggregation
+  Visibility --&gt; Dependency : Dependency
+  Visibility ..&gt; WeakDependency : Weak dependency
+}
+class &quot;Minimizer&quot; as C_0008093513517733324021
+class C_0008093513517733324021 {
+-addMagDiff(real) : void
+-converged() const : bool
++exec() : void
+-step() : void
+__
+-lastMagDiffs_ : std::deque&lt;real&gt;
+-m0 : std::vector&lt;Field&gt;
+-m1 : std::vector&lt;Field&gt;
+-magnets_ : std::vector&lt;const Ferromagnet *&gt;
+-nMagDiffSamples_ : int
+-nsteps_ : int
+-stepsizes_ : std::vector&lt;real&gt;
+-stopMaxMagDiff_ : real
+-t0 : std::vector&lt;Field&gt;
+-t1 : std::vector&lt;Field&gt;
+-torques_ : std::vector&lt;FM_FieldQuantity&gt;
+}
+class &quot;MumaxWorld&quot; as C_0016179571750721185330
+class C_0016179571750721185330 {
++addAltermagnet(Grid grid, GpuBuffer&lt;bool&gt; geometry, GpuBuffer&lt;unsigned int&gt; regions, std::string name = &quot;&quot;) : Altermagnet *
++addAntiferromagnet(Grid grid, GpuBuffer&lt;bool&gt; geometry, GpuBuffer&lt;unsigned int&gt; regions, std::string name = &quot;&quot;) : Antiferromagnet *
++addFerromagnet(Grid grid, GpuBuffer&lt;bool&gt; geometry, GpuBuffer&lt;unsigned int&gt; regions, std::string name = &quot;&quot;) : Ferromagnet *
++addMagnetTempl&lt;T&gt;(std::map&lt;std::string,std::unique_ptr&lt;T&gt;&gt; &amp; container, Grid grid, GpuBuffer&lt;bool&gt; geometry, GpuBuffer&lt;unsigned int&gt; regions, std::string name, const std::string &amp; prefix) : T *
++addNcAfm(Grid grid, GpuBuffer&lt;bool&gt; geometry, GpuBuffer&lt;unsigned int&gt; regions, std::string name = &quot;&quot;) : NcAfm *
++altermagnets() const : const std::map&lt;std::string,Altermagnet *&gt;
++antiferromagnets() const : const std::map&lt;std::string,Antiferromagnet *&gt;
++boundingGrid() const : Grid
++checkAddibility(Grid grid, std::string name) const : void
++checkAllMagnetsInMastergrid() const : void
++ferromagnets() const : const std::map&lt;std::string,Ferromagnet *&gt;
++getAltermagnet(std::string name) const : Altermagnet *
++getAntiferromagnet(std::string name) const : Antiferromagnet *
++getFerromagnet(std::string name) const : Ferromagnet *
++getMagnet(std::string name) const : Magnet *
++getMagnetPointers&lt;T,MapT&gt;(const MapT &amp; container) const : std::map&lt;std::string, T&gt;
++getMagnetTempl&lt;MapT&gt;(const MapT &amp; container, const std::string &amp; name) const : decltype(container.begin()-&gt;second.get())
++getNcAfm(std::string name) const : NcAfm *
++handleNewStrayfield(Magnet * newMagnet) : void
++magnets() const : const std::map&lt;std::string,Magnet *&gt;
++minimize(real tol = 1e-6, int nSamples = 10) : void
++ncafms() const : const std::map&lt;std::string,NcAfm *&gt;
++recalculateStrayFields() : void
++relax(real tol) : void
++resetTimeSolverEquations(FM_Field torque = torqueQuantity) const : void
++setMastergrid(const Grid mastergrid) : void
++setPBC(const Grid mastergrid, const int3 pbcRepetitions) : void
++setPBC(const int3 pbcRepetitions) : void
++setPbcRepetitions(const int3 pbcRepetitions) : void
++unsetPBC() : void
+__
++RelaxTorqueThreshold : real
+-altermagnets_ : std::map&lt;std::string,std::unique_ptr&lt;Altermagnet&gt;&gt;
+-antiferromagnets_ : std::map&lt;std::string,std::unique_ptr&lt;Antiferromagnet&gt;&gt;
++biasMagneticField : real3
+-ferromagnets_ : std::map&lt;std::string,std::unique_ptr&lt;Ferromagnet&gt;&gt;
+-hostmagnets_ : std::map&lt;std::string,HostMagnet *&gt;
+-magnets_ : std::map&lt;std::string,Magnet *&gt;
+-ncafms_ : std::map&lt;std::string,std::unique_ptr&lt;NcAfm&gt;&gt;
+}
+class &quot;DmiTensor&quot; as C_0004656650194850054816
+class C_0004656650194850054816 {
++assuredZero() const : bool
++cu() const : CuDmiTensor
+__
++xxy : Parameter
++xxz : Parameter
++xyz : Parameter
++yxy : Parameter
++yxz : Parameter
++yyz : Parameter
++zxy : Parameter
++zxz : Parameter
++zyz : Parameter
+}
+class &quot;CuDmiTensor&quot; as C_0013668556689540008513
+class C_0013668556689540008513 {
+__
++xxy : CuParameter
++xxz : CuParameter
++xyz : CuParameter
++yxy : CuParameter
++yxz : CuParameter
++yyz : CuParameter
++zxy : CuParameter
++zxz : CuParameter
++zyz : CuParameter
+}
+class &quot;BoundaryTraction&quot; as C_0006011030370442785102
+class C_0006011030370442785102 {
++assuredZero() const : bool
++cu() const : CuBoundaryTraction
+__
++negXside : VectorParameter
++negYside : VectorParameter
++negZside : VectorParameter
++posXside : VectorParameter
++posYside : VectorParameter
++posZside : VectorParameter
+}
+class &quot;CuBoundaryTraction&quot; as C_0005494726350955164753
+class C_0005494726350955164753 {
++getSide(int orientation, int sense) const : const CuVectorParameter &amp;
+__
++negXside : CuVectorParameter
++negYside : CuVectorParameter
++negZside : CuVectorParameter
++posXside : CuVectorParameter
++posYside : CuVectorParameter
++posZside : CuVectorParameter
+}
+class &quot;Magnet&quot; as C_0003275239944218480396
+class C_0003275239944218480396 {
++operator=(const Magnet &amp;) = deleted : Magnet &amp;
++operator=(Magnet &amp;&amp; other) noexcept : Magnet &amp;
+..
++addStrayField(const Magnet *, StrayFieldExecutor::Method method = StrayFieldExecutor::METHOD_AUTO) : void
++asAFM() const : const Antiferromagnet *
++asATM() const : const Altermagnet *
++asFM() const : const Ferromagnet *
++asHost() const : const HostMagnet *
++asNcAfm() const : const NcAfm *
++cellsize() const : real3
++elasticDisplacement() const : const Variable *
++elasticVelocity() const : const Variable *
++enableElastodynamics() const : bool
++getGeometry() const : const GpuBuffer&lt;bool&gt; &amp;
++getStrayField(const Magnet *) const : const StrayField *
++getStrayFields() const : std::vector&lt;const StrayField *&gt;
++grid() const : Grid
++mumaxWorld() const : const MumaxWorld *
++name() const : std::string
++removeStrayField(const Magnet *) : void
++setEnableElastodynamics(bool) : void
++system() const : std::shared_ptr&lt;const System&gt;
++world() const : const World *
+__
++C11 : Parameter
++C12 : Parameter
++C44 : Parameter
++boundaryTraction : BoundaryTraction
+-elasticDisplacement_ : std::unique_ptr&lt;Variable&gt;
+-elasticVelocity_ : std::unique_ptr&lt;Variable&gt;
++enableAsStrayFieldDestination : bool
++enableAsStrayFieldSource : bool
+-enableElastodynamics_ : bool
++eta : Parameter
++eta11 : Parameter
++eta12 : Parameter
++eta44 : Parameter
++externalBodyForce : VectorParameter
+-name_ : std::string
++rho : Parameter
++rigidNormStrain : VectorParameter
++rigidShearStrain : VectorParameter
++stiffnessDamping : Parameter
+-strayFields_ : std::map&lt;const Magnet *,StrayField *&gt;
+-system_ : std::shared_ptr&lt;System&gt;
+}
+class &quot;Ferromagnet&quot; as C_0014126231922832319520
+class C_0014126231922832319520 {
++getThermalSeed() const : int
++hostMagnet() const : const HostMagnet *
++isSublattice() const : bool
++magnetization() const : const Variable *
++minimize(real tol = 1e-6, int nSamples = 10) : void
++relax(real tol) : void
++resetNoiseGenerator() : void
++setThermalSeed(int value) : void
+__
++B1 : Parameter
++B2 : Parameter
++Lambda : Parameter
++RelaxTorqueThreshold : real
++aex : Parameter
++alpha : Parameter
++amrRatio : Parameter
++anisC1 : VectorParameter
++anisC2 : VectorParameter
++anisU : VectorParameter
++appliedPotential : Parameter
++biasMagneticField : VectorParameter
++conductivity : Parameter
++dmiTensor : DmiTensor
++enableDemag : bool
++enableOpenBC : bool
++enableSlonczewskiTorque : bool
++enableZhangLiTorque : bool
++epsilonPrime : Parameter
++fixedLayer : VectorParameter
++fixedLayerOnTop : bool
++freeLayerThickness : Parameter
++frozenSpins : Parameter
++gamma : Parameter
+-hostMagnet_ : HostMagnet *
++interExch : InterParameter
++jcur : VectorParameter
++kc1 : Parameter
++kc2 : Parameter
++kc3 : Parameter
++ku1 : Parameter
++ku2 : Parameter
+-magnetization_ : NormalizedVariable
++msat : Parameter
++poissonSystem : PoissonSystem
++pol : Parameter
++randomGenerator : curandGenerator_t
++scaleExch : InterParameter
++temperature : Parameter
++thermalSeed : int
++xi : Parameter
+}
+class &quot;HostMagnet&quot; as C_0007732802595508485477
+class C_0007732802595508485477 {
++addSublattice(const Ferromagnet * sub) : void
++getOtherSublattices(const Ferromagnet *) const : std::vector&lt;const Ferromagnet *&gt;
++getSublatticeIndex(const Ferromagnet *) const : int
++sublattices() const : std::vector&lt;const Ferromagnet *&gt;
+__
++afmex_cell : Parameter
++afmex_nn : Parameter
++dmiTensor : DmiTensor
++dmiVector : VectorParameter
++interAfmExchNN : InterParameter
++latcon : Parameter
++scaleAfmExchNN : InterParameter
+-sublattices_ : std::vector&lt;const Ferromagnet *&gt;
+}
+class &quot;Altermagnet&quot; as C_0014853714476038189127
+class C_0014853714476038189127 {
++minimize(real tol = 1e-6, int nSamples = 20) : void
++relax(real tol) : void
++sub1() const : const Ferromagnet *
++sub2() const : const Ferromagnet *
+__
++alterex_1 : Parameter
++alterex_2 : Parameter
++alterex_angle : Parameter
++interAlterex_1 : InterParameter
++interAlterex_2 : InterParameter
++scaleAlterex_1 : InterParameter
++scaleAlterex_2 : InterParameter
+-sub1_ : Ferromagnet
+-sub2_ : Ferromagnet
+}
+class &quot;Antiferromagnet&quot; as C_0016226320639562968932
+class C_0016226320639562968932 {
++minimize(real tol = 1e-6, int nSamples = 20) : void
++relax(real tol) : void
++sub1() const : const Ferromagnet *
++sub2() const : const Ferromagnet *
+__
+-sub1_ : Ferromagnet
+-sub2_ : Ferromagnet
+}
+class &quot;NcAfm&quot; as C_0003465611192535094070
+class C_0003465611192535094070 {
++minimize(real tol = 1e-6, int nsamples = 30) : void
++relax(real tol) : void
++sub1() const : const Ferromagnet *
++sub2() const : const Ferromagnet *
++sub3() const : const Ferromagnet *
+__
+-sub1_ : Ferromagnet
+-sub2_ : Ferromagnet
+-sub3_ : Ferromagnet
+}
+C_0008093513517733324021 ..&gt; C_0007732802595508485477
+C_0008093513517733324021 ..&gt; C_0016179571750721185330
+C_0008093513517733324021 --&gt; C_0014126231922832319520 : -magnets_
+C_0008093513517733324021 o-- C_0014126231922832319520 : -torques_
+C_0016179571750721185330 --&gt; C_0003275239944218480396 : -magnets_
+C_0016179571750721185330 --&gt; C_0007732802595508485477 : -hostmagnets_
+C_0016179571750721185330 o-- C_0014126231922832319520 : -ferromagnets_
+C_0016179571750721185330 o-- C_0016226320639562968932 : -antiferromagnets_
+C_0016179571750721185330 o-- C_0014853714476038189127 : -altermagnets_
+C_0016179571750721185330 o-- C_0003465611192535094070 : -ncafms_
+C_0004656650194850054816 ..&gt; C_0013668556689540008513
+C_0006011030370442785102 ..&gt; C_0005494726350955164753
+C_0003275239944218480396 ..&gt; C_0014126231922832319520
+C_0003275239944218480396 ..&gt; C_0007732802595508485477
+C_0003275239944218480396 ..&gt; C_0016226320639562968932
+C_0003275239944218480396 ..&gt; C_0014853714476038189127
+C_0003275239944218480396 ..&gt; C_0003465611192535094070
+C_0003275239944218480396 --&gt; C_0003275239944218480396 : -strayFields_
+C_0003275239944218480396 o-- C_0006011030370442785102 : +boundaryTraction
+C_0003275239944218480396 &lt;.. C_0016179571750721185330 : +&lt;&lt;friend&gt;&gt;
+C_0014126231922832319520 ..&gt; C_0016179571750721185330
+C_0014126231922832319520 --&gt; C_0007732802595508485477 : -hostMagnet_
+C_0014126231922832319520 o-- C_0004656650194850054816 : +dmiTensor
+C_0003275239944218480396 &lt;|-- C_0014126231922832319520
+C_0007732802595508485477 o-- C_0004656650194850054816 : +dmiTensor
+C_0007732802595508485477 --&gt; C_0014126231922832319520 : -sublattices_
+C_0003275239944218480396 &lt;|-- C_0007732802595508485477
+C_0014853714476038189127 ..&gt; C_0016179571750721185330
+C_0014853714476038189127 o-- C_0014126231922832319520 : -sub1_
+C_0014853714476038189127 o-- C_0014126231922832319520 : -sub2_
+C_0007732802595508485477 &lt;|-- C_0014853714476038189127
+C_0016226320639562968932 ..&gt; C_0016179571750721185330
+C_0016226320639562968932 o-- C_0014126231922832319520 : -sub1_
+C_0016226320639562968932 o-- C_0014126231922832319520 : -sub2_
+C_0007732802595508485477 &lt;|-- C_0016226320639562968932
+C_0003465611192535094070 ..&gt; C_0016179571750721185330
+C_0003465611192535094070 o-- C_0014126231922832319520 : -sub1_
+C_0003465611192535094070 o-- C_0014126231922832319520 : -sub2_
+C_0003465611192535094070 o-- C_0014126231922832319520 : -sub3_
+C_0007732802595508485477 &lt;|-- C_0003465611192535094070
+C_0016226320639562968932 -[hidden]down- C_0007732802595508485477
+C_0016226320639562968932 -[hidden]right- C_0003465611192535094070
+C_0003465611192535094070 -[hidden]right- C_0014853714476038189127
+
+'Generated with clang-uml, version 0.6.2
+'LLVM version clang version 19.1.7 (https://github.com/conda-forge/clangdev-feedstock 3c5e7de432e909e225d8040e72a44724afb0c446)
+&#64;enduml
+"/></p>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="quantities.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Quantities</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="strayfield.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Strayfield</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2026-06-08, v1.2.1.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

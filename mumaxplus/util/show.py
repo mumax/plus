@@ -4,7 +4,6 @@ import matplotlib.pyplot as _plt
 import matplotlib as _matplotlib
 import numpy as _np
 import math as _math
-import pyvista as _pv
 import warnings as _warnings
 
 from numbers import Integral, Number
@@ -1464,6 +1463,8 @@ def show_regions(magnet,
 
 def show_magnet_geometry(magnet):
     """Show the geometry of a :func:`mumaxplus.Ferromagnet`."""
+    import pyvista as _pv # Import here to not make this a required dependency of mumaxplus
+    
     geom = magnet.geometry
 
                  # [::-1] for [x,y,z] not [z,y,x] and +1 for cells, not points
@@ -1505,6 +1506,7 @@ def show_field_3D(quantity, cmap="HSL", enable_quiver=True, symmetric_clim=True)
     --------
     get_rgb
     """
+    import pyvista as _pv # Import here to not make this a required dependency of mumaxplus
 
     if not isinstance(quantity, _mxp.FieldQuantity):
         raise TypeError("The first argument should be a FieldQuantity")

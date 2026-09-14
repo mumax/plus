@@ -5,7 +5,7 @@
 A versatile and extensible GPU-accelerated micromagnetic simulator written in C++ and CUDA with a Python interface. This project is in development alongside [mumax³](https://github.com/mumax/3).
 If you have any questions, feel free to use the [mumax⁺ GitHub Discussions](https://github.com/mumax/plus/discussions).
 
-**Documentation, tutorials and examples can be found on the [mumax⁺ website](https://mumax.github.io/plus/).**
+**Installation instructions, documentation, tutorials and examples can be found on the [mumax⁺ website](https://mumax.github.io/plus/).**
 
 ## Paper
 
@@ -19,122 +19,11 @@ All demonstrations in the paper were simulated using version [v1.1.0](https://gi
 
 ## Installation
 
-### Dependencies
+See [INSTALL.md](INSTALL.md) or the [mumax⁺ website](https://mumax.github.io/plus/install.html) for full instructions, covering the 3 main ways you can run/install mumax⁺:
 
-mumax⁺ should work on any NVIDIA GPU.
-To get started you should install the following tools yourself.
-Take care to avoid **version conflicts** between these different types of software and your hardware: click the arrows for more details.
-
-<details><summary>CUDA Toolkit</summary>
-
-To see which CUDA Toolkit works for your GPU's Compute Capability, check [this Stack Overflow post](https://stackoverflow.com/questions/28932864/which-compute-capability-is-supported-by-which-cuda-versions).
-
-* **Windows**: Download an installer from [the CUDA website](https://developer.nvidia.com/cuda-toolkit-archive).
-* **Linux**: Use `sudo apt-get install nvidia-cuda-toolkit`, or [download an installer](https://developer.nvidia.com/cuda-toolkit-archive).
-
-> ⚠️ Make especially sure that everything CUDA-related (like `nvcc`) can be found inside your PATH.
-> On Linux, for instance, this can be done by editing your `~/.bashrc` file and adding the following lines:
->
-> ```bash
-> # add CUDA
-> export PATH="/usr/local/cuda/bin:$PATH"
-> export LD_LIBRARY_PATH="/usr/local/cuda/> lib64:$LD_LIBRARY_PATH"
-> ```
->
-> The paths may differ if the CUDA Toolkit was installed in a different location.
-
-👉 *Check CUDA installation with: `nvcc --version`*
-
-</details>
-
-<details><summary>A C++ compiler which supports C++17</summary>
-
-* **Linux:** `sudo apt-get install gcc`
-  * ⚠️ Each CUDA version has a maximum supported `gcc` version, as listed in [this StackOverflow answer](https://stackoverflow.com/a/46380601). If necessary, use `sudo apt-get install gcc-<min_version>` instead, with the appropriate `<min_version>`.
-* **Windows:** [Microsoft Visual C++](https://visualstudio.microsoft.com/downloads/) (MSVC) must be used, since CUDA does not support `gcc` on Windows.
-  * ⚠️ Make sure you install a version of MSVC that is compatible with your installed CUDA toolkit, as listed in [this table](https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html) (e.g., MSVC 2026 does not yet seem to be supported by CUDA as of January 2026).
-  * During installation, check the box to include the "Desktop development with C++" workload.
-  * After installing, check if the path to `cl.exe` was added to your `PATH` environment variable (i.e., check whether `where cl.exe` returns an appropriate path like `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`). If not, add it manually.
-
-👉 *Check C installation with: `gcc --version` on Linux and `where.exe cl.exe` on Windows.*
-
-</details>
-
-<details><summary>Git</summary>
-
-* **Windows:** [Download](https://git-scm.com/downloads) and install.
-* **Linux:** `sudo apt install git`
-
-👉 *Check Git installation with: `git --version`*
-
-</details>
-
-<details><summary>CPython <i>(version ≥ 3.11)</i>, pip and miniconda/anaconda</summary>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All these Python-related tools should be included in a standard installation of [Anaconda or Miniconda](https://www.anaconda.com/download/success).
-
-👉 *Check installation with `python --version`, `pip --version` and `conda --version`.*
-
-</details>
-
-### Building mumax⁺
-
-First, clone the mumax⁺ Git repository. The `--recursive` flag is used in the following command to get the pybind11 submodule, which is needed to build mumax⁺.
-
-```bash
-git clone --recursive https://github.com/mumax/plus.git mumaxplus
-cd mumaxplus
-```
-
-We recommend to install mumax⁺ in a clean conda environment as follows. You could also skip this step and use your own conda environment instead if preferred.
-
-<details><summary>Click to show tools automatically installed in the conda environment</summary>
-
-* cmake 4.0.0
-* Python 3.13
-* pybind11 v2.13.6
-* NumPy
-* matplotlib
-* SciPy
-* Sphinx
-
-</details>
-
-```bash
-conda env create -f environment.yml
-conda activate mumaxplus
-```
-
-Finally, build and install mumax⁺ using pip.
-
-```bash
-pip install .
-```
-
-> [!TIP]
-> If changes are made to the code, then `pip install -v .` can be used to rebuild mumax⁺, with the `-v` flag enabling verbose debug information.
->
-> If you want to change only the Python code, without needing to reinstall after each change, `pip install -ve .` can also be used.
-
-### Check the compilation
-
-To check if you successfully compiled mumax⁺, we recommend you to run some [examples](#examples) from the `examples/` directory
-or to run the [tests](#testing) in the `test/` directory.
-
-<details><summary><h3>Troubleshooting</h3></summary>
-
-* (*Windows*) If you encounter the error `No CUDA toolset found`, try copying the files in `NVIDIA GPU Computing Toolkit/CUDA/<version>/extras/visual_studio_integration/MSBuildExtensions` to `Microsoft Visual Studio/<year>/<edition>/MSBuild/Microsoft/VC/<version>/BuildCustomizations`. See [these instructions](https://github.com/NVlabs/tiny-cuda-nn/issues/164#issuecomment-1280749170) for more details.
-
-* (*Windows*) If you encounter errors related to interactions between CMake, MSVC and CUDA, like `-- Detecting CUDA compiler ABI info - failed`, you may try the following methods to activate an appropriate set of environment variables. One option is to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. For CUDA &leq;12.9, another option is to call one of the `.bat` scripts in the folder `& C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build`, such as `vcvars64.bat`, before you run `pip install`.
-
-</details>
-
-## Floating-point precision
-
-mumax⁺ can use either single or double floating-point precision.
-This can be controlled by the command-line argument `--mumaxplus-fp-precision` and/or the environment variable `MUMAXPLUS_FP_PRECISION`.
-
-See this [tutorial page](https://mumax.github.io/plus/tutorial/precision.html) or [example notebook](examples/precision.ipynb) for more details.
+- online through [Google Colab](https://colab.research.google.com/github/mumax/plus/blob/master/examples/colab.ipynb),
+- installing pre-built wheels from the [GitHub releases](https://github.com/mumax/plus/releases/latest),
+- building from source.
 
 ## Documentation
 
@@ -145,7 +34,7 @@ It follows the [NumPy style guide](https://numpydoc.readthedocs.io/en/latest/for
 make html
 ```
 
-The documentation can then be found at `docs/_build/html/index.html`.
+The documentation can then be found at `docs/_build/html/index.html`. However, to generate the class diagrams you should be on a Linux device and first install [clang-uml](https://github.com/bkryza/clang-uml/tree/master) otherwise they will not be generated.
 
 ## Examples
 
@@ -160,6 +49,13 @@ or they are interactive notebooks (`.ipynb` files), which can be run using Jupyt
 ## Testing
 
 Several automated tests are located inside the `test/` directory. Type `pytest` inside the terminal to run them. Some are marked as `slow`, such as `test_mumax3_standardproblem5.py`. You can deselect those by running `pytest -m "not slow"`. Tests inside the `test/mumax3/` directory require external installation of mumax³. They are marked by `mumax3` and can be deselected in the same way.
+
+## Floating-point precision
+
+mumax⁺ can use either single or double floating-point precision.
+This can be controlled by the command-line argument `--mumaxplus-fp-precision` and/or the environment variable `MUMAXPLUS_FP_PRECISION`.
+
+See this [tutorial page](https://mumax.github.io/plus/tutorial/precision.html) or [example notebook](examples/precision.ipynb) for more details.
 
 ## Contributing
 

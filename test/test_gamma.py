@@ -74,3 +74,21 @@ def test_gyromagnetic_ratio_Slonczewski():
 
     err = max_semirelative_error(t2 / 2, t1)
     assert err < 1e-7
+
+def test_gyromagnetic_ratio_noise():
+    """Thermal noise scales with the gyromagnetic ratio"""
+    def generate_noise(gamma_scaling=1):
+        world = World((1e-9, 1e-9, 1e-9))
+        magnet = Ferromagnet(world, Grid((10, 10, 1)))
+        magnet.msat = 800e3
+        magnet.alpha = 0.01
+        magnet.temperature = 10
+        magnet.thermal_seed = 12345
+        magnet.gamma = magnet.gamma() * gamma_scaling
+        return magnet.thermal_noise()
+
+    n1 = generate_noise(1)
+    n2 = generate_noise(4)
+
+    err = max_semirelative_error(n2 / 2, n1)
+    assert err < 1e-7

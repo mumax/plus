@@ -11,6 +11,7 @@ started!
    :maxdepth: 1
 
    tutorial/magnetization
+   tutorial/geometry
    tutorial/shapes
    tutorial/regions
    tutorial/stdp4

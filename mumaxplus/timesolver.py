@@ -77,13 +77,19 @@ class TimeSolver:
     def _assure_sensible_timestep(self):
         """Assure a sensible timestep.
 
-        If things in the world have been changed, than it could be that the current
-        timestep of the solver is way to big. Calling this method makes sure that
+        If things in the world have been changed, then it could be that the current
+        timestep of the solver is way too big. Calling this method makes sure that
         the timestep is sensibly small.
+
+        See Also
+        --------
+        headroom, lower_bound, max_error, sensible_timestep,
+        sensible_timestep_default, upper_bound
         """
         if self.adaptive_timestep:
-            if self.timestep == 0.0 or self.timestep > self._impl.sensible_timestep:
-                self.timestep = self._impl.sensible_timestep
+            sensible_dt = self.sensible_timestep  # calculate once
+            if self.timestep == 0.0 or self.timestep > sensible_dt:
+                self.timestep = sensible_dt
 
     def set_method(self, method_name):
         """Set the Runga Kutta method used by the time solver.
@@ -211,7 +217,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, sensible_factor, sensible_timestep_default, upper_bound
+        headroom, lower_bound, sensible_factor, sensible_timestep,
+        sensible_timestep_default, upper_bound
         """
 
         return self._impl.max_error
@@ -229,7 +236,8 @@ class TimeSolver:
 
         See Also
         --------
-        lower_bound, max_error, sensible_factor, sensible_timestep_default, upper_bound
+        lower_bound, max_error, sensible_factor, sensible_timestep,
+        sensible_timestep_default, upper_bound
         """
         return self._impl.headroom
 
@@ -247,7 +255,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, max_error, sensible_factor, sensible_timestep_default, upper_bound
+        headroom, max_error, sensible_factor, sensible_timestep,
+        sensible_timestep_default, upper_bound
         """
         return self._impl.lower_bound
 
@@ -265,7 +274,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_factor, sensible_timestep_default
+        headroom, lower_bound, max_error, sensible_factor, sensible_timestep,
+        sensible_timestep_default
         """
         return self._impl.upper_bound
 
@@ -283,7 +293,8 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, sensible_timestep_default, upper_bound
+        headroom, lower_bound, max_error, sensible_timestep,
+        sensible_timestep_default, upper_bound
         """
         return self._impl.sensible_factor
 
@@ -301,10 +312,20 @@ class TimeSolver:
 
         See Also
         --------
-        headroom, lower_bound, max_error, upper_bound
+        headroom, lower_bound, max_error, sensible_timestep, upper_bound
         """
         return self._impl.sensible_timestep_default
 
     @sensible_timestep_default.setter
     def sensible_timestep_default(self, dt):
         self._impl.sensible_timestep_default = dt
+
+    @property
+    def sensible_timestep(self):
+        """Return a calculated sensible time step.
+
+        See Also
+        --------
+        headroom, lower_bound, max_error, sensible_timestep_default, upper_bound
+        """
+        return self._impl.sensible_timestep

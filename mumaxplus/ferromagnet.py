@@ -545,18 +545,39 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        thermal_noise
+        reset_noise_generator, thermal_noise, thermal_seed
         """
         return Parameter(self._impl.temperature)
 
     @temperature.setter
     def temperature(self, value):
-        if self.grid.ncells % 2:
-            raise ValueError("The CUDA random number generator used to generate"
-                             + " a random noise field only works for an even"
-                             + " number of grid cells.\n"
-                             + "The used number of grid cells is {}.".format(self.grid.ncells))
         self.temperature.set(value)
+
+    @property
+    def thermal_seed(self) -> int:
+        """Return seed of the thermal noise generator.
+
+        If not set, a random seed is generated based on the current time.
+        Resetting the seed does not reset the generator. Use :func:`reset_noise_generator` instead.
+
+        See Also
+        --------
+        reset_noise_generator, temperature, thermal_noise
+        """
+        return self._impl.thermal_seed
+
+    @thermal_seed.setter
+    def thermal_seed(self, value):
+        self._impl.thermal_seed = value
+
+    def reset_noise_generator(self):
+        """Destroys and creates a new noise generator with the existing thermal seed.
+
+        See Also
+        --------
+        temperature, thermal_noise, thermal_seed
+        """
+        self._impl.reset_noise_generator()
 
     @property
     def dmi_tensor(self) -> DmiTensor:
@@ -958,7 +979,7 @@ class Ferromagnet(Magnet):
         
         See Also
         --------
-        temperature
+        reset_noise_generator, temperature, thermal_seed
         """
         return FieldQuantity(_cpp.thermal_noise(self._impl))
 

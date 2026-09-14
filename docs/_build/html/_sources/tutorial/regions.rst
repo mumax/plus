@@ -81,11 +81,13 @@ Now one can set parameter values in each region seperately.
 
     plot_field(magnet.magnetization, arrow_size=1)
 
-.. image:: ../images/regions_1.png
-   :width: 45%
+.. container:: side-by-side-images
 
-.. image:: ../images/regions_2.png
-   :width: 45%
+   .. image:: ../images/regions_1.png
+      :width: 100%
+
+   .. image:: ../images/regions_2.png
+      :width: 100%
 
 Likewise, the antiferromagnetic nearest-neighbour exchange constant, ``afmex_nn``,
 can be set in the same way.

@@ -15,3 +15,6 @@ cu*_*.dll
 docs/_build/*
 !docs/_build/html/
 !docs/_build/html/**
+test/test.ovf
+test/*_000000.ovf
+docs/diagrams/puml

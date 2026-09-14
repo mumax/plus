@@ -99,6 +99,18 @@ Here are a few examples of basic shapes. They can be initialized like any other
 instance of a class, with the approprate variables. Usually one or more diameters,
 not radii, are expected.
 
+All shapes are classes in ``mumaxplus.util.shape``, which has been imported as
+``shapes`` above. Hence, all built-in shapes can be found by
+
+.. code-block:: python
+
+    import mumaxplus.util.shape as shapes
+    print(dir(shapes))
+
+.. code-block:: console
+
+    ['Circle', 'Cone', 'Cube', 'Cuboid', 'Cylinder', 'DelaunayHull', 'Dodecahedron', 'Ellipse', 'Ellipsoid', 'Empty', 'Icosahedron', 'Icosidodecahedron', 'ImageShape', 'Octahedron', 'Polygon', 'Rectangle', 'RegularPolygon', 'Shape', 'Sphere', 'Square', 'Tetrahedron', 'Torus', 'Universe', 'XRange', 'YRange', 'ZRange', '_Delaunay', '_Image', '_Path', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_np']
+
 2D Shapes
 ^^^^^^^^^
 
@@ -154,17 +166,22 @@ right pixels are mapped to the given x and y coordinates.
    :align: center
    :width: 600px
 
-All shapes are classes in mumaxplus.util.shape, which has been imported as
-"shapes" above. Hence, all built-in shapes can be found by
+ObjShape
+**********
+
+A 3D object file (e.g., .obj) can also be used as a shape.
 
 .. code-block:: python
 
-    import mumaxplus.util.shape as shapes
-    print(dir(shapes))
+    plotter = pv.Plotter()
+    x = y = z = np.linspace(0, 1e-7, 64)
+    shape = shapes.ObjShape("teapot.obj", (0, 0, 0), (1e-7, 1e-7, 1e-7), keep_aspect=True, rotate_z_up=True)
+    plot_shape_3D(shape, x, y, z, title=shape.__class__.__name__, plotter=plotter)
+    plotter.show()
 
-.. code-block:: console
-
-    ['Circle', 'Cone', 'Cube', 'Cuboid', 'Cylinder', 'DelaunayHull', 'Dodecahedron', 'Ellipse', 'Ellipsoid', 'Empty', 'Icosahedron', 'Icosidodecahedron', 'ImageShape', 'Octahedron', 'Polygon', 'Rectangle', 'RegularPolygon', 'Shape', 'Sphere', 'Square', 'Tetrahedron', 'Torus', 'Universe', 'XRange', 'YRange', 'ZRange', '_Delaunay', '_Image', '_Path', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_np']
+.. image:: ../images/shapes_3_obj.png
+   :align: center
+   :width: 600px
 
 Transformations
 ---------------

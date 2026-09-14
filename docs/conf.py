@@ -9,6 +9,10 @@
 import os
 import sys
 import datetime
+import subprocess
+import shutil
+import warnings
+import platform
 
 sys.path.insert(0, os.path.abspath("../mumaxplus"))
 
@@ -17,7 +21,7 @@ sys.path.insert(0, os.path.abspath("../mumaxplus"))
 project = "mumax⁺"
 # "Diego De Gusem, Oleh Kozynets, Ian Lateur, Lars Moreels, Jeroen Mulkers"
 author = "the DyNaMat group, Ghent University, Belgium."
-release = "1.2.0"
+release = "1.2.1"
 
 date = datetime.datetime.now()
 html_last_updated_fmt = f"{date.strftime("%Y")}-{date.strftime("%m")}-{date.strftime("%d")}, v{release}"
@@ -33,7 +37,8 @@ extensions = [
     "sphinxcontrib.video",
     "sphinx_copybutton",
     "sphinx.ext.napoleon",
-    "sphinx_design"
+    "sphinx_design",
+    "sphinxcontrib.plantuml"
 ]
 
 toc_object_entries_show_parents = 'hide'
@@ -82,6 +87,8 @@ html_css_files = ['logo.css', 'custom.css']
 html_js_files = [
     ('https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH', {'async': 'async'}),
     'google-analytics.js',
+    'js/svg-pan-zoom.min.js',
+    'js/setup-pan-zoom.js',
 ]
 
 html_favicon = "_static/nimble-plus.png"
@@ -126,3 +133,33 @@ html_theme_options = {
     "icon_links_label": "Quick Links",  # screen reader label
     "use_download_button": False,
 }
+
+def setup(app):
+    if shutil.which("clang-uml") is None:
+        warnings.warn(
+            "clang-uml not found. Skipping UML diagram generation. "
+            "Install it from https://github.com/bkryza/clang-uml or via your package manager.",
+            UserWarning
+        )
+        return
+    
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    subprocess.run([
+        "cmake",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-B", "build"
+    ], check=True, cwd=project_root)
+
+    clang_resource_dir = subprocess.check_output(
+        ["clang", "-print-resource-dir"], text=True
+    ).strip()
+
+    subprocess.run([
+        'clang-uml',
+        '--add-compile-flag', f'-resource-dir={clang_resource_dir}'
+    ], cwd=project_root)
+
+plantuml = "plantuml"
+
+plantuml_output_format = 'svg_img'

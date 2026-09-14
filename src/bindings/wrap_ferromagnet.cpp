@@ -62,6 +62,7 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("pol", &Ferromagnet::pol)
       .def_readonly("jcur", &Ferromagnet::jcur)
       .def_readonly("temperature", &Ferromagnet::temperature)
+      .def_property("thermal_seed", &Ferromagnet::getThermalSeed, &Ferromagnet::setThermalSeed)
       .def_readonly("dmi_tensor", &Ferromagnet::dmiTensor)
       .def_readonly("applied_potential", &Ferromagnet::appliedPotential)
       .def_readonly("conductivity", &Ferromagnet::conductivity)
@@ -72,6 +73,7 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("B1", &Ferromagnet::B1)
       .def_readonly("B2", &Ferromagnet::B2)
       
+      .def("reset_noise_generator", &Ferromagnet::resetNoiseGenerator)
       .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Ferromagnet::relax, py::arg("tol"));
 

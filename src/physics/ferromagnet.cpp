@@ -78,8 +78,8 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
   // Initialize CUDA RNG
   // TODO: move the generator to somewhere else
   curandCreateGenerator(&randomGenerator, CURAND_RNG_PSEUDO_DEFAULT);
-  curandSetPseudoRandomGeneratorSeed(randomGenerator,
-  static_cast<int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+  thermalSeed = static_cast<int>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+  curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
 }
 
 Ferromagnet::Ferromagnet(MumaxWorld* world,
@@ -92,7 +92,11 @@ Ferromagnet::Ferromagnet(MumaxWorld* world,
 Ferromagnet::~Ferromagnet() {
   curandDestroyGenerator(randomGenerator);
 }
-
+void Ferromagnet::resetNoiseGenerator() {
+  curandDestroyGenerator(randomGenerator);
+  curandCreateGenerator(&randomGenerator, CURAND_RNG_PSEUDO_DEFAULT);
+  curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
+}
 const Variable* Ferromagnet::magnetization() const {
   return &magnetization_;
 }

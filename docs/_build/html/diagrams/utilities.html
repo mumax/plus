@@ -1,0 +1,604 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Utilities &#8212; mumax⁺</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4b5c67ef" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'diagrams/utilities';</script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-YEPT1QRBRH"></script>
+    <script src="../_static/google-analytics.js?v=27e7bdd4"></script>
+    <script src="../_static/js/svg-pan-zoom.min.js"></script>
+    <script src="../_static/js/setup-pan-zoom.js"></script>
+    <link rel="icon" href="../_static/nimble-plus.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Domain" href="domain.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nimble-plus.png" class="logo__image only-light" alt="mumax⁺ - Home"/>
+    <img src="../_static/nimble-plus.png" class="logo__image only-dark pst-js-only" alt="mumax⁺ - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.ugent.be/we/solidstatesciences/dynamat/en" title="DyNaMat research group" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-university fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">DyNaMat research group</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/mumax/plus" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub repository</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.nature.com/articles/s41524-025-01893-y" title="Paper" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-file-alt fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Paper</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Grid.html">Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Magnet.html">Magnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Ferromagnet.html">Ferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Antiferromagnet.html">Antiferromagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.NcAfm.html">NcAfm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Altermagnet.html">Altermagnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.TimeSolver.html">TimeSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.ScalarQuantity.html">ScalarQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.FieldQuantity.html">FieldQuantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Parameter.html">Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.InterParameter.html">InterParameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.StrayField.html">StrayField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.shape.html">shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.show.html">show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.voronoi.html">voronoi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.mfm.html">mfm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorial.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/magnetization.html">Setting a magnetization configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/geometry.html">Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/shapes.html">Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/regions.html">Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/stdp4.html">Micromagnetic standard problem #4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/langevin.html">Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/precision.html">Single and double floating-point precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/plot_field.html">The <code class="docutils literal notranslate"><span class="pre">plot_field</span></code> function</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/magnetoelastics.html">Magnetoelastics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/voronoi.html">Voronoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../class_diagrams.html">Class Diagrams</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quantities.html">Quantities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="magnetics.html">Magnetics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strayfield.html">Strayfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timeintegration.html">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Domain</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Utilities</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Utilities</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="utilities">
+<h1>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">#</a></h1>
+<p>UML diagram of <code class="docutils literal notranslate"><span class="pre">Center</span></code>, <code class="docutils literal notranslate"><span class="pre">Int3Hash</span></code>, <code class="docutils literal notranslate"><span class="pre">LinearSystem</span></code>, <code class="docutils literal notranslate"><span class="pre">LinearSystem::CuData</span></code>, <code class="docutils literal notranslate"><span class="pre">Linsolver</span></code>, <code class="docutils literal notranslate"><span class="pre">Linsolver::Stepper</span></code>, <code class="docutils literal notranslate"><span class="pre">MFM</span></code>, <code class="docutils literal notranslate"><span class="pre">PoissonSystem</span></code>, <code class="docutils literal notranslate"><span class="pre">Tile</span></code>, <code class="docutils literal notranslate"><span class="pre">VoronoiTessellator</span></code>.</p>
+<p class="plantuml">
+<img src="../_images/plantuml-16d2e2654fe52693b3e5e187b52cb100ceae345f.svg" alt="&#64;startuml
+!theme vibrant
+package Legend {
+  class Class
+  abstract class Abstract
+  class Visibility {
+    +public field
+    +public method()
+    -private field
+    -private method()
+    #protected method()
+  }
+  Class -[hidden]-&gt; WeakDependency
+  Abstract -[hidden]-&gt; WeakDependency
+  Visibility o-- Aggregation : Aggregation
+  Visibility +.. Nested : Nested
+  Visibility --&gt; Dependency : Dependency
+  Visibility ..&gt; WeakDependency : Weak dependency
+}
+class &quot;Center&quot; as C_0002384270896976357959
+class C_0002384270896976357959 {
+__
++pos : real3
++ridx : unsigned int
+}
+class &quot;Tile&quot; as C_0014918082456004758218
+class C_0014918082456004758218 {
+__
++centers : std::vector&lt;Center&gt;
++pos : int3
+}
+class &quot;Int3Hash&quot; as C_0013722146795233890461
+class C_0013722146795233890461 {
++operator()(const int3 &amp; k) const : std::size_t
+__
+}
+class &quot;VoronoiTessellator&quot; as C_0005483049785531173097
+class C_0005483049785531173097 {
+-Poisson(const real lambda) : int
+-centersInTile(const int3 pos) : std::vector&lt;Center&gt;
++generate(const Grid grid, const real3 cellsize, const bool pbc, const bool make2D = false) : std::vector&lt;unsigned int&gt;
++getTileSize(const real3 griddims) const : real3
++periodicShift(const real3 coo, real3 center) : real3
++regionOf(const real3 coo) : unsigned int
+-tileOfCell(const real3 coo) const : Tile
+__
+-centerIdx_ : std::function&lt;unsigned int (real3)&gt;
+-distInt_ : std::uniform_int_distribution&lt;&gt;
+-distReal_ : std::uniform_real_distribution&lt;&gt;
+-engine_ : std::default_random_engine
+-grainsize_ : real
+-grid_dims_ : real3
+-is2D_ : bool
+-lambda_ : real
+-numTiles_x : int
+-numTiles_y : int
+-numTiles_z : int
+-pbc_ : bool
+-seed_ : int
++tessellation : GpuBuffer&lt;unsigned int&gt;
+-tileCache_ : std::unordered_map&lt;int3,Tile,Int3Hash&gt;
+-tilesize_ : real3
+}
+class &quot;PoissonSystem&quot; as C_0015344774739314663014
+class C_0015344774739314663014 {
+-construct() const : LinearSystem
++init() : void
++solve() : Field
++solver() : LinSolver *
+__
+-magnet_ : const Ferromagnet *
+-solver_ : LinSolver
+}
+class &quot;LinearSystem&quot; as C_0010566572544474238227
+class C_0010566572544474238227 {
++operator=(const LinearSystem &amp;) = default : LinearSystem &amp;
++operator=(LinearSystem &amp;&amp;) = default : LinearSystem &amp;
+..
++cu() const : CuData
++empty() const : bool
++matrixmul(const GVec &amp; x) const : GVec
++nRows() const : int
++residual(const GVec &amp; x) const : GVec
+__
+-b_ : GVec
+-matrixidx_ : GpuBuffer&lt;int&gt;
+-matrixval_ : GVec
+-nnz_ : int
+}
+class &quot;LinearSystem::CuData&quot; as C_0017651466972960482510
+class C_0017651466972960482510 {
++matrixIdx(int row, int elem) : int &amp;
++matrixVal(int row, int elem) : lsReal &amp;
+__
++b : lsReal *
++idx_ : int *
++nnz : int
++nrows : int
++val_ : lsReal *
+}
+class &quot;LinSolver&quot; as C_0007259496789364408165
+class C_0007259496789364408165 {
+{static} +getMethodByName(const std::string &amp;) : Method
++getState() const : GVec
++resetState() : void
++residual() const : GVec
++residualMaxNorm() const : double
++setMethod(Method) : void
++setMethod(const std::string &amp; methodName) : void
++setState(GVec newx) : void
++setSystem(LinearSystem newSystem) : void
++solve() : GVec
++stepper() : Stepper *
+__
++max_iter : int
+-stepper_ : std::unique_ptr&lt;Stepper&gt;
+-system_ : LinearSystem
++tol : double
+-x_ : GVec
+}
+abstract &quot;LinSolver::Stepper&quot; as C_0001652868625503698268
+abstract C_0001652868625503698268 {
++Stepper(LinSolver * parent) : void
+{static} +create(LinSolver * parent, Method) : std::unique_ptr&lt;Stepper&gt;
+{abstract} +method() const = 0 : Method
++restart() : void
+{abstract} +step() = 0 : void
+#system() const : LinearSystem *
+#xRef() const : GVec &amp;
+__
+-parent_ : LinSolver *
+}
+class &quot;MFM&quot; as C_0017999676284232896070
+class C_0017999676284232896070 {
++eval() const : Field
++name() const : std::string
++ncomp() const : int
++system() const : std::shared_ptr&lt;const System&gt;
++unit() const : std::string
+__
++lift : real
+-magnets_ : std::map&lt;std::string,Magnet *&gt;
+-name_ : std::string
+-system_ : std::shared_ptr&lt;System&gt;
++tipsize : real
+}
+C_0014918082456004758218 o-- C_0002384270896976357959 : +centers
+C_0005483049785531173097 ..&gt; C_0002384270896976357959
+C_0005483049785531173097 o-- C_0014918082456004758218 : -tileCache_
+C_0015344774739314663014 ..&gt; C_0010566572544474238227
+C_0015344774739314663014 o-- C_0007259496789364408165 : -solver_
+C_0010566572544474238227 ..&gt; C_0017651466972960482510
+C_0017651466972960482510 --+ C_0010566572544474238227
+C_0007259496789364408165 o-- C_0001652868625503698268 : -stepper_
+C_0007259496789364408165 o-- C_0010566572544474238227 : -system_
+C_0001652868625503698268 --+ C_0007259496789364408165
+C_0001652868625503698268 ..&gt; C_0010566572544474238227
+C_0001652868625503698268 --&gt; C_0007259496789364408165 : -parent_
+
+'Generated with clang-uml, version 0.6.2
+'LLVM version clang version 19.1.7 (https://github.com/conda-forge/clangdev-feedstock 3c5e7de432e909e225d8040e72a44724afb0c446)
+&#64;enduml
+"/></p>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="domain.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Domain</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By the DyNaMat group, Ghent University, Belgium.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2026-06-08, v1.2.1.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
