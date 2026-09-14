@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from mumaxplus.util.shape import Cuboid
 
 from mumaxplus import Ferromagnet, Grid, World
 
@@ -52,3 +53,35 @@ class TestGeometry:
         geomfunc = lambda x, y: True
         with pytest.raises(TypeError):
             magnet = Ferromagnet(world=world, grid=grid, geometry=geomfunc)
+
+    def test_overlap_success(self):
+        cs = 1e-9
+        world = World(cellsize=(cs, cs, cs))
+        grid = Grid((20, 20, 1))
+
+        magnet1 = Ferromagnet(world, grid)
+        magnet2 = Ferromagnet(world, grid, geometry=np.zeros(grid.shape))
+
+        assert magnet1 is not None
+        assert magnet2 is not None
+
+    def test_overlap_fail(self):
+        cs = 1e-9
+        world = World(cellsize=(cs, cs, cs))
+        grid = Grid((20, 20, 1))
+
+        magnet = Ferromagnet(world, grid)  
+    
+        with pytest.raises(Exception):
+            Ferromagnet(world, grid, geometry=np.ones(grid.shape)) 
+
+    def test_overlap_fail_corner(self):
+            cs = 1e-9
+            world = World(cellsize=(cs, cs, cs))
+            grid1 = Grid((20, 20, 1))
+    
+            magnet = Ferromagnet(world, grid1)
+        
+            with pytest.raises(Exception):
+                grid2 = Grid((20, 20, 1), origin=(19,19,0))
+                Ferromagnet(world, grid2, geometry=np.ones(grid2.shape)) 
