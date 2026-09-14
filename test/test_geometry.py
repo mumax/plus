@@ -59,17 +59,8 @@ class TestGeometry:
         world = World(cellsize=(cs, cs, cs))
         grid = Grid((20, 20, 1))
 
-        bigside = 10*cs
-        smallside = 5*cs
-        planeside = 4*cs
-
-        bigCube = Cuboid(bigside, bigside, 2*bigside).translate(bigside, bigside, bigside)
-        smallCube = Cuboid(smallside, smallside, smallside).translate(8*cs, 8*cs, smallside)
-        plane = Cuboid(planeside, planeside, cs).translate(6*cs, 6*cs, 5*cs)
-        diff = bigCube - smallCube
-
-        magnet1 = Ferromagnet(world, grid, geometry=diff)
-        magnet2 = Ferromagnet(world, grid, geometry=plane) # or Ferromagnet(world, Grid((4, 4, 1), origin=(6, 6, 5))
+        magnet1 = Ferromagnet(world, grid)
+        magnet2 = Ferromagnet(world, grid, geometry=np.zeros(grid.shape))
 
         assert magnet1 is not None
         assert magnet2 is not None
@@ -78,19 +69,19 @@ class TestGeometry:
         cs = 1e-9
         world = World(cellsize=(cs, cs, cs))
         grid = Grid((20, 20, 1))
-    
-        bigside = 10 * cs
-        smallside = 5 * cs
-    
-        bigCube = Cuboid(bigside, bigside, cs).translate(bigside, bigside, 0)
-        smallCube = Cuboid(smallside, smallside, cs).translate(8 * cs, 8 * cs, 0)
-        smallCubeShift = Cuboid(smallside, smallside, cs).translate(8 * cs, 9 * cs, 0)
-        diff = bigCube - smallCube
-    
-        magnet = Ferromagnet(world, grid, geometry=diff)
+
+        magnet = Ferromagnet(world, grid)  
     
         with pytest.raises(Exception):
-            Ferromagnet(world, grid, geometry=smallCubeShift)
+            Ferromagnet(world, grid, geometry=np.ones(grid.shape)) 
 
-
-
+    def test_overlap_fail_corner(self):
+            cs = 1e-9
+            world = World(cellsize=(cs, cs, cs))
+            grid1 = Grid((20, 20, 1))
+    
+            magnet = Ferromagnet(world, grid1)
+        
+            with pytest.raises(Exception):
+                grid2 = Grid((20, 20, 1), origin=(19,19,0))
+                Ferromagnet(world, grid2, geometry=np.ones(grid2.shape)) 
