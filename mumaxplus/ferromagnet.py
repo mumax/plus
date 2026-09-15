@@ -710,13 +710,12 @@ class Ferromagnet(Magnet):
 
         Here :math:`\epsilon_{ijk}` is the Levi-Civita symbol and
         :math:`\varepsilon_{ii}` denotes the normal strain components.
-        This energy density comes from equations (8.12) and (8.16) in Ref. [1], where
-        B_chiral corresponds to :math:`\lambda_{12}`. Magnetoelastic coupling constants
+        This energy density comes from equations (8.12) and (8.16) in
+        `Franke (2025) <https://doi.org/10.5445/IR/1000184834>`_, where B_chiral
+        corresponds to :math:`\lambda_{12}`. Magnetoelastic coupling constants
         B1 and B2 correspond to :math:`\lambda_{11}` and :math:`2 \lambda_{44}` respectively.
         These lambdas are not the usual magnetostrictive coefficients.
 
-        .. [1] L\ . Franke, “Elastic Coupling at Quantum Phase Transitions and in Chiral Magnets,” Das Karlsruher Institut für Technologie, Karlsruhe, 2025. doi: 10.5445/IR/1000184834.
-        
         See Also
         --------
         B1, B2
