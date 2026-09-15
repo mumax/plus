@@ -25,7 +25,7 @@ class Antiferromagnet(Magnet):
         ----------
         world : World
             World in which the antiferromagnet lives.
-        grid : Grid
+        grid : Grid or tuple[int] of size 3
             The number of cells in x, y, z the antiferromagnet should be divided into.
         geometry : None, ndarray, or callable (default=None)
             The geometry of the antiferromagnet can be set in three ways.

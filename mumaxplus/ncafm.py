@@ -23,7 +23,7 @@ class NcAfm(Magnet):
         ----------
         world : World
             World in which the non-collinear antiferromagnet lives.
-        grid : Grid
+        grid : Grid or tuple[int] of size 3
             The number of cells in x, y, z the non-collinear antiferromagnet should be
             divided into.
         geometry : None, ndarray, or callable (default=None)
