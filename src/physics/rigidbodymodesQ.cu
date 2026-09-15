@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <limits>
 
 #include "cudaerror.hpp"
 #include "cudalaunch.hpp"
