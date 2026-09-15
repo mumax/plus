@@ -28,6 +28,7 @@ API
    PoissonSystem
    DmiTensor
    BoundaryTraction
+   Window
 
 .. toctree::
    :maxdepth: 1

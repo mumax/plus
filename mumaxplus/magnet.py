@@ -17,8 +17,9 @@ from .variable import Variable
 class Magnet(ABC):
     """A Magnet should never be initialized by the user. It contains no physics.
        Use :class:`Ferromagnet` or :class:`Antiferromagnet` instead."""    
-    @abstractmethod  # TODO: does this work?
-    def __init__(self, _impl_function, world, grid, name="", geometry=None, regions=None):
+    @abstractmethod
+    def __init__(self, _impl_function, world, grid: Grid | tuple[int], name="",
+                 geometry=None, regions=None):
         """
         Parameters
         ----------
@@ -27,7 +28,7 @@ class Magnet(ABC):
             `world._impl.add_ferromagnet` or `world._impl.add_antiferromagnet`.
         world : World
             World in which the magnet lives.
-        grid : Grid
+        grid : Grid or tuple[int] of size 3
             The number of cells in x, y, z the magnet should be divided into.
         geometry : None, ndarray, or callable (default=None)
             The geometry of the magnet can be set in three ways.
@@ -45,11 +46,23 @@ class Magnet(ABC):
             The magnet's identifier. If the name is empty (the default), a name for the
             magnet will be created.
         """
-   
+
+        grid = self._get_grid(grid)
         geometry_array = self._get_mask_array(geometry, grid, world, "geometry")
         regions_array = self._get_mask_array(regions, grid, world, "regions")
         self._impl = _impl_function(grid._impl, geometry_array, regions_array, name)
 
+    @staticmethod
+    def _get_grid(grid: Grid | tuple[int]) -> Grid:
+        """Check grid input and convert to Grid type if needed."""
+        if isinstance(grid, Grid):
+            return grid
+
+        if isinstance(grid, tuple):
+            return Grid(size=grid)  # Grid class handles size and type
+
+        raise ValueError("'grid' has to be a Grid instance or a tuple[int] of size 3.")
+    
     @staticmethod
     def _get_mask_array(input, grid, world, input_name):
         if input is None:

@@ -108,6 +108,7 @@ void TimeSolver::step() {
         "Timesolver can not make a step because the timestep is smaller than "
         "or equal to zero.");
   stepper_->step();
+  postStep();
 }
 
 void TimeSolver::steps(unsigned int nSteps) {
@@ -135,5 +136,6 @@ void TimeSolver::run(real duration) {
   real oldTimestep = timestep();
   setTimeStep(stoptime - time_);
   step();
+  postStep();
   if (fixedTimeStep_) setTimeStep(oldTimestep);
 }

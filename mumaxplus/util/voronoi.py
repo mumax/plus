@@ -6,6 +6,7 @@ import warnings as _w
 from .. import _cpp
 from mumaxplus.world import World
 from mumaxplus.grid import Grid
+
 class VoronoiTessellator:
 
 
