@@ -64,7 +64,10 @@ class TimeSolver {
   void steps(unsigned int nsteps);
   void runwhile(std::function<bool(void)>);
   void run(real duration);
-  void postStep() { if (postStep_) return postStep_(); }
+  void postStep() {
+    if (postStep_)
+      return postStep_();
+  }
 
   //------------- HELPER FUNCTIONS FOR ADAPTIVE TIMESTEPPING -------------------
 

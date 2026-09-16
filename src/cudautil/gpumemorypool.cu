@@ -12,8 +12,8 @@ GpuMemoryPool::~GpuMemoryPool() {
   for (const auto& poolEntry : pool_)
     for (auto& ptr : poolEntry.second) {
       cudaError_t freeErr = cudaFree(ptr);
-       if (freeErr == cudaErrorCudartUnloading)
-          continue; // Expect CUDA driver to be shutting down
+      if (freeErr == cudaErrorCudartUnloading)
+        continue;  // Expect CUDA driver to be shutting down
       checkCudaError(freeErr);
     }
 }

@@ -4,6 +4,7 @@ from mumaxplus import Ferromagnet, Grid, World
 
 RTOL = 2e-3  # fairly large, because energies can approach 0 -> divide by 0
 
+
 def max_relative_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
     relerr = err / np.linalg.norm(wanted, axis=0)
@@ -11,6 +12,7 @@ def max_relative_error(result, wanted):
 
 
 # --- Uniaxial Anisotropy ---
+
 
 def compute_uniaxial_anisotropy_field(magnet):
     """Computes the uniaxial anisotropy field."""
@@ -21,7 +23,7 @@ def compute_uniaxial_anisotropy_field(magnet):
     u /= np.sqrt(np.sum(u * u, axis=0))  # normalize u
     m = magnet.magnetization.get()
     mu = np.sum(m * u, axis=0)
-    return (2 * ku1 * mu + 4 * ku2 * mu ** 3) * u / msat
+    return (2 * ku1 * mu + 4 * ku2 * mu**3) * u / msat
 
 
 def compute_uniaxial_anisotropy_energy_density(magnet):
@@ -32,7 +34,7 @@ def compute_uniaxial_anisotropy_energy_density(magnet):
     u /= np.sqrt(np.sum(u * u, axis=0))  # normalize u
     m = magnet.magnetization.get()
     mu = np.sum(m * u, axis=0)
-    return -ku1 * mu ** 2 - ku2 * mu ** 4
+    return -ku1 * mu**2 - ku2 * mu**4
 
 
 def compute_uniaxial_anisotropy_energy(magnet):
@@ -68,7 +70,9 @@ class TestUniaxialAnisotropy:
         relative_error = (result - wanted) / wanted
         assert relative_error < RTOL
 
+
 # --- Cubic Anisotropy ---
+
 
 def compute_cubic_anisotropy_field(magnet):
     """Computes the cubic anisotropy field."""
@@ -81,17 +85,37 @@ def compute_cubic_anisotropy_field(magnet):
     c3 /= np.linalg.norm(c3, axis=0)
     m = magnet.magnetization.get()
 
-    c1m, c2m, c3m = np.sum(c1*m, axis=0), np.sum(c2*m, axis=0), np.sum(c3*m, axis=0)
+    c1m, c2m, c3m = (
+        np.sum(c1 * m, axis=0),
+        np.sum(c2 * m, axis=0),
+        np.sum(c3 * m, axis=0),
+    )
 
-    return -2/msat * (kc1 * ((c2m**2 + c3m**2)*c1m*c1 + \
-                             (c1m**2 + c3m**2)*c2m*c2 + \
-                             (c1m**2 + c2m**2)*c3m*c3) + \
-                      kc2 * (c2m**2*c3m**2*c1m*c1 + \
-                             c1m**2*c3m**2*c2m*c2 + \
-                             c1m**2*c2m**2*c3m*c3) + \
-                      2*kc3 * ((c2m**4 + c3m**4)*c1m**3*c1 + \
-                               (c1m**4 + c3m**4)*c2m**3*c2 + \
-                               (c1m**4 + c2m**4)*c3m**3*c3))
+    return (
+        -2
+        / msat
+        * (
+            kc1
+            * (
+                (c2m**2 + c3m**2) * c1m * c1
+                + (c1m**2 + c3m**2) * c2m * c2
+                + (c1m**2 + c2m**2) * c3m * c3
+            )
+            + kc2
+            * (
+                c2m**2 * c3m**2 * c1m * c1
+                + c1m**2 * c3m**2 * c2m * c2
+                + c1m**2 * c2m**2 * c3m * c3
+            )
+            + 2
+            * kc3
+            * (
+                (c2m**4 + c3m**4) * c1m**3 * c1
+                + (c1m**4 + c3m**4) * c2m**3 * c2
+                + (c1m**4 + c2m**4) * c3m**3 * c3
+            )
+        )
+    )
 
 
 def compute_cubic_anisotropy_energy_density(magnet):
@@ -104,11 +128,17 @@ def compute_cubic_anisotropy_energy_density(magnet):
     c3 /= np.linalg.norm(c3, axis=0)
     m = magnet.magnetization.get()
 
-    c1m, c2m, c3m = np.sum(c1*m, axis=0), np.sum(c2*m, axis=0), np.sum(c3*m, axis=0)
+    c1m, c2m, c3m = (
+        np.sum(c1 * m, axis=0),
+        np.sum(c2 * m, axis=0),
+        np.sum(c3 * m, axis=0),
+    )
 
-    return kc1 * (c1m**2*c2m**2 + c1m**2*c3m**2 + c2m**2*c3m**2) + \
-           kc2 * (c1m**2*c2m**2*c3m**2) + \
-           kc3 * (c1m**4*c2m**4 + c1m**4*c3m**4 + c2m**4*c3m**4)
+    return (
+        kc1 * (c1m**2 * c2m**2 + c1m**2 * c3m**2 + c2m**2 * c3m**2)
+        + kc2 * (c1m**2 * c2m**2 * c3m**2)
+        + kc3 * (c1m**4 * c2m**4 + c1m**4 * c3m**4 + c2m**4 * c3m**4)
+    )
 
 
 def compute_cubic_anisotropy_energy(magnet):
@@ -129,7 +159,9 @@ class TestCubicAnisotropy:
         self.magnet.kc3 = 3.1e6
         c1 = np.random.random(size=3)  # some random direction
         self.magnet.anisC1 = c1
-        self.magnet.anisC2 = np.cross(c1, np.random.random(size=3))  # random perpendicular vector
+        self.magnet.anisC2 = np.cross(
+            c1, np.random.random(size=3)
+        )  # random perpendicular vector
 
     def test_anisotropy_field(self):
         result = (self.magnet.anisotropy_field(),)

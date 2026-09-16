@@ -8,8 +8,8 @@
 #include "wrappers.hpp"
 
 #ifdef _MSC_VER  // On Windows, ssize_t is undefined, so declare it manually
-  #include <BaseTsd.h>
-  typedef SSIZE_T ssize_t;
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
 #endif
 
 void wrap_field(py::module& m) {
@@ -27,8 +27,8 @@ void setArrayInField(Field& f, py::array_t<real> data) {
   if (ndim == 1) {
     if (data.shape(0) != f.ncomp()) {
       std::stringstream ss;
-      ss << "The number of components do not match, "
-         << "expected " << data.shape(0) << ", got " << f.ncomp() << ".";
+      ss << "The number of components do not match, " << "expected "
+         << data.shape(0) << ", got " << f.ncomp() << ".";
       throw std::invalid_argument(ss.str());
     }
     py::buffer_info buf = data.request();

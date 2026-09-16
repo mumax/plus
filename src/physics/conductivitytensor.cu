@@ -1,8 +1,8 @@
 #include "conductivitytensor.hpp"
 #include "cudalaunch.hpp"
-#include "quantityevaluator.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
+#include "quantityevaluator.hpp"
 
 bool conductivityTensorAssuredZero(const Ferromagnet* magnet) {
   return magnet->conductivity.assuredZero();

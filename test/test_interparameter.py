@@ -2,7 +2,8 @@
 
 import numpy as np
 import pytest
-from mumaxplus import World, Grid, Ferromagnet
+
+from mumaxplus import Ferromagnet, Grid, World
 
 
 def lut_index(i, j):
@@ -11,8 +12,10 @@ def lut_index(i, j):
         i, j = j, i
     return j * (j - 1) // 2 + i
 
+
 n_regions = 5
 nx, ny, nz = 32, 16, 1
+
 
 @pytest.fixture(scope="module")  # reuse across tests
 def magnet():
@@ -21,6 +24,7 @@ def magnet():
     regions = np.random.randint(0, n_regions, size=(nz, ny, nx))
     magnet = Ferromagnet(world, Grid((nx, ny, nz)), regions=regions)
     return magnet
+
 
 @pytest.fixture
 def interex(magnet):
@@ -31,7 +35,9 @@ def interex(magnet):
     magnet.inter_exchange.set(0.0)  # reset state before each test
     return magnet.inter_exchange
 
+
 # -------------------- Tests --------------------
+
 
 class TestRegions:
     def test_reported_number_of_regions(self, interex):

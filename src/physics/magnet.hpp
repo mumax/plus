@@ -10,10 +10,10 @@
 #include "grid.hpp"
 #include "parameter.hpp"
 #include "strayfield.hpp"
-#include "variable.hpp"
-#include "world.hpp"
 #include "system.hpp"
 #include "traction.hpp"
+#include "variable.hpp"
+#include "world.hpp"
 
 class Altermagnet;
 class Antiferromagnet;
@@ -25,10 +25,10 @@ class NcAfm;
 class System;
 
 class Magnet {
- friend class MumaxWorld;
+  friend class MumaxWorld;
+
  public:
-  explicit Magnet(std::shared_ptr<System> system_ptr,
-                  std::string name);
+  explicit Magnet(std::shared_ptr<System> system_ptr, std::string name);
   /*explicit Magnet(MumaxWorld* world,
                   Grid grid,
                   std::string name,
@@ -59,8 +59,9 @@ class Magnet {
   void removeStrayField(const Magnet*);
 
  private:
-  std::shared_ptr<System> system_;  // the system_ has to be initialized first,
-                                    // hence its listed as the first datamember here
+  std::shared_ptr<System>
+      system_;  // the system_ has to be initialized first,
+                // hence its listed as the first datamember here
   std::string name_;
   std::map<const Magnet*, StrayField*> strayFields_;
 
@@ -72,7 +73,7 @@ class Magnet {
  public:
   bool enableAsStrayFieldSource;
   bool enableAsStrayFieldDestination;
-  bool enableElastodynamics() const {return enableElastodynamics_;}
+  bool enableElastodynamics() const { return enableElastodynamics_; }
   void setEnableElastodynamics(bool);
 
   // Elasticity
@@ -83,21 +84,23 @@ class Magnet {
   VectorParameter rigidNormStrain;
   VectorParameter rigidShearStrain;
 
-  BoundaryTraction boundaryTraction;  // Externally applied traction at the boundaries
+  BoundaryTraction
+      boundaryTraction;  // Externally applied traction at the boundaries
 
   // stiffness constants; TODO: can this be generalized to a 6x6 tensor?
   Parameter C11;  // C11 = C22 = C33
   Parameter C12;  // C12 = C13 = C23
   Parameter C44;  // C44 = C55 = C66
 
-  Parameter eta;  // Phenomenological elastic damping constant
+  Parameter eta;               // Phenomenological elastic damping constant
   Parameter stiffnessDamping;  // eta_ij = stiffnessDamping * Cij
-  Parameter eta11;  // viscosity tensor
+  Parameter eta11;             // viscosity tensor
   Parameter eta12;
   Parameter eta44;
   Parameter rho;  // Mass density
 
-  // Delete copy constructor and copy assignment operator to prevent shallow copies
+  // Delete copy constructor and copy assignment operator to prevent shallow
+  // copies
   Magnet(const Magnet&) = delete;
   Magnet& operator=(const Magnet&) = delete;
 

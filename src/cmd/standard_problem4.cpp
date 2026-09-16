@@ -1,4 +1,4 @@
-#include <filesystem>
+#include <filesystem>  // NOLINT(build/c++17)
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -24,7 +24,8 @@ void standard_problem4() {
   Grid mGrid(n);
   GpuBuffer<bool> geometry;
   GpuBuffer<unsigned int> regions;
-  auto magnet = mWorld.addFerromagnet(mGrid, geometry, regions, ferromagnet_name);
+  auto magnet =
+      mWorld.addFerromagnet(mGrid, geometry, regions, ferromagnet_name);
 
   magnet->msat.set(800E3);
   magnet->aex.set(13E-12);

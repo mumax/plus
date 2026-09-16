@@ -11,31 +11,30 @@
 #include "grid.hpp"
 #include "hostmagnet.hpp"
 #include "parameter.hpp"
-#include "world.hpp"
 #include "system.hpp"
+#include "world.hpp"
 
 class NcAfm : public HostMagnet {
  public:
-  NcAfm(std::shared_ptr<System> system_ptr,
-         std::string name);
+  NcAfm(std::shared_ptr<System> system_ptr, std::string name);
 
   NcAfm(MumaxWorld* world,
-         Grid grid,
-         std::string name,
-         GpuBuffer<bool> geometry,
-         GpuBuffer<unsigned int> regions);
-         
+        Grid grid,
+        std::string name,
+        GpuBuffer<bool> geometry,
+        GpuBuffer<unsigned int> regions);
+
   /** Empty destructor
    * Sublattices are destroyed automatically. They are not pointers.
    */
-  ~NcAfm() override {};
-  
- const Ferromagnet* sub1() const;
- const Ferromagnet* sub2() const;
- const Ferromagnet* sub3() const;
+  ~NcAfm() override{};
 
- void minimize(real tol = 1e-6, int nsamples = 30);
- void relax(real tol);
+  const Ferromagnet* sub1() const;
+  const Ferromagnet* sub2() const;
+  const Ferromagnet* sub3() const;
+
+  void minimize(real tol = 1e-6, int nsamples = 30);
+  void relax(real tol);
 
  private:
   Ferromagnet sub1_;

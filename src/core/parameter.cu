@@ -6,10 +6,15 @@
 #include "parameter.hpp"
 #include "reduce.hpp"
 
-Parameter::Parameter(std::shared_ptr<const System> system, real value,
-                     std::string name, std::string unit)
-    : system_(system), staticField_(nullptr), uniformValue_(value),
-      name_(name), unit_(unit) {}
+Parameter::Parameter(std::shared_ptr<const System> system,
+                     real value,
+                     std::string name,
+                     std::string unit)
+    : system_(system),
+      staticField_(nullptr),
+      uniformValue_(value),
+      name_(name),
+      unit_(unit) {}
 
 Parameter::~Parameter() {
   if (staticField_)
@@ -28,19 +33,20 @@ void Parameter::set(const Field& values) {
   if (isUniformField(values)) {
     real* value = values.device_ptr(0);
     checkCudaError(cudaMemcpy(&uniformValue_, value, sizeof(real),
-                            cudaMemcpyDeviceToHost));
+                              cudaMemcpyDeviceToHost));
     if (staticField_) {
       delete staticField_;
       staticField_ = nullptr;
     }
-  }
-  else
+  } else {
     staticField_ = new Field(values);
+  }
 }
 
 void Parameter::setInRegion(const unsigned int region_idx, real value) {
   if (isUniform()) {
-    if (value == uniformValue_) return;
+    if (value == uniformValue_)
+      return;
     staticField_ = new Field(system_, 1, uniformValue_);
   }
   staticField_->setUniformValueInRegion(region_idx, value);
@@ -85,7 +91,8 @@ Field Parameter::eval() const {
 
 real Parameter::getUniformValue() const {
   if (!isUniform()) {
-    throw std::invalid_argument("Cannot get uniform value of non-uniform Parameter.");
+    throw std::invalid_argument(
+        "Cannot get uniform value of non-uniform Parameter.");
   }
   return uniformValue_;
 }
@@ -103,9 +110,13 @@ CuParameter Parameter::cu() const {
 
 VectorParameter::VectorParameter(std::shared_ptr<const System> system,
                                  real3 value,
-                                 std::string name, std::string unit)
-    : system_(system), staticField_(nullptr), uniformValue_(value),
-      name_(name), unit_(unit) {}
+                                 std::string name,
+                                 std::string unit)
+    : system_(system),
+      staticField_(nullptr),
+      uniformValue_(value),
+      name_(name),
+      unit_(unit) {}
 
 VectorParameter::~VectorParameter() {
   if (staticField_)
@@ -127,23 +138,24 @@ void VectorParameter::set(const Field& values) {
     real* valueZ = values.device_ptr(2);
 
     checkCudaError(cudaMemcpy(&uniformValue_.x, valueX, sizeof(real),
-                            cudaMemcpyDeviceToHost));
+                              cudaMemcpyDeviceToHost));
     checkCudaError(cudaMemcpy(&uniformValue_.y, valueY, sizeof(real),
-                            cudaMemcpyDeviceToHost));
+                              cudaMemcpyDeviceToHost));
     checkCudaError(cudaMemcpy(&uniformValue_.z, valueZ, sizeof(real),
-                            cudaMemcpyDeviceToHost));
+                              cudaMemcpyDeviceToHost));
     if (staticField_) {
       delete staticField_;
       staticField_ = nullptr;
     }
-  }
-  else
+  } else {
     staticField_ = new Field(values);
+  }
 }
 
 void VectorParameter::setInRegion(const unsigned int region_idx, real3 value) {
   if (isUniform()) {
-    if (value == uniformValue_) return;
+    if (value == uniformValue_)
+      return;
     staticField_ = new Field(system_, 3, uniformValue_);
   }
   staticField_->setUniformValueInRegion(region_idx, value);
@@ -188,7 +200,8 @@ Field VectorParameter::eval() const {
 
 real3 VectorParameter::getUniformValue() const {
   if (!isUniform()) {
-    throw std::invalid_argument("Cannot get uniform value of non-uniform Parameter.");
+    throw std::invalid_argument(
+        "Cannot get uniform value of non-uniform Parameter.");
   }
   return uniformValue_;
 }

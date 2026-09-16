@@ -35,7 +35,7 @@ class TestGeometry:
         """Test if a geometry is correctly set when using a function."""
         world = World(cellsize=(3e-9, 4e-9, 5e-9))
         grid = Grid((128, 64, 4))
-        geomfunc = lambda x, y, z: x ** 2 + y ** 2 < (40e-9) ** 2
+        geomfunc = lambda x, y, z: x**2 + y**2 < (40e-9) ** 2
         magnet = Ferromagnet(world=world, grid=grid, geometry=geomfunc)
 
         # let's compute the geometry array ourselves here

@@ -6,6 +6,7 @@ import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 
+
 def get_initial_config(position, Radius):
     x0, y0, _ = position
 

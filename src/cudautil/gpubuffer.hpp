@@ -35,7 +35,7 @@ class GpuBuffer {
 
   size_t size() const { return size_; } /** Number of elements in buffer. */
   T* get() const { return ptr_; }       /** Device ptr of the buffer. */
-  std::vector<T> getData() const;                           /** Get copy of data on the host. */
+  std::vector<T> getData() const;       /** Get copy of data on the host. */
 
   /**
    * Copy the data from the gpubuffer to a newly allocated array on the

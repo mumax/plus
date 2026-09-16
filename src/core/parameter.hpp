@@ -15,8 +15,10 @@ class CuParameter;
 
 class Parameter : public FieldQuantity, public DynamicParameter<real> {
  public:
-  explicit Parameter(std::shared_ptr<const System> system, real value = 0.0,
-                     std::string name = "", std::string unit = "");
+  explicit Parameter(std::shared_ptr<const System> system,
+                     real value = 0.0,
+                     std::string name = "",
+                     std::string unit = "");
   ~Parameter();
 
   void set(real value);
@@ -27,8 +29,8 @@ class Parameter : public FieldQuantity, public DynamicParameter<real> {
   bool assuredZero() const;
   int ncomp() const;
   std::shared_ptr<const System> system() const;
-  std::string name() const {return name_;}
-  std::string unit() const {return unit_;}
+  std::string name() const { return name_; }
+  std::string unit() const { return unit_; }
   /** Evaluate parameter on its field. */
   Field eval() const;
   /** Get value of uniform parameter.*/
@@ -105,10 +107,12 @@ __device__ inline real CuParameter::valueAt(int3 coo) const {
 }
 
 __device__ inline real CuParameter::harmonicMean(int idx1, int idx2) const {
-  if (idx1 == idx2) { return valueAt(idx1); }
-  else { return ::harmonicMean(valueAt(idx1), valueAt(idx2)); }
+  if (idx1 == idx2) {
+    return valueAt(idx1);
+  } else {
+    return ::harmonicMean(valueAt(idx1), valueAt(idx2));
+  }
 }
-
 
 class CuVectorParameter;
 
@@ -116,7 +120,8 @@ class VectorParameter : public FieldQuantity, public DynamicParameter<real3> {
  public:
   VectorParameter(std::shared_ptr<const System> system,
                   real3 value = {0.0, 0.0, 0.0},
-                  std::string name = "", std::string unit = "");
+                  std::string name = "",
+                  std::string unit = "");
   ~VectorParameter();
 
   void set(real3 value);
@@ -127,8 +132,8 @@ class VectorParameter : public FieldQuantity, public DynamicParameter<real3> {
   bool assuredZero() const;
   int ncomp() const;
   std::shared_ptr<const System> system() const;
-  std::string name() const {return name_;}
-  std::string unit() const {return unit_;}
+  std::string name() const { return name_; }
+  std::string unit() const { return unit_; }
   Field eval() const;
   real3 getUniformValue() const;
 
@@ -196,7 +201,7 @@ __device__ inline bool CuVectorParameter::isUniform() const {
 }
 
 __device__ inline real CuVectorParameter::valueAt(int idx, int comp) const {
-  real sv, dv;  // static and dynamic values
+  real sv, dv;      // static and dynamic values
   if (comp == 0) {  // x
     sv = isUniform() ? uniformValue.x : xValuesPtr[idx];
     dv = xDynamicValuesPtr ? xDynamicValuesPtr[idx] : 0.;
@@ -217,7 +222,8 @@ __device__ inline real CuVectorParameter::valueAt(int3 coo, int comp) const {
 __device__ inline real3 CuVectorParameter::vectorAt(int idx) const {
   if (isUniform()) {
     if (xDynamicValuesPtr && yDynamicValuesPtr && zDynamicValuesPtr) {
-      real3 dynamic_value{xDynamicValuesPtr[idx], yDynamicValuesPtr[idx], zDynamicValuesPtr[idx]};
+      real3 dynamic_value{xDynamicValuesPtr[idx], yDynamicValuesPtr[idx],
+                          zDynamicValuesPtr[idx]};
 
       return uniformValue + dynamic_value;
     }
@@ -226,7 +232,8 @@ __device__ inline real3 CuVectorParameter::vectorAt(int idx) const {
   } else {
     real3 static_value{xValuesPtr[idx], yValuesPtr[idx], zValuesPtr[idx]};
     if (xDynamicValuesPtr && yDynamicValuesPtr && zDynamicValuesPtr) {
-      real3 dynamic_value{xDynamicValuesPtr[idx], yDynamicValuesPtr[idx], zDynamicValuesPtr[idx]};
+      real3 dynamic_value{xDynamicValuesPtr[idx], yDynamicValuesPtr[idx],
+                          zDynamicValuesPtr[idx]};
 
       return static_value + dynamic_value;
     }

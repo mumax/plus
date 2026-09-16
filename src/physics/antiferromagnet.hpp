@@ -11,30 +11,29 @@
 #include "grid.hpp"
 #include "hostmagnet.hpp"
 #include "parameter.hpp"
-#include "world.hpp"
 #include "system.hpp"
+#include "world.hpp"
 
 class Antiferromagnet : public HostMagnet {
  public:
-  Antiferromagnet(std::shared_ptr<System> system_ptr,
-                  std::string name);
+  Antiferromagnet(std::shared_ptr<System> system_ptr, std::string name);
 
   Antiferromagnet(MumaxWorld* world,
-         Grid grid,
-         std::string name,
-         GpuBuffer<bool> geometry,
-         GpuBuffer<unsigned int> regions);
-         
+                  Grid grid,
+                  std::string name,
+                  GpuBuffer<bool> geometry,
+                  GpuBuffer<unsigned int> regions);
+
   /** Empty destructor
    * Sublattices are destroyed automatically. They are not pointers.
    */
-  ~Antiferromagnet() override {};
-  
- const Ferromagnet* sub1() const;
- const Ferromagnet* sub2() const;
- 
- void minimize(real tol = 1e-6, int nSamples = 20);
- void relax(real tol);
+  ~Antiferromagnet() override{};
+
+  const Ferromagnet* sub1() const;
+  const Ferromagnet* sub2() const;
+
+  void minimize(real tol = 1e-6, int nSamples = 20);
+  void relax(real tol);
 
  private:
   Ferromagnet sub1_;

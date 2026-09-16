@@ -1,9 +1,9 @@
 """InterParameter implementation."""
 
-from . import _cpp
 import numpy as _np
 
-class InterParameter():
+
+class InterParameter:
     """Represent a physical material parameter which acts between
     different regions, i.e. `inter_exchange`.
     """
@@ -66,8 +66,7 @@ class InterParameter():
 
     @property
     def number_of_regions(self) -> int:
-        """Return the number of regions between which the quantity
-        is active."""
+        """Return the number of regions between which the quantity is active."""
         return self._impl.number_of_regions
 
     @property
@@ -78,7 +77,7 @@ class InterParameter():
     @property
     def is_uniform(self) -> bool:
         """Return True if an InterParameter instance is uniform, otherwise False.
-        
+
         See Also
         --------
         uniform_value
@@ -88,7 +87,7 @@ class InterParameter():
     @property
     def uniform_value(self) -> float:
         """Return the uniform value of the InterParameter instance if it exists.
-        
+
         See Also
         --------
         is_uniform
@@ -105,8 +104,9 @@ class InterParameter():
         --------
         set
         """
-        assert isinstance(value, (float, int)
-                          ), "The value should be uniform and static."
+        assert isinstance(
+            value, (float, int)
+        ), "The value should be uniform and static."
         self._impl.uniform_value = value
 
     def set(self, value):
@@ -117,13 +117,14 @@ class InterParameter():
         --------
         set_between
         """
-        assert isinstance(value, (float, int)
-                          ), "The value should be uniform and static."
+        assert isinstance(
+            value, (float, int)
+        ), "The value should be uniform and static."
         self._impl.set(value)
 
     def set_between(self, i, j, value):
         """Set InterParameter value between regions i and j.
-        
+
         See Also
         --------
         get_between, set
@@ -132,7 +133,7 @@ class InterParameter():
 
     def get_between(self, i, j) -> float:
         """Get the InterParameter value between regions i and j.
-        
+
         See Also
         --------
         set_between

@@ -3,11 +3,11 @@
 #include "datatypes.hpp"
 #include "energy.hpp"
 #include "ferromagnet.hpp"
-#include "quantityevaluator.hpp"
 #include "field.hpp"
 #include "fieldops.hpp"
 #include "magnet.hpp"
 #include "mumaxworld.hpp"
+#include "quantityevaluator.hpp"
 #include "zeeman.hpp"
 
 bool strayFieldsAssuredZero(const Ferromagnet* ferromagnet) {
@@ -45,21 +45,20 @@ bool magnetBiasFieldAssuredZero(const Ferromagnet* magnet) {
 }
 
 bool externalFieldAssuredZero(const Ferromagnet* magnet) {
-  return (strayFieldsAssuredZero(magnet)
-          && worldBiasFieldAssuredZero(magnet)
-          && magnetBiasFieldAssuredZero(magnet));
+  return (strayFieldsAssuredZero(magnet) && worldBiasFieldAssuredZero(magnet) &&
+          magnetBiasFieldAssuredZero(magnet));
 }
 
 Field evalExternalField(const Ferromagnet* magnet) {
-
   Field h(magnet->system(), 3);
   if (externalFieldAssuredZero(magnet)) {
     h.makeZero();
     return h;
   }
 
-  real3 wB_bias = magnet->mumaxWorld()->biasMagneticField; // bias field on world
-  auto& mB_bias = magnet->biasMagneticField; // bias field on individual magnet
+  real3 wB_bias =
+      magnet->mumaxWorld()->biasMagneticField;  // bias field on world
+  auto& mB_bias = magnet->biasMagneticField;  // bias field on individual magnet
 
   h.setUniformComponent(0, wB_bias.x);
   h.setUniformComponent(1, wB_bias.y);
@@ -109,7 +108,8 @@ FM_FieldQuantity externalFieldQuantity(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity zeemanEnergyDensityQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalZeemanEnergyDensity, 1, "zeeman_energy_density", "J/m3");
+  return FM_FieldQuantity(magnet, evalZeemanEnergyDensity, 1,
+                          "zeeman_energy_density", "J/m3");
 }
 
 FM_ScalarQuantity zeemanEnergyQuantity(const Ferromagnet* magnet) {

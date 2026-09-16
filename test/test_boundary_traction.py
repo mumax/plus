@@ -1,13 +1,18 @@
 import numpy as np
-from mumaxplus import World, Grid, Ferromagnet
+
+from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util.shape import Ellipsoid
 
-
-C11, C12, C44 = 300e-9, 110e-9, 60e-9  # not explicitely used, but avoids assuredZero checks
+C11, C12, C44 = (
+    300e-9,
+    110e-9,
+    60e-9,
+)  # not explicitely used, but avoids assuredZero checks
 cx, cy, cz = 1e-9, 2e-9, 3e-9  # non-equal cell sizes
 
 nx, ny, nz = 32, 16, 8
 max_traction = 1e9  # 1 GPa
+
 
 class TestBoundaryTraction3DGeom:
     """Test the inclusion of spatially resolved boundary traction into the
@@ -17,9 +22,11 @@ class TestBoundaryTraction3DGeom:
     """
 
     def setup_class(self):
-        geom = Ellipsoid(nx*cx, ny*cy, nz*cz)
-        geom -= Ellipsoid(nx*cx/2, ny*cy/2, nz*cz/2)  # make hole
-        geom.translate((nx - 1)/2 * cx, (ny - 1)/2 * cy, (nz - 1)/2 * cz)  # to center
+        geom = Ellipsoid(nx * cx, ny * cy, nz * cz)
+        geom -= Ellipsoid(nx * cx / 2, ny * cy / 2, nz * cz / 2)  # make hole
+        geom.translate(
+            (nx - 1) / 2 * cx, (ny - 1) / 2 * cy, (nz - 1) / 2 * cz
+        )  # to center
 
         self.world = World((cx, cy, cz))
         self.magnet = Ferromagnet(self.world, Grid((nx, ny, nz)), geometry=geom)
@@ -27,7 +34,9 @@ class TestBoundaryTraction3DGeom:
         self.magnet.C11, self.magnet.C12, self.magnet.C44 = C11, C12, C44
 
         # random traction to set
-        self.traction = np.random.uniform(low=-max_traction, high=max_traction, size=(3, nz, ny, nx))
+        self.traction = np.random.uniform(
+            low=-max_traction, high=max_traction, size=(3, nz, ny, nx)
+        )
 
     def get_force(self, orientation, sense):
         """Get numerical force calculation for a specific orientation
@@ -38,12 +47,12 @@ class TestBoundaryTraction3DGeom:
         force.
         """
         geom = self.magnet.geometry
-        geom_shifted = np.roll(geom, -sense, axis=[2-orientation])
+        geom_shifted = np.roll(geom, -sense, axis=[2 - orientation])
 
         # new geometry side is empty space: 0
-        index = [slice(None)]*3
+        index = [slice(None)] * 3
         # slice the appropriate side of the appropriate axis
-        index[2-orientation] = 0 if sense == -1 else -1
+        index[2 - orientation] = 0 if sense == -1 else -1
         geom_shifted[tuple(index)] = 0  # no geom
 
         # boundary where there used to be geometry, but not after shifting
@@ -52,10 +61,16 @@ class TestBoundaryTraction3DGeom:
         num_force = np.zeros((3, nz, ny, nx))
         for c in range(3):
             # 4/3 from stencil; 1/cellsize from derivative
-            num_force[c,...] = 1 / self.world.cellsize[orientation] * 4./3. * boundaries * self.traction[c,...]
-        
-        return num_force
+            num_force[c, ...] = (
+                1
+                / self.world.cellsize[orientation]
+                * 4.0
+                / 3.0
+                * boundaries
+                * self.traction[c, ...]
+            )
 
+        return num_force
 
     def test_neg_x_side(self):
         self.magnet.boundary_traction.make_zero()
@@ -118,6 +133,7 @@ class TestBoundaryTraction3DGeom:
 neg_side_traction = (0.11e9, -0.21e9, 0.14e9)
 pos_side_traction = (-0.05e9, 0.13e9, -0.32e9)
 
+
 def get_2D_magnet(orientation):
     """Make small flat elastic magnet."""
     grid_size = [3, 3, 3]
@@ -130,11 +146,15 @@ def get_2D_magnet(orientation):
 
     return magnet
 
+
 def get_2D_force(orientation):
     """Calculate central difference with traction multiplied by sign of surface
     normal.
     """
-    return (np.array(pos_side_traction) + np.array(neg_side_traction)) / (cx, cy, cz)[orientation]
+    return (np.array(pos_side_traction) + np.array(neg_side_traction)) / (cx, cy, cz)[
+        orientation
+    ]
+
 
 class TestBoundaryTraction2D:
     """A different stencil is used if the material is only 1 cell thick.
@@ -152,7 +172,7 @@ class TestBoundaryTraction2D:
         num_force = get_2D_force(orientation)
 
         for c in range(3):
-            assert np.allclose(mxp_force[c], num_force[c], atol=1e-7*1e9*cx)
+            assert np.allclose(mxp_force[c], num_force[c], atol=1e-7 * 1e9 * cx)
 
     def test_y_side(self):
         orientation = 1
@@ -165,7 +185,7 @@ class TestBoundaryTraction2D:
         num_force = get_2D_force(orientation)
 
         for c in range(3):
-            assert np.allclose(mxp_force[c], num_force[c], atol=1e-7*1e9*cy)
+            assert np.allclose(mxp_force[c], num_force[c], atol=1e-7 * 1e9 * cy)
 
     def test_z_side(self):
         orientation = 2
@@ -178,4 +198,4 @@ class TestBoundaryTraction2D:
         num_force = get_2D_force(orientation)
 
         for c in range(3):
-            assert np.allclose(mxp_force[c], num_force[c], atol=1e-7*1e9*cz)
+            assert np.allclose(mxp_force[c], num_force[c], atol=1e-7 * 1e9 * cz)

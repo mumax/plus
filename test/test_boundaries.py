@@ -24,33 +24,37 @@ import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 
-
 RTOL = 2e-4  # 0.02%
 
 ncell = 1024
 cs = 0.05
 
-DMI = 0.9 * 4/np.pi  # 90% of critical DMI strength
+DMI = 0.9 * 4 / np.pi  # 90% of critical DMI strength
 
 minimizerstop = 1e-7
 
 
 def relative_error(simulated, wanted):
-    return np.abs(simulated - wanted)/wanted
+    return np.abs(simulated - wanted) / wanted
 
 
-def canting_x(magnet):  
-    return np.arctan2(magnet.magnetization.eval()[0,0,0,0],  
-                      magnet.magnetization.eval()[2,0,0,0]) 
+def canting_x(magnet):
+    return np.arctan2(
+        magnet.magnetization.eval()[0, 0, 0, 0], magnet.magnetization.eval()[2, 0, 0, 0]
+    )
 
-def canting_y(magnet):  
-    return np.arctan2(magnet.magnetization.eval()[1,0,0,0],  
-                      magnet.magnetization.eval()[2,0,0,0]) 
+
+def canting_y(magnet):
+    return np.arctan2(
+        magnet.magnetization.eval()[1, 0, 0, 0], magnet.magnetization.eval()[2, 0, 0, 0]
+    )
 
 
 def analytic():
-    theta0 = np.arcsin(DMI/2)
-    cant_analytic = 2*np.arctan(np.exp(-cs/2)*np.tan(theta0/2)) # shift towards center of the cell
+    theta0 = np.arcsin(DMI / 2)
+    cant_analytic = 2 * np.arctan(
+        np.exp(-cs / 2) * np.tan(theta0 / 2)
+    )  # shift towards center of the cell
     return cant_analytic
 
 
@@ -66,13 +70,14 @@ def simulation(x_dir):
 
     magnet.dmi_tensor.set_interfacial_dmi(DMI)
     magnet.enable_demag = False
-    magnet.anisU = (0,0,1)
-    magnet.aex = 1.
-    magnet.ku1 = 1.
-    magnet.msat = 1.
-    magnet.magnetization = (0,0,1)
+    magnet.anisU = (0, 0, 1)
+    magnet.aex = 1.0
+    magnet.ku1 = 1.0
+    magnet.msat = 1.0
+    magnet.magnetization = (0, 0, 1)
 
     return world, magnet
+
 
 class TestBoundaries:
     def setup_class(self):
@@ -82,7 +87,7 @@ class TestBoundaries:
         self.world_x, self.magnet_x = simulation(True)  # Wire in the x-direction.
         self.world_y, self.magnet_y = simulation(False)  # Wire in the y-direction
         self.wanted = analytic()
-    
+
     def test_neumann_x(self):
         """Compare the Neumann boundary conditions with mumax³
         for a wire in the x-direction."""
@@ -91,7 +96,7 @@ class TestBoundaries:
         cant_neumann = canting_x(self.magnet_x)
         err = relative_error(cant_neumann, 0.44716486657643906)
         assert err < RTOL
-    
+
     def test_open_x(self):
         """Compare the open boundary conditions with the analytical result
         for a wire in the x-direction."""
@@ -100,17 +105,17 @@ class TestBoundaries:
         cant_open = canting_x(self.magnet_x)
         err = relative_error(cant_open, self.wanted)
         assert err < RTOL
-    
+
     def test_periodic_x(self):
         """Compare the periodic boundary conditions with the analytical result
         for a wire in the x-direction."""
         self.magnet_x.enable_openbc = False
-        self.world_x.set_pbc((0,1,0))
+        self.world_x.set_pbc((0, 1, 0))
         self.magnet_x.minimize(minimizerstop)
         cant_period = canting_x(self.magnet_x)
         err = relative_error(cant_period, self.wanted)
         assert err < RTOL
-    
+
     def test_neumann_y(self):
         """Compare the Neumann boundary conditions with mumax³
         for a wire in the y-direction."""
@@ -119,7 +124,7 @@ class TestBoundaries:
         cant_neumann = canting_y(self.magnet_y)
         err = relative_error(cant_neumann, 0.44716486657643906)
         assert err < RTOL
-    
+
     def test_open_y(self):
         """Compare the open boundary conditions with the analytical result
         for a wire in the y-direction."""
@@ -128,12 +133,12 @@ class TestBoundaries:
         cant_open = canting_y(self.magnet_y)
         err = relative_error(cant_open, self.wanted)
         assert err < RTOL
-    
+
     def test_periodic_y(self):
         """Compare the periodic boundary conditions with the analytical result
         for a wire in the y-direction."""
         self.magnet_y.enable_openbc = False
-        self.world_y.set_pbc((1,0,0))
+        self.world_y.set_pbc((1, 0, 0))
         self.magnet_y.minimize(minimizerstop)
         cant_period = canting_y(self.magnet_y)
         err = relative_error(cant_period, self.wanted)

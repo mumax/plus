@@ -6,11 +6,11 @@
 #include "dmi.hpp"
 #include "energy.hpp"
 #include "fieldquantity.hpp"
+#include "fullmag.hpp"
 #include "magnet.hpp"
 #include "mumaxworld.hpp"
 #include "neel.hpp"
 #include "parameter.hpp"
-#include "fullmag.hpp"
 #include "world.hpp"
 #include "wrappers.hpp"
 
@@ -18,10 +18,14 @@ void wrap_antiferromagnet(py::module& m) {
   py::class_<Antiferromagnet, Magnet>(m, "Antiferromagnet")
       .def("sub1", &Antiferromagnet::sub1, py::return_value_policy::reference)
       .def("sub2", &Antiferromagnet::sub2, py::return_value_policy::reference)
-      .def("sublattices", &Antiferromagnet::sublattices, py::return_value_policy::reference)
-      .def("other_sublattice",
-          [](const Antiferromagnet* m, Ferromagnet* mag) { return m->getOtherSublattices(mag)[0]; },
-            py::return_value_policy::reference)
+      .def("sublattices", &Antiferromagnet::sublattices,
+           py::return_value_policy::reference)
+      .def(
+          "other_sublattice",
+          [](const Antiferromagnet* m, Ferromagnet* mag) {
+            return m->getOtherSublattices(mag)[0];
+          },
+          py::return_value_policy::reference)
       .def_readonly("afmex_cell", &Antiferromagnet::afmex_cell)
       .def_readonly("afmex_nn", &Antiferromagnet::afmex_nn)
       .def_readonly("inter_afmex_nn", &Antiferromagnet::interAfmExchNN)
@@ -30,9 +34,10 @@ void wrap_antiferromagnet(py::module& m) {
       .def_readonly("dmi_tensor", &Antiferromagnet::dmiTensor)
       .def_readonly("dmi_vector", &Antiferromagnet::dmiVector)
 
-      .def("minimize", &Antiferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
+      .def("minimize", &Antiferromagnet::minimize, py::arg("tol"),
+           py::arg("nsamples"))
       .def("relax", &Antiferromagnet::relax, py::arg("tol"));
-      
+
   m.def("neel_vector",
         py::overload_cast<const Antiferromagnet*>(&neelVectorQuantity));
   m.def("full_magnetization",
@@ -44,7 +49,7 @@ void wrap_antiferromagnet(py::module& m) {
         py::overload_cast<const Antiferromagnet*>(&maxAngle));
 
   m.def("total_energy_density",
-      [](const Antiferromagnet* m) {return totalEnergyDensityQuantity(m); });
+        [](const Antiferromagnet* m) { return totalEnergyDensityQuantity(m); });
   m.def("total_energy",
-      [](const Antiferromagnet* m) {return totalEnergyQuantity(m);});
+        [](const Antiferromagnet* m) { return totalEnergyQuantity(m); });
 }

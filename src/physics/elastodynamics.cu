@@ -1,17 +1,16 @@
 #include "antiferromagnet.hpp"
 #include "cudalaunch.hpp"
 #include "elasticdamping.hpp"
-#include "internalbodyforce.hpp"
 #include "elastodynamics.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "fieldops.hpp"
+#include "internalbodyforce.hpp"
 #include "magnet.hpp"
 #include "magnetoelasticfield.hpp"
 #include "magnetoelasticforce.hpp"
 #include "ncafm.hpp"
 #include "parameter.hpp"
-
 
 bool elasticityAssuredZero(const Magnet* magnet) {
   return ((!magnet->enableElastodynamics()) ||
@@ -33,8 +32,7 @@ Field evalEffectiveBodyForce(const Magnet* magnet) {
       if (!magnetoelasticAssuredZero(sub))
         fField += evalMagnetoelasticForce(sub);
     }
-  }
-  else {
+  } else {
     // add magnetoelastic force of independent ferromagnet
     const Ferromagnet* fm = magnet->asFM();
     if (!magnetoelasticAssuredZero(fm))
@@ -45,8 +43,8 @@ Field evalEffectiveBodyForce(const Magnet* magnet) {
 }
 
 M_FieldQuantity effectiveBodyForceQuantity(const Magnet* magnet) {
-    return M_FieldQuantity(magnet, evalEffectiveBodyForce, 3,
-                           "effective_body_force", "N/m3");
+  return M_FieldQuantity(magnet, evalEffectiveBodyForce, 3,
+                         "effective_body_force", "N/m3");
 }
 
 // ========== Elastic Accelleration ==========
@@ -74,11 +72,11 @@ __global__ void k_divideByParam(CuField field, const CuParameter param) {
 
 Field evalElasticAcceleration(const Magnet* magnet) {
   Field aField = evalEffectiveBodyForce(magnet) + evalElasticDamping(magnet);
-  
+
   // divide by rho if possible
   if (!magnet->rho.assuredZero())
-    cudaLaunch(aField.grid().ncells(), k_divideByParam,
-               aField.cu(), magnet->rho.cu());
+    cudaLaunch(aField.grid().ncells(), k_divideByParam, aField.cu(),
+               magnet->rho.cu());
 
   return aField;
 }
@@ -91,7 +89,8 @@ M_FieldQuantity elasticAccelerationQuantity(const Magnet* magnet) {
 // ========== Elastic Velocity Quantity ==========
 
 M_FieldQuantity elasticVelocityQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet,
-       [](const Magnet* magnet){return magnet->elasticVelocity()->eval();},
-                         3, "elastic_velocity", "m/s");
+  return M_FieldQuantity(
+      magnet,
+      [](const Magnet* magnet) { return magnet->elasticVelocity()->eval(); }, 3,
+      "elastic_velocity", "m/s");
 }

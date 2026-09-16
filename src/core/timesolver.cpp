@@ -22,7 +22,8 @@ TimeSolver::~TimeSolver() {}
 
 void TimeSolver::setRungeKuttaMethod(RKmethod method) {
   stepper_ = std::make_unique<RungeKuttaStepper>(this, method);
-  if (!fixedTimeStep_) timestep_ = sensibleTimeStep();
+  if (!fixedTimeStep_)
+    timestep_ = sensibleTimeStep();
   method_ = method;
 }
 
@@ -49,13 +50,15 @@ real TimeSolver::sensibleTimeStep() const {
       // TODO: replace by expected maximum prefactor of noise, depending on the
       // number of cells, without curand noise generation?
       real eqMaxNoise = maxVecNorm(eq.noiseTerm->eval());
-      if (eqMaxNoise > maxNoise) maxNoise = eqMaxNoise;
+      if (eqMaxNoise > maxNoise)
+        maxNoise = eqMaxNoise;
     }
   }
 
   if (maxNoise == 0) {
     // Sensible timestep cannot be calculated if torque is zero
-    if (maxRhs == 0) return sensibleTimestepDefault();
+    if (maxRhs == 0)
+      return sensibleTimestepDefault();
     // with RHS but no noise
     return sensibleFactor() / maxRhs;
   }
@@ -66,7 +69,7 @@ real TimeSolver::sensibleTimeStep() const {
   real smallNumber = 1e-3;
   if (2 * sensibleFactor() * maxRhs / (maxNoise * maxNoise) < smallNumber) {
     // return solution of dt = sensibleFactor / (maxNoise / sqrt(dt))
-    return pow(sensibleFactor() / maxNoise , 2);
+    return pow(sensibleFactor() / maxNoise, 2);
   }
   // RHS and noise
   // returns solution of dt = sensibleFactor / (maxRhs + maxNoise/sqrt(dt))
@@ -76,12 +79,14 @@ real TimeSolver::sensibleTimeStep() const {
 
 void TimeSolver::setEquations(std::vector<DynamicEquation> eqs) {
   eqs_ = eqs;
-  if (!fixedTimeStep_) timestep_ = sensibleTimeStep();
+  if (!fixedTimeStep_)
+    timestep_ = sensibleTimeStep();
 }
 
 void TimeSolver::setSensibleTimestepDefault(real dt) {
   if (dt < 0)
-    throw std::runtime_error("The sensible timestep should be larger than zero.");
+    throw std::runtime_error(
+        "The sensible timestep should be larger than zero.");
   sensibleTimestepDefault_ = dt;
 }
 
@@ -94,10 +99,13 @@ void TimeSolver::adaptTimeStep(real correctionFactor) {
 
   correctionFactor *= headroom_;
   if (lowerBound_ >= upperBound_) {
-    throw std::runtime_error("The lower bound should be lower than the upper bound.");
+    throw std::runtime_error(
+        "The lower bound should be lower than the upper bound.");
   }
-  correctionFactor = correctionFactor > upperBound_ ? upperBound_ : correctionFactor;
-  correctionFactor = correctionFactor < lowerBound_ ? lowerBound_ : correctionFactor;
+  correctionFactor =
+      correctionFactor > upperBound_ ? upperBound_ : correctionFactor;
+  correctionFactor =
+      correctionFactor < lowerBound_ ? lowerBound_ : correctionFactor;
 
   timestep_ *= correctionFactor;
 }
@@ -137,5 +145,6 @@ void TimeSolver::run(real duration) {
   setTimeStep(stoptime - time_);
   step();
   postStep();
-  if (fixedTimeStep_) setTimeStep(oldTimestep);
+  if (fixedTimeStep_)
+    setTimeStep(oldTimestep);
 }

@@ -1,5 +1,7 @@
 import numpy as np
+
 from mumaxplus import Ferromagnet, Grid, World
+
 
 class TestTemperature:
     @staticmethod
@@ -29,7 +31,7 @@ class TestTemperature:
         assert not np.allclose(noise1, noise2)
 
     def test_grid_compatibility(self):
-        """ The CUDA RNG is only compatible with an even number of grid cells.
+        """The CUDA RNG is only compatible with an even number of grid cells.
         Internally, an additional cell is added in the noise generation when
         this is not the case. This function tests if the last cell is cropped
         accordingly. This simultaneously tests the compatibility with an odd

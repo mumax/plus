@@ -1,24 +1,26 @@
 """World imlementation."""
 
-from . import _cpp
+import warnings
 
-from .timesolver import TimeSolver
+import numpy as np
+
+from . import _cpp
+from .altermagnet import Altermagnet
+from .antiferromagnet import Antiferromagnet
+from .ferromagnet import Ferromagnet
 from .grid import Grid
 from .magnet import Magnet
-from .ferromagnet import Ferromagnet
-from .antiferromagnet import Antiferromagnet
-from .altermagnet import Altermagnet
 from .ncafm import NcAfm
+from .timesolver import TimeSolver
 from .window import Window
 
-import warnings
-import numpy as np
 
 class World:
     """Construct a world with a given cell size."""
-    def __init__(self, cellsize,
-                 pbc_repetitions=(0,0,0), mastergrid:Grid=Grid((0,0,0))):
-        
+
+    def __init__(
+        self, cellsize, pbc_repetitions=(0, 0, 0), mastergrid: Grid = Grid((0, 0, 0))
+    ):
         """
         Parameters
         ----------
@@ -31,7 +33,7 @@ class World:
             x, y and z directions to create periodic boundary conditions.
             The number of repetitions determines the cutoff range for the
             demagnetization.
-        
+
         mastergrid : Grid, default=Grid((0,0,0))
             Mastergrid defines a periodic simulation box. If it has zero size in
             a direction, then it is considered to be infinitely large
@@ -39,17 +41,17 @@ class World:
             A 0 in `mastergrid` should correspond to a 0 in `pbc_repetitions`.
             All subsequently added magnets need to fit inside this mastergrid.
 
-            
+
         Note
         ----
-        ``pbc_repetitions`` and ``mastergrid`` can be changed later using :func:`set_pbc`.
+        ``pbc_repetitions`` and ``mastergrid`` can be changed later using
+        :func:`set_pbc`.
 
-            
+
         See Also
         --------
         cellsize, pbc_repetitions, mastergrid
         """
-        
         if len(cellsize) != 3:
             raise ValueError("'cellsize' should have three dimensions.")
         if len(pbc_repetitions) != 3:
@@ -77,16 +79,18 @@ class World:
     def get_ferromagnet(self, name) -> Ferromagnet:
         """Get a :class:`Ferromagnet` by its name.
 
-        Raises KeyError if there is no magnet with the given name."""
+        Raises KeyError if there is no magnet with the given name.
+        """
         magnet_impl = self._impl.get_ferromagnet(name)
         if magnet_impl is None:
             raise KeyError(f"No magnet named {name}")
         return Ferromagnet._from_impl(magnet_impl)
-    
+
     def get_antiferromagnet(self, name) -> Antiferromagnet:
         """Get an :class:`Antiferromagnet` by its name.
-        
-        Raises KeyError if there is no magnet with the given name."""
+
+        Raises KeyError if there is no magnet with the given name.
+        """
         magnet_impl = self._impl.get_antiferromagnet(name)
         if magnet_impl is None:
             raise KeyError(f"No magnet named {name}")
@@ -94,40 +98,52 @@ class World:
 
     def get_ncafm(self, name):
         """Get a non-collinear antiferromagnet by its name.
-        Raises KeyError if there is no magnet with the given name."""
+        Raises KeyError if there is no magnet with the given name.
+        """
         magnet_impl = self._impl.get_ncafm(name)
         if magnet_impl is None:
             raise KeyError(f"No magnet named {name}")
         return NcAfm._from_impl(magnet_impl)
 
     @property
-    def magnets(self) -> dict[str,Magnet]:
+    def magnets(self) -> dict[str, Magnet]:
         """Get a dictionary of all magnet names."""
-        return {**self.ferromagnets, **self.antiferromagnets, **self.altermagnets, **self.ncafms}
+        return {
+            **self.ferromagnets,
+            **self.antiferromagnets,
+            **self.altermagnets,
+            **self.ncafms,
+        }
 
     @property
-    def ferromagnets(self) -> dict[str,Ferromagnet]:
+    def ferromagnets(self) -> dict[str, Ferromagnet]:
         """Get a dictionary of :class:`Ferromagnet` names."""
-        return {key: Ferromagnet._from_impl(impl) for key, impl in
-                self._impl.ferromagnets.items()}
-    
+        return {
+            key: Ferromagnet._from_impl(impl)
+            for key, impl in self._impl.ferromagnets.items()
+        }
+
     @property
-    def antiferromagnets(self) -> dict[str,Antiferromagnet]:
+    def antiferromagnets(self) -> dict[str, Antiferromagnet]:
         """Get a dictionary of :class:`Antiferromagnet` names."""
-        return {key: Antiferromagnet._from_impl(impl) for key, impl in
-                self._impl.antiferromagnets.items()}
+        return {
+            key: Antiferromagnet._from_impl(impl)
+            for key, impl in self._impl.antiferromagnets.items()
+        }
+
     @property
-    def altermagnets(self) -> dict[str,Altermagnet]:
+    def altermagnets(self) -> dict[str, Altermagnet]:
         """Get a dictionary of :class:`Altermagnet` names."""
-        return {key: Altermagnet._from_impl(impl) for key, impl in
-                self._impl.altermagnets.items()}
+        return {
+            key: Altermagnet._from_impl(impl)
+            for key, impl in self._impl.altermagnets.items()
+        }
 
     @property
     def ncafms(self):
         """Get a dictionary of non-collinear antiferromagnets by name."""
-        return {key: NcAfm._from_impl(impl) for key, impl in
-                self._impl.ncafms.items()}
-    
+        return {key: NcAfm._from_impl(impl) for key, impl in self._impl.ncafms.items()}
+
     def minimize(self, tol=1e-6, nsamples=10):
         """Minimize the total energy.
 
@@ -149,7 +165,7 @@ class World:
         relax
         """
         self._impl.minimize(tol, nsamples)
-    
+
     def relax(self, tol=1e-9):
         """Relax the state to an energy minimum.
 
@@ -169,11 +185,13 @@ class World:
         RelaxTorqueThreshold
         minimize
         """
-
         if tol >= 1e-5:
-            warnings.warn("The set tolerance is greater than or equal to the default value"
-                          + " used for the timesolver (1e-5). Using this value results"
-                          + " in no torque minimization, only energy minimization.", UserWarning)
+            warnings.warn(
+                "The set tolerance is greater than or equal to the default value"
+                + " used for the timesolver (1e-5). Using this value results"
+                + " in no torque minimization, only energy minimization.",
+                UserWarning,
+            )
         self._impl.relax(tol)
 
     @property
@@ -193,7 +211,7 @@ class World:
         relax
         """
         return self._impl.RelaxTorqueThreshold
-        
+
     @RelaxTorqueThreshold.setter
     def RelaxTorqueThreshold(self, value):
         assert value != 0, "The relax threshold should not be zero."
@@ -238,11 +256,11 @@ class World:
         return Grid._from_impl(self._impl.mastergrid)
 
     @mastergrid.setter
-    def mastergrid(self, mastergrid: 'Grid'):
+    def mastergrid(self, mastergrid: "Grid"):
         """Set the PBC mastergrid.
 
         It is advised to set ``mastergrid`` using ``set_pbc``.
-        
+
         This will recalculate all strayfield kernels of all magnets in the world.
 
         Parameters
@@ -273,7 +291,7 @@ class World:
 
     @pbc_repetitions.setter
     def pbc_repetitions(self, value):
-        """Set the PBC repetitions. 
+        """Set the PBC repetitions.
 
         This will recalculate all strayfield kernels of all magnets in the world.
 
@@ -301,7 +319,7 @@ class World:
         """Set the periodic boundary conditions.
 
         This will recalculate all strayfield kernels of all magnets in the world.
-        
+
         Parameters
         ----------
         pbc_repetitions : tuple[int] of size 3
@@ -309,7 +327,7 @@ class World:
             x, y and z directions to create periodic boundary conditions.
             The number of repetitions determines the cutoff range for the
             demagnetization.
-        
+
         mastergrid : Grid, default=None
             Mastergrid defines a periodic simulation box. If it has zero size in
             a direction, then it is considered to be infinitely large
@@ -342,7 +360,7 @@ class World:
         """Unset the periodic boundary conditions.
 
         This will recalculate all strayfield kernels of all magnets in the world.
-        
+
         See Also
         --------
         set_pbc
@@ -386,24 +404,40 @@ class World:
             raise ValueError("The component `comp` should be 0 (x), 1 (y) or 2 (z).")
 
         if len(self.magnets) != 1:
-            raise RuntimeError("The moving window functionality only works if exactly 1 magnet exists.")
+            raise RuntimeError(
+                "The moving window functionality only works if exactly 1 magnet exists."
+            )
 
         magnet = list(self.magnets.values())[0]
         if not np.all(magnet.geometry) or np.any(magnet.regions):
-            raise RuntimeError("The moving window functionality doesn't work well with geometry"
-                               " or regions as of yet.")
+            raise RuntimeError(
+                "The moving window functionality doesn't work well with geometry"
+                " or regions as of yet."
+            )
 
         # If no axis is given, return first axis with most number of cells
         if axis is None:
-            axis = np.argmax(self.bounding_grid.size) # bounding grid is safe if only 1 magnet
-            warnings.warn("There is no axis provided in the moving simulation window."
-                        + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"
-                        + " domain wall", UserWarning)
+            axis = np.argmax(
+                self.bounding_grid.size
+            )  # bounding grid is safe if only 1 magnet
+            warnings.warn(
+                "There is no axis provided in the moving simulation window."
+                + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"
+                + " domain wall",
+                UserWarning,
+            )
 
-        av = magnet.magnetization.average() if isinstance(magnet, Ferromagnet) else magnet.sub1.magnetization.average()
+        av = (
+            magnet.magnetization.average()
+            if isinstance(magnet, Ferromagnet)
+            else magnet.sub1.magnetization.average()
+        )
         if np.abs(av[comp]) > 4 / magnet.grid.size[0]:
-            raise RuntimeError(f"The domain wall does not seem centered (average {('x', 'y', 'z')[comp]}-"
-                              + f"component is {av[comp]:.2e}). `center_domain_wall` only works properly "
-                              + "if the wall is initialized near the center of the magnet.")
+            raise RuntimeError(
+                "The domain wall does not seem centered "
+                + f"(average {('x', 'y', 'z')[comp]}-"
+                + f"component is {av[comp]:.2e}). `center_domain_wall` only works "
+                + "properly if the wall is initialized near the center of the magnet."
+            )
 
         self._impl.center_domain_wall(comp, axis)

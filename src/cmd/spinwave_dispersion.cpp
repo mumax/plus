@@ -1,5 +1,5 @@
 #include <cmath>
-#include <filesystem>
+#include <filesystem>  // NOLINT (build/c++17)
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -39,7 +39,8 @@ void spinwave_dispersion() {
   Grid mGrid(grid_size);
   GpuBuffer<bool> geometry;
   GpuBuffer<unsigned int> regions;
-  auto magnet = mWorld.addFerromagnet(mGrid, geometry, regions, ferromagnet_name);
+  auto magnet =
+      mWorld.addFerromagnet(mGrid, geometry, regions, ferromagnet_name);
 
   magnet->enableDemag = false;
   magnet->msat.set(Ms);

@@ -87,7 +87,7 @@ real maxVecNorm(const Field& f) {
     throw std::runtime_error(
         "the input field of maxVecNorm should have 3 components");
   }
-  
+
   GpuBuffer<real> d_result(1);
   cudaLaunchReductionKernel(k_maxVecNorm, d_result.get(), f.cu());
 
@@ -133,11 +133,12 @@ real fieldComponentAverage(const Field& f, int comp) {
                              " of a field which has only " +
                              std::to_string(f.ncomp()) + " components");
   }
-  
+
   real result;
   int cellsingeo = f.system()->cellsInGeo();
   GpuBuffer<real> d_result(1);
-  cudaLaunchReductionKernel(k_average, d_result.get(), f.cu(), comp, cellsingeo);
+  cudaLaunchReductionKernel(k_average, d_result.get(), f.cu(), comp,
+                            cellsingeo);
   checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(real),
                                  cudaMemcpyDeviceToHost, getCudaStream()));
   return result;
@@ -194,7 +195,10 @@ real dotSum(const Field& f, const Field& g) {
   return result;
 }
 
-__global__ void k_idxInRegions(bool* result, unsigned int* regions, size_t size, unsigned int ridx) {
+__global__ void k_idxInRegions(bool* result,
+                               unsigned int* regions,
+                               size_t size,
+                               unsigned int ridx) {
   __shared__ bool sdata[BLOCKDIM];
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   int thread_id = threadIdx.x;
@@ -224,9 +228,9 @@ __global__ void k_idxInRegions(bool* result, unsigned int* regions, size_t size,
 }
 
 bool idxInRegions(GpuBuffer<unsigned int> regions, unsigned int idx) {
-
   GpuBuffer<bool> d_result(1);
-  cudaLaunchReductionKernel(k_idxInRegions, d_result.get(), regions.get(), regions.size(), idx);
+  cudaLaunchReductionKernel(k_idxInRegions, d_result.get(), regions.get(),
+                            regions.size(), idx);
 
   // copy the result to the host and return
   bool result;
@@ -243,7 +247,7 @@ __global__ void k_isUniformComponent(bool* isUniform, CuField f, int c) {
   bool result = true;
 
   real firstValue = 0.0;
-  for (int i = 0; i < ncells; i ++)
+  for (int i = 0; i < ncells; i++)
     if (f.cellInGeometry(i)) {
       firstValue = f.valueAt(i, c);
       break;
@@ -275,7 +279,8 @@ __global__ void k_isUniformComponent(bool* isUniform, CuField f, int c) {
 bool isUniformFieldComponent(const Field& f, int comp) {
   GpuBuffer<bool> d_isUniform(1);
 
-  cudaLaunchReductionKernel(k_isUniformComponent, d_isUniform.get(), f.cu(), comp);
+  cudaLaunchReductionKernel(k_isUniformComponent, d_isUniform.get(), f.cu(),
+                            comp);
 
   bool isUniform;
   checkCudaError(cudaMemcpyAsync(&isUniform, d_isUniform.get(), sizeof(bool),

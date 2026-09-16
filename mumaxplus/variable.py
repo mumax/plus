@@ -7,6 +7,7 @@ from .fieldquantity import FieldQuantity
 
 class Variable(FieldQuantity):
     """Represent a physical variable field, e.g. magnetization."""
+
     def __init__(self, impl):
         super().__init__(impl)
 
@@ -48,16 +49,17 @@ class Variable(FieldQuantity):
         --------
         :func:`set`
         """
-
         # uniform value
         if isinstance(value, (float, int)) or (
-           (isinstance(value, tuple) or isinstance(value, _np.ndarray)) and len(value) == 3):
+            (isinstance(value, tuple) or isinstance(value, _np.ndarray))
+            and len(value) == 3
+        ):
             self._impl.set_in_region(region_idx, value)
 
         # evaluate value based on function
         elif callable(value):
             regions = self._impl.system.regions
-            mask = (regions == region_idx)
+            mask = regions == region_idx
             x, y, z = self.meshgrid
 
             field = self.eval().copy()
@@ -69,8 +71,10 @@ class Variable(FieldQuantity):
                 field[0][mask] = data
             else:
                 if len(data) != self.ncomp:
-                    raise ValueError(f"Function must return values with {self.ncomp} components, "+
-                                     f"got {len(data)} instead.")
+                    raise ValueError(
+                        f"Function must return values with {self.ncomp} components, "
+                        + f"got {len(data)} instead."
+                    )
                 for c in range(self.ncomp):
                     field[c][mask] = data[c]
             self._impl.set(field)
@@ -80,7 +84,7 @@ class Variable(FieldQuantity):
 
     def _set_func(self, func):
         X, Y, Z = self.meshgrid
-        self._impl.set(_np.vectorize(func, otypes=[float]*self.shape[0])(X, Y, Z))
+        self._impl.set(_np.vectorize(func, otypes=[float] * self.shape[0])(X, Y, Z))
 
     def get(self):
         """Get the variable value."""

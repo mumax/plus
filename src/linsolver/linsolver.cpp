@@ -214,8 +214,8 @@ std::unique_ptr<LinSolver::Stepper> LinSolver::Stepper::create(
     case Method::STEEPESTDESCENT:
       return std::make_unique<SteepestDescent>(parent);
     default:  // should never be reached
-      throw std::invalid_argument("Linear system solver method number '"
-                       + std::to_string(method) + "' does not exist");
+      throw std::invalid_argument("Linear system solver method number '" +
+                                  std::to_string(method) + "' does not exist");
   }
 }
 

@@ -32,7 +32,8 @@ Field::Field(std::shared_ptr<const System> system, int nComponents, real3 value)
   setUniformValue(value);
 }
 
-Field::Field(const Field& other) : system_(other.system_), ncomp_(other.ncomp_) {
+Field::Field(const Field& other)
+    : system_(other.system_), ncomp_(other.ncomp_) {
   buffers_ = other.buffers_;
   updateDevicePointersBuffer();
 }
@@ -82,7 +83,7 @@ void Field::updateDevicePointersBuffer() {
 void Field::allocate() {
   free();
 
-  if(empty())
+  if (empty())
     return;
 
   buffers_ =
@@ -168,7 +169,9 @@ __global__ void k_setVectorValue(CuField f, real3 value) {
   }
 }
 
-__global__ void k_setVectorValueInRegion(CuField f, real3 value, unsigned int region_idx) {
+__global__ void k_setVectorValueInRegion(CuField f,
+                                         real3 value,
+                                         unsigned int region_idx) {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
   if (!f.cellInGrid(idx) || !f.cellInRegion(region_idx, idx))
     return;
@@ -184,9 +187,12 @@ void Field::setUniformComponent(int comp, real value) {
   cudaLaunch(grid().ncells(), k_setComponent, cu(), value, comp);
 }
 
-void Field::setUniformComponentInRegion(unsigned int regionIdx, int comp, real value) {
+void Field::setUniformComponentInRegion(unsigned int regionIdx,
+                                        int comp,
+                                        real value) {
   system_->checkIdxInRegions(regionIdx);
-  cudaLaunch(grid().ncells(), k_setComponentInRegion, cu(), value, comp, regionIdx);
+  cudaLaunch(grid().ncells(), k_setComponentInRegion, cu(), value, comp,
+             regionIdx);
 }
 
 void Field::setUniformValue(real value) {

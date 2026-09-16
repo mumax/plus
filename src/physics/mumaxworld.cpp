@@ -39,9 +39,9 @@ MumaxWorld::~MumaxWorld() {}
 
 void MumaxWorld::checkAddibility(Grid grid, std::string name) const {
   if (!inMastergrid(grid)) {
-      throw std::out_of_range(
-          "Can not add magnet because the grid does not fit in the "
-          "mastergrid ");
+    throw std::out_of_range(
+        "Can not add magnet because the grid does not fit in the "
+        "mastergrid ");
   }
 
   for (const auto& namedMagnet : magnets_) {
@@ -63,7 +63,8 @@ Ferromagnet* MumaxWorld::addFerromagnet(Grid grid,
                                         GpuBuffer<bool> geometry,
                                         GpuBuffer<unsigned int> regions,
                                         std::string name) {
-  auto mag = addMagnetTempl<Ferromagnet>(ferromagnets_, grid, geometry, regions, name, "ferromagnet");
+  auto mag = addMagnetTempl<Ferromagnet>(ferromagnets_, grid, geometry, regions,
+                                         name, "ferromagnet");
   resetTimeSolverEquations();
   return mag;
 }
@@ -72,7 +73,8 @@ Antiferromagnet* MumaxWorld::addAntiferromagnet(Grid grid,
                                                 GpuBuffer<bool> geometry,
                                                 GpuBuffer<unsigned int> regions,
                                                 std::string name) {
-  auto mag = addMagnetTempl<Antiferromagnet>(antiferromagnets_, grid, geometry, regions, name, "antiferromagnet");
+  auto mag = addMagnetTempl<Antiferromagnet>(antiferromagnets_, grid, geometry,
+                                             regions, name, "antiferromagnet");
   hostmagnets_[mag->name()] = mag;
   resetTimeSolverEquations();
   return mag;
@@ -82,7 +84,8 @@ Altermagnet* MumaxWorld::addAltermagnet(Grid grid,
                                         GpuBuffer<bool> geometry,
                                         GpuBuffer<unsigned int> regions,
                                         std::string name) {
-  auto mag = addMagnetTempl<Altermagnet>(altermagnets_, grid, geometry, regions, name, "altermagnet");
+  auto mag = addMagnetTempl<Altermagnet>(altermagnets_, grid, geometry, regions,
+                                         name, "altermagnet");
   hostmagnets_[mag->name()] = mag;
   resetTimeSolverEquations();
   return mag;
@@ -92,7 +95,8 @@ NcAfm* MumaxWorld::addNcAfm(Grid grid,
                             GpuBuffer<bool> geometry,
                             GpuBuffer<unsigned int> regions,
                             std::string name) {
-  auto mag = addMagnetTempl<NcAfm>(ncafms_, grid, geometry, regions, name, "ncafm");
+  auto mag =
+      addMagnetTempl<NcAfm>(ncafms_, grid, geometry, regions, name, "ncafm");
   hostmagnets_[mag->name()] = mag;
   resetTimeSolverEquations();
   return mag;
@@ -118,19 +122,19 @@ Magnet* MumaxWorld::getMagnet(std::string name) const {
 }
 
 Ferromagnet* MumaxWorld::getFerromagnet(std::string name) const {
-    return getMagnetTempl(ferromagnets_, name);
+  return getMagnetTempl(ferromagnets_, name);
 }
 
 Antiferromagnet* MumaxWorld::getAntiferromagnet(std::string name) const {
-    return getMagnetTempl(antiferromagnets_, name);
+  return getMagnetTempl(antiferromagnets_, name);
 }
 
 Altermagnet* MumaxWorld::getAltermagnet(std::string name) const {
-    return getMagnetTempl(altermagnets_, name);
+  return getMagnetTempl(altermagnets_, name);
 }
 
 NcAfm* MumaxWorld::getNcAfm(std::string name) const {
-    return getMagnetTempl(ncafms_, name);
+  return getMagnetTempl(ncafms_, name);
 }
 
 const std::map<std::string, Magnet*> MumaxWorld::magnets() const {
@@ -138,19 +142,20 @@ const std::map<std::string, Magnet*> MumaxWorld::magnets() const {
 }
 
 const std::map<std::string, Ferromagnet*> MumaxWorld::ferromagnets() const {
-    return getMagnetPointers<Ferromagnet*>(ferromagnets_);
+  return getMagnetPointers<Ferromagnet*>(ferromagnets_);
 }
 
-const std::map<std::string, Antiferromagnet*> MumaxWorld::antiferromagnets() const {
-    return getMagnetPointers<Antiferromagnet*>(antiferromagnets_);
+const std::map<std::string, Antiferromagnet*> MumaxWorld::antiferromagnets()
+    const {
+  return getMagnetPointers<Antiferromagnet*>(antiferromagnets_);
 }
 
 const std::map<std::string, Altermagnet*> MumaxWorld::altermagnets() const {
-    return getMagnetPointers<Altermagnet*>(altermagnets_);
+  return getMagnetPointers<Altermagnet*>(altermagnets_);
 }
 
 const std::map<std::string, NcAfm*> MumaxWorld::ncafms() const {
-    return getMagnetPointers<NcAfm*>(ncafms_);
+  return getMagnetPointers<NcAfm*>(ncafms_);
 }
 
 void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
@@ -168,9 +173,9 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
     const HostMagnet* magnet = namedMagnet.second;
     for (const Ferromagnet* sub : magnet->sublattices()) {
       DynamicEquation eq(
-        sub->magnetization(),
-        std::shared_ptr<FieldQuantity>(torque(sub).clone()),
-        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()));
+          sub->magnetization(),
+          std::shared_ptr<FieldQuantity>(torque(sub).clone()),
+          std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()));
       equations.push_back(eq);
     }
   }
@@ -181,19 +186,18 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
     // add elastodynamics if enabled
     // TODO: this does not play nice with relax()
     if (magnet->enableElastodynamics()) {
-
       // change in displacement = velocity
-      DynamicEquation dvEq(
-          magnet->elasticDisplacement(),
-          std::shared_ptr<FieldQuantity>(elasticVelocityQuantity(magnet).clone()));
-          // No thermal noise
+      DynamicEquation dvEq(magnet->elasticDisplacement(),
+                           std::shared_ptr<FieldQuantity>(
+                               elasticVelocityQuantity(magnet).clone()));
+      // No thermal noise
       equations.push_back(dvEq);
 
       // change in velocity = acceleration
-      DynamicEquation vaEq(
-          magnet->elasticVelocity(),
-          std::shared_ptr<FieldQuantity>(elasticAccelerationQuantity(magnet).clone()));
-          // No thermal noise
+      DynamicEquation vaEq(magnet->elasticVelocity(),
+                           std::shared_ptr<FieldQuantity>(
+                               elasticAccelerationQuantity(magnet).clone()));
+      // No thermal noise
       equations.push_back(vaEq);
     }
   }
@@ -211,19 +215,17 @@ void MumaxWorld::relax(real tol) {
   relaxer.exec();
 }
 
-
 // --------------------------------------------------
 // PBC
 
 void MumaxWorld::checkAllMagnetsInMastergrid() const {
   for (const auto& namedMagnet : magnets_) {
     Magnet* magnet = namedMagnet.second;
-      if (!inMastergrid(magnet->grid()))
-        throw std::out_of_range(
-            "Not all magnets of the world fit inside the mastergrid.");
+    if (!inMastergrid(magnet->grid()))
+      throw std::out_of_range(
+          "Not all magnets of the world fit inside the mastergrid.");
   }
 }
-
 
 void MumaxWorld::recalculateStrayFields() {
   for (const auto& namedMagnet : magnets_) {
@@ -234,7 +236,6 @@ void MumaxWorld::recalculateStrayFields() {
     }
   }
 }
-
 
 // (very) possibly unnecessary
 int3 int3min(int3 a, int3 b) {
@@ -252,8 +253,9 @@ int3 int3max(int3 a, int3 b) {
 
 Grid MumaxWorld::boundingGrid() const {
   if (this->magnets_.size() == 0)
-    throw std::out_of_range("Cannot find minimum bounding box if there are "
-                            "no magnets in the world.");
+    throw std::out_of_range(
+        "Cannot find minimum bounding box if there are "
+        "no magnets in the world.");
 
   if (magnets_.size() == 1)
     return magnets_.begin()->second->grid();
@@ -262,9 +264,9 @@ Grid MumaxWorld::boundingGrid() const {
   int3 minimum = magnets_.begin()->second->grid().origin();
   int3 maximum = magnets_.begin()->second->grid().origin() +
                  magnets_.begin()->second->grid().size();
-  
+
   auto it = magnets_.begin();  // iterator
-  it++;  // go to second magnet
+  it++;                        // go to second magnet
   for (; it != magnets_.end(); it++) {
     Magnet* magnet = it->second;
     minimum = int3min(minimum, magnet->grid().origin());
@@ -309,7 +311,6 @@ void MumaxWorld::setPBC(const Grid mastergrid, const int3 pbcRepetitions) {
   recalculateStrayFields();
 }
 
-
 void MumaxWorld::setPbcRepetitions(int3 pbcRepetitions) {
   checkPbcRepetitions(pbcRepetitions);
   checkPbcCompatibility(mastergrid(), pbcRepetitions);
@@ -325,8 +326,8 @@ void MumaxWorld::setMastergrid(Grid mastergrid) {
 }
 
 void MumaxWorld::unsetPBC() {
-  mastergrid_ = Grid(int3{0,0,0});
-  pbcRepetitions_ = int3{0,0,0};
+  mastergrid_ = Grid(int3{0, 0, 0});
+  pbcRepetitions_ = int3{0, 0, 0};
   recalculateStrayFields();
 }
 
@@ -335,20 +336,23 @@ void MumaxWorld::unsetPBC() {
 
 void MumaxWorld::centerDomainWall(int comp, int axis) {
   if (magnets_.size() > 1)
-    throw std::runtime_error("Moving the simulation window is only possible when only one "
-                             "magnet lives in the world.");
+    throw std::runtime_error(
+        "Moving the simulation window is only possible when only one "
+        "magnet lives in the world.");
   if (magnets_.size() < 1)
-    throw std::runtime_error("Moving the simulation window is not possible when there is no "
-                             "magnet in the world.");
+    throw std::runtime_error(
+        "Moving the simulation window is not possible when there is no "
+        "magnet in the world.");
 
   Magnet* magnet = magnets_.begin()->second;
   timesolver_->setPostStepFunction([this, magnet, comp, axis]() {
-  const Field& mag = magnet->asHost() ? magnet->asHost()->sublattices()[0]->magnetization()->field()
-                                      : magnet->asFM()->magnetization()->field();
-  int dir = calculateShiftDirection(mag,
-                                    comp, axis,
-                                    window_->getMagValues()[0],
-                                    window_->getMagValues()[1]);
+    const Field& mag =
+        magnet->asHost()
+            ? magnet->asHost()->sublattices()[0]->magnetization()->field()
+            : magnet->asFM()->magnetization()->field();
+    int dir =
+        calculateShiftDirection(mag, comp, axis, window_->getMagValues()[0],
+                                window_->getMagValues()[1]);
     if (dir != 0) {
       window_->move(dir, axis, comp);
       // Shift magnetization
@@ -359,14 +363,13 @@ void MumaxWorld::centerDomainWall(int comp, int axis) {
         auto sub0 = host->sublattices()[0];
         sub0->magnetization()->set(shifted);
         for (auto sub : host->getOtherSublattices(sub0)) {
-          auto shifted = window_->centerOnExcitation(sub->magnetization()->field(), dir, axis, comp);
+          auto shifted = window_->centerOnExcitation(
+              sub->magnetization()->field(), dir, axis, comp);
           sub->magnetization()->set(shifted);
         }
-      }
-
-      // Ferromagnet
-      else
+      } else {  // Ferromagnet
         magnet->asFM()->magnetization()->set(shifted);
+      }
     }
   });
 }

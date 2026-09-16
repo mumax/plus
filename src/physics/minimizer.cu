@@ -44,8 +44,9 @@ Minimizer::Minimizer(const MumaxWorld* world,
                      int nMagDiffSamples)
     : stopMaxMagDiff_(stopMaxMagDiff) {
   // Total number of ferromagnets (FM instances or sublattices)
-  size_t N = world->ferromagnets().size() + 2 * world->antiferromagnets().size();
-  
+  size_t N =
+      world->ferromagnets().size() + 2 * world->antiferromagnets().size();
+
   nMagDiffSamples_ = nMagDiffSamples * N;
 
   t0.resize(N);
@@ -57,17 +58,17 @@ Minimizer::Minimizer(const MumaxWorld* world,
     if (auto host = pair.second->asHost()) {
       for (auto sub : host->sublattices())
         magnets_.push_back(sub);
-    }
-    else if (const Ferromagnet* mag = pair.second->asFM())
+    } else if (const Ferromagnet* mag = pair.second->asFM()) {
       magnets_.push_back(mag);
+    }
   }
 
   for (auto magnet : magnets_)
     torques_.push_back(relaxTorqueQuantity(magnet));
-    
+
   stepsizes_.assign(N, 1e-14);
 }
-      
+
 void Minimizer::exec() {
   nsteps_ = 0;
   lastMagDiffs_.clear();
@@ -110,7 +111,6 @@ static inline real BarzilianBorweinStepSize(Field& dm, Field& dtorque, int n) {
 
 void Minimizer::step() {
   for (size_t i = 0; i < magnets_.size(); i++) {
-
     m0[i] = magnets_[i]->magnetization()->eval();
 
     if (nsteps_ == 0)
@@ -121,18 +121,20 @@ void Minimizer::step() {
     m1[i] = Field(magnets_[i]->system(), 3);
     int ncells = m1[i].grid().ncells();
 
-    cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(), stepsizes_[i]);
+    cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(),
+               stepsizes_[i]);
   }
-  
+
   for (size_t i = 0; i < magnets_.size(); i++)
     magnets_[i]->magnetization()->set(m1[i]);  // normalizes
-    
+
   for (size_t i = 0; i < magnets_.size(); i++)
     t1[i] = torques_[i].eval();
 
   for (size_t i = 0; i < magnets_.size(); i++) {
     Field dm = add(real(+1), m1[i], real(-1), m0[i]);
-    Field dt = add(real(-1), t1[i], real(+1), t0[i]);  // TODO: check sign difference
+    Field dt =
+        add(real(-1), t1[i], real(+1), t0[i]);  // TODO: check sign difference
 
     stepsizes_[i] = BarzilianBorweinStepSize(dm, dt, nsteps_);
 
@@ -144,7 +146,7 @@ void Minimizer::step() {
 bool Minimizer::converged() const {
   if (lastMagDiffs_.size() < nMagDiffSamples_)
     return false;
- 
+
   for (auto dm : lastMagDiffs_)
     if (dm > stopMaxMagDiff_)
       return false;

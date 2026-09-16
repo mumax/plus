@@ -1,10 +1,10 @@
 """Magnet implementation."""
 
-import numpy as _np
 from abc import ABC, abstractmethod
 
-from . import _cpp
+import numpy as _np
 
+from . import _cpp
 from .fieldquantity import FieldQuantity
 from .grid import Grid
 from .parameter import Parameter
@@ -16,9 +16,13 @@ from .variable import Variable
 
 class Magnet(ABC):
     """A Magnet should never be initialized by the user. It contains no physics.
-       Use :class:`Ferromagnet` or :class:`Antiferromagnet` instead."""    
+    Use :class:`Ferromagnet` or :class:`Antiferromagnet` instead.
+    """
+
     @abstractmethod  # TODO: does this work?
-    def __init__(self, _impl_function, world, grid, name="", geometry=None, regions=None):
+    def __init__(
+        self, _impl_function, world, grid, name="", geometry=None, regions=None
+    ):
         """
         Parameters
         ----------
@@ -32,12 +36,13 @@ class Magnet(ABC):
         geometry : None, ndarray, or callable (default=None)
             The geometry of the magnet can be set in three ways.
 
-            1. If the geometry contains all cells in the grid, then use None (the default)
+            1. If the geometry contains all cells in the grid, then use None
+               (the default)
             2. Use an ndarray which specifies for each cell wheter or not it is in the
                geometry.
-            3. Use a function which takes x, y, and z coordinates as arguments and returns
-               true if this position is inside the geometry and false otherwise.
-        
+            3. Use a function which takes x, y, and z coordinates as arguments and
+               returns true if this position is inside the geometry and false otherwise.
+
         regions : None, ndarray, or callable (default=None)
             The regional structure of a magnet can be set in the same three ways
             as the geometry. This parameter indexes each grid cell to a certain region.
@@ -45,7 +50,6 @@ class Magnet(ABC):
             The magnet's identifier. If the name is empty (the default), a name for the
             magnet will be created.
         """
-   
         geometry_array = self._get_mask_array(geometry, grid, world, "geometry")
         regions_array = self._get_mask_array(regions, grid, world, "regions")
         self._impl = _impl_function(grid._impl, geometry_array, regions_array, name)
@@ -54,7 +58,7 @@ class Magnet(ABC):
     def _get_mask_array(input, grid, world, input_name):
         if input is None:
             return None
-        
+
         T = bool if input_name == "geometry" else int
         if callable(input):
             # construct meshgrid of x, y, and z coordinates for the grid
@@ -65,7 +69,7 @@ class Magnet(ABC):
 
             # evaluate the input function for each position in this meshgrid
             try:
-                return input(x, y, z) # If input function is already vectorized
+                return input(x, y, z)  # If input function is already vectorized
             except Exception:
                 return _np.vectorize(input, otypes=[T])(x, y, z)
 
@@ -74,9 +78,9 @@ class Magnet(ABC):
         input_array = _np.array(input, dtype=T)
         if input_array.shape != grid.shape:
             raise ValueError(
-                "The dimensions of the {} do not match the dimensions "
-                + "of the grid.".format(input_name)
-                    )
+                "The dimensions of the {} do not match the ".format(input_name)
+                + "dimensions of the grid."
+            )
         return input_array
 
     @abstractmethod
@@ -138,7 +142,7 @@ class Magnet(ABC):
         return self._impl.system.center
 
     @property
-    def extent(self) ->tuple[float]:
+    def extent(self) -> tuple[float]:
         """Extent of the magnet.
 
         Returns
@@ -152,6 +156,7 @@ class Magnet(ABC):
     def world(self):
         """Return the World of which the magnet is a part."""
         from .world import World  # imported here to avoid circular imports
+
         return World._from_impl(self._impl.world)
 
     @property
@@ -170,7 +175,7 @@ class Magnet(ABC):
     def enable_as_stray_field_source(self) -> bool:
         """Enable/disable this magnet (self) as the source of stray fields felt
         by other magnets. This does not influence demagnetization.
-        
+
         Default = True.
 
         See Also
@@ -187,7 +192,7 @@ class Magnet(ABC):
     def enable_as_stray_field_destination(self) -> bool:
         """Enable/disable whether this magnet (self) is influenced by the stray
         fields of other magnets. This does not influence demagnetization.
-        
+
         Default = True.
 
         See Also
@@ -208,7 +213,7 @@ class Magnet(ABC):
 
         The elastic displacement is uninitialized (does not exist) if the
         elastodynamics are disabled.
-        
+
         See Also
         --------
         elastic_velocity
@@ -223,7 +228,7 @@ class Magnet(ABC):
     @property
     def elastic_velocity(self) -> Variable:
         """Elastic velocity vector (m/s).
-        
+
         The elastic velocity is uninitialized (does not exist) if the
         elastodynamics are disabled.
 
@@ -278,7 +283,7 @@ class Magnet(ABC):
     @property
     def C11(self) -> Parameter:
         """Stiffness constant C11 = C22 = C33 of the stiffness tensor (N/m²).
-        
+
         See Also
         --------
         C12, C44, stress_tensor
@@ -292,7 +297,7 @@ class Magnet(ABC):
     @property
     def C12(self) -> Parameter:
         """Stiffness constant C12 = C13 = C23 of the stiffness tensor (N/m²).
-        
+
         See Also
         --------
         C11, C44, stress_tensor
@@ -365,7 +370,7 @@ class Magnet(ABC):
         σ = η : dε/dt.
 
         When set, this parameter overrules the :attr:`stiffness_damping`.
-        
+
         See Also
         --------
         eta12, eta44
@@ -385,7 +390,7 @@ class Magnet(ABC):
         σ = η : dε/dt.
 
         When set, this parameter overrules the :attr:`stiffness_damping`.
-        
+
         See Also
         --------
         eta11, eta44
@@ -407,7 +412,7 @@ class Magnet(ABC):
         For isotropic materials, this is equal to the shear viscosity.
 
         When set, this parameter overrules the :attr:`stiffness_damping`.
-        
+
         See Also
         --------
         eta11, eta12
@@ -423,7 +428,7 @@ class Magnet(ABC):
     @property
     def rho(self) -> Parameter:
         """Mass density (kg/m³).
-        
+
         Default = 1.0 kg/m³
         """
         return Parameter(self._impl.rho)
@@ -456,13 +461,13 @@ class Magnet(ABC):
         enable_elastodynamics, strain_tensor
         """
         return Parameter(self._impl.rigid_norm_strain)
-    
+
     @rigid_norm_strain.setter
     def rigid_norm_strain(self, value):
         if self.enable_elastodynamics:
             raise Exception("Can not use normal strain with elastodynamics enabled.")
         self.rigid_norm_strain.set(value)
-    
+
     @property
     def rigid_shear_strain(self) -> Parameter:
         r"""The applied shear strain (m/m).
@@ -497,7 +502,7 @@ class Magnet(ABC):
     @property
     def boundary_traction(self) -> BoundaryTraction:
         """Get the boundary traction of this Magnet (Pa).
-        
+
         See Also
         --------
         internal_body_force
@@ -545,7 +550,7 @@ class Magnet(ABC):
         elastic_velocity
         """
         return FieldQuantity(_cpp.strain_rate(self._impl))
-    
+
     @property
     def elastic_stress(self):
         """Elastic stress tensor (N/m²), calculated according to Hooke's law
@@ -580,7 +585,7 @@ class Magnet(ABC):
     @property
     def stress_tensor(self):
         r"""Total stress tensor (N/m²), including elastic stress and viscous stress.
-        
+
         This quantity has six components (σxx, σyy, σzz, σxy, σxz, σyz),
         which forms the symmetric stress tensor:
 
@@ -606,7 +611,7 @@ class Magnet(ABC):
 
         The boundary conditions of this force density are determined by the
         applied :attr:`boundary_traction` (traction-free by default).
-        
+
         See Also
         --------
         stress_tensor
@@ -635,7 +640,7 @@ class Magnet(ABC):
     @property
     def elastic_damping(self) -> FieldQuantity:
         """Elastic damping body force density proportional to η and velocity
-        
+
         -ηv (N/m³).
 
         See Also
@@ -660,7 +665,7 @@ class Magnet(ABC):
     @property
     def kinetic_energy_density(self) -> FieldQuantity:
         """Kinetic energy density related to the elastic velocity (J/m³).
-        
+
         See Also
         --------
         elastic_velocity, kinetic_energy, rho
@@ -670,7 +675,7 @@ class Magnet(ABC):
     @property
     def kinetic_energy(self) -> ScalarQuantity:
         """Kinetic energy related to the elastic velocity (J/m³).
-        
+
         See Also
         --------
         elastic_velocity, kinetic_energy_density, rho
@@ -681,7 +686,7 @@ class Magnet(ABC):
     def elastic_energy_density(self) -> FieldQuantity:
         """Potential energy density related to elastics (J/m³).
         This is given by 1/2 σ:ε
-        
+
         See Also
         --------
         elastic_energy, strain_tensor, stress_tensor
@@ -691,7 +696,7 @@ class Magnet(ABC):
     @property
     def elastic_energy(self) -> ScalarQuantity:
         """Potential energy related to elastics (J).
-        
+
         See Also
         --------
         elastic_energy_density, strain_tensor, stress_tensor
@@ -702,7 +707,7 @@ class Magnet(ABC):
     def poynting_vector(self) -> FieldQuantity:
         """Poynting vector (W/m2).
         This is given by P = - σv
-        
+
         See Also
         --------
         elastic_velocity, stress_tensor
@@ -720,7 +725,7 @@ class Magnet(ABC):
         ----------
         source_magnet : Magnet
             The magnet acting as the source of the requested stray field.
-        
+
         Returns
         -------
         stray_field : StrayField
@@ -732,14 +737,15 @@ class Magnet(ABC):
         StrayField
         """
         return StrayField._from_impl(
-                        self._impl.stray_field_from_magnet(source_magnet._impl))
+            self._impl.stray_field_from_magnet(source_magnet._impl)
+        )
 
     @property
     def demag_field(self) -> StrayField:
         """Demagnetization field (T).
 
         Ferromagnetic sublattices of other host magnets don't have a demag field.
-        
+
         See Also
         --------
         stray_field_from_magnet

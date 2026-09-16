@@ -10,8 +10,7 @@ void wrap_grid(py::module& m) {
       .def_property_readonly("size", &Grid::size, "size of the grid")
       .def_property_readonly("origin", &Grid::origin, "origin of the grid")
       .def_property_readonly("ncells", &Grid::ncells,
-           "total number of cells in the grid")
+                             "total number of cells in the grid")
       .def(py::self == py::self)
-      .def(py::self != py::self)
-      ;
+      .def(py::self != py::self);
 }

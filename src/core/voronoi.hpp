@@ -1,7 +1,9 @@
+#pragma once
+
 #include <functional>
 #include <random>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "datatypes.hpp"
 #include "field.hpp"
@@ -23,17 +25,19 @@ struct Tile {
 
 struct Int3Hash {
   // Hash function to allow int3 to be used as a key
-    std::size_t operator()(const int3& k) const {
-        return std::hash<int>()(k.x) ^ std::hash<int>()(k.y) ^ std::hash<int>()(k.z);
-    }
+  std::size_t operator()(const int3& k) const {
+    return std::hash<int>()(k.x) ^ std::hash<int>()(k.y) ^
+           std::hash<int>()(k.z);
+  }
 };
 
 class VoronoiTessellator {
  public:
-  VoronoiTessellator(real grainsize,
-                     int seed,
-                     unsigned int maxIdx=255,
-                     const std::function<unsigned int(real3)>& centerIdx = nullptr);
+  VoronoiTessellator(
+      real grainsize,
+      int seed,
+      unsigned int maxIdx = 255,
+      const std::function<unsigned int(real3)>& centerIdx = nullptr);
   ~VoronoiTessellator() = default;
 
   // * Generate a Voronoi tessellation
@@ -41,27 +45,28 @@ class VoronoiTessellator {
                                      const real3 cellsize,
                                      const bool pbc,
                                      const bool make2D = false);
-  
+
   real3 getTileSize(const real3 griddims) const;
 
   // * Calc nearest center and assign center index to coo
   unsigned int regionOf(const real3 coo);
 
   real3 periodicShift(const real3 coo, real3 center);
-  
-  private:
+
+ private:
   // * Calculate position and index of centers in tile
   std::vector<Center> centersInTile(const int3 pos);
 
   // * Poisson distribution
   int Poisson(const real lambda);
-  
+
   // * Calculate to which tile the given cell belongs
   Tile tileOfCell(const real3 coo) const;
 
-public:
+ public:
   GpuBuffer<unsigned int> tessellation;
-private:
+
+ private:
   real grainsize_;
   real3 grid_dims_;
   bool is2D_;
@@ -75,8 +80,8 @@ private:
   int seed_;
   std::unordered_map<int3, Tile, Int3Hash> tileCache_;
 
- // RNG related members
-  real lambda_; // Poisson parameter
+  // RNG related members
+  real lambda_;  // Poisson parameter
   std::default_random_engine engine_;
   std::uniform_real_distribution<> distReal_;
   std::uniform_int_distribution<> distInt_;

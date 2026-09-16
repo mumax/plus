@@ -1,12 +1,12 @@
 #include "conductivitytensor.hpp"
 #include "cudalaunch.hpp"
-#include "quantityevaluator.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "fieldops.hpp"
 #include "linsolver.hpp"
 #include "linsystem.hpp"
 #include "poissonsystem.hpp"
+#include "quantityevaluator.hpp"
 #include "reduce.hpp"
 
 /** Represent a sparce matrix row with max N non zero elements. */

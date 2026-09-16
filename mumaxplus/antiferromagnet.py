@@ -1,24 +1,25 @@
 """Antiferromagnet implementation."""
 
-import numpy as _np
 import warnings
 
-from . import _cpp
+import numpy as _np
 
+from . import _cpp
 from .dmitensor import DmiTensor, DmiTensorGroup
-from .magnet import Magnet
-from .fieldquantity import FieldQuantity
 from .ferromagnet import Ferromagnet
+from .fieldquantity import FieldQuantity
 from .interparameter import InterParameter
+from .magnet import Magnet
 from .parameter import Parameter
 from .scalarquantity import ScalarQuantity
 
 
 class Antiferromagnet(Magnet):
     """Create an antiferromagnet instance."""
+
     def __init__(self, world, grid, name="", geometry=None, regions=None):
-        """        
-        This class can also be used to create a Ferrimagnet instance since
+        """
+        Can also be used to create a Ferrimagnet instance since
         both sublattices are independently modifiable.
 
         Parameters
@@ -30,21 +31,24 @@ class Antiferromagnet(Magnet):
         geometry : None, ndarray, or callable (default=None)
             The geometry of the antiferromagnet can be set in three ways.
 
-            1. If the geometry contains all cells in the grid, then use None (the default)
+            1. If the geometry contains all cells in the grid, then use None
+               (the default)
             2. Use an ndarray which specifies for each cell whether or not it is in the
                geometry.
-            3. Use a function which takes x, y, and z coordinates as arguments and returns
-               true if this position is inside the geometry and false otherwise.
+            3. Use a function which takes x, y, and z coordinates as arguments and
+               returns true if this position is inside the geometry and false otherwise.
 
         regions : None, ndarray, or callable (default=None)
-            The regional structure of an antiferromagnet can be set in the same three ways
-            as the geometry. This parameter indexes each grid cell to a certain region.
+            The regional structure of an antiferromagnet can be set in the same three
+            ways as the geometry. This parameter indexes each grid cell to a certain
+            region.
         name : str (default="")
-            The antiferromagnet's identifier. If the name is empty (the default), a name for the
-            antiferromagnet will be created.
+            The antiferromagnet's identifier. If the name is empty (the default), a name
+            for the antiferromagnet will be created.
         """
-        super().__init__(world._impl.add_antiferromagnet,
-                         world, grid, name, geometry, regions)
+        super().__init__(
+            world._impl.add_antiferromagnet, world, grid, name, geometry, regions
+        )
 
     def __repr__(self):
         """Return Antiferromagnet string representation."""
@@ -52,15 +56,15 @@ class Antiferromagnet(Magnet):
 
     def __setattr__(self, name, value):
         """Set AFM or sublattice properties.
-        
-            If the AFM doesn't have the named attribute, then the corresponding
-            attributes of both sublattices are set.
-            e.g. to set the saturation magnetization of both sublattices to the
-            same value, one could use:
-                antiferromagnet.msat = 800e3
-            which is equal to
-                antiferromagnet.sub1.msat = 800e3
-                antiferromagnet.sub2.msat = 800e3
+
+        If the AFM doesn't have the named attribute, then the corresponding
+        attributes of both sublattices are set.
+        e.g. to set the saturation magnetization of both sublattices to the
+        same value, one could use:
+            antiferromagnet.msat = 800e3
+        which is equal to
+            antiferromagnet.sub1.msat = 800e3
+            antiferromagnet.sub2.msat = 800e3
         """
         if hasattr(Antiferromagnet, name) or name == "_impl":
             # set attribute of yourself, without causing recursion
@@ -70,25 +74,28 @@ class Antiferromagnet(Magnet):
             setattr(self.sub2, name, value)
         else:
             raise AttributeError(
-                r'Both Antiferromagnet and Ferromagnet have no attribute "{}".'.format(name))
+                r'Both Antiferromagnet and Ferromagnet have no attribute "{}".'.format(
+                    name
+                )
+            )
 
     @property
     def sub1(self) -> Ferromagnet:
         """First sublattice instance."""
         return Ferromagnet._from_impl(self._impl.sub1())
-    
+
     @property
     def sub2(self) -> Ferromagnet:
         """Second sublattice instance."""
         return Ferromagnet._from_impl(self._impl.sub2())
-    
+
     @property
     def sublattices(self) -> tuple[Ferromagnet]:
-        """Both sublattice instances"""
+        """Return both sublattice instances"""
         return (self.sub1, self.sub2)
 
     def other_sublattice(self, sub: "Ferromagnet") -> Ferromagnet:
-        """Returns sister sublattice of given sublattice."""
+        """Return sister sublattice of given sublattice."""
         return Ferromagnet._from_impl(self._impl.other_sublattice(sub._impl))
 
     @property
@@ -160,11 +167,13 @@ class Antiferromagnet(Magnet):
         minimize
         """
         if tol >= 1e-5:
-            warnings.warn("The set tolerance is greater than or equal to the default value"
-                          + " used for the timesolver (1e-5). Using this value results"
-                          + " in no torque minimization, only energy minimization.", UserWarning)
+            warnings.warn(
+                "The set tolerance is greater than or equal to the default value"
+                + " used for the timesolver (1e-5). Using this value results"
+                + " in no torque minimization, only energy minimization.",
+                UserWarning,
+            )
         self._impl.relax(tol)
-
 
     # ----- MATERIAL PARAMETERS -----------
 
@@ -174,7 +183,7 @@ class Antiferromagnet(Magnet):
         This parameter plays the role of exchange constant of
         the antiferromagnetic homogeneous exchange interaction
         in a single simulation cell.
-        
+
         See Also
         --------
         afmex_nn
@@ -191,11 +200,14 @@ class Antiferromagnet(Magnet):
             warn = self.afmex_cell.uniform_value > 0
         elif _np.any(self.afmex_cell.eval() > 0):
             warn = True
-        
+
         if warn:
-            warnings.warn("The antiferromagnetic exchange constant afmex_cell"
-                          + " is set to a positive value, instead of negative (or zero)."
-                          + " Make sure this is intentional!", UserWarning)
+            warnings.warn(
+                "The antiferromagnetic exchange constant afmex_cell"
+                + " is set to a positive value, instead of negative (or zero)."
+                + " Make sure this is intentional!",
+                UserWarning,
+            )
 
     @property
     def afmex_nn(self) -> Parameter:
@@ -203,7 +215,7 @@ class Antiferromagnet(Magnet):
         This parameter plays the role of exchange constant of
         the antiferromagnetic inhomogeneous exchange interaction
         between neighbouring simulation cells.
-        
+
         See Also
         --------
         afmex_cell
@@ -219,11 +231,14 @@ class Antiferromagnet(Magnet):
             warn = self.afmex_nn.uniform_value > 0
         elif _np.any(self.afmex_nn.eval() > 0):
             warn = True
-        
+
         if warn:
-            warnings.warn("The antiferromagnetic exchange constant afmex_nn"
-                          + " is set to a positive value, instead of negative (or zero)."
-                          + " Make sure this is intentional!", UserWarning)
+            warnings.warn(
+                "The antiferromagnetic exchange constant afmex_nn"
+                + " is set to a positive value, instead of negative (or zero)."
+                + " Make sure this is intentional!",
+                UserWarning,
+            )
 
     @property
     def inter_afmex_nn(self) -> InterParameter:
@@ -235,7 +250,7 @@ class Antiferromagnet(Magnet):
         is wanted, set `scale_afmex_nn` to zero.
 
         This parameter should be set with
-        
+
         >>> magnet.inter_afmex_nn.set_between(region1, region2, value)
 
         See Also
@@ -247,9 +262,12 @@ class Antiferromagnet(Magnet):
     @inter_afmex_nn.setter
     def inter_afmex_nn(self, value):
         if value > 0:
-            warnings.warn("The antiferromagnetic exchange constant inter_afmex_nn"
-                          + " is set to a positive value, instead of negative (or zero)."
-                          + " Make sure this is intentional!", UserWarning)
+            warnings.warn(
+                "The antiferromagnetic exchange constant inter_afmex_nn"
+                + " is set to a positive value, instead of negative (or zero)."
+                + " Make sure this is intentional!",
+                UserWarning,
+            )
         self.inter_afmex_nn.set(value)
 
     @property
@@ -263,7 +281,7 @@ class Antiferromagnet(Magnet):
         automatically set to zero when `inter_afmex_nn` is not.
 
         This parameter should be set with
-        
+
         >>> magnet.scale_afmex_nn.set_between(region1, region2, value)
 
         See Also
@@ -292,7 +310,7 @@ class Antiferromagnet(Magnet):
         afmex_cell
         """
         return Parameter(self._impl.latcon)
-    
+
     @latcon.setter
     def latcon(self, value):
         self.latcon.set(value)
@@ -310,7 +328,7 @@ class Antiferromagnet(Magnet):
         -------
         DmiTensor
             The DMI tensor of this Antiferromagnet.
-        
+
         See Also
         --------
         DmiTensor, dmi_tensors, dmi_vector
@@ -319,37 +337,39 @@ class Antiferromagnet(Magnet):
 
     @property
     def dmi_tensors(self) -> DmiTensorGroup:
-        """ Returns the DMI tensor of self, self.sub1 and self.sub2.
+        """Returns the DMI tensor of self, self.sub1 and self.sub2.
 
         This group can be used to set the intersublattice and both intrasublattice
         DMI tensors at the same time.
 
         For example, to set interfacial DMI in the whole system to the same value,
         one could use
-        
+
         >>> magnet = Antiferromagnet(world, grid)
         >>> magnet.dmi_tensors.set_interfacial_dmi(1e-3)
 
         Or to set an individual tensor element, one could use
-        
+
         >>> magnet.dmi_tensors.xxy = 1e-3
 
         See Also
         --------
         DmiTensor, dmi_tensor, dmi_vector
         """
-        return DmiTensorGroup([self.dmi_tensor, self.sub1.dmi_tensor, self.sub2.dmi_tensor])
+        return DmiTensorGroup(
+            [self.dmi_tensor, self.sub1.dmi_tensor, self.sub2.dmi_tensor]
+        )
 
     @property
     def dmi_vector(self):
-        """ DMI vector D (J/m³) associated with the homogeneous DMI (in a single simulation cell),
-         defined by the energy density ε = D . (m1 x m2) with m1 and m2 being the sublattice
-         magnetizations.
+        """DMI vector D (J/m³) associated with the homogeneous DMI (in a single
+        simulation cell), defined by the energy density ε = D . (m1 x m2) with m1 and m2
+        being the sublattice magnetizations.
 
         See Also
         --------
         DmiTensor, dmi_tensor, dmi_tensors
-         """
+        """
         return Parameter(self._impl.dmi_vector)
 
     @dmi_vector.setter
@@ -364,17 +384,17 @@ class Antiferromagnet(Magnet):
         (msat1*m1 - msat2*m2) / (msat1 + msat2)
         """
         return FieldQuantity(_cpp.neel_vector(self._impl))
-    
+
     @property
     def full_magnetization(self) -> FieldQuantity:
         """Full antiferromagnetic magnetization M1 + M2 (A/m).
-        
+
         See Also
         --------
         Ferromagnet.full_magnetization
         """
         return FieldQuantity(_cpp.full_magnetization(self._impl))
-    
+
     @property
     def angle_field(self) -> FieldQuantity:
         """Returns the deviation from the optimal angle (180°) between
@@ -387,7 +407,7 @@ class Antiferromagnet(Magnet):
         afmex_cell
         """
         return FieldQuantity(_cpp.angle_field(self._impl))
-    
+
     @property
     def max_intracell_angle(self) -> ScalarQuantity:
         """The maximal deviation from 180° between AFM-exchange coupled magnetization
@@ -406,11 +426,12 @@ class Antiferromagnet(Magnet):
         """Total energy density of both sublattices combined (J/m³). Kinetic and
         elastic energy densities of the antiferromagnet are also included if
         elastodynamics is enabled.
-        
+
         See Also
         --------
         total_energy
-        Magnet.enable_elastodynamics, Magnet.elastic_energy_density, Magnet.kinetic_energy_density
+        Magnet.enable_elastodynamics, Magnet.elastic_energy_density,
+        Magnet.kinetic_energy_density
         """
         return FieldQuantity(_cpp.total_energy_density(self._impl))
 
@@ -419,7 +440,7 @@ class Antiferromagnet(Magnet):
         """Total energy of both sublattices combined (J). Kinetic and elastic
         energies of the antiferromagnet are also included if elastodynamics is
         enabled.
-        
+
         See Also
         --------
         total_energy_density

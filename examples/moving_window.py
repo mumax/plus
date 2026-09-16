@@ -10,12 +10,12 @@ The moving window functionality only works properly if
 - The magnet has no geometry
 - The magnet has no regions
 """
-from mumaxplus import World, Grid, Ferromagnet
-from mumaxplus.util import twodomain, plot_field
-
+from matplotlib.animation import FFMpegWriter, FuncAnimation
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, FFMpegWriter
 import numpy as np
+
+from mumaxplus import Ferromagnet, Grid, World
+from mumaxplus.util import plot_field, twodomain
 
 # ----------- Material and simulation parameters -----------
 cs = 1e-9
