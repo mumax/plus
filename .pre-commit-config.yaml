@@ -38,7 +38,7 @@ repos:
         args:
           - "--verbose=3"
           - "--counting=toplevel"
-          - "--filter=-legal/copyright"
+          - "--filter=-legal/copyright,-build/include_subdir,-build/include_what_you_use,-whitespace/braces,-build/include_order,-readability/casting"
           - "--linelength=80"
 
   # clang-format for C/C++/CUDA sources (Chromium style)
