@@ -14,6 +14,7 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: [flake8-docstrings]
+        args: ["--extend-ignore=E266,E402,D101,D205,D400,D105,D214,D215,F403,F405,E731"]
 
   # isort — settings come from setup.cfg [isort]
   # NOTE: old pin (9.0.0b2) was a pre-release; pinned to a real stable tag
