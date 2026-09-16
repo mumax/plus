@@ -8,6 +8,8 @@ import sys
 
 from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 
 
 class CMakeExtension(Extension):
@@ -96,6 +98,31 @@ class CMakeBuild(build_ext):
                 + build_args,
                 cwd=build_temp,
             )
+
+
+def _install_precommit_hook():
+    """Best-effort install of the pre-commit git hook after setup."""
+    try:
+        subprocess.run(["pre-commit", "install"], check=True)
+    except FileNotFoundError:
+        print(
+            "Note: 'pre-commit' executable not found; skipping git hook install. "
+            "Make sure your conda env is active and includes pre-commit."
+        )
+    except subprocess.CalledProcessError:
+        print("Warning: 'pre-commit install' failed; hook was not installed.")
+
+
+class DevelopWithPreCommit(develop):
+    def run(self):
+        develop.run(self)
+        _install_precommit_hook()
+
+
+class InstallWithPreCommit(install):
+    def run(self):
+        install.run(self)
+        _install_precommit_hook()
 
 
 setup(
