@@ -103,7 +103,17 @@ class CMakeBuild(build_ext):
 def _install_precommit_hook():
     """Best-effort install of the pre-commit git hook after setup."""
     try:
-        subprocess.run(["pre-commit", "install"], check=True)
+        subprocess.run(
+            [
+                "pre-commit",
+                "install",
+                "--hook-type",
+                "pre-commit",
+                "--hook-type",
+                "pre-push",
+            ],
+            check=True,
+        )
     except FileNotFoundError:
         print(
             "Note: 'pre-commit' executable not found; skipping git hook install. "
