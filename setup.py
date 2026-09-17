@@ -102,6 +102,12 @@ class CMakeBuild(build_ext):
 
 def _install_precommit_hook():
     """Best-effort install of the pre-commit git hook after setup."""
+    env = os.environ.copy()
+    # Remove pip build-isolation leftovers so the pre-commit
+    # subprocess can see the real environment's site-packages.
+    env.pop("PYTHONPATH", None)
+    env.pop("PYTHONNOUSERSITE", None)
+
     try:
         subprocess.run(
             [
@@ -113,6 +119,7 @@ def _install_precommit_hook():
                 "pre-push",
             ],
             check=True,
+            env=env,
         )
     except FileNotFoundError:
         print(
@@ -142,6 +149,10 @@ setup(
         CMakeExtension("_mumaxpluscpp_single"),
         CMakeExtension("_mumaxpluscpp_double"),
     ],
-    cmdclass=dict(build_ext=CMakeBuild),
+    cmdclass=dict(
+        build_ext=CMakeBuild,
+        install=InstallWithPreCommit,
+        develop=DevelopWithPreCommit,
+    ),
     zip_safe=False,
 )
