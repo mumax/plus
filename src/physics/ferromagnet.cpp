@@ -108,9 +108,9 @@ bool Ferromagnet::isSublattice() const {
 void Ferromagnet::minimize(real tol, int nSamples, real tolEl, int nSamplesEl,
                            real stepsizeEl, real stepsizeElFallback,
                            int maxSteps, int rigidBodyModesInterval, int rigidBodyModesDelay,
-                           int rigidBodyModesMethod) {
+                           int initialRot) {
   Minimizer minimizer(this, tol, nSamples, tolEl, nSamplesEl, stepsizeEl, stepsizeElFallback,
-                      maxSteps, rigidBodyModesInterval, rigidBodyModesDelay, rigidBodyModesMethod);
+                      maxSteps, rigidBodyModesInterval, rigidBodyModesDelay, initialRot);
   minimizer.exec();
 }
 

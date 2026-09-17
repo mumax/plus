@@ -99,7 +99,7 @@ class MumaxWorld : public World {
               real tolEl = 1e-6, int nSamplesEl = 10,
               real stepsizeEl = 1e-30, real stepsizeElFallback = 1e-30,
               int maxSteps = 200000, int rigidBodyModesInterval = 1, int rigidBodyModesDelay = 0,
-              int rigidBodyModesMethod = 0);
+              int initialRot = 0);
   /** Relax the current state of the world with every magnet in it. */
   void relax(real tol);
   real RelaxTorqueThreshold;

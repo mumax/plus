@@ -125,58 +125,37 @@ class NcAfm(Magnet):
         self.sub2.enable_demag = value
         self.sub3.enable_demag = value
 
-    def minimize(self, tol=1e-6, nsamples=30, tol_el=1e-6, nsamples_el=30,
-                stepsize_el=1e-30, stepsize_el_fallback=1e-30,
-                max_steps=200000, rigid_body_modes_interval=1,
-                rigid_body_modes_delay=0, rigid_body_modes_method=0):
+    def minimize(self, tol=1e-6, nsamples=30, tol_el=1e-6, nsamples_el=30, stepsize_el=1e-30, stepsize_el_fallback=1e-30, 
+                 max_steps=200000, rigid_body_modes_interval=1, rigid_body_modes_delay=0, initial_rot=0):
         """Minimize the total energy.
 
-        Fast energy minimization, but less robust than `relax`
-        when starting from a high energy state. If elastodynamics is enabled, this simultaneously minimizes the
-        elastic displacement towards mechanical equilibrium (vanishing
-        effective body force), using its own independent convergence
-        check against `tol_el`/`nsamples_el`.
+        Fast energy minimization, but less robust than :func:`relax`
+        when starting from a high energy state. If elastodynamics is enabled,
+        this simultaneously minimizes the elastic displacement towards mechanical 
+        equilibrium (minimal effective body force), using its own independent convergence check.
 
         Parameters
         ----------
         tol : int / float (default=1e-6)
             The maximum allowed difference between consecutive magnetization
             evaluations when advancing toward an energy minimum.
+
         nsamples : int (default=30)
             The number of consecutive magnetization evaluations that must not
             differ by more than the tolerance "tol".
-        tol_el : int / float (default=1e-6)
-            The maximum allowed difference between consecutive elastic
-            displacement evaluations when advancing toward mechanical
-            equilibrium. Ignored if elastodynamics is disabled.
-        nsamples_el : int (default=30)
-            The number of consecutive elastic displacement evaluations that
-            must not differ by more than the tolerance "tol_el". 
-        stepsize_el : int / float (default=1e-30)
-            The initial stepsize used for the elastic system,
-            automatically updated after first step.
-        stepsize_el_fallback : int / float (default=1e-30)
-            Fallback stepsize if BB estimate is undefined, NaN, or infinite (e.g. zero denominator).
-        max_steps : int (default=200000)
-            The maximum number of steps to take before stopping,
-            regardless of convergence.
-        rigid_body_modes_interval : int (default=1)
-            How often (in steps) rigid-body translation and rotation modes
-            are projected out of the elastic displacement and force. A
-            value of 1 removes them every step, n removes them every n
-            steps, and 0 disables removal entirely. 
-        rigid_body_modes_delay : int (default=0)
-            The number of steps to wait before rigid-body-mode removal
-            begins, regardless of "rigid_body_modes_interval". 
-        
 
+        tol_el : int / float (default=1e-6), nsamples_el : int (default=30), stepsize_el : int / float (default=1e-30),
+        stepsize_el_fallback : int / float (default=1e-30), max_steps : int (default=200000), 
+        rigid_body_modes_interval : int (default=1), rigid_body_modes_delay : int (default=0), initial_rot : int (default=0)
+            Settings that control the behavior of the elastic portion of the minimizer. 
+            See world.py for in depth descriptions of each setting. Ignored if elastodynamics is disabled.
 
         See Also
         --------
         relax
         """
-        self._impl.minimize(tol, nsamples, tol_el, nsamples_el,
-                            stepsize_el, stepsize_el_fallback, max_steps, rigid_body_modes_interval, rigid_body_modes_delay, rigid_body_modes_method)
+        self._impl.minimize(tol, nsamples, tol_el, nsamples_el, stepsize_el, stepsize_el_fallback, max_steps,
+                             rigid_body_modes_interval, rigid_body_modes_delay, initial_rot)
 
     def relax(self, tol=1e-9):
         """Relax the state to an energy minimum.

@@ -117,42 +117,37 @@ class Antiferromagnet(Magnet):
         self.sub1.enable_demag = value
         self.sub2.enable_demag = value
 
-    def minimize(self, tol=1e-6, nsamples=20, tol_el=1e-6, nsamples_el=20,
-                stepsize_el=1e-30, stepsize_el_fallback=1e-30,max_steps=200000, rigid_body_modes_interval=1, rigid_body_modes_delay=0,
-                rigid_body_modes_method=0):
+    def minimize(self, tol=1e-6, nsamples=20, tol_el=1e-6, nsamples_el=20, stepsize_el=1e-30, stepsize_el_fallback=1e-30,
+                 max_steps=200000, rigid_body_modes_interval=1, rigid_body_modes_delay=0, initial_rot=0):
         """Minimize the total energy.
 
         Fast energy minimization, but less robust than :func:`relax`
-        when starting from a high energy state.
-
-        If elastodynamics is enabled, this simultaneously minimizes the
-        elastic displacement towards mechanical equilibrium (vanishing
-        effective body force), using its own independent convergence
-        check against `tol_el`/`nsamples_el`.
+        when starting from a high energy state. If elastodynamics is enabled,
+        this simultaneously minimizes the elastic displacement towards mechanical 
+        equilibrium (minimal effective body force), using its own independent convergence check.
 
         Parameters
         ----------
         tol : int / float (default=1e-6)
             The maximum allowed difference between consecutive magnetization
             evaluations when advancing toward an energy minimum.
+
         nsamples : int (default=20)
             The number of consecutive magnetization evaluations that must not
             differ by more than the tolerance "tol".
-        tol_el : int / float (default=1e-6)
-            The maximum allowed difference between consecutive elastic
-            displacement evaluations when advancing toward mechanical
-            equilibrium. Ignored if elastodynamics is disabled.
-        nsamples_el : int (default=20)
-            The number of consecutive elastic displacement evaluations that
-            must not differ by more than the tolerance "tol_el". Ignored if
-            elastodynamics is disabled.
+
+        tol_el : int / float (default=1e-6), nsamples_el : int (default=20), stepsize_el : int / float (default=1e-30),
+        stepsize_el_fallback : int / float (default=1e-30), max_steps : int (default=200000), 
+        rigid_body_modes_interval : int (default=1), rigid_body_modes_delay : int (default=0), initial_rot : int (default=0)
+            Settings that control the behavior of the elastic portion of the minimizer. 
+            See world.py for in depth descriptions of each setting. Ignored if elastodynamics is disabled.
 
         See Also
         --------
         relax
         """
-        self._impl.minimize(tol, nsamples, tol_el, nsamples_el,
-                            stepsize_el, stepsize_el_fallback, max_steps, rigid_body_modes_interval, rigid_body_modes_delay, rigid_body_modes_method)
+        self._impl.minimize(tol, nsamples, tol_el, nsamples_el, stepsize_el, stepsize_el_fallback, max_steps,
+                             rigid_body_modes_interval, rigid_body_modes_delay, initial_rot)
 
     def relax(self, tol=1e-9):
         """Relax the state to an energy minimum.

@@ -134,7 +134,7 @@ void wrap_world(py::module& m) {
            py::arg("max_steps"),
            py::arg("rigid_body_modes_interval"),
            py::arg("rigid_body_modes_delay"),
-           py::arg("rigid_body_modes_method"))
+           py::arg("initial_rot"))
       .def("relax", &MumaxWorld::relax, py::arg("tol"))
 
       // PBC

@@ -211,11 +211,11 @@ void MumaxWorld::cleanElasticRigidModesCallback() const {
     const RigidBodyGeometry& geom = it->second;
 
     Field u = magnet->elasticDisplacement()->eval();
-    removeRigidBodyModes(u, geom, magnet, /*isForce=*/false);
+    removeRigidBodyModes(u, geom, magnet, true);
     magnet->elasticDisplacement()->set(u);
 
     Field v = magnet->elasticVelocity()->eval();
-    removeRigidBodyModes(v, geom, magnet, /*isForce=*/false);
+    removeRigidBodyModes(v, geom, magnet, true);
     magnet->elasticVelocity()->set(v);
   }
 }
@@ -223,9 +223,9 @@ void MumaxWorld::cleanElasticRigidModesCallback() const {
 void MumaxWorld::minimize(real tol, int nSamples, real tolEl, int nSamplesEl,
                            real stepsizeEl, real stepsizeElFallback,
                            int maxSteps, int rigidBodyModesInterval, int rigidBodyModesDelay,
-                           int rigidBodyModesMethod) {
+                           int initialRot) {
   Minimizer minimizer(this, tol, nSamples, tolEl, nSamplesEl, stepsizeEl, stepsizeElFallback,
-                      maxSteps, rigidBodyModesInterval, rigidBodyModesDelay, rigidBodyModesMethod);
+                      maxSteps, rigidBodyModesInterval, rigidBodyModesDelay, initialRot);
   minimizer.exec();
 }
 

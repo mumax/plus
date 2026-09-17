@@ -38,7 +38,7 @@ void wrap_ncafm(py::module& m) {
            py::arg("max_steps"),
            py::arg("rigid_body_modes_interval"),
            py::arg("rigid_body_modes_delay"),
-           py::arg("rigid_body_modes_method"))
+           py::arg("initial_rot"))
       .def("relax", &NcAfm::relax, py::arg("tol"));
 
   m.def("octupole_vector", &octupoleVectorQuantity);
