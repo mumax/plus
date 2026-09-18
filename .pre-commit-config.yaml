@@ -52,7 +52,7 @@ repos:
         language: system  # was "python" — that's wrong for a hook that just shells out to a system binary
         files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
         entry: clang-format
-        args: ["-i", "-style=Chromium"]
+        args: ["-i", "-style=file"]
 
   - repo: local
     hooks:
