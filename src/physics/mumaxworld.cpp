@@ -24,8 +24,6 @@
 #include "torque.hpp"
 #include "window.hpp"
 
-#include <iostream>
-
 MumaxWorld::MumaxWorld(real3 cellsize)
     : World(cellsize),
       biasMagneticField({0, 0, 0}),
