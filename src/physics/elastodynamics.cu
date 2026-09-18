@@ -11,6 +11,7 @@
 #include "magnetoelasticforce.hpp"
 #include "ncafm.hpp"
 #include "parameter.hpp"
+#include "rigidbodymodes.hpp"
 
 
 bool elasticityAssuredZero(const Magnet* magnet) {
@@ -74,11 +75,14 @@ __global__ void k_divideByParam(CuField field, const CuParameter param) {
 
 Field evalElasticAcceleration(const Magnet* magnet) {
   Field aField = evalEffectiveBodyForce(magnet) + evalElasticDamping(magnet);
-  
+
   // divide by rho if possible
   if (!magnet->rho.assuredZero())
     cudaLaunch(aField.grid().ncells(), k_divideByParam,
                aField.cu(), magnet->rho.cu());
+
+  if (magnet->cleanElasticRigidModes())
+    removeRigidBodyModes(aField, magnet->rigidBodyGeometry(), magnet, true,"a");
 
   return aField;
 }
