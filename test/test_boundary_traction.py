@@ -7,7 +7,7 @@ C11, C12, C44 = (
     300e-9,
     110e-9,
     60e-9,
-)  # not explicitely used, but avoids assuredZero checks
+)  # not explicitly used, but avoids assuredZero checks
 cx, cy, cz = 1e-9, 2e-9, 3e-9  # non-equal cell sizes
 
 nx, ny, nz = 32, 16, 8

@@ -52,39 +52,33 @@ def compute_inhomo_exchange_numpy(magnet, sub2, sub3):
 
     m2_ = np.roll(m2, 1, axis=1)
     m3_ = np.roll(m3, 1, axis=1)
-    h_exch[:, 1:, :, :] += ((m2_ - m2)[:, 1:, :, :] + (m3_ - m3)[:, 1:, :, :]) / (
-        cellsize[2] ** 2
-    )
+    h_exch[:, 1:, :, :] += ((m2_ - m2)[:, 1:, :, :] + (m3_ - m3)[:, 1:, :, :]) \
+                         / (cellsize[2] ** 2)  # fmt: skip
 
     m2_ = np.roll(m2, -1, axis=1)
     m3_ = np.roll(m3, -1, axis=1)
-    h_exch[:, :-1, :, :] += ((m2_ - m2)[:, :-1, :, :] + (m3_ - m3)[:, :-1, :, :]) / (
-        cellsize[2] ** 2
-    )
+    h_exch[:, :-1, :, :] += ((m2_ - m2)[:, :-1, :, :] + (m3_ - m3)[:, :-1, :, :]) \
+                          / (cellsize[2] ** 2)  # fmt: skip
 
     m2_ = np.roll(m2, 1, axis=2)
     m3_ = np.roll(m3, 1, axis=2)
-    h_exch[:, :, 1:, :] += ((m2_ - m2)[:, :, 1:, :] + (m3_ - m3)[:, :, 1:, :]) / (
-        cellsize[1] ** 2
-    )
+    h_exch[:, :, 1:, :] += ((m2_ - m2)[:, :, 1:, :] + (m3_ - m3)[:, :, 1:, :]) \
+                         / (cellsize[1] ** 2)  # fmt: skip
 
     m2_ = np.roll(m2, -1, axis=2)
     m3_ = np.roll(m3, -1, axis=2)
-    h_exch[:, :, 0:-1, :] += ((m2_ - m2)[:, :, 0:-1, :] + (m3_ - m3)[:, :, 0:-1, :]) / (
-        cellsize[1] ** 2
-    )
+    h_exch[:, :, 0:-1, :] += ((m2_ - m2)[:, :, 0:-1, :] + (m3_ - m3)[:, :, 0:-1, :]) \
+                           / (cellsize[1] ** 2)  # fmt: skip
 
     m2_ = np.roll(m2, 1, axis=3)
     m3_ = np.roll(m3, 1, axis=3)
-    h_exch[:, :, :, 1:] += ((m2_ - m2)[:, :, :, 1:] + (m3_ - m3)[:, :, :, 1:]) / (
-        cellsize[0] ** 2
-    )
+    h_exch[:, :, :, 1:] += ((m2_ - m2)[:, :, :, 1:] + (m3_ - m3)[:, :, :, 1:]) \
+                         / (cellsize[0] ** 2)  # fmt: skip
 
     m2_ = np.roll(m2, -1, axis=3)
     m3_ = np.roll(m3, -1, axis=3)
-    h_exch[:, :, :, 0:-1] += ((m2_ - m2)[:, :, :, 0:-1] + (m3_ - m3)[:, :, :, 0:-1]) / (
-        cellsize[0] ** 2
-    )
+    h_exch[:, :, :, 0:-1] += ((m2_ - m2)[:, :, :, 0:-1] + (m3_ - m3)[:, :, :, 0:-1]) \
+                           / (cellsize[0] ** 2)  # fmt: skip
 
     return magnet.ncafmex_nn.average()[0] * h_exch / sub2.msat.average()[0]
 

@@ -943,7 +943,7 @@ class ObjShape(Shape):
         """Use a .obj file as a shape. Exactly two parameters of (min_point,
         max_point, center, scale, size) must be provided to define the bounding
         box. The object will be stretched to fill that box unless keep_aspect
-        is True. The inside of the object Return True, otherwise False.
+        is True. The inside of the object returns True, otherwise False.
 
         Parameters
         ----------
@@ -973,8 +973,8 @@ class ObjShape(Shape):
             you can set `rotate_z_up=True` to rotate your 3D object correctly
             in mumax, where the Z-axis represents the out-of-plane direction.
         """
-        # Only attempt import if this shape is used, since this is an optional
-        # dependency
+        # Only attempt import if this shape is used, since these are optional
+        # dependencies
         import pyvista as pv
         import trimesh
 
@@ -1005,9 +1005,8 @@ class ObjShape(Shape):
                     "time."
                 )
             scale = size / mesh_size
-        if (min_point is not None) + (max_point is not None) + (center is not None) + (
-            scale is not None
-        ) != 2:
+        if (min_point is not None) + (max_point is not None) + (center is not None) \
+           + (scale is not None) != 2:  # fmt: skip
             raise ValueError(
                 "Exactly 2 arguments of 'min_point', 'max_point', 'center' and "
                 "'scale'/'size' should be provided."

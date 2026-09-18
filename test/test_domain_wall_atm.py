@@ -79,13 +79,13 @@ def initialize_and_minimize(magnet, dw_comp):
 
     m = np.zeros(magnet.sub1.magnetization.shape)
     if dw_comp:
-        m[2, :, :, 0 : nx2 - dw2] = 1  # Left domain
-        m[dw_comp, :, :, nx2 - dw2 : nx2 + dw2] = -1  # Domain wall
-        m[2, :, :, nx2 + dw2 :] = -1  # Right domain
+        m[2, :, :, 0 : nx2 - dw2] = 1  # Left domain  # fmt: skip
+        m[dw_comp, :, :, nx2 - dw2 : nx2 + dw2] = -1  # Domain wall  # fmt: skip
+        m[2, :, :, nx2 + dw2 :] = -1  # Right domain  # fmt: skip
     else:
-        m[2, :, 0 : nx2 - dw2, :] = 1  # Left domain
-        m[dw_comp, :, nx2 - dw2 : nx2 + dw2, :] = -1  # Domain wall
-        m[2, :, nx2 + dw2 :, :] = -1  # Right domain
+        m[2, :, 0 : nx2 - dw2, :] = 1  # Left domain  # fmt: skip
+        m[dw_comp, :, nx2 - dw2 : nx2 + dw2, :] = -1  # Domain wall  # fmt: skip
+        m[2, :, nx2 + dw2 :, :] = -1  # Right domain  # fmt: skip
     magnet.sub1.magnetization = m
     magnet.sub2.magnetization = -m
     magnet.minimize()
