@@ -82,7 +82,7 @@ Field evalElasticAcceleration(const Magnet* magnet) {
                aField.cu(), magnet->rho.cu());
 
   if (magnet->cleanElasticRigidModes())
-    removeRigidBodyModes(aField, magnet->rigidBodyGeometry(), magnet, true,"a");
+    removeRigidBodyModes(aField, magnet->rigidBodyGeometry(), magnet, true);
 
   return aField;
 }
