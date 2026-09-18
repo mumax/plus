@@ -118,6 +118,10 @@ class TimeSolver:
             If None (default), the initial time step is set to a sensible value
             if adaptive timestepping is enabled, or remains unchanged if
             disabled.
+
+        See Also
+        --------
+        _assure_sensible_timestep
         """
         if initial_timestep is None:
             # Make sure we start stepping with a sensible timestep
