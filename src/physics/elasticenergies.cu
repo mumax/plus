@@ -96,8 +96,8 @@ Field evalElasticEnergyDensity(const Magnet* magnet) {
   }
 
   int ncells = elField.grid().ncells();
-  Field stress = evalStressTensor(magnet);
   Field strain = evalStrainTensor(magnet);
+  Field stress = evalStressTensor(magnet, &strain);
   cudaLaunch(ncells, k_elasticEnergyDensity, elField.cu(), stress.cu(), strain.cu());
   return elField;
 }

@@ -11,6 +11,7 @@
 #include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 #include "world.hpp"
 
 class Altermagnet;
@@ -128,6 +129,7 @@ class MumaxWorld : public World {
     magnets_[name] = raw;
 
     handleNewStrayfield(raw);
+    window_->setOrigin(int3_to_real3(grid.origin()) * this->cellsize());
     return raw;
   }
 
@@ -259,6 +261,10 @@ class MumaxWorld : public World {
 
   // --------------------------------------------------
 
+  // Moving simulation window
+  Window& window() const { return *window_; }
+  void centerDomainWall(int comp, int axis);
+
 
  private:
   std::map<std::string, Magnet*> magnets_;
@@ -267,4 +273,6 @@ class MumaxWorld : public World {
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
   std::map<std::string, std::unique_ptr<Altermagnet>> altermagnets_;
   std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
+
+  std::unique_ptr<Window> window_;
 };
