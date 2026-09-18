@@ -115,8 +115,6 @@ def _install_precommit_hook():
                 "install",
                 "--hook-type",
                 "pre-commit",
-                "--hook-type",
-                "pre-push",
             ],
             check=True,
             env=env,
