@@ -17,4 +17,4 @@ bool isUniformFieldComponent(const Field&, int);
 bool isUniformField(const Field&);
 bool geometriesOverlap(Grid grid1, bool const* geometry1,
                        Grid grid2, bool const* geometry2,
-                       int3 lo, int3 n);
+                       Grid overlapGrid);

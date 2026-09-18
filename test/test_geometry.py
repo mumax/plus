@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
-from mumaxplus.util.shape import Cuboid
-
+from mumaxplus.util.shape import Ellipsoid
 from mumaxplus import Ferromagnet, Grid, World
 
 
@@ -76,12 +75,27 @@ class TestGeometry:
             Ferromagnet(world, grid, geometry=np.ones(grid.shape)) 
 
     def test_overlap_fail_corner(self):
-            cs = 1e-9
-            world = World(cellsize=(cs, cs, cs))
-            grid1 = Grid((20, 20, 1))
+        cs = 1e-9
+        world = World(cellsize=(cs, cs, cs))
+        grid1 = Grid((20, 20, 1))
+
+        magnet = Ferromagnet(world, grid1)
     
-            magnet = Ferromagnet(world, grid1)
-        
-            with pytest.raises(Exception):
-                grid2 = Grid((20, 20, 1), origin=(19,19,0))
-                Ferromagnet(world, grid2, geometry=np.ones(grid2.shape)) 
+        with pytest.raises(Exception):
+            grid2 = Grid((20, 20, 1), origin=(19,19,0))
+            Ferromagnet(world, grid2, geometry=np.ones(grid2.shape)) 
+
+    def test_overlap_succeed_oval(self):
+        cs = 1e-9
+        ellipsoid_geom1 = Ellipsoid(15, 10, 5).translate(15/2,10/2,5/2)
+        ellipsoid_geom2 = Ellipsoid(10, 15, 3).translate(10/2,15/2,3/2)
+
+        world = World(cellsize=(cs, cs, cs))
+        grid1 = Grid((20, 20, 10))
+        grid2 = Grid((20, 20, 10), origin=(10,10,0))
+
+        magnet1 = Ferromagnet(world, grid1, geometry=ellipsoid_geom1)
+        magnet2 = Ferromagnet(world, grid2, geometry=ellipsoid_geom2) 
+
+        assert magnet1 is not None
+        assert magnet2 is not None

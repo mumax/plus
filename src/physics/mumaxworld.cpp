@@ -24,6 +24,8 @@
 #include "torque.hpp"
 #include "window.hpp"
 
+#include <iostream>
+
 MumaxWorld::MumaxWorld(real3 cellsize)
     : World(cellsize),
       biasMagneticField({0, 0, 0}),
@@ -38,7 +40,7 @@ MumaxWorld::MumaxWorld(real3 cellsize, Grid mastergrid, int3 pbcRepetitions)
 
 MumaxWorld::~MumaxWorld() {}
 
-void MumaxWorld::checkAddibility(Grid grid, GpuBuffer<bool> geometry, std::string name) const {
+void MumaxWorld::checkAddibility(Grid grid, const GpuBuffer<bool>& geometry, std::string name) const {
   if (!inMastergrid(grid)) {
       throw std::out_of_range(
           "Can not add magnet because the grid does not fit in the "
@@ -402,8 +404,10 @@ bool MumaxWorld::overlaps(Grid grid1, const GpuBuffer<bool>& geometry1,
          overlapMaximum.y - overlapOrigin.y,
          overlapMaximum.z - overlapOrigin.z};
 
+  Grid overlapGrid(overlapCells, overlapOrigin);
+
   // Check all cells in the overlapping box on GPU
-  return geometriesOverlap(grid1, hasGeo1 ? geometry1.get() : nullptr,
-                           grid2, hasGeo2 ? geometry2.get() : nullptr,
-                           overlapOrigin, overlapCells);
+  return geometriesOverlap(grid1, geometry1.get(),
+                           grid2, geometry2.get(),
+                           overlapGrid);
 }
