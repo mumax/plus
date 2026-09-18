@@ -23,6 +23,7 @@ class HostMagnet;
 class MumaxWorld;
 class NcAfm;
 class System;
+struct RigidBodyGeometry;
 
 class Magnet {
  friend class MumaxWorld;
@@ -69,6 +70,7 @@ class Magnet {
   std::unique_ptr<Variable> elasticVelocity_;
   bool enableElastodynamics_;
   bool cleanElasticRigidModes_ = false;
+  mutable std::unique_ptr<RigidBodyGeometry> rigidBodyGeometryCache_;
 
  public:
   bool enableAsStrayFieldSource;
@@ -77,10 +79,12 @@ class Magnet {
   void setEnableElastodynamics(bool);
   bool cleanElasticRigidModes() const {return cleanElasticRigidModes_;}
   void setCleanElasticRigidModes(bool value) {cleanElasticRigidModes_ = value;}
+  const RigidBodyGeometry& rigidBodyGeometry() const;
 
   // Elasticity
   const Variable* elasticDisplacement() const;
   const Variable* elasticVelocity() const;
+  
 
   VectorParameter externalBodyForce;  // Externally applied force density
   VectorParameter rigidNormStrain;

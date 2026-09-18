@@ -15,6 +15,7 @@
 #include "mumaxworld.hpp"
 #include "relaxer.hpp"
 #include "strayfield.hpp"
+#include "rigidbodymodes.hpp"
 
 Magnet::Magnet(std::shared_ptr<System> system_ptr,
                std::string name)
@@ -203,6 +204,14 @@ const Variable* Magnet::elasticVelocity() const {
   return elasticVelocity_.get();
 }
 
+const RigidBodyGeometry& Magnet::rigidBodyGeometry() const {
+  if (!rigidBodyGeometryCache_)
+    rigidBodyGeometryCache_ =
+        std::make_unique<RigidBodyGeometry>(computeRigidBodyGeometry(this));
+  return *rigidBodyGeometryCache_;
+}
+
+
 void Magnet::setEnableElastodynamics(bool value) {
   // if this is a ferromagnetic sublattice, stop!
   auto thisFM = this->asFM();
@@ -235,6 +244,7 @@ void Magnet::setEnableElastodynamics(bool value) {
       // free memory of unnecessary Variables
       elasticDisplacement_.reset();
       elasticVelocity_.reset();
+      rigidBodyGeometryCache_.reset();
     }
 
     this->mumaxWorld()->resetTimeSolverEquations();
