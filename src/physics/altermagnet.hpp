@@ -28,7 +28,7 @@ class Altermagnet : public HostMagnet {
   /** Empty destructor
    * Sublattices are destroyed automatically. They are not pointers.
    */
-  ~Altermagnet() override{};
+  ~Altermagnet() override = default;
 
   const Ferromagnet* sub1() const;
   const Ferromagnet* sub2() const;

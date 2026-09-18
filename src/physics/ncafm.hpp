@@ -27,7 +27,7 @@ class NcAfm : public HostMagnet {
   /** Empty destructor
    * Sublattices are destroyed automatically. They are not pointers.
    */
-  ~NcAfm() override{};
+  ~NcAfm() override = default;
 
   const Ferromagnet* sub1() const;
   const Ferromagnet* sub2() const;

@@ -1,3 +1,4 @@
+// clang-format off
 #pragma once
 
 #include <cuda_runtime_api.h>
