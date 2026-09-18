@@ -290,3 +290,54 @@ bool isUniformField(const Field& f) {
   }
   return true;
 }
+
+__global__ void k_geometriesOverlap(bool* result,
+                                     Grid grid1, bool const* geometry1,
+                                     Grid grid2, bool const* geometry2,
+                                     Grid overlapGrid) {
+  __shared__ bool sdata[BLOCKDIM];
+  int tid = threadIdx.x;
+
+  int ncells = overlapGrid.ncells();
+
+  bool found = false;
+  for (int i = tid; i < ncells; i += BLOCKDIM) {
+    int3 coo = overlapGrid.index2coord(i);
+
+    // Should always be true if there is no geometry
+    bool in1 = geometry1 ? geometry1[grid1.coord2index(coo)] : true;
+    bool in2 = geometry2 ? geometry2[grid2.coord2index(coo)] : true;
+
+    if (in1 && in2) {
+      found = true;
+      break;  // Once one overlap is found we can stop
+    }
+  }
+
+  sdata[tid] = found;
+  __syncthreads();
+
+  // Reduce the block
+  for (unsigned int s = BLOCKDIM / 2; s > 0; s >>= 1) {
+    if (tid < s)
+      sdata[tid] = sdata[tid] || sdata[tid + s];
+    __syncthreads();
+  }
+
+  if (tid == 0)
+    *result = sdata[0];
+}
+
+bool geometriesOverlap(Grid grid1, bool const* geometry1,
+                       Grid grid2, bool const* geometry2,
+                       Grid overlapGrid) {
+
+  GpuBuffer<bool> d_result(1);
+  cudaLaunchReductionKernel(k_geometriesOverlap, d_result.get(),
+                            grid1, geometry1, grid2, geometry2, overlapGrid);
+
+  bool result;
+  checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(bool),
+                                 cudaMemcpyDeviceToHost, getCudaStream()));
+  return result;
+}
