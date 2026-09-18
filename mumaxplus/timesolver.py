@@ -106,35 +106,86 @@ class TimeSolver:
         """
         self._impl.set_method(method_name)
 
-    def steps(self, nsteps):
-        """Make n steps with the time solver."""
-        # Make sure we start stepping with a sensible timestep
-        self._assure_sensible_timestep()
+    def steps(self, nsteps : int, initial_timestep: float | None = None):
+        """Make n steps with the time solver.
+        
+        Parameters
+        ----------
+        nsteps : int
+            The number of steps to take.
+        initial_timestep : float, optional
+            The time step is set to this value before running the solver.
+            If None (default), the initial time step is set to a sensible value
+            if adaptive timestepping is enabled, or remains unchanged if
+            disabled.
+
+        See Also
+        --------
+        _assure_sensible_timestep
+        """
+        if initial_timestep is None:
+            # Make sure we start stepping with a sensible timestep
+            self._assure_sensible_timestep()
+        else:
+            self.timestep = initial_timestep
+
         self._impl.steps(nsteps)
 
-    def run_while(self, condition: Callable[[], bool]):
+    def run_while(self, condition: Callable[[], bool],
+                  initial_timestep: float | None = None):
         """Run the solver while the evaluation of the condition is True.
 
         Parameters
         ----------
         condition : Callable[[], bool]
             Callable condition returning a boolean.
+        initial_timestep : float, optional
+            The time step is set to this value before running the solver.
+            If None (default), the initial time step is set to a sensible value
+            if adaptive timestepping is enabled, or remains unchanged if
+            disabled.
+
+        See Also
+        --------
+        run, solve
+        _assure_sensible_timestep
         """
-        self._assure_sensible_timestep()
+        if initial_timestep is None:
+            self._assure_sensible_timestep()
+        else:
+            self.timestep = initial_timestep
+        
         self._impl.run_while(condition)
 
-    def run(self, duration):
+    def run(self, duration: float, initial_timestep: float | None = None):
         """Run the solver for a given duration.
 
         Parameters
         ----------
         duration : float
             Duration in seconds.
+        initial_timestep : float, optional
+            The time step is set to this value before running the solver.
+            If None (default), the initial time step is set to a sensible value
+            if adaptive timestepping is enabled, or remains unchanged if
+            disabled.
+
+        See Also
+        --------
+        run_while, solve
+        _assure_sensible_timestep
         """
-        self._assure_sensible_timestep()
+        if initial_timestep is None:
+            self._assure_sensible_timestep()
+        else:
+            self.timestep = initial_timestep
+        
         self._impl.run(duration)
 
-    def solve(self, timepoints, quantity_dict, file_name=None, store_as_dict=True, tqdm=False) -> TimeSolverOutput:
+    def solve(self, timepoints, quantity_dict: dict,
+              file_name : str | None = None, store_as_dict: bool =True,
+              initial_timestep : float | None = None,
+              tqdm: bool = False) -> TimeSolverOutput:
         """Solve the differential equation.
 
         The functions collects values of a list of specified quantities
@@ -151,6 +202,11 @@ class TimeSolver:
             as tab-separated values during the simulation.
         store_as_dict : bool (default=True)
             Specify whether to store the evaluated quantities in an output dictionary.
+        initial_timestep : float, optional
+            The time step is set to this value before running the solver.
+            If None (default), the initial time step is set to a sensible value
+            if adaptive timestepping is enabled, or remains unchanged if
+            disabled.
         tqdm : bool (default=False)
             Prints tqdm progress bar if set to True.
 
@@ -159,12 +215,21 @@ class TimeSolver:
         output : TimeSolverOutput
             Collected values of specified quantities at specified timepoints.
             If store_as_dict=False, this returns None.
+
+        See Also
+        --------
+        run, run_while
+        _assure_sensible_timestep
         """
         # check if time points are increasing and lie in the future
         assert all(i1 <= i2 for i1, i2 in zip(timepoints, timepoints[1:])), "The list of timepoints should be increasing."
         assert self.time <= timepoints[0], "The list of timepoints should lie in the future."
 
-        self._assure_sensible_timestep()
+        if initial_timestep is None:
+            self._assure_sensible_timestep()
+        else:
+            self.timestep = initial_timestep
+
         output = TimeSolverOutput(quantity_dict, file_name, store_as_dict)
 
         if tqdm: timepoints = _tqdm(timepoints)
