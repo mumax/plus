@@ -102,12 +102,10 @@ void NormalizedVariable::set(real3 value) const {
   Variable::set(normalized(value));
 }
 
-void NormalizedVariable::setInRegion(const unsigned int region_idx,
-                                     real value) const {
+void NormalizedVariable::setInRegion(const unsigned int region_idx, real value) const {
   Variable::setInRegion(region_idx, 1);
 }
 
-void NormalizedVariable::setInRegion(const unsigned int region_idx,
-                                     real3 value) const {
+void NormalizedVariable::setInRegion(const unsigned int region_idx, real3 value) const {
   Variable::setInRegion(region_idx, normalized(value));
 }

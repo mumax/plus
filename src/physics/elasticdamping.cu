@@ -43,6 +43,5 @@ Field evalElasticDamping(const Magnet* magnet) {
 }
 
 M_FieldQuantity elasticDampingQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalElasticDamping, 3, "elastic_damping",
-                         "N/m3");
+  return M_FieldQuantity(magnet, evalElasticDamping, 3, "elastic_damping", "N/m3");
 }

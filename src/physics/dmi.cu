@@ -65,8 +65,7 @@ __global__ void k_dmiFieldFM(CuField hField,
 
     // If we assume open boundary conditions and if there is no neighbor,
     // then simply continue without adding to the effective field.
-    if (openBC &&
-        (!system.inGeometry(neighbor_coo) || msat.valueAt(neighbor_idx) == 0))
+    if (openBC && (!system.inGeometry(neighbor_coo) || msat.valueAt(neighbor_idx) == 0))
       continue;
 
     // Get the dmi strengths between the center cell and the neighbor, which are
@@ -234,12 +233,11 @@ __global__ void k_dmiFieldAFM(CuField hField,
         d_m2 = (m2 - m2__) / delta;
       }
       real Aex_nn = getExchangeStiffness(interExch.valueBetween(ridx, ridx__),
-                                         scaleExch.valueBetween(ridx, ridx__),
-                                         an, afmex_nn.valueAt(idx__));
-      m1_ =
-          m1 + (Aex_nn * cross(cross(d_m2, m1), m1) + Gamma1) * delta / (2 * a);
-      m2_ = m2 + (Aex_nn * cross(cross((m1_ - m1) / delta, m2), m2) + Gamma2) *
-                     delta / (2 * a);
+                                         scaleExch.valueBetween(ridx, ridx__), an,
+                                         afmex_nn.valueAt(idx__));
+      m1_ = m1 + (Aex_nn * cross(cross(d_m2, m1), m1) + Gamma1) * delta / (2 * a);
+      m2_ = m2 + (Aex_nn * cross(cross((m1_ - m1) / delta, m2), m2) + Gamma2) * delta /
+                     (2 * a);
     } else {
       m1_ = m1Field.vectorAt(neighbor_idx);
       m2_ = m2Field.vectorAt(neighbor_idx);
@@ -247,14 +245,11 @@ __global__ void k_dmiFieldAFM(CuField hField,
     bool ms1 = (msat.valueAt(neighbor_idx) != 0);
     bool ms2 = (msat2.valueAt(neighbor_idx) != 0);
     // Compute the effective field contribution of the DMI with the neighbor
-    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z) -
-            ms2 * (Dixy * m2_.y - Dixz * m2_.z)) /
+    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z) - ms2 * (Dixy * m2_.y - Dixz * m2_.z)) /
            delta;
-    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z) -
-            ms2 * (Diyx * m2_.x - Diyz * m2_.z)) /
+    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z) - ms2 * (Diyx * m2_.x - Diyz * m2_.z)) /
            delta;
-    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y) -
-            ms2 * (Dizx * m2_.x - Dizy * m2_.y)) /
+    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y) - ms2 * (Dizx * m2_.x - Dizy * m2_.y)) /
            delta;
   }  // end loop over neighbors
 
@@ -390,13 +385,11 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
         d_m3 = (m3 - m3__) / delta;
       }
       real Aex_nn = getExchangeStiffness(interExch.valueBetween(ridx, ridx__),
-                                         scaleExch.valueBetween(ridx, ridx__),
-                                         an, ncafmex_nn.valueAt(idx__));
-      m1_ =
-          m1 +
-          (Aex_nn * (cross(cross(d_m2, m1), m1) + cross(cross(d_m3, m1), m1)) +
-           Gamma1) *
-              delta / (2 * a);
+                                         scaleExch.valueBetween(ridx, ridx__), an,
+                                         ncafmex_nn.valueAt(idx__));
+      m1_ = m1 + (Aex_nn * (cross(cross(d_m2, m1), m1) + cross(cross(d_m3, m1), m1)) +
+                  Gamma1) *
+                     delta / (2 * a);
       m2_ = m2 + (Aex_nn * (cross(cross((m1_ - m1) / delta, m2), m2) +
                             cross(cross(d_m3, m2), m2)) +
                   Gamma2) *
@@ -416,16 +409,13 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
     bool ms3 = (msat3.valueAt(neighbor_idx) != 0);
 
     // Compute the effective field contribution of the DMI with the neighbor
-    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z) -
-            ms2 * (Dixy * m2_.y - Dixz * m2_.z) -
+    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z) - ms2 * (Dixy * m2_.y - Dixz * m2_.z) -
             ms3 * (Dixy * m3_.y - Dixz * m3_.z)) /
            delta;
-    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z) -
-            ms2 * (Diyx * m2_.x - Diyz * m2_.z) -
+    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z) - ms2 * (Diyx * m2_.x - Diyz * m2_.z) -
             ms3 * (Diyx * m3_.x - Diyz * m3_.z)) /
            delta;
-    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y) -
-            ms2 * (Dizx * m2_.x - Dizy * m2_.y) -
+    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y) - ms2 * (Dizx * m2_.x - Dizy * m2_.y) -
             ms3 * (Dizx * m3_.x - Dizy * m3_.y)) /
            delta;
   }  // end loop over neighbors
@@ -451,21 +441,18 @@ Field evalDmiField(const Ferromagnet* magnet) {
 
   if (!magnet->isSublattice()) {
     // magnet is stand-alone FM
-    cudaLaunch(ncells, k_dmiFieldFM, hField.cu(), mag, dmiTensor, msat, grid,
-               aex, BC);
+    cudaLaunch(ncells, k_dmiFieldFM, hField.cu(), mag, dmiTensor, msat, grid, aex, BC);
   } else if (magnet->hostMagnet()->sublattices().size() == 2) {
     // magnet is sublattice and has exactly 1 sister sublattice (AFM or ATM)
     auto host = magnet->hostMagnet();
-    auto mag2 =
-        host->getOtherSublattices(magnet)[0]->magnetization()->field().cu();
+    auto mag2 = host->getOtherSublattices(magnet)[0]->magnetization()->field().cu();
     auto afmex_nn = host->afmex_nn.cu();
     auto interDmiTensor = host->dmiTensor.cu();
     auto msat2 = host->getOtherSublattices(magnet)[0]->msat.cu();
     auto inter = host->interAfmExchNN.cu();
     auto scale = host->scaleAfmExchNN.cu();
-    cudaLaunch(ncells, k_dmiFieldAFM, hField.cu(), mag, mag2, dmiTensor,
-               interDmiTensor, msat, msat2, grid, aex, afmex_nn, inter, scale,
-               BC);
+    cudaLaunch(ncells, k_dmiFieldAFM, hField.cu(), mag, mag2, dmiTensor, interDmiTensor,
+               msat, msat2, grid, aex, afmex_nn, inter, scale, BC);
   } else if (magnet->hostMagnet()->sublattices().size() == 3) {
     // magnet is sublatice and has exactly 2 sister sublattices (NcAfm)
     auto m2 = magnet->hostMagnet()->getOtherSublattices(magnet)[0];
@@ -479,8 +466,8 @@ Field evalDmiField(const Ferromagnet* magnet) {
     auto inter = magnet->hostMagnet()->interAfmExchNN.cu();
     auto scale = magnet->hostMagnet()->scaleAfmExchNN.cu();
     cudaLaunch(ncells, k_dmiFieldNcAfm, hField.cu(), mag, mag2, mag3, dmiTensor,
-               interDmiTensor, msat, msat2, msat3, grid, aex, ncafmex_nn, inter,
-               scale, BC);
+               interDmiTensor, msat, msat2, msat3, grid, aex, ncafmex_nn, inter, scale,
+               BC);
   } else {
     throw std::invalid_argument(
         "Cannot calculate DMI field since magnet is neither "

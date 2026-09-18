@@ -28,6 +28,5 @@ FieldQuantityEvaluator<T> totalEnergyDensityQuantity(const T* magnet) {
 template <class T>
 ScalarQuantityEvaluator<T> totalEnergyQuantity(const T* magnet) {
   return ScalarQuantityEvaluator<T>(
-      magnet, [](const T* m) { return evalTotalEnergy(m); }, "total_energy",
-      "J");
+      magnet, [](const T* m) { return evalTotalEnergy(m); }, "total_energy", "J");
 }

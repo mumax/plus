@@ -2,6 +2,7 @@
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+
 #include <type_traits>
 
 #include "field.hpp"
@@ -34,9 +35,9 @@ py::array_t<T> fieldToArray(const Field& f) {
     delete[] data;
   });
 
-  int shape[4] = {
-      static_cast<int>(f.ncomp()), static_cast<int>(f.grid().size().z),
-      static_cast<int>(f.grid().size().y), static_cast<int>(f.grid().size().x)};
+  int shape[4] = {static_cast<int>(f.ncomp()), static_cast<int>(f.grid().size().z),
+                  static_cast<int>(f.grid().size().y),
+                  static_cast<int>(f.grid().size().x)};
 
   int strides[4];
   strides[0] = sizeof(T) * shape[3] * shape[2] * shape[1];

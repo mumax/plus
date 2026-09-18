@@ -78,8 +78,7 @@ __global__ void k_atmExchangeField(CuField hField,
   // SECOND ORDER DERIVATIVES
   // TODO: add proper (Neumann) BC once mixed derivative formulation is clear
 #pragma unroll
-  for (int3 rel_coo :
-       {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0}}) {
+  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0}}) {
     const int3 coo_ = mastergrid.wrap(coo + rel_coo);
     const int idx_ = grid.coord2index(coo_);
 
@@ -191,13 +190,13 @@ Field evalAtmExchangeField(const Ferromagnet* magnet) {
   auto scale2 = host->scaleAlterex_2.cu();
 
   if (host->getSublatticeIndex(magnet) == 0)
-    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(), mag, A1,
-               A2, angle, msat, magnet->world()->mastergrid(), w, inter1,
-               scale1, inter2, scale2);
+    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(), mag, A1, A2,
+               angle, msat, magnet->world()->mastergrid(), w, inter1, scale1, inter2,
+               scale2);
   else  // Switch A1 and A2
-    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(), mag, A2,
-               A1, angle, msat, magnet->world()->mastergrid(), w, inter2,
-               scale2, inter1, scale1);
+    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(), mag, A2, A1,
+               angle, msat, magnet->world()->mastergrid(), w, inter2, scale2, inter1,
+               scale1);
   return hField;
 }
 
@@ -216,8 +215,8 @@ real evalAtmExchangeEnergy(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity atmExchangeFieldQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalAtmExchangeField, 3,
-                          "anisotropic_exchange_field", "T");
+  return FM_FieldQuantity(magnet, evalAtmExchangeField, 3, "anisotropic_exchange_field",
+                          "T");
 }
 
 FM_FieldQuantity atmExchangeEnergyDensityQuantity(const Ferromagnet* magnet) {
@@ -226,6 +225,6 @@ FM_FieldQuantity atmExchangeEnergyDensityQuantity(const Ferromagnet* magnet) {
 }
 
 FM_ScalarQuantity atmExchangeEnergyQuantity(const Ferromagnet* magnet) {
-  return FM_ScalarQuantity(magnet, evalAtmExchangeEnergy,
-                           "anisotropic_exchange_energy", "J");
+  return FM_ScalarQuantity(magnet, evalAtmExchangeEnergy, "anisotropic_exchange_energy",
+                           "J");
 }

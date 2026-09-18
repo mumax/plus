@@ -20,8 +20,7 @@ void wrap_strayfield(py::module& m) {
              } else if (method == "brute") {
                strayField->setMethod(StrayFieldExecutor::METHOD_BRUTE);
              } else {
-               throw std::invalid_argument(
-                   "Method should be \"fft\" or \"brute\"");
+               throw std::invalid_argument("Method should be \"fft\" or \"brute\"");
              }
            })
       .def_property("order", &StrayField::order, &StrayField::setOrder)

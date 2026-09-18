@@ -32,8 +32,8 @@ void Parameter::set(real value) {
 void Parameter::set(const Field& values) {
   if (isUniformField(values)) {
     real* value = values.device_ptr(0);
-    checkCudaError(cudaMemcpy(&uniformValue_, value, sizeof(real),
-                              cudaMemcpyDeviceToHost));
+    checkCudaError(
+        cudaMemcpy(&uniformValue_, value, sizeof(real), cudaMemcpyDeviceToHost));
     if (staticField_) {
       delete staticField_;
       staticField_ = nullptr;
@@ -91,8 +91,7 @@ Field Parameter::eval() const {
 
 real Parameter::getUniformValue() const {
   if (!isUniform()) {
-    throw std::invalid_argument(
-        "Cannot get uniform value of non-uniform Parameter.");
+    throw std::invalid_argument("Cannot get uniform value of non-uniform Parameter.");
   }
   return uniformValue_;
 }
@@ -137,12 +136,12 @@ void VectorParameter::set(const Field& values) {
     real* valueY = values.device_ptr(1);
     real* valueZ = values.device_ptr(2);
 
-    checkCudaError(cudaMemcpy(&uniformValue_.x, valueX, sizeof(real),
-                              cudaMemcpyDeviceToHost));
-    checkCudaError(cudaMemcpy(&uniformValue_.y, valueY, sizeof(real),
-                              cudaMemcpyDeviceToHost));
-    checkCudaError(cudaMemcpy(&uniformValue_.z, valueZ, sizeof(real),
-                              cudaMemcpyDeviceToHost));
+    checkCudaError(
+        cudaMemcpy(&uniformValue_.x, valueX, sizeof(real), cudaMemcpyDeviceToHost));
+    checkCudaError(
+        cudaMemcpy(&uniformValue_.y, valueY, sizeof(real), cudaMemcpyDeviceToHost));
+    checkCudaError(
+        cudaMemcpy(&uniformValue_.z, valueZ, sizeof(real), cudaMemcpyDeviceToHost));
     if (staticField_) {
       delete staticField_;
       staticField_ = nullptr;
@@ -200,8 +199,7 @@ Field VectorParameter::eval() const {
 
 real3 VectorParameter::getUniformValue() const {
   if (!isUniform()) {
-    throw std::invalid_argument(
-        "Cannot get uniform value of non-uniform Parameter.");
+    throw std::invalid_argument("Cannot get uniform value of non-uniform Parameter.");
   }
   return uniformValue_;
 }

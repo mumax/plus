@@ -37,8 +37,7 @@ __global__ void k_homoDmiFieldAFM(CuField hField,
   real3 D = dmiVector.vectorAt(idx);
   real3 h0 = hField.vectorAt(idx);
 
-  hField.setVectorInCell(
-      idx, h0 + symmetry_factor * cross(D, m2) / msat.valueAt(idx));
+  hField.setVectorInCell(idx, h0 + symmetry_factor * cross(D, m2) / msat.valueAt(idx));
 }
 
 __global__ void k_homoDmiFieldNcAfm(CuField hField,
@@ -62,8 +61,7 @@ __global__ void k_homoDmiFieldNcAfm(CuField hField,
   real3 m2 = m2Field.vectorAt(idx);
   real3 m3 = m3Field.vectorAt(idx);
   real3 D = dmiVector.vectorAt(idx);
-  hField.setVectorInCell(
-      idx, symmetry_factor * cross(D, m2 - m3) / msat.valueAt(idx));
+  hField.setVectorInCell(idx, symmetry_factor * cross(D, m2 - m3) / msat.valueAt(idx));
 }
 
 Field evalHomoDmiField(const Ferromagnet* magnet) {
@@ -83,8 +81,7 @@ Field evalHomoDmiField(const Ferromagnet* magnet) {
   for (auto sub : subs) {
     auto m2 = sub->magnetization()->field().cu();
     real symmetry_factor = (i % 2 == 0) ? 1 : -1;
-    cudaLaunch(ncells, k_homoDmiFieldAFM, hField.cu(), m2, D, msat,
-               symmetry_factor);
+    cudaLaunch(ncells, k_homoDmiFieldAFM, hField.cu(), m2, D, msat, symmetry_factor);
     i += 1;
   }
   return hField;
@@ -109,8 +106,7 @@ real evalHomoDmiEnergy(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity homoDmiFieldQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalHomoDmiField, 3, "homogeneous_dmi_field",
-                          "T");
+  return FM_FieldQuantity(magnet, evalHomoDmiField, 3, "homogeneous_dmi_field", "T");
 }
 
 FM_FieldQuantity homoDmiEnergyDensityQuantity(const Ferromagnet* magnet) {
@@ -119,6 +115,5 @@ FM_FieldQuantity homoDmiEnergyDensityQuantity(const Ferromagnet* magnet) {
 }
 
 FM_ScalarQuantity homoDmiEnergyQuantity(const Ferromagnet* magnet) {
-  return FM_ScalarQuantity(magnet, evalHomoDmiEnergy, "homogeneous_dmi_energy",
-                           "J");
+  return FM_ScalarQuantity(magnet, evalHomoDmiEnergy, "homogeneous_dmi_energy", "J");
 }

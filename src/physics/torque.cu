@@ -53,8 +53,7 @@ Field evalLlgTorque(const Ferromagnet* magnet) {
   auto gamma = magnet->gamma.cu();
   auto frozenSpins = magnet->frozenSpins.cu();
   int ncells = torque.grid().ncells();
-  cudaLaunch(ncells, k_llgtorque, torque.cu(), m, h.cu(), alpha, gamma,
-             frozenSpins);
+  cudaLaunch(ncells, k_llgtorque, torque.cu(), m, h.cu(), alpha, gamma, frozenSpins);
   return torque;
 }
 
@@ -89,8 +88,7 @@ Field evalRelaxTorque(const Ferromagnet* magnet) {
   auto gamma = magnet->gamma.cu();
   auto frozenSpins = magnet->frozenSpins.cu();
   int ncells = torque.grid().ncells();
-  cudaLaunch(ncells, k_dampingtorque, torque.cu(), m, h.cu(), gamma,
-             frozenSpins);
+  cudaLaunch(ncells, k_dampingtorque, torque.cu(), m, h.cu(), gamma, frozenSpins);
   return torque;
 }
 
@@ -107,8 +105,7 @@ FM_FieldQuantity llgTorqueQuantity(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity relaxTorqueQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalRelaxTorque, 3, "damping_torque",
-                          "rad/s");
+  return FM_FieldQuantity(magnet, evalRelaxTorque, 3, "damping_torque", "rad/s");
 }
 
 FM_ScalarQuantity maxTorqueQuantity(const Ferromagnet* magnet) {

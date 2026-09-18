@@ -6,13 +6,7 @@
 
 #include "datatypes.hpp"
 
-enum class RKmethod {
-  HEUN,
-  BOGACKI_SHAMPINE,
-  CASH_KARP,
-  FEHLBERG,
-  DORMAND_PRINCE
-};
+enum class RKmethod { HEUN, BOGACKI_SHAMPINE, CASH_KARP, FEHLBERG, DORMAND_PRINCE };
 
 const std::map<RKmethod, std::string> RungeKuttaMethodNames{
     // clang-format off

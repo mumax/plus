@@ -38,9 +38,7 @@ __global__ void k_energyDensity(CuField edens,
   edens.setValueInCell(idx, 0, -prefactor * Ms * dot(m, h));
 }
 
-Field evalEnergyDensity(const Ferromagnet* magnet,
-                        const Field& h,
-                        real prefactor) {
+Field evalEnergyDensity(const Ferromagnet* magnet, const Field& h, real prefactor) {
   Field edens(magnet->system(), 1);
   if (magnet->msat.assuredZero()) {
     edens.makeZero();
@@ -119,11 +117,8 @@ Field evalTotalEnergyDensity(const HostMagnet* magnet) {
 
 real evalTotalEnergy(const Magnet* magnet) {
   if (const Ferromagnet* mag = magnet->asFM())
-    return energyFromEnergyDensity(
-        mag, totalEnergyDensityQuantity(mag).average()[0]);
+    return energyFromEnergyDensity(mag, totalEnergyDensityQuantity(mag).average()[0]);
   if (const HostMagnet* mag = magnet->asHost())
-    return energyFromEnergyDensity(
-        mag, totalEnergyDensityQuantity(mag).average()[0]);
-  throw std::invalid_argument(
-      "Cannot calculate energy of unknown magnet type.");
+    return energyFromEnergyDensity(mag, totalEnergyDensityQuantity(mag).average()[0]);
+  throw std::invalid_argument("Cannot calculate energy of unknown magnet type.");
 }

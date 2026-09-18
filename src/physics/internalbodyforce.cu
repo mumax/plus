@@ -75,13 +75,12 @@ __global__ void k_internalBodyForce(CuField fField,
                     + traction.getSide(i, -1).vectorAt(idx));
     } else if (!im1_inGeo) {
       // --11- left boundary, custom difference + traction BC,  ε ~ h^2
-      f += ws[i] *
-           (
-               // stress row at coo_i-1/2 = boundary traction * negative sense
-               // of normal vector -1 from stencil * -1 from normal vector
-               4. / 3. * traction.getSide(i, -1).vectorAt(idx) +
-               stressTensor.vectorAt(idx, stressRow)  // +3/3 weight
-               + 1. / 3. * stressTensor.vectorAt(coo_ip1, stressRow));
+      f += ws[i] * (
+                       // stress row at coo_i-1/2 = boundary traction * negative sense
+                       // of normal vector -1 from stencil * -1 from normal vector
+                       4. / 3. * traction.getSide(i, -1).vectorAt(idx) +
+                       stressTensor.vectorAt(idx, stressRow)  // +3/3 weight
+                       + 1. / 3. * stressTensor.vectorAt(coo_ip1, stressRow));
     } else if (!ip1_inGeo) {
       // -11-- right boundary, custom difference + traction BC,  ε ~ h^2
       f += ws[i] * (-1. / 3. * stressTensor.vectorAt(coo_im1, stressRow) -
@@ -119,13 +118,13 @@ Field evalInternalBodyForce(const Magnet* magnet) {
   real3 w = 1. / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
 
-  cudaLaunch(ncells, k_internalBodyForce, fField.cu(), stressTensor.cu(),
-             traction, w, mastergrid);
+  cudaLaunch(ncells, k_internalBodyForce, fField.cu(), stressTensor.cu(), traction, w,
+             mastergrid);
 
   return fField;
 }
 
 M_FieldQuantity internalBodyForceQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalInternalBodyForce, 3,
-                         "internal_body_force", "N/m3");
+  return M_FieldQuantity(magnet, evalInternalBodyForce, 3, "internal_body_force",
+                         "N/m3");
 }

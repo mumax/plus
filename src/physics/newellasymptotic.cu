@@ -4,9 +4,7 @@
     This method is based on the method used in OOMMF.
     https://math.nist.gov/~MDonahue/talks/mmm2020-talk.pdf
  */
-__host__ __device__ real calcAsymptoticNxx(int3 idx,
-                                           real3 cellsize,
-                                           int order) {
+__host__ __device__ real calcAsymptoticNxx(int3 idx, real3 cellsize, int order) {
   double hx2 = cellsize.x * cellsize.x;
   double hy2 = cellsize.y * cellsize.y;
   double hz2 = cellsize.z * cellsize.z;
@@ -582,9 +580,7 @@ __host__ __device__ real calcAsymptoticNxx(int3 idx,
 }
 
 // clang-format on
-__host__ __device__ real calcAsymptoticNxy(int3 idx,
-                                           real3 cellsize,
-                                           int order) {
+__host__ __device__ real calcAsymptoticNxy(int3 idx, real3 cellsize, int order) {
   double hx = cellsize.x;
   double hy = cellsize.y;
   double hz = cellsize.z;

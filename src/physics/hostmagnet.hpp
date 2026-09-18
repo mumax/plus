@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "dmitensor.hpp"
 #include "ferromagnet.hpp"
 #include "inter_parameter.hpp"

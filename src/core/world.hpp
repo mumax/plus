@@ -65,8 +65,7 @@ class World {
    * @throws std:invalid_argument Thrown when 0 in mastergrid does not match 0
    * in pbcRepetitions.
    */
-  void checkPbcCompatibility(const Grid mastergrid,
-                             const int3 pbcRepetitions) const;
+  void checkPbcCompatibility(const Grid mastergrid, const int3 pbcRepetitions) const;
 
   /** Return a reference to the world's timesolver. */
   TimeSolver& timesolver() const;

@@ -43,9 +43,8 @@ Field evalNeelvector(const HostMagnet* magnet) {
   auto sub1 = magnet->sublattices()[0];
   auto sub2 = magnet->sublattices()[1];
   cudaLaunch(neel.grid().ncells(), k_neelvector, neel.cu(),
-             sub1->magnetization()->field().cu(),
-             sub2->magnetization()->field().cu(), sub1->msat.cu(),
-             sub2->msat.cu());
+             sub1->magnetization()->field().cu(), sub2->magnetization()->field().cu(),
+             sub1->msat.cu(), sub2->msat.cu());
   return neel;
 }
 

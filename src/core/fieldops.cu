@@ -64,9 +64,8 @@ __global__ void k_addFields(CuField y,
 
   for (int c = 0; c < y.ncomp; c++) {
     int c_a2 = (a2.ncomp == y.ncomp) ? c : 0;
-    y.setValueInCell(
-        idx, c,
-        x1.valueAt(idx, c) + a2.valueAt(idx, c_a2) * x2.valueAt(idx, c));
+    y.setValueInCell(idx, c,
+                     x1.valueAt(idx, c) + a2.valueAt(idx, c_a2) * x2.valueAt(idx, c));
   }
 }
 
@@ -85,11 +84,7 @@ inline void add(Field& y, real a1, const Field& x1, real a2, const Field& x2) {
   cudaLaunch(ncells, k_addFields, y.cu(), a1, x1.cu(), a2, x2.cu());
 }
 
-inline void add(Field& y,
-                real3 a1,
-                const Field& x1,
-                real3 a2,
-                const Field& x2) {
+inline void add(Field& y, real3 a1, const Field& x1, real3 a2, const Field& x2) {
   if (x1.system() != y.system() || x2.system() != y.system()) {
     throw std::invalid_argument(
         "Fields can not be added together because they belong to different "
@@ -212,10 +207,7 @@ Field operator*(real a, const Field& x) {
   return add(0, x, a, x);
 }
 
-__global__ void k_addConstant(CuField y,
-                              const CuField x,
-                              real value,
-                              int comp) {
+__global__ void k_addConstant(CuField y, const CuField x, real value, int comp) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!y.cellInGeometry(idx))
     return;

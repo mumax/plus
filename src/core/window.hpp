@@ -1,10 +1,10 @@
 #pragma once
 
-#include "datatypes.hpp"
-#include "field.hpp"
-
 #include <array>
 #include <vector>
+
+#include "datatypes.hpp"
+#include "field.hpp"
 
 enum class Boundary { Left, Right };
 
@@ -17,9 +17,7 @@ class Window {
   // Set origin of the simulation window
   void setOrigin(real3 origin) { origin_ = origin; }
   // Set values to be inserted at the boundaries
-  void setMagValue(Boundary side, real3 value) {
-    magValues_[idx(side)] = value;
-  }
+  void setMagValue(Boundary side, real3 value) { magValues_[idx(side)] = value; }
   // Get values to be inserted at the boundaries
   std::array<real3, 2> getMagValues() { return magValues_; }
 

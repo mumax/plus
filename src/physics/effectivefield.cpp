@@ -53,6 +53,5 @@ Field evalEffectiveField(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity effectiveFieldQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalEffectiveField, 3, "effective_field",
-                          "T");
+  return FM_FieldQuantity(magnet, evalEffectiveField, 3, "effective_field", "T");
 }

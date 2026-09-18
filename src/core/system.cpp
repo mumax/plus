@@ -30,8 +30,8 @@ System::System(const World* world,
   if (regions.size() != 0) {
     // Filter out unique region indices
     std::vector<unsigned int> regionsVec = regions.getData();
-    std::set<unsigned int> uni(
-        regionsVec.begin(), regionsVec.end());  // The order is of no importance
+    std::set<unsigned int> uni(regionsVec.begin(),
+                               regionsVec.end());  // The order is of no importance
     uniqueRegions = std::vector<unsigned int>(uni.begin(), uni.end());
   }
   if (geometry.size() != 0) {

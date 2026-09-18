@@ -1,6 +1,7 @@
 #include "ncafm.hpp"
 
 #include <math.h>
+
 #include <algorithm>
 #include <cfloat>
 #include <memory>

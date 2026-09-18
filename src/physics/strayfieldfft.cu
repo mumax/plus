@@ -119,12 +119,15 @@ __global__ void k_apply_kernel_3d(complex* hx,
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i >= n)
     return;
-  hx[i] = prod(preFactor, (sum(sum(prod(kxx[i], mx[i]), prod(kxy[i], my[i])),
-                               prod(kxz[i], mz[i]))));
-  hy[i] = prod(preFactor, (sum(sum(prod(kxy[i], mx[i]), prod(kyy[i], my[i])),
-                               prod(kyz[i], mz[i]))));
-  hz[i] = prod(preFactor, (sum(sum(prod(kxz[i], mx[i]), prod(kyz[i], my[i])),
-                               prod(kzz[i], mz[i]))));
+  hx[i] =
+      prod(preFactor,
+           (sum(sum(prod(kxx[i], mx[i]), prod(kxy[i], my[i])), prod(kxz[i], mz[i]))));
+  hy[i] =
+      prod(preFactor,
+           (sum(sum(prod(kxy[i], mx[i]), prod(kyy[i], my[i])), prod(kyz[i], mz[i]))));
+  hz[i] =
+      prod(preFactor,
+           (sum(sum(prod(kxz[i], mx[i]), prod(kyz[i], my[i])), prod(kzz[i], mz[i]))));
 }
 
 __global__ void k_apply_kernel_2d(complex* hx,
@@ -147,12 +150,11 @@ __global__ void k_apply_kernel_2d(complex* hx,
   hz[i] = prod(preFactor, prod(kzz[i], mz[i]));
 }
 
-StrayFieldFFTExecutor::StrayFieldFFTExecutor(
-    const Magnet* magnet,
-    std::shared_ptr<const System> system,
-    int order,
-    double eps,
-    double switchingradius)
+StrayFieldFFTExecutor::StrayFieldFFTExecutor(const Magnet* magnet,
+                                             std::shared_ptr<const System> system,
+                                             int order,
+                                             double eps,
+                                             double switchingradius)
     : StrayFieldExecutor(magnet, system),
       kernel_(system->grid(),
               magnet_->grid(),
@@ -215,8 +217,7 @@ Field StrayFieldFFTExecutor::exec() const {
 
   // Forward fourier transforms
   for (int comp = 0; comp < 3; comp++)
-    checkCufftResult(
-        fftExec(forwardPlan, mpad->device_ptr(comp), mfft.at(comp)));
+    checkCufftResult(fftExec(forwardPlan, mpad->device_ptr(comp), mfft.at(comp)));
 
   // apply kernel on m_fft
   int ncells = fftSize.x * fftSize.y * fftSize.z;
@@ -226,19 +227,17 @@ Field StrayFieldFFTExecutor::exec() const {
     // (kernel grid origin at z=0) then the kernel matrix has only 4 relevant
     // components and a more efficient cuda kernel can be used:
     cudaLaunch(ncells, k_apply_kernel_2d, hfft.at(0), hfft.at(1), hfft.at(2),
-               mfft.at(0), mfft.at(1), mfft.at(2), kfft.at(0), kfft.at(1),
-               kfft.at(2), kfft.at(3), preFactor, ncells);
+               mfft.at(0), mfft.at(1), mfft.at(2), kfft.at(0), kfft.at(1), kfft.at(2),
+               kfft.at(3), preFactor, ncells);
   } else {
     cudaLaunch(ncells, k_apply_kernel_3d, hfft.at(0), hfft.at(1), hfft.at(2),
-               mfft.at(0), mfft.at(1), mfft.at(2), kfft.at(0), kfft.at(1),
-               kfft.at(2), kfft.at(3), kfft.at(4), kfft.at(5), preFactor,
-               ncells);
+               mfft.at(0), mfft.at(1), mfft.at(2), kfft.at(0), kfft.at(1), kfft.at(2),
+               kfft.at(3), kfft.at(4), kfft.at(5), preFactor, ncells);
   }
 
   // backward fourier transfrom
   for (int comp = 0; comp < 3; comp++)
-    checkCufftResult(
-        ifftExec(backwardPlan, hfft.at(comp), mpad->device_ptr(comp)));
+    checkCufftResult(ifftExec(backwardPlan, hfft.at(comp), mpad->device_ptr(comp)));
 
   // unpad
   Field h(system_, 3);

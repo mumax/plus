@@ -14,8 +14,7 @@ struct Center {
   real3 pos;
   unsigned int ridx;
   Center() : pos{0, 0, 0}, ridx(0) {}
-  Center(real3 position, unsigned int region_idx)
-      : pos(position), ridx(region_idx) {}
+  Center(real3 position, unsigned int region_idx) : pos(position), ridx(region_idx) {}
 };
 
 struct Tile {
@@ -26,18 +25,16 @@ struct Tile {
 struct Int3Hash {
   // Hash function to allow int3 to be used as a key
   std::size_t operator()(const int3& k) const {
-    return std::hash<int>()(k.x) ^ std::hash<int>()(k.y) ^
-           std::hash<int>()(k.z);
+    return std::hash<int>()(k.x) ^ std::hash<int>()(k.y) ^ std::hash<int>()(k.z);
   }
 };
 
 class VoronoiTessellator {
  public:
-  VoronoiTessellator(
-      real grainsize,
-      int seed,
-      unsigned int maxIdx = 255,
-      const std::function<unsigned int(real3)>& centerIdx = nullptr);
+  VoronoiTessellator(real grainsize,
+                     int seed,
+                     unsigned int maxIdx = 255,
+                     const std::function<unsigned int(real3)>& centerIdx = nullptr);
   ~VoronoiTessellator() = default;
 
   // * Generate a Voronoi tessellation

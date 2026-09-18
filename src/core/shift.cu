@@ -65,8 +65,8 @@ int calculateShiftDirection(const Field& field,
       // TODO: What if coo not in geometry?
       int idx = grid.coord2index(coo);
       real value;
-      checkCudaError(cudaMemcpy(&value, field.device_ptr(comp) + idx,
-                                sizeof(real), cudaMemcpyDeviceToHost));
+      checkCudaError(cudaMemcpy(&value, field.device_ptr(comp) + idx, sizeof(real),
+                                cudaMemcpyDeviceToHost));
       (&leftValue.x)[comp] = value;
     }
     return -sgn((&leftValue.x)[comp]) * sgn(av);
@@ -82,7 +82,7 @@ Field shift(const Field& field,
             real3 leftValue,
             real3 rightValue) {
   Field result(field.system(), 3);
-  cudaLaunch(field.grid().ncells(), k_shift_field, result.cu(), field.cu(), dir,
-             axis, leftValue, rightValue);
+  cudaLaunch(field.grid().ncells(), k_shift_field, result.cu(), field.cu(), dir, axis,
+             leftValue, rightValue);
   return result;
 }

@@ -34,19 +34,15 @@ void wrap_antiferromagnet(py::module& m) {
       .def_readonly("dmi_tensor", &Antiferromagnet::dmiTensor)
       .def_readonly("dmi_vector", &Antiferromagnet::dmiVector)
 
-      .def("minimize", &Antiferromagnet::minimize, py::arg("tol"),
-           py::arg("nsamples"))
+      .def("minimize", &Antiferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Antiferromagnet::relax, py::arg("tol"));
 
-  m.def("neel_vector",
-        py::overload_cast<const Antiferromagnet*>(&neelVectorQuantity));
+  m.def("neel_vector", py::overload_cast<const Antiferromagnet*>(&neelVectorQuantity));
   m.def("full_magnetization",
         py::overload_cast<const Antiferromagnet*>(&fullMagnetizationQuantity));
 
-  m.def("angle_field",
-        py::overload_cast<const Antiferromagnet*>(&angleFieldQuantity));
-  m.def("max_intracell_angle",
-        py::overload_cast<const Antiferromagnet*>(&maxAngle));
+  m.def("angle_field", py::overload_cast<const Antiferromagnet*>(&angleFieldQuantity));
+  m.def("max_intracell_angle", py::overload_cast<const Antiferromagnet*>(&maxAngle));
 
   m.def("total_energy_density",
         [](const Antiferromagnet* m) { return totalEnergyDensityQuantity(m); });

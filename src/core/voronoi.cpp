@@ -1,10 +1,12 @@
+#include "voronoi.hpp"
+
 #include <math.h>
+
 #include <cmath>
 #include <random>
 
 #include "field.hpp"
 #include "gpubuffer.hpp"
-#include "voronoi.hpp"
 
 VoronoiTessellator::VoronoiTessellator(
     real grainsize,
@@ -23,9 +25,7 @@ VoronoiTessellator::VoronoiTessellator(
   if (centerIdx) {
     centerIdx_ = centerIdx;
   } else {
-    centerIdx_ = [this](real3 coo) -> unsigned int {
-      return distInt_(engine_);
-    };
+    centerIdx_ = [this](real3 coo) -> unsigned int { return distInt_(engine_); };
   }
 }
 
@@ -33,10 +33,9 @@ real3 VoronoiTessellator::getTileSize(const real3 griddims) const {
   if (!pbc_)
     return real3{2 * grainsize_, 2 * grainsize_, 2 * grainsize_ * (!is2D_)};
 
-  return griddims /
-         real3{std::max(real(1), std::ceil(griddims.x / (2 * grainsize_))),
-               std::max(real(1), std::ceil(griddims.y / (2 * grainsize_))),
-               std::max(real(1), std::ceil(griddims.z / (2 * grainsize_)))};
+  return griddims / real3{std::max(real(1), std::ceil(griddims.x / (2 * grainsize_))),
+                          std::max(real(1), std::ceil(griddims.y / (2 * grainsize_))),
+                          std::max(real(1), std::ceil(griddims.z / (2 * grainsize_)))};
 }
 
 std::vector<unsigned int> VoronoiTessellator::generate(const Grid grid,
@@ -156,9 +155,8 @@ int VoronoiTessellator::Poisson(const real lambda) {
 }
 
 Tile VoronoiTessellator::tileOfCell(const real3 coo) const {
-  return Tile{int3{
-      static_cast<int>(
-          std::floor(coo.x / tilesize_.x)),  // This cannot be the best way...
-      static_cast<int>(std::floor(coo.y / tilesize_.y)),
-      is2D_ ? 0 : static_cast<int>(std::floor(coo.z / tilesize_.z))}};
+  return Tile{int3{static_cast<int>(std::floor(
+                       coo.x / tilesize_.x)),  // This cannot be the best way...
+                   static_cast<int>(std::floor(coo.y / tilesize_.y)),
+                   is2D_ ? 0 : static_cast<int>(std::floor(coo.z / tilesize_.z))}};
 }

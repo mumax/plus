@@ -1,8 +1,9 @@
+#include <pybind11/functional.h>  // for run_while
+
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <pybind11/functional.h>  // for run_while
 #include "butchertableau.hpp"
 #include "dynamicequation.hpp"
 #include "field.hpp"
@@ -22,17 +23,13 @@ void wrap_timesolver(py::module& m) {
              solver.setRungeKuttaMethod(method);
            })
       .def_property("headroom", &TimeSolver::headroom, &TimeSolver::setHeadroom)
-      .def_property("lower_bound", &TimeSolver::lowerBound,
-                    &TimeSolver::setLowerBound)
-      .def_property("max_error", &TimeSolver::maxError,
-                    &TimeSolver::setMaxError)
+      .def_property("lower_bound", &TimeSolver::lowerBound, &TimeSolver::setLowerBound)
+      .def_property("max_error", &TimeSolver::maxError, &TimeSolver::setMaxError)
       .def_property("sensible_factor", &TimeSolver::sensibleFactor,
                     &TimeSolver::setSensibleFactor)
-      .def_property("sensible_timestep_default",
-                    &TimeSolver::sensibleTimestepDefault,
+      .def_property("sensible_timestep_default", &TimeSolver::sensibleTimestepDefault,
                     &TimeSolver::setSensibleTimestepDefault)
-      .def_property("upper_bound", &TimeSolver::upperBound,
-                    &TimeSolver::setUpperBound)
+      .def_property("upper_bound", &TimeSolver::upperBound, &TimeSolver::setUpperBound)
       .def("step", &TimeSolver::step)
       .def("steps", &TimeSolver::steps)
       .def_property("timestep", &TimeSolver::timestep, &TimeSolver::setTimeStep)

@@ -39,11 +39,7 @@ struct LinearSystem::CuData {
   lsReal* val_;
   lsReal* b;
 
-  __device__ int& matrixIdx(int row, int elem) {
-    return idx_[row + nrows * elem];
-  }
+  __device__ int& matrixIdx(int row, int elem) { return idx_[row + nrows * elem]; }
 
-  __device__ lsReal& matrixVal(int row, int elem) {
-    return val_[row + nrows * elem];
-  }
+  __device__ lsReal& matrixVal(int row, int elem) { return val_[row + nrows * elem]; }
 };

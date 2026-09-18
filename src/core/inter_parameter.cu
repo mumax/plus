@@ -1,19 +1,15 @@
+#include <algorithm>
+#include <string>
+
 #include "cudalaunch.hpp"
 #include "inter_parameter.hpp"
 #include "reduce.hpp"
-
-#include <algorithm>
-#include <string>
 
 InterParameter::InterParameter(std::shared_ptr<const System> system,
                                real value,
                                std::string name,
                                std::string unit)
-    : system_(system),
-      name_(name),
-      unit_(unit),
-      uniformValue_(value),
-      valuesBuffer_() {
+    : system_(system), name_(name), unit_(unit), uniformValue_(value), valuesBuffer_() {
   size_t N = 1;  // at least 1 region: default 0
   std::vector<unsigned int> uni = system->uniqueRegions;
   if (!uni.empty()) {
@@ -72,8 +68,7 @@ void InterParameter::setBetween(unsigned int i, unsigned int j, real value) {
 real InterParameter::getUniformValue() const {
   if (!isUniform()) {
     throw std::invalid_argument(
-        "Cannot get uniform value of non-uniform InterParameter " + name_ +
-        ".");
+        "Cannot get uniform value of non-uniform InterParameter " + name_ + ".");
   }
   return uniformValue_;
 }

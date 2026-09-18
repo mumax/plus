@@ -84,8 +84,7 @@ __global__ void k_maxVecNorm(real* result, CuField f) {
 
 real maxVecNorm(const Field& f) {
   if (f.ncomp() != 3) {
-    throw std::runtime_error(
-        "the input field of maxVecNorm should have 3 components");
+    throw std::runtime_error("the input field of maxVecNorm should have 3 components");
   }
 
   GpuBuffer<real> d_result(1);
@@ -129,16 +128,14 @@ __global__ void k_average(real* result, CuField f, int comp, int cellsingeo) {
 real fieldComponentAverage(const Field& f, int comp) {
   if (comp >= f.ncomp()) {
     throw std::runtime_error("Can not take the average of component " +
-                             std::to_string(comp) +
-                             " of a field which has only " +
+                             std::to_string(comp) + " of a field which has only " +
                              std::to_string(f.ncomp()) + " components");
   }
 
   real result;
   int cellsingeo = f.system()->cellsInGeo();
   GpuBuffer<real> d_result(1);
-  cudaLaunchReductionKernel(k_average, d_result.get(), f.cu(), comp,
-                            cellsingeo);
+  cudaLaunchReductionKernel(k_average, d_result.get(), f.cu(), comp, cellsingeo);
   checkCudaError(cudaMemcpyAsync(&result, d_result.get(), sizeof(real),
                                  cudaMemcpyDeviceToHost, getCudaStream()));
   return result;
@@ -279,8 +276,7 @@ __global__ void k_isUniformComponent(bool* isUniform, CuField f, int c) {
 bool isUniformFieldComponent(const Field& f, int comp) {
   GpuBuffer<bool> d_isUniform(1);
 
-  cudaLaunchReductionKernel(k_isUniformComponent, d_isUniform.get(), f.cu(),
-                            comp);
+  cudaLaunchReductionKernel(k_isUniformComponent, d_isUniform.get(), f.cu(), comp);
 
   bool isUniform;
   checkCudaError(cudaMemcpyAsync(&isUniform, d_isUniform.get(), sizeof(bool),

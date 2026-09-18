@@ -18,13 +18,10 @@ void wrap_ncafm(py::module& m) {
       .def("sub1", &NcAfm::sub1, py::return_value_policy::reference)
       .def("sub2", &NcAfm::sub2, py::return_value_policy::reference)
       .def("sub3", &NcAfm::sub3, py::return_value_policy::reference)
-      .def("sublattices", &NcAfm::sublattices,
-           py::return_value_policy::reference)
+      .def("sublattices", &NcAfm::sublattices, py::return_value_policy::reference)
       .def(
           "other_sublattices",
-          [](const NcAfm* m, Ferromagnet* mag) {
-            return m->getOtherSublattices(mag);
-          },
+          [](const NcAfm* m, Ferromagnet* mag) { return m->getOtherSublattices(mag); },
           py::return_value_policy::reference)
 
       .def_readonly("ncafmex_cell", &NcAfm::afmex_cell)
@@ -45,9 +42,7 @@ void wrap_ncafm(py::module& m) {
   m.def("angle_field", &angleFieldQuantity);
   m.def(
       "max_intracell_angle_between",
-      [](const Ferromagnet* i, const Ferromagnet* j) {
-        return evalMaxAngle(i, j);
-      },
+      [](const Ferromagnet* i, const Ferromagnet* j) { return evalMaxAngle(i, j); },
       py::arg("sub1"), py::arg("sub2"));
 
   m.def("total_energy_density",

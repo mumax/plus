@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+
 #include "mumaxworld.hpp"
 #include "quantityevaluator.hpp"
 

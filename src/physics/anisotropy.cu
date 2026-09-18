@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "anisotropy.hpp"
 #include "cudalaunch.hpp"
 #include "energy.hpp"
@@ -20,8 +21,7 @@ bool cubicanisotropyAssuredZero(const Ferromagnet* magnet) {
 }
 
 bool anisotropyAssuredZero(const Ferromagnet* magnet) {
-  return (unianisotropyAssuredZero(magnet) &&
-          cubicanisotropyAssuredZero(magnet));
+  return (unianisotropyAssuredZero(magnet) && cubicanisotropyAssuredZero(magnet));
 }
 
 __global__ void k_unianisotropyField(CuField hField,
@@ -94,24 +94,20 @@ __global__ void k_cubicanisotropyField(CuField hField,
   real c2m = dot(c2, m);
   real c3m = dot(c3, m);
 
-  real3 h = -2 * kc1 *
-                ((c2m * c2m + c3m * c3m) * (c1m * c1) +
-                 (c1m * c1m + c3m * c3m) * (c2m * c2) +
-                 (c1m * c1m + c2m * c2m) * (c3m * c3)) /
-                Ms -
-            2 * kc2 *
-                ((c2m * c2m * c3m * c3m) * (c1m * c1) +
-                 (c1m * c1m * c3m * c3m) * (c2m * c2) +
-                 (c1m * c1m * c2m * c2m) * (c3m * c3)) /
-                Ms -
-            4 * kc3 *
-                ((c2m * c2m * c2m * c2m + c3m * c3m * c3m * c3m) *
-                     (c1m * c1m * c1m * c1) +
-                 (c1m * c1m * c1m * c1m + c3m * c3m * c3m * c3m) *
-                     (c2m * c2m * c2m * c2) +
-                 (c1m * c1m * c1m * c1m + c2m * c2m * c2m * c2m) *
-                     (c3m * c3m * c3m * c3)) /
-                Ms;
+  real3 h =
+      -2 * kc1 *
+          ((c2m * c2m + c3m * c3m) * (c1m * c1) + (c1m * c1m + c3m * c3m) * (c2m * c2) +
+           (c1m * c1m + c2m * c2m) * (c3m * c3)) /
+          Ms -
+      2 * kc2 *
+          ((c2m * c2m * c3m * c3m) * (c1m * c1) + (c1m * c1m * c3m * c3m) * (c2m * c2) +
+           (c1m * c1m * c2m * c2m) * (c3m * c3)) /
+          Ms -
+      4 * kc3 *
+          ((c2m * c2m * c2m * c2m + c3m * c3m * c3m * c3m) * (c1m * c1m * c1m * c1) +
+           (c1m * c1m * c1m * c1m + c3m * c3m * c3m * c3m) * (c2m * c2m * c2m * c2) +
+           (c1m * c1m * c1m * c1m + c2m * c2m * c2m * c2m) * (c3m * c3m * c3m * c3)) /
+          Ms;
 
   hField.setVectorInCell(idx, h);
 }
@@ -140,8 +136,8 @@ Field evalAnisotropyField(const Ferromagnet* magnet) {
     auto kc1 = magnet->kc1.cu();
     auto kc2 = magnet->kc2.cu();
     auto kc3 = magnet->kc3.cu();
-    cudaLaunch(ncells, k_cubicanisotropyField, h, m, anisC1, anisC2, kc1, kc2,
-               kc3, msat);
+    cudaLaunch(ncells, k_cubicanisotropyField, h, m, anisC1, anisC2, kc1, kc2, kc3,
+               msat);
   }
   return result;
 }
@@ -217,8 +213,7 @@ __global__ void k_cubanisotropyEnergyDensity(CuField edens,
   real c3m = dot(c3, m);
 
   real e = 0.0;
-  e += kc1 *
-       (c1m * c1m * c2m * c2m + c1m * c1m * c3m * c3m + c2m * c2m * c3m * c3m);
+  e += kc1 * (c1m * c1m * c2m * c2m + c1m * c1m * c3m * c3m + c2m * c2m * c3m * c3m);
   e += kc2 * c1m * c1m * c2m * c2m * c3m * c3m;
   e += kc3 * (c1m * c1m * c1m * c1m * c2m * c2m * c2m * c2m +
               c1m * c1m * c1m * c1m * c3m * c3m * c3m * c3m +
@@ -244,16 +239,15 @@ Field evalAnisotropyEnergyDensity(const Ferromagnet* magnet) {
     auto anisU = magnet->anisU.cu();
     auto ku1 = magnet->ku1.cu();
     auto ku2 = magnet->ku2.cu();
-    cudaLaunch(ncells, k_unianisotropyEnergyDensity, e, m, anisU, ku1, ku2,
-               msat);
+    cudaLaunch(ncells, k_unianisotropyEnergyDensity, e, m, anisU, ku1, ku2, msat);
   } else if (!cubicanisotropyAssuredZero(magnet)) {
     auto anisC1 = magnet->anisC1.cu();
     auto anisC2 = magnet->anisC2.cu();
     auto kc1 = magnet->kc1.cu();
     auto kc2 = magnet->kc2.cu();
     auto kc3 = magnet->kc3.cu();
-    cudaLaunch(ncells, k_cubanisotropyEnergyDensity, e, m, anisC1, anisC2, kc1,
-               kc2, kc3, msat);
+    cudaLaunch(ncells, k_cubanisotropyEnergyDensity, e, m, anisC1, anisC2, kc1, kc2,
+               kc3, msat);
   }
   return edens;
 }
@@ -267,8 +261,7 @@ real evalAnisotropyEnergy(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity anisotropyFieldQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalAnisotropyField, 3, "anisotropy_field",
-                          "T");
+  return FM_FieldQuantity(magnet, evalAnisotropyField, 3, "anisotropy_field", "T");
 }
 
 FM_FieldQuantity anisotropyEnergyDensityQuantity(const Ferromagnet* magnet) {
@@ -277,6 +270,5 @@ FM_FieldQuantity anisotropyEnergyDensityQuantity(const Ferromagnet* magnet) {
 }
 
 FM_ScalarQuantity anisotropyEnergyQuantity(const Ferromagnet* magnet) {
-  return FM_ScalarQuantity(magnet, evalAnisotropyEnergy, "anisotropy_energy",
-                           "J");
+  return FM_ScalarQuantity(magnet, evalAnisotropyEnergy, "anisotropy_energy", "J");
 }

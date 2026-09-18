@@ -154,9 +154,8 @@ __global__ void k_Slonczewski(CuField torque,
 
   const real3 pxm = cross(p, m);
   const real3 mxpxm = cross(m, pxm);
-  const real3 t =
-      ((eps + eps_p * alpha) * mxpxm + (eps_p - eps * alpha) * pxm) *
-      (B / (1 + alpha * alpha)) * gamma;
+  const real3 t = ((eps + eps_p * alpha) * mxpxm + (eps_p - eps * alpha) * pxm) *
+                  (B / (1 + alpha * alpha)) * gamma;
 
   torque.setVectorInCell(idx, t);
 }
@@ -189,16 +188,16 @@ Field evalSpinTransferTorque(const Ferromagnet* magnet) {
   // Either Zhang Li xor Slonczewski, can't have both TODO: should that be
   // possible?
   if (SlonczewskiSTTAssuredZero(magnet))
-    cudaLaunch(ncells, k_ZhangLi, torque.cu(), m, msat, pol, xi, alpha,
-               frozenSpins, jcur, magnet->world()->mastergrid());
+    cudaLaunch(ncells, k_ZhangLi, torque.cu(), m, msat, pol, xi, alpha, frozenSpins,
+               jcur, magnet->world()->mastergrid());
   else
-    cudaLaunch(ncells, k_Slonczewski, torque.cu(), m, msat, pol, lambda, alpha,
-               gamma, jcur, epsilonPrime, fixedLayer, freeLayerThickness,
-               frozenSpins, fixedLayerOnTop);
+    cudaLaunch(ncells, k_Slonczewski, torque.cu(), m, msat, pol, lambda, alpha, gamma,
+               jcur, epsilonPrime, fixedLayer, freeLayerThickness, frozenSpins,
+               fixedLayerOnTop);
   return torque;
 }
 
 FM_FieldQuantity spinTransferTorqueQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalSpinTransferTorque, 3,
-                          "spintransfer_torque", "1/s");
+  return FM_FieldQuantity(magnet, evalSpinTransferTorque, 3, "spintransfer_torque",
+                          "1/s");
 }

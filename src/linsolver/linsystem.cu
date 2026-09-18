@@ -33,10 +33,7 @@ __global__ static void k_apply(lsReal* y,
 }
 
 // For a linear system Ax=b, this function returns y= ka * A*x + kb * b
-static GVec apply(const LinearSystem& sys,
-                  const GVec& x,
-                  lsReal ka,
-                  lsReal kb) {
+static GVec apply(const LinearSystem& sys, const GVec& x, lsReal ka, lsReal kb) {
   if (x.size() != sys.nRows()) {
     throw std::invalid_argument(
         "The numbers of rows in the linear system does not match the number of "

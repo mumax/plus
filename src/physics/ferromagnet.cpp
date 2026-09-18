@@ -1,10 +1,10 @@
 #include "ferromagnet.hpp"
 
 #include <curand.h>
-#include <chrono>
-
 #include <math.h>
+
 #include <cfloat>
+#include <chrono>
 #include <memory>
 #include <random>
 
@@ -47,19 +47,13 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
       anisC1(system(), {0, 0, 0}, name + ":anisC1", ""),
       anisC2(system(), {0, 0, 0}, name + ":anisC2", ""),
       jcur(system(), {0, 0, 0}, name + ":jcur", "A/m2"),
-      biasMagneticField(system(),
-                        {0, 0, 0},
-                        name + ":bias_magnetic_field",
-                        "T"),
+      biasMagneticField(system(), {0, 0, 0}, name + ":bias_magnetic_field", "T"),
       dmiTensor(system()),
       enableDemag(true),
       enableOpenBC(false),
       enableZhangLiTorque(true),
       enableSlonczewskiTorque(true),
-      appliedPotential(system(),
-                       std::nanf("0"),
-                       name + ":applied_potential",
-                       "V"),
+      appliedPotential(system(), std::nanf("0"), name + ":applied_potential", "V"),
       conductivity(system(), 0.0, name + ":conductivity", "S/m"),
       amrRatio(system(), 0.0, name + ":amr_ratio", ""),
       frozenSpins(system(), 0.0, name + ":frozen_spins", ""),
@@ -75,8 +69,7 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
     std::vector<real> randomValues(nvalues);
     std::normal_distribution<real> dist(0.0, 1.0);
     std::default_random_engine randomEngine;
-    auto seed =
-        std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     randomEngine.seed(seed);
     for (auto& v : randomValues) {
       v = dist(randomEngine);
@@ -98,8 +91,7 @@ Ferromagnet::Ferromagnet(MumaxWorld* world,
                          std::string name,
                          GpuBuffer<bool> geometry,
                          GpuBuffer<unsigned int> regions)
-    : Ferromagnet(std::make_shared<System>(world, grid, geometry, regions),
-                  name) {}
+    : Ferromagnet(std::make_shared<System>(world, grid, geometry, regions), name) {}
 
 Ferromagnet::~Ferromagnet() {
   curandDestroyGenerator(randomGenerator);

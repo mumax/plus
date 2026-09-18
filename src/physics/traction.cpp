@@ -18,7 +18,6 @@ CuBoundaryTraction BoundaryTraction::cu() const {
 }
 
 bool BoundaryTraction::assuredZero() const {
-  return posXside.assuredZero() && negXside.assuredZero() &&
-         posYside.assuredZero() && negYside.assuredZero() &&
-         posZside.assuredZero() && negZside.assuredZero();
+  return posXside.assuredZero() && negXside.assuredZero() && posYside.assuredZero() &&
+         negYside.assuredZero() && posZside.assuredZero() && negZside.assuredZero();
 }

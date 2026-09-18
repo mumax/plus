@@ -50,20 +50,14 @@ class Row {
    *  If neighbor is outside the geometry, return -1.
    */
   __device__ int& colidx(int3 rcoo) { return colidx_[neighborId(rcoo)]; }
-  __device__ const int& colidx(int3 rcoo) const {
-    return colidx_[neighborId(rcoo)];
-  }
+  __device__ const int& colidx(int3 rcoo) const { return colidx_[neighborId(rcoo)]; }
 
   /** Matrix value for neighbor with relative position rcoo. */
   __device__ real& value(int3 rcoo) { return value_[neighborId(rcoo)]; }
-  __device__ const real& value(int3 rcoo) const {
-    return value_[neighborId(rcoo)];
-  }
+  __device__ const real& value(int3 rcoo) const { return value_[neighborId(rcoo)]; }
 
   /** Return true if neighbor is in geometry. */
-  __device__ bool inGeometry(int3 rcoo) const {
-    return colidx_[neighborId(rcoo)] >= 0;
-  }
+  __device__ bool inGeometry(int3 rcoo) const { return colidx_[neighborId(rcoo)] >= 0; }
 
   /** Add finite difference in the matrix row. */
   __device__ void addDiff(int3 rcoo1, int3 rcoo2, real val) {
@@ -124,8 +118,7 @@ class Row {
 
 //------------------------------------------------------------------------------
 
-PoissonSystem::PoissonSystem(const Ferromagnet* magnet)
-    : magnet_(magnet), solver_() {}
+PoissonSystem::PoissonSystem(const Ferromagnet* magnet) : magnet_(magnet), solver_() {}
 
 void PoissonSystem::init() {
   solver_.setSystem(construct());

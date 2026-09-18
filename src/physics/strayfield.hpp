@@ -45,8 +45,7 @@ class StrayFieldExecutor {
 
  protected:
   /** Constructor only to be used in constructor of derived classes. */
-  StrayFieldExecutor(const Magnet* magnet,
-                     std::shared_ptr<const System> system);
+  StrayFieldExecutor(const Magnet* magnet, std::shared_ptr<const System> system);
 
  public:
   /** Empty virtual destructor. */

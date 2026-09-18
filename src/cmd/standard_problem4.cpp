@@ -24,8 +24,7 @@ void standard_problem4() {
   Grid mGrid(n);
   GpuBuffer<bool> geometry;
   GpuBuffer<unsigned int> regions;
-  auto magnet =
-      mWorld.addFerromagnet(mGrid, geometry, regions, ferromagnet_name);
+  auto magnet = mWorld.addFerromagnet(mGrid, geometry, regions, ferromagnet_name);
 
   magnet->msat.set(800E3);
   magnet->aex.set(13E-12);
@@ -49,8 +48,8 @@ void standard_problem4() {
   for (int i = 0; i < n_timepoints; i++) {
     mWorld.timesolver().run(delta);
     auto m = magnet->magnetization()->average();
-    magn_csv << mWorld.time() << "," << m[0] << "," << m[1] << "," << m[2]
-             << "," << std::endl;
+    magn_csv << mWorld.time() << "," << m[0] << "," << m[1] << "," << m[2] << ","
+             << std::endl;
   }
 
   std::cout << "Simulation results were saved into\n"

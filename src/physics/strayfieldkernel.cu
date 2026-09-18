@@ -30,11 +30,7 @@ StrayFieldKernel::StrayFieldKernel(Grid dst,
                                    int order,
                                    double eps,
                                    double switchingradius)
-    : StrayFieldKernel(kernelGrid(dst, src),
-                       world,
-                       order,
-                       eps,
-                       switchingradius) {}
+    : StrayFieldKernel(kernelGrid(dst, src), world, order, eps, switchingradius) {}
 
 StrayFieldKernel::~StrayFieldKernel() {}
 
@@ -83,8 +79,7 @@ __global__ void k_strayFieldKernel(CuField kernel,
         double h = fmax(cellsize.x, fmax(cellsize.y, cellsize.z));
 
         if (switchingradius < 0) {
-          if (eps * (R * R - h * h) / (V * V) * pow(R, order + 1) /
-                  pow(h, order - 3) <
+          if (eps * (R * R - h * h) / (V * V) * pow(R, order + 1) / pow(h, order - 3) <
               1) {
             Nxx += calcNewellNxx(coo_, cellsize);
             Nyy += calcNewellNyy(coo_, cellsize);

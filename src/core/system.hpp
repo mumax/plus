@@ -117,13 +117,11 @@ __device__ inline bool CuSystem::inGeometry(int idx) const {
   return grid.cellInGrid(idx) && (!geometry || geometry[idx]);
 }
 
-__device__ inline bool CuSystem::inRegion(unsigned int regionIdx,
-                                          int3 coo) const {
+__device__ inline bool CuSystem::inRegion(unsigned int regionIdx, int3 coo) const {
   return grid.cellInGrid(coo) && (regionIdx == getRegionIdx(coo));
 }
 
-__device__ inline bool CuSystem::inRegion(unsigned int regionIdx,
-                                          int idx) const {
+__device__ inline bool CuSystem::inRegion(unsigned int regionIdx, int idx) const {
   return grid.cellInGrid(idx) && (regionIdx == getRegionIdx(idx));
 }
 

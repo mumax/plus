@@ -43,8 +43,8 @@ Field evalEffectiveBodyForce(const Magnet* magnet) {
 }
 
 M_FieldQuantity effectiveBodyForceQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalEffectiveBodyForce, 3,
-                         "effective_body_force", "N/m3");
+  return M_FieldQuantity(magnet, evalEffectiveBodyForce, 3, "effective_body_force",
+                         "N/m3");
 }
 
 // ========== Elastic Accelleration ==========
@@ -75,22 +75,20 @@ Field evalElasticAcceleration(const Magnet* magnet) {
 
   // divide by rho if possible
   if (!magnet->rho.assuredZero())
-    cudaLaunch(aField.grid().ncells(), k_divideByParam, aField.cu(),
-               magnet->rho.cu());
+    cudaLaunch(aField.grid().ncells(), k_divideByParam, aField.cu(), magnet->rho.cu());
 
   return aField;
 }
 
 M_FieldQuantity elasticAccelerationQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalElasticAcceleration, 3,
-                         "elastic_acceleration", "m/s2");
+  return M_FieldQuantity(magnet, evalElasticAcceleration, 3, "elastic_acceleration",
+                         "m/s2");
 }
 
 // ========== Elastic Velocity Quantity ==========
 
 M_FieldQuantity elasticVelocityQuantity(const Magnet* magnet) {
   return M_FieldQuantity(
-      magnet,
-      [](const Magnet* magnet) { return magnet->elasticVelocity()->eval(); }, 3,
+      magnet, [](const Magnet* magnet) { return magnet->elasticVelocity()->eval(); }, 3,
       "elastic_velocity", "m/s");
 }

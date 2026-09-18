@@ -17,8 +17,7 @@ void wrap_field(py::module& m) {
       .def_property_readonly("grid", &Field::grid)
       .def_property_readonly("ncomp", &Field::ncomp)
       .def("get", [](const Field* f) { return fieldToArray(*f); })
-      .def("set",
-           [](Field* f, py::array_t<real> data) { setArrayInField(*f, data); });
+      .def("set", [](Field* f, py::array_t<real> data) { setArrayInField(*f, data); });
 }
 
 void setArrayInField(Field& f, py::array_t<real> data) {
@@ -27,8 +26,8 @@ void setArrayInField(Field& f, py::array_t<real> data) {
   if (ndim == 1) {
     if (data.shape(0) != f.ncomp()) {
       std::stringstream ss;
-      ss << "The number of components do not match, " << "expected "
-         << data.shape(0) << ", got " << f.ncomp() << ".";
+      ss << "The number of components do not match, " << "expected " << data.shape(0)
+         << ", got " << f.ncomp() << ".";
       throw std::invalid_argument(ss.str());
     }
     py::buffer_info buf = data.request();
@@ -56,10 +55,9 @@ void setArrayInField(Field& f, py::array_t<real> data) {
       if (shape[i] != data.shape(i)) {
         std::stringstream ss;
         ss << "The shape of the data does not match the shape of the field, "
-           << "expected (" << shape[0] << ", " << shape[1] << ", " << shape[2]
-           << ", " << shape[3] << "), got (" << data.shape(0) << ", "
-           << data.shape(1) << ", " << data.shape(2) << ", " << data.shape(3)
-           << ").";
+           << "expected (" << shape[0] << ", " << shape[1] << ", " << shape[2] << ", "
+           << shape[3] << "), got (" << data.shape(0) << ", " << data.shape(1) << ", "
+           << data.shape(2) << ", " << data.shape(3) << ").";
         throw std::invalid_argument(ss.str());
       }
     }

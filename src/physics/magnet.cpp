@@ -1,8 +1,8 @@
 #include "magnet.hpp"
 
 #include <curand.h>
-
 #include <math.h>
+
 #include <cfloat>
 #include <memory>
 #include <random>
@@ -23,10 +23,7 @@ Magnet::Magnet(std::shared_ptr<System> system_ptr, std::string name)
       enableAsStrayFieldDestination(true),
       // elasticity
       enableElastodynamics_(false),
-      externalBodyForce(system(),
-                        {0, 0, 0},
-                        name + ":external_body_force",
-                        "N/m3"),
+      externalBodyForce(system(), {0, 0, 0}, name + ":external_body_force", "N/m3"),
       C11(system(), 0.0, name + ":C11", "N/m2"),
       C12(system(), 0.0, name + ":C12", "N/m2"),
       C44(system(), 0.0, name + ":C44", "N/m2"),
@@ -40,14 +37,8 @@ Magnet::Magnet(std::shared_ptr<System> system_ptr, std::string name)
       eta12(system(), 0.0, name + ":eta12", "Pa s"),
       eta44(system(), 0.0, name + ":eta44", "Pa s"),
       rho(system(), 1.0, name + ":rho", "kg/m3"),
-      rigidNormStrain(system(),
-                      {0.0, 0.0, 0.0},
-                      name + ":rigid_norm_strain",
-                      ""),
-      rigidShearStrain(system(),
-                       {0.0, 0.0, 0.0},
-                       name + ":rigid_shear_strain",
-                       ""),
+      rigidNormStrain(system(), {0.0, 0.0, 0.0}, name + ":rigid_norm_strain", ""),
+      rigidShearStrain(system(), {0.0, 0.0, 0.0}, name + ":rigid_shear_strain", ""),
       boundaryTraction(system(), name + ":boundary_traction") {
   // Check that the system has at least size 1
   int3 size = system_->grid().size();
@@ -178,8 +169,7 @@ std::vector<const StrayField*> Magnet::getStrayFields() const {
   return strayFields;
 }
 
-void Magnet::addStrayField(const Magnet* magnet,
-                           StrayFieldExecutor::Method method) {
+void Magnet::addStrayField(const Magnet* magnet, StrayFieldExecutor::Method method) {
   if (world() != magnet->world()) {
     throw std::runtime_error(
         "Can not define the field of the magnet on this magnet because it is "
@@ -233,8 +223,8 @@ void Magnet::setEnableElastodynamics(bool value) {
   }
 
   // should not use elastodynamics together with rigid strain!
-  if (value && (!this->rigidNormStrain.assuredZero() ||
-                !this->rigidShearStrain.assuredZero())) {
+  if (value &&
+      (!this->rigidNormStrain.assuredZero() || !this->rigidShearStrain.assuredZero())) {
     throw std::invalid_argument(
         "Cannot enable elastodynamics when rigid strain is set.");
   }
@@ -247,8 +237,8 @@ void Magnet::setEnableElastodynamics(bool value) {
       elasticDisplacement_ = std::make_unique<Variable>(
           system(), 3, name() + ":elastic_displacement", "m");
       elasticDisplacement_->set(real3{0, 0, 0});
-      elasticVelocity_ = std::make_unique<Variable>(
-          system(), 3, name() + ":elastic_velocity", "m/s");
+      elasticVelocity_ =
+          std::make_unique<Variable>(system(), 3, name() + ":elastic_velocity", "m/s");
       elasticVelocity_->set(real3{0, 0, 0});
     } else {
       // free memory of unnecessary Variables

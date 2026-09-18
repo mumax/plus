@@ -62,7 +62,6 @@ class FieldQuantity {
   const World* world() const;
 };
 
-inline bool sameFieldDimensions(const FieldQuantity& q1,
-                                const FieldQuantity& q2) {
+inline bool sameFieldDimensions(const FieldQuantity& q1, const FieldQuantity& q2) {
   return q1.grid() == q2.grid() && q1.ncomp() == q2.ncomp();
 }

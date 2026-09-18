@@ -74,6 +74,5 @@ void GpuMemoryPool::printInfo() const {
     std::cout << std::setw(colwidth) << b.second.first;
     std::cout << std::setw(colwidth) << b.second.second << std::endl;
   }
-  std::cout << "Total used GPU memory:  " << totalMemUsed << " bytes"
-            << std::endl;
+  std::cout << "Total used GPU memory:  " << totalMemUsed << " bytes" << std::endl;
 }

@@ -51,12 +51,11 @@ __global__ void k_demagfield(CuField hField,
   hField.setVectorInCell(idx, MU0 * h);
 }
 
-StrayFieldBruteExecutor::StrayFieldBruteExecutor(
-    const Magnet* magnet,
-    std::shared_ptr<const System> system,
-    int order,
-    double eps,
-    double switchingradius)
+StrayFieldBruteExecutor::StrayFieldBruteExecutor(const Magnet* magnet,
+                                                 std::shared_ptr<const System> system,
+                                                 int order,
+                                                 double eps,
+                                                 double switchingradius)
     : StrayFieldExecutor(magnet, system),
       kernel_(system->grid(),
               magnet_->grid(),

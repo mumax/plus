@@ -1,4 +1,7 @@
 #include "relaxer.hpp"
+
+#include <algorithm>
+
 #include "antiferromagnet.hpp"
 #include "butchertableau.hpp"
 #include "dynamicequation.hpp"
@@ -11,11 +14,7 @@
 #include "timesolver.hpp"
 #include "torque.hpp"
 
-#include <algorithm>
-
-Relaxer::Relaxer(const Magnet* magnet,
-                 std::vector<real> RelaxTorqueThreshold,
-                 real tol)
+Relaxer::Relaxer(const Magnet* magnet, std::vector<real> RelaxTorqueThreshold, real tol)
     : magnets_({magnet}),
       timesolver_(magnet->world()->timesolver()),
       world_(magnet->mumaxWorld()),
@@ -94,8 +93,7 @@ void Relaxer::exec() {
   real timestep = timesolver_.timestep();
   bool adaptive = timesolver_.hasAdaptiveTimeStep();
   real maxerr = timesolver_.maxError();
-  std::string method =
-      getRungeKuttaNameFromMethod(timesolver_.getRungeKuttaMethod());
+  std::string method = getRungeKuttaNameFromMethod(timesolver_.getRungeKuttaMethod());
   auto eqs = timesolver_.equations();
 
   // Set solver settings for relax
@@ -122,8 +120,8 @@ void Relaxer::exec() {
   // Run while monitoring torque
   // If threshold < 0 (default = -1): relax until torque is steady or
   // increasing.
-  if (std::all_of(threshold_.begin(), threshold_.end(),
-                  [](real t) { return t < 0; })) {
+  auto all_negative = [](real t) { return t < 0; };
+  if (std::all_of(threshold_.begin(), threshold_.end(), all_negative)) {
     std::vector<FM_FieldQuantity> torque = getTorque();
     real t0 = 0;
     real t1 = calcTorque(torque);
@@ -144,8 +142,7 @@ void Relaxer::exec() {
         t1 = calcTorque(torque);
       }
     }
-  } else if (std::find(threshold_.begin(), threshold_.end(), 0) !=
-             threshold_.end()) {
+  } else if (std::find(threshold_.begin(), threshold_.end(), 0) != threshold_.end()) {
     throw std::invalid_argument("The relax threshold should not be zero.");
   } else {
     // If threshold is set by user: relax until torque is smaller than or equal

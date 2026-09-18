@@ -47,8 +47,7 @@ Field evalOctupoleVector(const NcAfm* magnet) {
   // NC-ferrimagnets
   Field octupole(magnet->system(), 3);
 
-  if (magnet->sub1()->msat.assuredZero() &&
-      magnet->sub2()->msat.assuredZero() &&
+  if (magnet->sub1()->msat.assuredZero() && magnet->sub2()->msat.assuredZero() &&
       magnet->sub3()->msat.assuredZero()) {
     octupole.makeZero();
     return octupole;
@@ -56,13 +55,11 @@ Field evalOctupoleVector(const NcAfm* magnet) {
   cudaLaunch(octupole.grid().ncells(), k_octupolevector, octupole.cu(),
              magnet->sub1()->magnetization()->field().cu(),
              magnet->sub2()->magnetization()->field().cu(),
-             magnet->sub3()->magnetization()->field().cu(),
-             magnet->sub1()->msat.cu(), magnet->sub2()->msat.cu(),
-             magnet->sub3()->msat.cu());
+             magnet->sub3()->magnetization()->field().cu(), magnet->sub1()->msat.cu(),
+             magnet->sub2()->msat.cu(), magnet->sub3()->msat.cu());
   return octupole;
 }
 
 NcAfm_FieldQuantity octupoleVectorQuantity(const NcAfm* magnet) {
-  return NcAfm_FieldQuantity(magnet, evalOctupoleVector, 3, "octupole_vector",
-                             "");
+  return NcAfm_FieldQuantity(magnet, evalOctupoleVector, 3, "octupole_vector", "");
 }

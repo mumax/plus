@@ -74,9 +74,7 @@ class Field : public FieldQuantity {
    */
   void setData(const std::vector<real>& buffer);
   void setUniformComponent(int comp, real value);
-  void setUniformComponentInRegion(unsigned int regionIdx,
-                                   int comp,
-                                   real value);
+  void setUniformComponentInRegion(unsigned int regionIdx, int comp, real value);
   void setUniformValue(real value);
   void setUniformValue(real3 value);
   void setUniformValueInRegion(unsigned int regionIdx, real value);
@@ -104,9 +102,7 @@ struct CuField {
 
  public:
   explicit CuField(const Field* f)
-      : system(f->system()->cu()),
-        ncomp(f->ncomp()),
-        ptrs(f->bufferPtrs_.get()) {}
+      : system(f->system()->cu()), ncomp(f->ncomp()), ptrs(f->bufferPtrs_.get()) {}
 
   __device__ bool cellInGrid(int) const;
   __device__ bool cellInGrid(int3) const;
@@ -146,13 +142,11 @@ __device__ inline bool CuField::cellInGeometry(int3 coo) const {
   return system.inGeometry(coo);
 }
 
-__device__ inline bool CuField::cellInRegion(unsigned int region_idx,
-                                             int idx) const {
+__device__ inline bool CuField::cellInRegion(unsigned int region_idx, int idx) const {
   return system.inRegion(region_idx, idx);
 }
 
-__device__ inline bool CuField::cellInRegion(unsigned int region_idx,
-                                             int3 coo) const {
+__device__ inline bool CuField::cellInRegion(unsigned int region_idx, int3 coo) const {
   return system.inRegion(region_idx, coo);
 }
 

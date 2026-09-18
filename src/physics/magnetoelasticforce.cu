@@ -61,12 +61,10 @@ __global__ void k_magnetoelasticForce(CuField fField,
       dmdi = (-m_0 + m.vectorAt(coo_ip1));
     } else if (system.inGeometry(coo_im2) && !system.inGeometry(coo_ip1)) {
       // 111-- backward difference, ε ~ h^2
-      dmdi =
-          (0.5 * m.vectorAt(coo_im2) - 2.0 * m.vectorAt(coo_im1) + 1.5 * m_0);
+      dmdi = (0.5 * m.vectorAt(coo_im2) - 2.0 * m.vectorAt(coo_im1) + 1.5 * m_0);
     } else if (!system.inGeometry(coo_im1) && system.inGeometry(coo_ip1)) {
       // --111 forward difference,  ε ~ h^2
-      dmdi =
-          (-0.5 * m.vectorAt(coo_ip2) + 2.0 * m.vectorAt(coo_ip1) - 1.5 * m_0);
+      dmdi = (-0.5 * m.vectorAt(coo_ip2) + 2.0 * m.vectorAt(coo_ip1) - 1.5 * m_0);
     } else {
       // 11111 central difference,  ε ~ h^4
       dmdi = ((2. / 3.) * (m.vectorAt(coo_ip1) - m.vectorAt(coo_im1)) +
@@ -93,10 +91,9 @@ __global__ void k_magnetoelasticForce(CuField fField,
 
     real f_i = 2 * B1.valueAt(idx) * m_here[i] * der[i][i];
     f_i += B2.valueAt(idx) * m_here[i] * (der[ip1][ip1] + der[ip2][ip2]);
-    f_i += B2.valueAt(idx) *
-           (m_here[ip1] * der[ip1][i] + m_here[ip2] * der[ip2][i]);
-    f_i += BChiral.valueAt(idx) *
-           (m_here[ip1] * der[i][ip1] - m_here[ip2] * der[i][ip2]);
+    f_i += B2.valueAt(idx) * (m_here[ip1] * der[ip1][i] + m_here[ip2] * der[ip2][i]);
+    f_i +=
+        BChiral.valueAt(idx) * (m_here[ip1] * der[i][ip1] - m_here[ip2] * der[i][ip2]);
     fField.setValueInCell(idx, i, f_i);
   }
 }
@@ -120,6 +117,6 @@ Field evalMagnetoelasticForce(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity magnetoelasticForceQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalMagnetoelasticForce, 3,
-                          "magnetoelastic_force", "N/m3");
+  return FM_FieldQuantity(magnet, evalMagnetoelasticForce, 3, "magnetoelastic_force",
+                          "N/m3");
 }

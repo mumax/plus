@@ -201,9 +201,8 @@ class SteepestDescent : public LinSolver::Stepper {
 
 //--- LINSOLVER FACTORY METHOD -----------------------------------
 
-std::unique_ptr<LinSolver::Stepper> LinSolver::Stepper::create(
-    LinSolver* parent,
-    Method method) {
+std::unique_ptr<LinSolver::Stepper> LinSolver::Stepper::create(LinSolver* parent,
+                                                               Method method) {
   switch (method) {
     case Method::JACOBI:
       return std::make_unique<Jacobi>(parent);

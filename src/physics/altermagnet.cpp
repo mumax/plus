@@ -1,6 +1,7 @@
 #include "altermagnet.hpp"
 
 #include <math.h>
+
 #include <algorithm>
 #include <cfloat>
 #include <memory>
@@ -32,8 +33,7 @@ Altermagnet::Altermagnet(MumaxWorld* world,
                          std::string name,
                          GpuBuffer<bool> geometry,
                          GpuBuffer<unsigned int> regions)
-    : Altermagnet(std::make_shared<System>(world, grid, geometry, regions),
-                  name) {}
+    : Altermagnet(std::make_shared<System>(world, grid, geometry, regions), name) {}
 
 const Ferromagnet* Altermagnet::sub1() const {
   return &sub1_;

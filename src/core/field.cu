@@ -1,5 +1,3 @@
-#include "field.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -9,6 +7,7 @@
 #include "cudaerror.hpp"
 #include "cudalaunch.hpp"
 #include "cudastream.hpp"
+#include "field.hpp"
 #include "fieldops.hpp"
 #include "fieldquantity.hpp"
 #include "gpubuffer.hpp"
@@ -32,8 +31,7 @@ Field::Field(std::shared_ptr<const System> system, int nComponents, real3 value)
   setUniformValue(value);
 }
 
-Field::Field(const Field& other)
-    : system_(other.system_), ncomp_(other.ncomp_) {
+Field::Field(const Field& other) : system_(other.system_), ncomp_(other.ncomp_) {
   buffers_ = other.buffers_;
   updateDevicePointersBuffer();
 }
@@ -86,8 +84,7 @@ void Field::allocate() {
   if (empty())
     return;
 
-  buffers_ =
-      std::vector<GpuBuffer<real>>(ncomp_, GpuBuffer<real>(grid().ncells()));
+  buffers_ = std::vector<GpuBuffer<real>>(ncomp_, GpuBuffer<real>(grid().ncells()));
 
   updateDevicePointersBuffer();
 }
@@ -187,12 +184,9 @@ void Field::setUniformComponent(int comp, real value) {
   cudaLaunch(grid().ncells(), k_setComponent, cu(), value, comp);
 }
 
-void Field::setUniformComponentInRegion(unsigned int regionIdx,
-                                        int comp,
-                                        real value) {
+void Field::setUniformComponentInRegion(unsigned int regionIdx, int comp, real value) {
   system_->checkIdxInRegions(regionIdx);
-  cudaLaunch(grid().ncells(), k_setComponentInRegion, cu(), value, comp,
-             regionIdx);
+  cudaLaunch(grid().ncells(), k_setComponentInRegion, cu(), value, comp, regionIdx);
 }
 
 void Field::setUniformValue(real value) {

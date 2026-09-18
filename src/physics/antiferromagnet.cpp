@@ -1,6 +1,7 @@
 #include "antiferromagnet.hpp"
 
 #include <math.h>
+
 #include <algorithm>
 #include <cfloat>
 #include <memory>
@@ -12,8 +13,7 @@
 #include "mumaxworld.hpp"
 #include "relaxer.hpp"
 
-Antiferromagnet::Antiferromagnet(std::shared_ptr<System> system_ptr,
-                                 std::string name)
+Antiferromagnet::Antiferromagnet(std::shared_ptr<System> system_ptr, std::string name)
     : HostMagnet(system_ptr, name),
       sub1_(Ferromagnet(system_ptr, name + ":sublattice_1", this)),
       sub2_(Ferromagnet(system_ptr, name + ":sublattice_2", this)) {
@@ -26,8 +26,7 @@ Antiferromagnet::Antiferromagnet(MumaxWorld* world,
                                  std::string name,
                                  GpuBuffer<bool> geometry,
                                  GpuBuffer<unsigned int> regions)
-    : Antiferromagnet(std::make_shared<System>(world, grid, geometry, regions),
-                      name) {}
+    : Antiferromagnet(std::make_shared<System>(world, grid, geometry, regions), name) {}
 
 const Ferromagnet* Antiferromagnet::sub1() const {
   return &sub1_;

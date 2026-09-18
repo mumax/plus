@@ -16,6 +16,7 @@ void wrap_variable(py::module& m) {
            })
       .def("set_in_region", [](const Variable* v, unsigned int idx,
                                real value) { v->setInRegion(idx, value); })
-      .def("set_in_region", [](const Variable* v, unsigned int idx,
-                               real3 value) { v->setInRegion(idx, value); });
+      .def("set_in_region", [](const Variable* v, unsigned int idx, real3 value) {
+        v->setInRegion(idx, value);
+      });
 }

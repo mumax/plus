@@ -31,15 +31,12 @@ __global__ void k_angle(CuField angleField,
   bool b2 = (msat2.valueAt(idx) != 0);
   bool b3 = (msat3.valueAt(idx) != 0);
 
-  real dev12 =
-      acos(dot(mField1.vectorAt(idx) * b1, mField2.vectorAt(idx) * b2)) -
-      (120.0 * M_PI / 180.0);
-  real dev13 =
-      acos(dot(mField1.vectorAt(idx) * b1, mField3.vectorAt(idx) * b3)) -
-      (120.0 * M_PI / 180.0);
-  real dev23 =
-      acos(dot(mField2.vectorAt(idx) * b2, mField3.vectorAt(idx) * b3)) -
-      (120.0 * M_PI / 180.0);
+  real dev12 = acos(dot(mField1.vectorAt(idx) * b1, mField2.vectorAt(idx) * b2)) -
+               (120.0 * M_PI / 180.0);
+  real dev13 = acos(dot(mField1.vectorAt(idx) * b1, mField3.vectorAt(idx) * b3)) -
+               (120.0 * M_PI / 180.0);
+  real dev23 = acos(dot(mField2.vectorAt(idx) * b2, mField3.vectorAt(idx) * b3)) -
+               (120.0 * M_PI / 180.0);
 
   angleField.setVectorInCell(idx, real3{dev12, dev13, dev23});
 }
@@ -60,8 +57,7 @@ __global__ void k_maxAngle(real* result,
       continue;
     if (msat1.valueAt(i) == 0 || msat2.valueAt(i) == 0)
       continue;
-    real angle =
-        fabs(acos(dot(sub1.vectorAt(i), sub2.vectorAt(i))) - 2.0 * M_PI / 3);
+    real angle = fabs(acos(dot(sub1.vectorAt(i), sub2.vectorAt(i))) - 2.0 * M_PI / 3);
 
     threadValue = angle > threadValue ? angle : threadValue;
   }
@@ -89,9 +85,9 @@ Field evalAngleField(const NcAfm* magnet) {
   cudaLaunch(angleField.grid().ncells(), k_angle, angleField.cu(),
              magnet->sub1()->magnetization()->field().cu(),
              magnet->sub2()->magnetization()->field().cu(),
-             magnet->sub3()->magnetization()->field().cu(),
-             magnet->afmex_cell.cu(), magnet->sub1()->msat.cu(),
-             magnet->sub2()->msat.cu(), magnet->sub3()->msat.cu());
+             magnet->sub3()->magnetization()->field().cu(), magnet->afmex_cell.cu(),
+             magnet->sub1()->msat.cu(), magnet->sub2()->msat.cu(),
+             magnet->sub3()->msat.cu());
   return angleField;
 }
 

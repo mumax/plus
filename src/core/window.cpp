@@ -1,4 +1,5 @@
 #include "window.hpp"
+
 #include "datatypes.hpp"
 #include "mumaxworld.hpp"
 #include "shift.hpp"
@@ -17,14 +18,10 @@ void Window::move(int dir, int axis, int comp) {
   // Multiply dir by -1 because the field is moved to dir iff the window is
   // moved to -dir
   (&position_.x)[axis] += -1. * dir * (&cs.x)[axis];
-  (&velocity_.x)[axis] =
-      -1. * dir * (&cs.x)[axis] / world_.timesolver().timestep();
+  (&velocity_.x)[axis] = -1. * dir * (&cs.x)[axis] / world_.timesolver().timestep();
   (&total_dist_.x)[axis] += (&cs.x)[axis];
 }
-Field Window::centerOnExcitation(const Field& field,
-                                 int dir,
-                                 int axis,
-                                 int comp) {
+Field Window::centerOnExcitation(const Field& field, int dir, int axis, int comp) {
   return shift(field, dir, comp, axis, magValues_[0], magValues_[1]);
 }
 

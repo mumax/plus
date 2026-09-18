@@ -55,8 +55,8 @@ real evalKineticEnergy(const Magnet* magnet) {
 }
 
 M_FieldQuantity kineticEnergyDensityQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalKineticEnergyDensity, 1,
-                         "kinetic_energy_density", "J/m3");
+  return M_FieldQuantity(magnet, evalKineticEnergyDensity, 1, "kinetic_energy_density",
+                         "J/m3");
 }
 
 M_ScalarQuantity kineticEnergyQuantity(const Magnet* magnet) {
@@ -98,8 +98,7 @@ Field evalElasticEnergyDensity(const Magnet* magnet) {
   int ncells = elField.grid().ncells();
   Field stress = evalStressTensor(magnet);
   Field strain = evalStrainTensor(magnet);
-  cudaLaunch(ncells, k_elasticEnergyDensity, elField.cu(), stress.cu(),
-             strain.cu());
+  cudaLaunch(ncells, k_elasticEnergyDensity, elField.cu(), stress.cu(), strain.cu());
   return elField;
 }
 
@@ -112,8 +111,8 @@ real evalElasticEnergy(const Magnet* magnet) {
 }
 
 M_FieldQuantity elasticEnergyDensityQuantity(const Magnet* magnet) {
-  return M_FieldQuantity(magnet, evalElasticEnergyDensity, 1,
-                         "elastic_energy_density", "J/m3");
+  return M_FieldQuantity(magnet, evalElasticEnergyDensity, 1, "elastic_energy_density",
+                         "J/m3");
 }
 
 M_ScalarQuantity elasticEnergyQuantity(const Magnet* magnet) {

@@ -41,8 +41,7 @@ py::array_t<T> get_data(const System* system, Getter getter, T default_value) {
 void wrap_system(py::module& m) {
   py::class_<System, std::shared_ptr<System>>(m, "System")
       .def_property_readonly("grid", &System::grid)
-      .def_property_readonly("time",
-                             [](const System& s) { return s.world()->time(); })
+      .def_property_readonly("time", [](const System& s) { return s.world()->time(); })
       .def_property_readonly("cellsize", &System::cellsize)
       .def("cell_position", &System::cellPosition)
       .def_property_readonly("origin", &System::origin)
@@ -51,13 +50,12 @@ void wrap_system(py::module& m) {
                              [](const System* system) {
                                std::array<real, 6> e = system->extent();
                                // return tuple, not list
-                               return py::make_tuple(e[0], e[1], e[2], e[3],
-                                                     e[4], e[5]);
+                               return py::make_tuple(e[0], e[1], e[2], e[3], e[4],
+                                                     e[5]);
                              })
       .def_property_readonly("geometry",
                              [](const System* system) {
-                               return get_data<bool>(system, &System::geometry,
-                                                     true);
+                               return get_data<bool>(system, &System::geometry, true);
                              })
       .def_property_readonly("regions", [](const System* system) {
         return get_data<unsigned int>(system, &System::regions, 0);

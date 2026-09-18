@@ -63,12 +63,10 @@ __global__ void k_strainTensor(CuField strain,
       dudi = (-u_0 + u.vectorAt(coo_ip1));
     } else if (system.inGeometry(coo_im2) && !system.inGeometry(coo_ip1)) {
       // 111-- backward difference, ε ~ h^2
-      dudi =
-          (0.5 * u.vectorAt(coo_im2) - 2.0 * u.vectorAt(coo_im1) + 1.5 * u_0);
+      dudi = (0.5 * u.vectorAt(coo_im2) - 2.0 * u.vectorAt(coo_im1) + 1.5 * u_0);
     } else if (!system.inGeometry(coo_im1) && system.inGeometry(coo_ip1)) {
       // --111 forward difference,  ε ~ h^2
-      dudi =
-          (-0.5 * u.vectorAt(coo_ip2) + 2.0 * u.vectorAt(coo_ip1) - 1.5 * u_0);
+      dudi = (-0.5 * u.vectorAt(coo_ip2) + 2.0 * u.vectorAt(coo_ip1) - 1.5 * u_0);
     } else {
       // 11111 central difference,  ε ~ h^4
       dudi = ((2.0 / 3.0) * (u.vectorAt(coo_ip1) - u.vectorAt(coo_im1)) +

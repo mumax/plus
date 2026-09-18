@@ -24,9 +24,7 @@ Minimizer::Minimizer(const Ferromagnet* magnet,
   // TODO: check if input arguments are sane
 }
 
-Minimizer::Minimizer(const HostMagnet* magnet,
-                     real stopMaxMagDiff,
-                     int nMagDiffSamples)
+Minimizer::Minimizer(const HostMagnet* magnet, real stopMaxMagDiff, int nMagDiffSamples)
     : magnets_(magnet->sublattices()),
       nMagDiffSamples_(nMagDiffSamples),
       stopMaxMagDiff_(stopMaxMagDiff),
@@ -39,13 +37,10 @@ Minimizer::Minimizer(const HostMagnet* magnet,
     torques_.push_back(relaxTorqueQuantity(sub));
 }
 
-Minimizer::Minimizer(const MumaxWorld* world,
-                     real stopMaxMagDiff,
-                     int nMagDiffSamples)
+Minimizer::Minimizer(const MumaxWorld* world, real stopMaxMagDiff, int nMagDiffSamples)
     : stopMaxMagDiff_(stopMaxMagDiff) {
   // Total number of ferromagnets (FM instances or sublattices)
-  size_t N =
-      world->ferromagnets().size() + 2 * world->antiferromagnets().size();
+  size_t N = world->ferromagnets().size() + 2 * world->antiferromagnets().size();
 
   nMagDiffSamples_ = nMagDiffSamples * N;
 
@@ -121,8 +116,7 @@ void Minimizer::step() {
     m1[i] = Field(magnets_[i]->system(), 3);
     int ncells = m1[i].grid().ncells();
 
-    cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(),
-               stepsizes_[i]);
+    cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(), stepsizes_[i]);
   }
 
   for (size_t i = 0; i < magnets_.size(); i++)
@@ -133,8 +127,7 @@ void Minimizer::step() {
 
   for (size_t i = 0; i < magnets_.size(); i++) {
     Field dm = add(real(+1), m1[i], real(-1), m0[i]);
-    Field dt =
-        add(real(-1), t1[i], real(+1), t0[i]);  // TODO: check sign difference
+    Field dt = add(real(-1), t1[i], real(+1), t0[i]);  // TODO: check sign difference
 
     stepsizes_[i] = BarzilianBorweinStepSize(dm, dt, nsteps_);
 
