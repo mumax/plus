@@ -111,8 +111,7 @@ inline void add(Field& y,
       a1.system() != y.system() || a2.system() != y.system()) {
     throw std::invalid_argument(
         "Fields can not be multiplied and added together because they belong "
-        "to "
-        "different systems.");
+        "to different systems.");
   }
   if (x1.ncomp() != y.ncomp() || x2.ncomp() != y.ncomp()) {
     throw std::invalid_argument(
@@ -169,8 +168,7 @@ void addTo(Field& y, const Field& a, const Field& x) {
   if (x.system() != y.system() || a.system() != y.system()) {
     throw std::invalid_argument(
         "Fields can not be multiplied and added together because they belong "
-        "to "
-        "different systems.");
+        "to different systems.");
   }
   if (x.ncomp() != y.ncomp()) {
     throw std::invalid_argument(
@@ -314,9 +312,10 @@ __device__ real3 getRGB(real3 vec) {
 
   // HSL to RGB
   float Hp = 3.f * H / pi;
+  // in [0, 6)
   if (Hp < 0.f) {
     Hp += 6.f;
-  } else if (Hp >= 6.f) {  // in [0, 6)
+  } else if (Hp >= 6.f) {
     Hp -= 6.f;
   }
   float C = (L <= 0.5f) ? 2.f * L * S : 2.f * (1.f - L) * S;

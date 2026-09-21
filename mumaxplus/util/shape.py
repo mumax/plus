@@ -903,9 +903,8 @@ class ImageShape(Shape):
 
         w, h = img.width, img.height
         x0, y0, x1, y1 = min_point[0], min_point[1], max_point[0], max_point[1]
-        dx, dy = (x1 - x0) / (w - 1), (y1 - y0) / (
-            h - 1
-        )  # pixel width and height in world
+        # pixel width and height in world
+        dx, dy = (x1 - x0) / (w - 1), (y1 - y0) / (h - 1)
 
         def shape_func(x, y, z):
             inside = (
@@ -991,13 +990,8 @@ class ObjShape(Shape):
 
         ## Parse the positioning arguments
         toarray = lambda arg: _np.asarray(arg) if arg is not None else None
-        min_point, max_point, center, scale, size = (
-            toarray(min_point),
-            toarray(max_point),
-            toarray(center),
-            toarray(scale),
-            toarray(size),
-        )
+        min_point, max_point = toarray(min_point), toarray(max_point)
+        center, scale, size = toarray(center), toarray(scale), toarray(size)
         if size is not None:
             if scale is not None:
                 raise ValueError(
@@ -1011,12 +1005,8 @@ class ObjShape(Shape):
                 "Exactly 2 arguments of 'min_point', 'max_point', 'center' and "
                 "'scale'/'size' should be provided."
             )
-        match (
-            min_point,
-            max_point,
-            center,
-            scale,
-        ):  # Reduce parameters to just (min_point, max_point)
+        # Reduce parameters to just (min_point, max_point)
+        match (min_point, max_point, center, scale):
             case (_, _, None, None):
                 pass
             case (None, None, _, _):
@@ -1034,9 +1024,8 @@ class ObjShape(Shape):
                 min_point = max_point - scale * mesh_size
         if keep_aspect:
             center = (min_point + max_point) / 2
-            scale = min(
-                (max_point - min_point) / mesh_size
-            )  # Isotropic scaling, defined by smallest factor needed to fit in box
+            # Isotropic scaling, defined by smallest factor needed to fit in box
+            scale = min((max_point - min_point) / mesh_size)
             min_point, max_point = (
                 center - scale * mesh_size / 2,
                 center + scale * mesh_size / 2,
@@ -1047,9 +1036,8 @@ class ObjShape(Shape):
         mesh.apply_translation(min_point - mesh.bounds[0])
 
         ## Use PyVista mesh in hape_func
-        mesh_pv = pv.wrap(
-            mesh
-        )  # PyVista provides far more efficient checks than trimesh
+        # PyVista provides far more efficient checks than trimesh
+        mesh_pv = pv.wrap(mesh)
 
         def shape_func(x, y, z):
             if hasattr(x, "__iter__"):  # ndarray

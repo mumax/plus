@@ -191,7 +191,7 @@ class FieldQuantity:
         if self.ncomp == 1:
             data = _np.array([ovf.data])
         else:
-            # _np.ascontiguousarray is used so data is the transformed array. Otherwise
-            # the C++ layer still uses ovf.data
+            # _np.ascontiguousarray is used so data is the transformed array.
+            # Otherwise the C++ layer still uses ovf.data
             data = _np.ascontiguousarray(_np.moveaxis(ovf.data, -1, 0))
         self.set(data)

@@ -52,9 +52,8 @@ def canting_y(magnet):
 
 def analytic():
     theta0 = np.arcsin(DMI / 2)
-    cant_analytic = 2 * np.arctan(
-        np.exp(-cs / 2) * np.tan(theta0 / 2)
-    )  # shift towards center of the cell
+    # shift towards center of the cell
+    cant_analytic = 2 * np.arctan(np.exp(-cs / 2) * np.tan(theta0 / 2))
     return cant_analytic
 
 

@@ -417,9 +417,8 @@ class World:
 
         # If no axis is given, return first axis with most number of cells
         if axis is None:
-            axis = np.argmax(
-                self.bounding_grid.size
-            )  # bounding grid is safe if only 1 magnet
+            # bounding grid is safe if only 1 magnet
+            axis = np.argmax(self.bounding_grid.size)
             warnings.warn(
                 "There is no axis provided in the moving simulation window."
                 + f" The {('x', 'y', 'z')[axis]}-direction is used as normal to the"

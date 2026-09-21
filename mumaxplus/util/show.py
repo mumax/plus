@@ -148,8 +148,8 @@ def get_rgb(
     # FieldQuantity in 3D or with trivial index: use CUDA
     if is_quantity and (
         (layer is None or OoP_axis_idx is None)  # 3D
-        or (field_quantity.shape[-1 - OoP_axis_idx] == 1)
-    ):  # trivial
+        or (field_quantity.shape[-1 - OoP_axis_idx] == 1)  # trivial
+    ):
 
         # use faster CUDA get_rgb for 3D rgb
         rgb_front = field_quantity.get_rgb()
@@ -261,9 +261,8 @@ def slice_field_right_handed(
     field_2D = field[tuple(slice_)]
 
     if OoP_axis_idx == 1:  # y
-        field_2D = _np.swapaxes(
-            field_2D, -1, -2
-        )  # ([ncomp,] nx, nz)  for right-hand axes
+        # ([ncomp,] nx, nz)  for right-hand axes
+        field_2D = _np.swapaxes(field_2D, -1, -2)
 
     return field_2D
 
@@ -920,16 +919,14 @@ class _Plotter:
                     cellsize[self.hor_axis_idx], cellsize[self.vert_axis_idx]
                 )
 
-            max_IP_norm = _np.max(
-                _np.sqrt(U**2 + V**2)
-            )  # longest in-plane arrow in UV units
+            # longest in-plane arrow in UV units
+            max_IP_norm = _np.max(_np.sqrt(U**2 + V**2))
             self.quiver_kwargs["scale"] = max_IP_norm / max_allowed_len
             self.quiver_kwargs["scale_units"] = "xy"
 
         # plot requested quiver
-        if (
-            isinstance(self.quiver_cmap, str) and "hsl" in self.quiver_cmap.lower()
-        ):  # HSL with rgb
+        # HSL with rgb
+        if isinstance(self.quiver_cmap, str) and "hsl" in self.quiver_cmap.lower():
             q_rgb = _np.reshape(
                 get_rgb(sampled_field, OoP_axis_idx=None, layer=None),
                 (nx_new * ny_new, 3),
@@ -1758,9 +1755,8 @@ def show_magnet_geometry(magnet):
         spacing=magnet.cellsize,
         origin=_np.array(magnet.origin) - 0.5 * _np.array(magnet.cellsize),
     )
-    image_data.cell_data["values"] = _np.float32(
-        geom.flatten("C")
-    )  # "C" because [z,y,x]
+    # "C" because [z,y,x]
+    image_data.cell_data["values"] = _np.float32(geom.flatten("C"))
     threshed = image_data.threshold_percent(0.5)  # only show True
 
     plotter = _pv.Plotter()
@@ -1839,9 +1835,8 @@ def show_field_3D(quantity, cmap="HSL", enable_quiver=True, symmetric_clim=True)
         cone = _pv.Cone(center=(1 / 4, 0, 0), radius=0.32, height=1, resolution=cres)
         factor = min(cell_size[0:2]) if shape[2] == 1 else min(cell_size)
         factor *= 0.95  # no touching
-        factor /= _np.max(
-            _np.linalg.norm(threshed["field"], axis=1)
-        )  # proper magnitude support
+        # proper magnitude support
+        factor /= _np.max(_np.linalg.norm(threshed["field"], axis=1))
 
         quiver = threshed.glyph(orient="field", factor=factor, geom=cone)
 

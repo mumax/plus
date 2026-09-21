@@ -3,11 +3,8 @@ import numpy as np
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util.shape import Ellipsoid
 
-C11, C12, C44 = (
-    300e-9,
-    110e-9,
-    60e-9,
-)  # not explicitly used, but avoids assuredZero checks
+# not explicitly used, but avoids assuredZero checks
+C11, C12, C44 = 300e-9, 110e-9, 60e-9
 cx, cy, cz = 1e-9, 2e-9, 3e-9  # non-equal cell sizes
 
 nx, ny, nz = 32, 16, 8
@@ -24,9 +21,8 @@ class TestBoundaryTraction3DGeom:
     def setup_class(self):
         geom = Ellipsoid(nx * cx, ny * cy, nz * cz)
         geom -= Ellipsoid(nx * cx / 2, ny * cy / 2, nz * cz / 2)  # make hole
-        geom.translate(
-            (nx - 1) / 2 * cx, (ny - 1) / 2 * cy, (nz - 1) / 2 * cz
-        )  # to center
+        # to center
+        geom.translate((nx - 1) / 2 * cx, (ny - 1) / 2 * cy, (nz - 1) / 2 * cz)
 
         self.world = World((cx, cy, cz))
         self.magnet = Ferromagnet(self.world, Grid((nx, ny, nz)), geometry=geom)

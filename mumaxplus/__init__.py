@@ -32,9 +32,8 @@ FP_PRECISION: str = _args.fp_precision  # Can be None
 # If not, was an environment variable set?
 if not FP_PRECISION:
     FP_PRECISION = _os.environ.get("MUMAXPLUS_FP_PRECISION")
-elif mfpenv := _os.environ.get(
-    "MUMAXPLUS_FP_PRECISION"
-):  # Both envvar and CLI arg were set: warn user of this
+# Both envvar and CLI arg were set: warn user of this
+elif mfpenv := _os.environ.get("MUMAXPLUS_FP_PRECISION"):
     if _FP_allowed_vals.get(mfpenv.upper()) != _FP_allowed_vals.get(
         FP_PRECISION.upper()
     ):

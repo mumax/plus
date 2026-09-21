@@ -154,13 +154,8 @@ class TestNcAfmExchange:
         V = length * width * thickness
 
         # find exchange energy per angle
-        angles, E_fm_mumax, E_inhomo_mumax, E_fm_theory, E_inhomo_theory = (
-            [],
-            [],
-            [],
-            [],
-            [],
-        )
+        angles = []
+        E_fm_mumax, E_inhomo_mumax, E_fm_theory, E_inhomo_theory = [], [], [], []
         kx = 0
         kx_step = 1e7
         X, _, _ = magnet.sub1.magnetization.meshgrid  # for fast magnetization setting
@@ -222,13 +217,8 @@ class TestNcAfmExchange:
         V = length * width * thickness
 
         # find exchange energy per phase angle
-        angles, E_homo_mumax, E_inhomo_mumax, E_homo_theory, E_inhomo_theory = (
-            [],
-            [],
-            [],
-            [],
-            [],
-        )
+        angles = []
+        E_homo_mumax, E_inhomo_mumax, E_homo_theory, E_inhomo_theory = [], [], [], []
         kx = 1e7  # arbitrary k value
         phi = 0
         X, _, _ = magnet.sub1.magnetization.meshgrid  # for fast magnetization setting

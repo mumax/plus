@@ -15,11 +15,10 @@ from .scalarquantity import ScalarQuantity
 
 
 class Antiferromagnet(Magnet):
-    """Create an antiferromagnet instance."""
-
     def __init__(self, world, grid, name="", geometry=None, regions=None):
-        """
-        Can also be used to create a Ferrimagnet instance since
+        """Create an antiferromagnet instance.
+
+        This class can also be used to create a Ferrimagnet instance since
         both sublattices are independently modifiable.
 
         Parameters
