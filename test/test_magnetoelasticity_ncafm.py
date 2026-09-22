@@ -36,18 +36,10 @@ def check_magnetoelastic_field(host, sublattice):
         ip1 = (i + 1) % 3
         ip2 = (i + 2) % 3
 
-        B_anal[i, ...] = (
-            -2
-            / msat
-            * (
-                B1 * strain[i, ...] * m[i, ...]
-                + B2
-                * (
-                    strain[i + ip1 + 2, ...] * m[ip1, ...]
-                    + strain[i + ip2 + 2, ...] * m[ip2, ...]
-                )
-            )
-        )
+        B_anal[i,...] = - 2  / msat * (
+            B1 *  strain[i,...] * m[i,...] + 
+            B2 * (strain[i+ip1+2,...] * m[ip1,...] + 
+                  strain[i+ip2+2,...] * m[ip2,...]))  # fmt: skip
 
     assert max_semirelative_error(B_num, B_anal) < SRTOL
 
