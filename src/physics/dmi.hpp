@@ -64,13 +64,13 @@ __device__ static inline real3 getGamma(const CuDmiTensor dmiTensor,
   real Dzxz = dmiTensor.zxz.valueAt(idx);
   real Dzxy = dmiTensor.zxy.valueAt(idx);
   real Dzyz = dmiTensor.zyz.valueAt(idx);
-  return real3{-Dxxy * n.x * m.y - Dxxz * n.x * m.z - Dyxz * n.y * m.z -
-                   Dzxy * n.z * m.y - Dyxy * n.y * m.y - Dzxz * n.z * m.z,
-               Dxxy * n.x * m.x - Dzyz * n.z * m.z + Dyxy * n.y * m.x -
-                   Dxyz * n.x * m.z + Dzxy * n.z * m.x - Dyyz * n.y * m.z,
-               Dxxz * n.x * m.x + Dyyz * n.y * m.y + Dxyz * n.x * m.y +
-                   Dyxz * n.y * m.x + Dzxz * n.z * m.x + Dzyz * n.z * m.y};
+  // clang-format off
+  return real3{
+        -Dxxy*n.x*m.y - Dxxz*n.x*m.z - Dyxz*n.y*m.z - Dzxy*n.z*m.y - Dyxy*n.y*m.y - Dzxz*n.z*m.z,
+         Dxxy*n.x*m.x - Dzyz*n.z*m.z + Dyxy*n.y*m.x - Dxyz*n.x*m.z + Dzxy*n.z*m.x - Dyyz*n.y*m.z,
+         Dxxz*n.x*m.x + Dyyz*n.y*m.y + Dxyz*n.x*m.y + Dyxz*n.y*m.x + Dzxz*n.z*m.x + Dzyz*n.z*m.y};
 }
+// clang-format on
 
 // returns exchange stiffness constant, taking grain boundaries into account
 // (not really DMI-related, but is also used in Neumann BC calculation, along
