@@ -41,16 +41,13 @@ repos:
           - "--filter=-legal/copyright,-build/include_subdir,-build/include_what_you_use,-whitespace/braces,-build/include_order,-readability/casting"
           - "--linelength=88"
 
-  # clang-format for C/C++/CUDA sources (Chromium style)
-  # Uses a local hook so it runs whatever clang-format is on PATH,
-  # matching the version your build toolchain already uses.
-  - repo: local
+  # clang-format for C/C++/CUDA sources (custom style)
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v23.1.1
     hooks:
       - id: clang-format
         name: clang-format
         description: Run `clang-format` against C/C++/CUDA header and source files
-        language: system
         files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
-        entry: clang-format
         args: ["-i", "-style=file"]
 
