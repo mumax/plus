@@ -312,8 +312,7 @@ __device__ real3 getRGB(real3 vec) {
 
   // HSL to RGB
   float Hp = 3.f * H / pi;
-  // in [0, 6)
-  if (Hp < 0.f) {
+  if (Hp < 0.f) {  // in [0, 6)
     Hp += 6.f;
   } else if (Hp >= 6.f) {
     Hp -= 6.f;
