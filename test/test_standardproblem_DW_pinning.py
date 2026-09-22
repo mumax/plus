@@ -10,7 +10,7 @@ https://doi.org/10.1016/j.jmmm.2021.168875
 import numpy as np
 import pytest
 
-from mumaxplus import World, Grid, Ferromagnet
+from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util.constants import MU0
 
 
@@ -18,7 +18,9 @@ def analytical_pinning_field(A1, A2, K1, K2, Ms1, Ms2):
     """Returns the minimum field strength in Tesla at which the domain wall
     unpins from the boundary between phases 1 and 2.
     """
-    return 2 * K2 / Ms2 * (1 - K1/K2 * A1/A2) / (1 + np.sqrt(Ms1/Ms2 * A1/A2)) ** 2
+    return (
+        2 * K2 / Ms2 * (1 - K1 / K2 * A1 / A2) / (1 + np.sqrt(Ms1 / Ms2 * A1 / A2)) ** 2
+    )
 
 
 @pytest.mark.slow
@@ -39,8 +41,11 @@ def test_stdp_DW_pinning():
     nx, ny, nz = 80, 1, 1  # each phase 40 nm long
 
     world = World((cx, cy, cz))
-    magnet = Ferromagnet(world, Grid((nx, ny, nz)),
-                regions=lambda x,y,z: 1 if x < (nx - 1) / 2 * cx else 2)  # left 1, right 2
+    magnet = Ferromagnet(
+        world,
+        Grid((nx, ny, nz)),
+        regions=lambda x, y, z: 1 if x < (nx - 1) / 2 * cx else 2,
+    )  # left 1, right 2
 
     magnet.enable_demag = False  # disabled for simplicity
     magnet.anisU = (1, 0, 0)
@@ -65,7 +70,9 @@ def test_stdp_DW_pinning():
 
     # initial configuration
     magnet.bias_magnetic_field = (Bx_min, 0, 0)
-    magnet.magnetization = lambda x, y, z: (1.0, 0.3, 0.0) if x < magnet.center[0] else (-1.0, 0.3, 0.0)
+    magnet.magnetization = lambda x, y, z: (
+        (1.0, 0.3, 0.0) if x < magnet.center[0] else (-1.0, 0.3, 0.0)
+    )
     magnet.relax()  # relax to initial configuration
 
     mx_array = np.zeros_like(Bx_array)
@@ -73,7 +80,6 @@ def test_stdp_DW_pinning():
         magnet.bias_magnetic_field = (Bx, 0, 0)
         magnet.minimize()
         mx_array[i] = magnet.magnetization.average()[0]
-
 
     # find sudden big change in mx
     mx_diff_tol = 0.6

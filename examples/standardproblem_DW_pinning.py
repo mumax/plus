@@ -12,11 +12,11 @@ The problem specification can be found in the following paper.
 https://doi.org/10.1016/j.jmmm.2021.168875
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
-from mumaxplus import World, Grid, Ferromagnet
+from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util.constants import MU0
 
 
