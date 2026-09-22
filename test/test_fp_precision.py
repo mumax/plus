@@ -13,6 +13,7 @@ from typing import Literal
 import numpy as np
 
 import mumaxplus
+from mumaxplus.util.constants import GAMMALL_DEFAULT, MU0 as gamma, mu0
 
 
 def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping):
@@ -22,7 +23,7 @@ def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping):
     mx, my, mz = initial_magnetization
     theta0 = np.acos(mz)
     phi0 = np.atan(my / mx)
-    freq = mumaxplus.util.constants.GAMMALL_DEFAULT * hfield_z / (1 + damping**2)
+    freq = gamma * hfield_z / (1 + damping**2)
     phi = phi0 + freq * time
     theta = np.pi - 2 * np.atan(
         np.exp(damping * freq * time) * np.tan(np.pi / 2 - theta0 / 2)
@@ -47,20 +48,16 @@ def single_system(method, dt):
     magnetization = (1 / np.sqrt(2), 0, 1 / np.sqrt(2))
     damping = 0.001
     hfield_z = 0.1  # External field strength
-    duration = (
-        2
-        * np.pi
-        / (mumaxplus.util.constants.GAMMALL_DEFAULT * hfield_z)
-        * (1 + damping**2)
-        * 10
-    )  # Time of 10 precessions
+
+    # Time of 10 precessions
+    duration = 2 * np.pi / (gamma * hfield_z) * (1 + damping**2) * 10
 
     magnet = mumaxplus.Ferromagnet(world, grid=mumaxplus.Grid((1, 1, 1)))
     magnet.enable_demag = False
     magnet.magnetization = magnetization
     magnet.alpha = damping
     magnet.aex = 10e-12
-    magnet.msat = 1 / mumaxplus.util.constants.MU0
+    magnet.msat = 1 / mu0
     world.bias_magnetic_field = (0, 0, hfield_z)
 
     # --- Run the simulation ---
