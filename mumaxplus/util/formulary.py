@@ -242,20 +242,12 @@ def Rayleigh_damping_coefficients(
 
     denom = frequency_2 * frequency_2 - frequency_1 * frequency_1
 
-    mass_coef = (
-        4
-        * _np.pi
-        * frequency_1
-        * frequency_2
-        * (damping_ratio_1 * frequency_2 - damping_ratio_2 * frequency_1)
-        / denom
-    )
-    stiffness_coef = (
-        1
-        / _np.pi
-        * (damping_ratio_2 * frequency_2 - damping_ratio_1 * frequency_1)
-        / denom
-    )
+    mass_coef = (4 * _np.pi * frequency_1 * frequency_2
+                 * (damping_ratio_1 * frequency_2 - damping_ratio_2 * frequency_1)
+                 / denom)  # fmt: skip
+    stiffness_coef = (1 / _np.pi
+                      * (damping_ratio_2 * frequency_2 - damping_ratio_1 * frequency_1)
+                      / denom)  # fmt: skip
 
     return (mass_coef, stiffness_coef)
 
