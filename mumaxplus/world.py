@@ -426,11 +426,8 @@ class World:
                 UserWarning,
             )
 
-        av = (
-            magnet.magnetization.average()
-            if isinstance(magnet, Ferromagnet)
-            else magnet.sub1.magnetization.average()
-        )
+        source = magnet if isinstance(magnet, Ferromagnet) else magnet.sub1
+        av = source.magnetization.average()
         if np.abs(av[comp]) > 4 / magnet.grid.size[0]:
             raise RuntimeError(
                 "The domain wall does not seem centered "
