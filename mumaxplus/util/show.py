@@ -1825,9 +1825,9 @@ def show_field_3D(quantity, cmap="HSL", enable_quiver=True, symmetric_clim=True)
     image_data.cell_data["field"] = quantity.eval().reshape((3, -1)).T  # cell data
 
     # don't show cells without geometry
-    image_data.cell_data["geom"] = _np.float32(quantity._impl.system.geometry).flatten(
-        "C"
-    )
+    image_data.cell_data["geom"] = (
+        _np.float32(quantity._impl.system.geometry).flatten("C")
+    )  # fmt: skip
     threshed = image_data.threshold_percent(0.5, scalars="geom")
 
     if enable_quiver:  # use cones to display direction
