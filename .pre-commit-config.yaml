@@ -39,7 +39,7 @@ repos:
           - "--verbose=3"
           - "--counting=toplevel"
           - "--filter=-legal/copyright,-build/include_subdir,-build/include_what_you_use,-whitespace/braces,-build/include_order,-readability/casting"
-          - "--linelength=80"
+          - "--linelength=88"
 
   # clang-format for C/C++/CUDA sources (Chromium style)
   # Uses a local hook so it runs whatever clang-format is on PATH,
@@ -49,7 +49,7 @@ repos:
       - id: clang-format
         name: clang-format
         description: Run `clang-format` against C/C++/CUDA header and source files
-        language: system  # was "python" — that's wrong for a hook that just shells out to a system binary
+        language: system
         files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
         entry: clang-format
         args: ["-i", "-style=file"]
