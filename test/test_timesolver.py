@@ -187,3 +187,113 @@ def test_set_invalid_timepoints(test_world, invalid_timepoints, expected_error_m
     # Catch the specific AssertionError and match its message
     with pytest.raises(AssertionError, match=expected_error_message):
         test_world.timesolver.solve(invalid_timepoints, {})
+
+
+@pytest.fixture
+def arbitrary_system(test_world):
+    """Returns the test world and a ferromagnet with arbitrary parameters as a
+    tuple.
+    """
+    magnet = Ferromagnet(test_world, grid=Grid((1, 1, 1)))
+    magnet.enable_demag = False
+    magnet.magnetization = (1, 0, 0)
+    magnet.alpha = 0.2
+    test_world.bias_magnetic_field = (0, 0, 0.11)
+
+    return (test_world, magnet)
+
+
+@pytest.mark.parametrize("adaptive", [True, False])
+def test_steps_initial_timestep(arbitrary_system, adaptive):
+    """Test setting an initial timestep with steps."""
+    timesolver = arbitrary_system[0].timesolver
+
+    before_timestep = 1e-12
+    initial_timestep = 2.5e-11
+    nsteps = 0  # no stepping or adapting will occur
+
+    timesolver.adaptive_timestep = adaptive
+    timesolver.timestep = before_timestep  # NOT initial timestep
+    timesolver.steps(nsteps, initial_timestep=initial_timestep)
+
+    # before_timestep is changed to initial_timestep
+    assert isclose(timesolver.timestep, initial_timestep, rel_tol=1e-5)
+
+
+def test_steps_sensible_timestep(arbitrary_system):
+    """Test adaptive steps without an initial timestep."""
+    timesolver = arbitrary_system[0].timesolver
+
+    before_timestep = 1e-12
+    nsteps = 0  # no stepping or adapting will occur
+
+    timesolver.adaptive_timestep = True
+    timesolver.timestep = before_timestep
+    sensible_timestep = timesolver.sensible_timestep  # get for checking
+    timesolver.steps(nsteps, initial_timestep=None)
+
+    # before_timestep is changed to sensible_timestep
+    assert isclose(timesolver.timestep, sensible_timestep, rel_tol=1e-5)
+
+
+def test_steps_initial_timestep_none(arbitrary_system):
+    """Test fixed steps without an initial timestep."""
+    timesolver = arbitrary_system[0].timesolver
+
+    before_timestep = 1e-12
+    nsteps = 0  # no stepping will occur
+
+    timesolver.adaptive_timestep = False
+    timesolver.timestep = before_timestep  # NOT initial timestep
+    timesolver.steps(nsteps, initial_timestep=None)
+
+    # before_timestep is unchanged
+    assert isclose(timesolver.timestep, before_timestep, rel_tol=1e-5)
+
+
+@pytest.mark.parametrize("adaptive", [True, False])
+def test_run_initial_timestep(arbitrary_system, adaptive):
+    """Test setting an initial timestep with run."""
+    timesolver = arbitrary_system[0].timesolver
+
+    before_timestep = 1e-12
+    initial_timestep = 2.5e-11
+    duration = 0  # no stepping or adapting will occur
+
+    timesolver.adaptive_timestep = adaptive
+    timesolver.timestep = before_timestep  # NOT initial timestep
+    timesolver.run(duration, initial_timestep=initial_timestep)
+
+    # before_timestep is changed to initial_timestep
+    assert isclose(timesolver.timestep, initial_timestep, rel_tol=1e-5)
+
+
+def test_run_sensible_timestep(arbitrary_system):
+    """Test adaptive run without an initial timestep."""
+    timesolver = arbitrary_system[0].timesolver
+
+    before_timestep = 1e-12
+    duration = 0  # no stepping or adapting will occur
+
+    timesolver.adaptive_timestep = True
+    timesolver.timestep = before_timestep
+    sensible_timestep = timesolver.sensible_timestep  # get for checking
+    timesolver.run(duration, initial_timestep=None)
+
+    # before_timestep is changed to sensible_timestep
+    assert isclose(timesolver.timestep, sensible_timestep, rel_tol=1e-5)
+
+
+def test_run_initial_timestep_none(arbitrary_system):
+    """Test fixed run without an initial timestep."""
+    timesolver = arbitrary_system[0].timesolver
+
+    before_timestep = 1e-12
+    duration = 0  # no stepping will occur
+
+    timesolver.adaptive_timestep = False
+    timesolver.timestep = before_timestep  # NOT initial timestep
+    timesolver.run(duration, initial_timestep=None)
+
+    # before_timestep is unchanged
+    assert isclose(timesolver.timestep, before_timestep, rel_tol=1e-5)
