@@ -93,19 +93,11 @@ def sine_displacement(magnet, i_comp, j_comp, B1=0, B2=0, Bc=0):
         ip1 = (i + 1) % 3
         ip2 = (i + 2) % 3
 
-        B_anal[i, ...] = (
-            -2
-            / msat
-            * (
-                B1 * strain_anal[i, ...] * m[i, ...]
-                + Bc * (-strain_anal[ip1, ...] + strain_anal[ip2, ...]) * m[i, ...]
-                + B2
-                * (
-                    strain_anal[i + ip1 + 2, ...] * m[ip1, ...]
-                    + strain_anal[i + ip2 + 2, ...] * m[ip2, ...]
-                )
-            )
-        )
+        B_anal[i,...] = - 2  / msat * (
+            B1 *  strain_anal[i,...] * m[i,...] + 
+            Bc * (-strain_anal[ip1,...] + strain_anal[ip2,...]) * m[i,...] +
+            B2 * (strain_anal[i+ip1+2,...] * m[ip1,...] + 
+                  strain_anal[i+ip2+2,...] * m[ip2,...]))  # fmt: skip
 
     assert max_semirelative_error(B_num, B_anal) < RTOL
 
@@ -242,19 +234,11 @@ def test_random():
         ip1 = (i + 1) % 3
         ip2 = (i + 2) % 3
 
-        B_anal[i, ...] = (
-            -2
-            / msat
-            * (
-                B1 * strain[i, ...] * m[i, ...]
-                + Bc * (-strain[ip1, ...] + strain[ip2, ...]) * m[i, ...]
-                + B2
-                * (
-                    strain[i + ip1 + 2, ...] * m[ip1, ...]
-                    + strain[i + ip2 + 2, ...] * m[ip2, ...]
-                )
-            )
-        )
+        B_anal[i,...] = - 2  / msat * (
+            B1 *  strain[i,...] * m[i,...] + 
+            Bc * (-strain[ip1,...] + strain[ip2,...]) * m[i,...] +
+            B2 * (strain[i+ip1+2,...] * m[ip1,...] + 
+                  strain[i+ip2+2,...] * m[ip2,...]))  # fmt: skip
 
     assert max_semirelative_error(B_num, B_anal) < 1e-6
 
@@ -285,18 +269,10 @@ def test_rigid_magnetoelastic_field():
         ip1 = (i + 1) % 3
         ip2 = (i + 2) % 3
 
-        B_anal[i, ...] = (
-            -2
-            / msat
-            * (
-                B1 * norm_strain[i, ...] * m[i, ...]
-                + Bc * (-norm_strain[ip1, ...] + norm_strain[ip2, ...]) * m[i, ...]
-                + B2
-                * (
-                    shear_strain[i + ip1 - 1, ...] * m[ip1, ...]
-                    + shear_strain[i + ip2 - 1, ...] * m[ip2, ...]
-                )
-            )
-        )
+        B_anal[i,...] = - 2  / msat * (
+            B1 *  norm_strain[i,...] * m[i,...] + 
+            Bc * (-norm_strain[ip1,...] + norm_strain[ip2,...]) * m[i,...] +
+            B2 * (shear_strain[i+ip1-1,...] * m[ip1,...] + 
+                  shear_strain[i+ip2-1,...] * m[ip2,...]))  # fmt: skip
 
     assert max_semirelative_error(B_num, B_anal) < 1e-6
