@@ -1,11 +1,11 @@
 #pragma once
 
 #include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
 
 #include "cast.hpp"
-#include "fieldToArray.hpp" // Seperate header file for template declaration
+#include "fieldToArray.hpp"  // Seperate header file for template declaration
 
 namespace py = pybind11;
 

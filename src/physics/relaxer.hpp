@@ -7,14 +7,14 @@ class DynamicEquation;
 class Magnet;
 class MumaxWorld;
 class TimeSolver;
-// Relax the system to a minimum energy state by first minimizing the total energy
-// and then minimizing the total torque.
+// Relax the system to a minimum energy state by first minimizing the total
+// energy and then minimizing the total torque.
 
 class Relaxer {
  public:
   Relaxer(const Magnet*, std::vector<real> RelaxTorqueThreshold, real tol);
   Relaxer(const MumaxWorld*, real RelaxTorqueThreshold, real tol);
-  
+
   // Execute relaxing procedure
   void exec();
 
@@ -28,7 +28,7 @@ class Relaxer {
  private:
   std::vector<const Magnet*> magnets_;
   std::vector<real> threshold_;
-  TimeSolver &timesolver_;
+  TimeSolver& timesolver_;
   const MumaxWorld* world_;
   real tol_;
 };

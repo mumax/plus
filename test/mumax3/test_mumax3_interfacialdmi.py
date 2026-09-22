@@ -1,10 +1,11 @@
+from mumax3 import Mumax3Simulation
 import numpy as np
 import pytest
-from mumax3 import Mumax3Simulation
 
 from mumaxplus import Ferromagnet, Grid, World
 
 RTOL = 1e-3
+
 
 @pytest.fixture(scope="class", params=[True, False])
 def simulations(request):
@@ -67,14 +68,12 @@ class TestInterfacialDMI:
     def test_dmi_energy_density(self, simulations):
         world, magnet, mumax3sim = simulations
         wanted = mumax3sim.get_field("edens_exch_dmi")
-        result = np.add(magnet.dmi_energy_density(),
-                        magnet.exchange_energy_density())
+        result = np.add(magnet.dmi_energy_density(), magnet.exchange_energy_density())
         assert np.allclose(result, wanted, rtol=RTOL)
 
     def test_dmi_in_total_energy_density(self, simulations):
         world, magnet, mumax3sim = simulations
-        wanted = np.add(magnet.dmi_energy_density(),
-                        magnet.exchange_energy_density())
+        wanted = np.add(magnet.dmi_energy_density(), magnet.exchange_energy_density())
         result = magnet.total_energy_density()
         assert np.allclose(result, wanted, rtol=RTOL)
 

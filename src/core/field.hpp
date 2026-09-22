@@ -80,7 +80,6 @@ class Field : public FieldQuantity {
   void setUniformValueInRegion(unsigned int regionIdx, real value);
   void setUniformValueInRegion(unsigned int regionIdx, real3 value);
 
-
   void makeZero();
 
   void setZeroOutsideGeometry();
@@ -103,9 +102,7 @@ struct CuField {
 
  public:
   explicit CuField(const Field* f)
-      : system(f->system()->cu()),
-        ncomp(f->ncomp()),
-        ptrs(f->bufferPtrs_.get()) {}
+      : system(f->system()->cu()), ncomp(f->ncomp()), ptrs(f->bufferPtrs_.get()) {}
 
   __device__ bool cellInGrid(int) const;
   __device__ bool cellInGrid(int3) const;

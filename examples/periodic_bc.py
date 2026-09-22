@@ -1,8 +1,8 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import get_rgb
-import numpy as np
-import matplotlib.pyplot as plt
-
 
 nx, ny, nz = 128, 128, 1
 cellsize = (0.1, 0.1, 0.1)

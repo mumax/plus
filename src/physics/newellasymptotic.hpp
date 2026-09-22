@@ -73,4 +73,4 @@ __host__ __device__ real calcAsymptoticNzx(int3 idx, real3 cellsize, int order);
  *  @param order the order of the approximation
  *  @see https://math.nist.gov/~MDonahue/talks/mmm2020-talk.pdf
  */
-__host__ __device__ real calcAsymptoticNzy(int3 idx, real3 cellsize,int order);
+__host__ __device__ real calcAsymptoticNzy(int3 idx, real3 cellsize, int order);

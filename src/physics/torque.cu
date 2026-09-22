@@ -26,8 +26,9 @@ __global__ void k_llgtorque(CuField torque,
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
   // Don't do anything outside of the grid.
-  if (!torque.cellInGrid(idx)) return;
-  
+  if (!torque.cellInGrid(idx))
+    return;
+
   // When outside the geometry or frozen, set to zero and return early
   if (!torque.cellInGeometry(idx) || (frozenSpins.valueAt(idx) != 0)) {
     torque.setVectorInCell(idx, real3{0, 0, 0});
@@ -42,7 +43,6 @@ __global__ void k_llgtorque(CuField torque,
   real3 mxmxh = cross(m, mxh);
   real3 t = -g / (1 + a * a) * (mxh + a * mxmxh);
   torque.setVectorInCell(idx, t);
-
 }
 
 Field evalLlgTorque(const Ferromagnet* magnet) {
@@ -63,10 +63,11 @@ __global__ void k_dampingtorque(CuField torque,
                                 const CuParameter gamma,
                                 const CuParameter frozenSpins) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  
+
   // Don't do anything outside of the grid.
-  if (!torque.cellInGrid(idx)) return;
-  
+  if (!torque.cellInGrid(idx))
+    return;
+
   // When outside the geometry or frozen, set to zero and return early
   if (!torque.cellInGeometry(idx) || (frozenSpins.valueAt(idx) != 0)) {
     torque.setVectorInCell(idx, real3{0, 0, 0});

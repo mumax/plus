@@ -23,7 +23,10 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
    * @param system the system in which to compute the stray field
    */
   StrayFieldFFTExecutor(const Magnet* magnet,
-                        std::shared_ptr<const System> system, int order, double eps, double switchingradius);
+                        std::shared_ptr<const System> system,
+                        int order,
+                        double eps,
+                        double switchingradius);
 
   /** Destruct the executor. */
   ~StrayFieldFFTExecutor();
@@ -43,9 +46,9 @@ class StrayFieldFFTExecutor : public StrayFieldExecutor {
   double eps() const { return kernel_.eps(); }
 
   /** Return the switching radius. */
-  double switchingradius() const { return kernel_.switchingradius();}
+  double switchingradius() const { return kernel_.switchingradius(); }
 
-  const StrayFieldKernel& kernel() const { return kernel_;};
+  const StrayFieldKernel& kernel() const { return kernel_; }
 
  private:
   StrayFieldKernel kernel_;

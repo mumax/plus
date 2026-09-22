@@ -1,8 +1,8 @@
-#include "ncafm.hpp"
 #include "cudalaunch.hpp"
-#include "ncafmangle.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
+#include "ncafm.hpp"
+#include "ncafmangle.hpp"
 #include "parameter.hpp"
 
 __global__ void k_angle(CuField angleField,
@@ -19,7 +19,7 @@ __global__ void k_angle(CuField angleField,
   if (!angleField.cellInGeometry(idx)) {
     if (angleField.cellInGrid(idx))
       angleField.setVectorInCell(idx, real3{0, 0, 0});
-      return;
+    return;
   }
 
   if (ncafmex.valueAt(idx) == 0) {
@@ -31,12 +31,12 @@ __global__ void k_angle(CuField angleField,
   bool b2 = (msat2.valueAt(idx) != 0);
   bool b3 = (msat3.valueAt(idx) != 0);
 
-  real dev12 = acos(dot(mField1.vectorAt(idx) * b1, mField2.vectorAt(idx) * b2))
-                    - (120.0 * M_PI / 180.0);
-  real dev13 = acos(dot(mField1.vectorAt(idx) * b1, mField3.vectorAt(idx) * b3))
-                    - (120.0 * M_PI / 180.0);
-  real dev23 = acos(dot(mField2.vectorAt(idx) * b2, mField3.vectorAt(idx) * b3))
-                    - (120.0 * M_PI / 180.0);
+  real dev12 = acos(dot(mField1.vectorAt(idx) * b1, mField2.vectorAt(idx) * b2)) -
+               (120.0 * M_PI / 180.0);
+  real dev13 = acos(dot(mField1.vectorAt(idx) * b1, mField3.vectorAt(idx) * b3)) -
+               (120.0 * M_PI / 180.0);
+  real dev23 = acos(dot(mField2.vectorAt(idx) * b2, mField3.vectorAt(idx) * b3)) -
+               (120.0 * M_PI / 180.0);
 
   angleField.setVectorInCell(idx, real3{dev12, dev13, dev23});
 }
@@ -85,21 +85,23 @@ Field evalAngleField(const NcAfm* magnet) {
   cudaLaunch(angleField.grid().ncells(), k_angle, angleField.cu(),
              magnet->sub1()->magnetization()->field().cu(),
              magnet->sub2()->magnetization()->field().cu(),
-             magnet->sub3()->magnetization()->field().cu(),
-             magnet->afmex_cell.cu(),
-             magnet->sub1()->msat.cu(),
-             magnet->sub2()->msat.cu(),
+             magnet->sub3()->magnetization()->field().cu(), magnet->afmex_cell.cu(),
+             magnet->sub1()->msat.cu(), magnet->sub2()->msat.cu(),
              magnet->sub3()->msat.cu());
   return angleField;
 }
 
 real evalMaxAngle(const Ferromagnet* sub1, const Ferromagnet* sub2) {
   if (!sub1->hostMagnet()->asNcAfm() || !sub2->hostMagnet()->asNcAfm())
-    throw std::invalid_argument("Maximum angle can only be calculated for NcAfm sublattices.");
+    throw std::invalid_argument(
+        "Maximum angle can only be calculated for NcAfm sublattices.");
   if (sub1->hostMagnet()->asNcAfm() != sub2->hostMagnet()->asNcAfm())
-    throw std::invalid_argument("Maximum angle can only be calculated for sublattices in the same NcAfm host.");
+    throw std::invalid_argument(
+        "Maximum angle can only be calculated for sublattices in the same "
+        "NcAfm host.");
   if (sub1 == sub2)
-    throw std::invalid_argument("Maximum angle can only be calculated for different sublattices.");
+    throw std::invalid_argument(
+        "Maximum angle can only be calculated for different sublattices.");
   auto m1 = sub1->magnetization()->field().cu();
   auto m2 = sub2->magnetization()->field().cu();
   auto ms1 = sub1->msat.cu();

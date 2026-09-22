@@ -2,11 +2,11 @@
 
 #include "constants.hpp"
 #include "cudalaunch.hpp"
-#include "fullmag.hpp"
-#include "magnet.hpp"
 #include "field.hpp"
 #include "fieldops.hpp"
+#include "fullmag.hpp"
 #include "grid.hpp"
+#include "magnet.hpp"
 #include "parameter.hpp"
 #include "strayfieldbrute.hpp"
 #include "system.hpp"
@@ -40,37 +40,43 @@ __global__ void k_demagfield(CuField hField,
     real nxy = kernel.valueAt(r, 3);
     real nxz = kernel.valueAt(r, 4);
     real nyz = kernel.valueAt(r, 5);
-    
+
     real3 M = msat.valueAt(i) * mField.vectorAt(i);
 
     h.x -= nxx * M.x + nxy * M.y + nxz * M.z;
     h.y -= nxy * M.x + nyy * M.y + nyz * M.z;
     h.z -= nxz * M.x + nyz * M.y + nzz * M.z;
   }
-  
+
   hField.setVectorInCell(idx, MU0 * h);
 }
 
-StrayFieldBruteExecutor::StrayFieldBruteExecutor(
-    const Magnet* magnet,
-    std::shared_ptr<const System> system, int order, double eps, double switchingradius)
+StrayFieldBruteExecutor::StrayFieldBruteExecutor(const Magnet* magnet,
+                                                 std::shared_ptr<const System> system,
+                                                 int order,
+                                                 double eps,
+                                                 double switchingradius)
     : StrayFieldExecutor(magnet, system),
-      kernel_(system->grid(), magnet_->grid(), magnet_->world(), order, eps, switchingradius) {}
+      kernel_(system->grid(),
+              magnet_->grid(),
+              magnet_->world(),
+              order,
+              eps,
+              switchingradius) {}
 
 Field StrayFieldBruteExecutor::exec() const {
-  
   Field h(system_, 3);
   int ncells = h.grid().ncells();
 
-  if(const Ferromagnet* mag = magnet_->asFM()) {
+  if (const Ferromagnet* mag = magnet_->asFM()) {
     auto m = mag->magnetization()->field().cu();
     auto msat = mag->msat.cu();
     cudaLaunch(ncells, k_demagfield, h.cu(), m, kernel_.field().cu(), msat);
-  }
-  else {
+  } else {
     auto hostmag = evalHMFullMag(magnet_->asHost());
     auto msat = Parameter(magnet_->system(), 1.0);
-    cudaLaunch(ncells, k_demagfield, h.cu(), hostmag.cu(), kernel_.field().cu(), msat.cu());
+    cudaLaunch(ncells, k_demagfield, h.cu(), hostmag.cu(), kernel_.field().cu(),
+               msat.cu());
   }
   return h;
 }

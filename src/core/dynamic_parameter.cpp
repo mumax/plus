@@ -14,8 +14,7 @@ DynamicParameter<T>::DynamicParameter(const DynamicParameter<T>& other)
 }
 
 template <typename T>
-DynamicParameter<T>& DynamicParameter<T>::operator=(
-    const DynamicParameter<T>& other) {
+DynamicParameter<T>& DynamicParameter<T>::operator=(const DynamicParameter<T>& other) {
   if (other.dynamicField_) {
     dynamicField_.reset(new Field(*other.dynamicField_));
   }
@@ -27,8 +26,7 @@ DynamicParameter<T>& DynamicParameter<T>::operator=(
 }
 
 template <typename T>
-DynamicParameter<T>::DynamicParameter(
-    const DynamicParameter<T>&& other) noexcept
+DynamicParameter<T>::DynamicParameter(const DynamicParameter<T>&& other) noexcept
     : dynamicField_(std::move(other.dynamicField_)),
       time_dep_terms(std::move(other.time_dep_terms)) {}
 

@@ -7,21 +7,23 @@ and give theoretical results for the Néel vector and net magnetization.
 The numerical material parameters used here are prototypical values.
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from mumaxplus import Altermagnet, Grid, World
 
 SRTOL = 7e-3
 
-cs = 0.5e-9 # Small to get good resolution in net magnetization profile
+cs = 0.5e-9  # Small to get good resolution in net magnetization profile
 nx, ny, nz = 512, 1, 1
 dw = 10  # Initial guess of number of cells in DW
+
 
 def max_normalized_error(result, wanted):
     err = np.abs(result - wanted)
     relerr = err / np.max(np.abs(wanted))
     return np.max(relerr)
+
 
 def compute_domain_wall_width(magnet):
     """Computes the domain wall width"""
@@ -29,20 +31,22 @@ def compute_domain_wall_width(magnet):
     A2 = magnet.alterex_2.uniform_value
     A12 = magnet.afmex_nn.uniform_value
     K = magnet.sub1.ku1.uniform_value
-    return np.sqrt((0.5*(A1+A2) - A12) / (2*K))
+    return np.sqrt((0.5 * (A1 + A2) - A12) / (2 * K))
+
 
 def compute_magnetization_prefactor(magnet):
-    K   = magnet.sub1.ku1.uniform_value
-    Ms  = magnet.sub1.msat.uniform_value
-    a   = magnet.latcon.uniform_value
-    A1  = magnet.alterex_1.uniform_value
-    A2  = magnet.alterex_2.uniform_value
-    A0  = magnet.afmex_cell.uniform_value
+    K = magnet.sub1.ku1.uniform_value
+    Ms = magnet.sub1.msat.uniform_value
+    a = magnet.latcon.uniform_value
+    A1 = magnet.alterex_1.uniform_value
+    A2 = magnet.alterex_2.uniform_value
+    A0 = magnet.afmex_cell.uniform_value
     A12 = magnet.afmex_nn.uniform_value
 
     Han = 2 * K / Ms
     Hex = -8 * A0 / (Ms * a**2)
-    return 0.5 * (Han/Hex) * (A1 - A2) / (0.5 * (A1+A2) - A12)
+    return 0.5 * (Han / Hex) * (A1 - A2) / (0.5 * (A1 + A2) - A12)
+
 
 def neel_profile(x, position, width, dw_comp, zero_comp):
     """Walker ansatz to describe domain wall profile"""
@@ -55,16 +59,18 @@ def neel_profile(x, position, width, dw_comp, zero_comp):
 
     return result
 
+
 def net_magnetization_profile(x, position, width, prefactor, dw_comp, zero_comp):
     t = (x - position) / width
-    denom = np.cosh(t)**3
+    denom = np.cosh(t) ** 3
 
     result = [None, None, None]
     result[zero_comp] = np.zeros(x.shape)
-    result[dw_comp] = -prefactor * np.sinh(t)**2 / denom
-    result[2] =  prefactor * np.sinh(t) / denom
+    result[dw_comp] = -prefactor * np.sinh(t) ** 2 / denom
+    result[2] = prefactor * np.sinh(t) / denom
 
     return result
+
 
 def initialize_and_minimize(magnet, dw_comp):
     """Create a two-domain state"""
@@ -73,28 +79,35 @@ def initialize_and_minimize(magnet, dw_comp):
 
     m = np.zeros(magnet.sub1.magnetization.shape)
     if dw_comp:
-        m[2      , :, :,          0:nx2 - dw2] =  1 # Left domain
-        m[dw_comp, :, :,  nx2 - dw2:nx2 + dw2] = -1 # Domain wall
-        m[2      , :, :,  nx2 + dw2:         ] = -1 # Right domain
+        m[2      , :, :,         0:nx2 - dw2] =  1  # Left domain   # fmt: skip
+        m[dw_comp, :, :, nx2 - dw2:nx2 + dw2] = -1  # Domain wall   # fmt: skip
+        m[2      , :, :, nx2 + dw2:         ] = -1  # Right domain  # fmt: skip
     else:
-        m[2      , :,          0:nx2 - dw2, :] =  1 # Left domain
-        m[dw_comp, :,  nx2 - dw2:nx2 + dw2, :] = -1 # Domain wall
-        m[2      , :,  nx2 + dw2:         , :] = -1 # Right domain
+        m[2      , :,         0:nx2 - dw2, :] =  1  # Left domain   # fmt: skip
+        m[dw_comp, :, nx2 - dw2:nx2 + dw2, :] = -1  # Domain wall   # fmt: skip
+        m[2      , :, nx2 + dw2:         , :] = -1  # Right domain  # fmt: skip
     magnet.sub1.magnetization = m
     magnet.sub2.magnetization = -m
     magnet.minimize()
 
-ORIENTATIONS = { "x": dict(grid = Grid((nx, ny, nz)),
-                           angle = 0,
-                           result_slice = lambda v: v[:, 0, 0, :],
-                           dw_comp = 1,
-                           zero_comp = 0),
-                 "y": dict(grid = Grid((ny, nx, nz)),
-                           angle = np.pi/2,
-                           result_slice = lambda v: v[:, 0, :, 0],
-                           dw_comp = 0,
-                           zero_comp = 1)
+
+ORIENTATIONS = {
+    "x": dict(
+        grid=Grid((nx, ny, nz)),
+        angle=0,
+        result_slice=lambda v: v[:, 0, 0, :],
+        dw_comp=1,
+        zero_comp=0,
+    ),
+    "y": dict(
+        grid=Grid((ny, nx, nz)),
+        angle=np.pi / 2,
+        result_slice=lambda v: v[:, 0, :, 0],
+        dw_comp=0,
+        zero_comp=1,
+    ),
 }
+
 
 def make_magnet(world, orientation):
     cfg = ORIENTATIONS[orientation]
@@ -112,6 +125,8 @@ def make_magnet(world, orientation):
 
     initialize_and_minimize(magnet, cfg["dw_comp"])
     return magnet
+
+
 @pytest.mark.slow
 class AltermagneticDomainWall:
 
@@ -128,14 +143,19 @@ class AltermagneticDomainWall:
         xx = np.linspace(0, nx * cs, nx)
 
         result = cfg["result_slice"](self.magnet.neel_vector())
-        wanted = neel_profile(xx, nx*cs/2, width, cfg["dw_comp"], cfg["zero_comp"])
+        wanted = neel_profile(xx, nx * cs / 2, width, cfg["dw_comp"], cfg["zero_comp"])
 
         # Only look at DW itself when profile goes to zero inside the domains
         start = int(nx * 0.45)
         end = int(nx * 0.55)
 
         assert np.all(result[cfg["zero_comp"]] == 0)
-        assert max_normalized_error(result[cfg["dw_comp"]][start:end], wanted[cfg["dw_comp"]][start:end]) < SRTOL
+        assert (
+            max_normalized_error(
+                result[cfg["dw_comp"]][start:end], wanted[cfg["dw_comp"]][start:end]
+            )
+            < SRTOL
+        )
         assert max_normalized_error(result[2], wanted[2]) < SRTOL
 
     def test_net_magnetization_profile(self):
@@ -145,24 +165,36 @@ class AltermagneticDomainWall:
         prefactor = compute_magnetization_prefactor(self.magnet)
         xx = np.linspace(0, nx * cs, nx)
 
-        result = cfg["result_slice"]( 0.5 * (self.magnet.sub1.magnetization()
-                                           + self.magnet.sub2.magnetization()))
-        wanted = net_magnetization_profile(xx, nx*cs/2, width, prefactor, cfg["dw_comp"], cfg["zero_comp"])
+        result = cfg["result_slice"](
+            0.5 * (self.magnet.sub1.magnetization() + self.magnet.sub2.magnetization())
+        )
+        wanted = net_magnetization_profile(
+            xx, nx * cs / 2, width, prefactor, cfg["dw_comp"], cfg["zero_comp"]
+        )
 
         # Only look at DW itself when profile goes to zero inside the domains
         start = int(nx * 0.45)
         end = int(nx * 0.55)
 
         assert np.all(result[cfg["zero_comp"]] == 0)
-        assert max_normalized_error(result[cfg["dw_comp"]][start:end], wanted[cfg["dw_comp"]][start:end]) < SRTOL
+        assert (
+            max_normalized_error(
+                result[cfg["dw_comp"]][start:end], wanted[cfg["dw_comp"]][start:end]
+            )
+            < SRTOL
+        )
         assert max_normalized_error(result[2][start:end], wanted[2][start:end]) < SRTOL
+
 
 @pytest.mark.slow
 class TestAltermagneticDomainWallAlongX(AltermagneticDomainWall):
     """Domain wall along x-direction."""
+
     orientation = "x"
+
 
 @pytest.mark.slow
 class TestAltermagneticDomainWallAlongY(AltermagneticDomainWall):
     """Domain wall along y-direction."""
+
     orientation = "y"

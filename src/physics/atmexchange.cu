@@ -1,9 +1,9 @@
 #include "altermagnet.hpp"
+#include "atmexchange.hpp"
 #include "cudalaunch.hpp"
 #include "datatypes.hpp"
-#include "dmi.hpp" // used for inter-regional exchange
+#include "dmi.hpp"  // used for inter-regional exchange
 #include "energy.hpp"
-#include "atmexchange.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
 #include "inter_parameter.hpp"
@@ -12,30 +12,36 @@
 #include "world.hpp"
 
 bool atmExchangeAssuredZero(const Ferromagnet* magnet) {
-  if (!magnet->hostMagnet()) { return true; }
-  if (!magnet->hostMagnet()->asATM()) { return true; }
+  if (!magnet->hostMagnet()) {
+    return true;
+  }
+  if (!magnet->hostMagnet()->asATM()) {
+    return true;
+  }
   if ((magnet->hostMagnet()->asATM()->alterex_1.assuredZero() &&
        magnet->hostMagnet()->asATM()->alterex_2.assuredZero() &&
        magnet->hostMagnet()->asATM()->interAlterex_1.assuredZero() &&
        magnet->hostMagnet()->asATM()->interAlterex_2.assuredZero()) ||
-       magnet->msat.assuredZero()) { return true; }
+      magnet->msat.assuredZero()) {
+    return true;
+  }
 
   return false;
 }
 
 // ATM exchange between NN cells
 __global__ void k_atmExchangeField(CuField hField,
-                                const CuField mField,
-                                const CuParameter A1,
-                                const CuParameter A2,
-                                const CuParameter angle,
-                                const CuParameter msat,
-                                const Grid mastergrid,
-                                const real3 w,
-                                const CuInterParameter interEx1,
-                                const CuInterParameter scaleEx1,
-                                const CuInterParameter interEx2,
-                                const CuInterParameter scaleEx2) {
+                                   const CuField mField,
+                                   const CuParameter A1,
+                                   const CuParameter A2,
+                                   const CuParameter angle,
+                                   const CuParameter msat,
+                                   const Grid mastergrid,
+                                   const real3 w,
+                                   const CuInterParameter interEx1,
+                                   const CuInterParameter scaleEx1,
+                                   const CuInterParameter interEx2,
+                                   const CuInterParameter scaleEx2) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const auto system = hField.system;
   // When outside the geometry, set to zero and return early
@@ -85,7 +91,7 @@ __global__ void k_atmExchangeField(CuField hField,
     real scale1 = 1, scale2 = 1;
     real Aex;
 
-    if(hField.cellInGeometry(coo_)) {
+    if (hField.cellInGeometry(coo_)) {
       if (msat.valueAt(idx_) == 0)
         continue;
 
@@ -101,8 +107,7 @@ __global__ void k_atmExchangeField(CuField hField,
         scale2 = scaleEx2.valueBetween(ridx, ridx_);
         inter2 = interEx2.valueBetween(ridx, ridx_);
       }
-    }
-    else { // Dirichlet boundaries
+    } else {  // Dirichlet boundaries
       m_ = real3{0, 0, 0};
       a1_ = a1;
       a2_ = a2;
@@ -111,8 +116,11 @@ __global__ void k_atmExchangeField(CuField hField,
     real aex_1 = getExchangeStiffness(inter1, scale1, a1, a1_);
     real aex_2 = getExchangeStiffness(inter2, scale2, a2, a2_);
 
-    if (rel_coo.x != 0) { Aex = aex_1 * c2 + aex_2 * s2; }
-    else { Aex = aex_1 * s2 + aex_2 * c2; }
+    if (rel_coo.x != 0) {
+      Aex = aex_1 * c2 + aex_2 * s2;
+    } else {
+      Aex = aex_1 * s2 + aex_2 * c2;
+    }
     h += 2 * Aex * dot(normal, w2) * (m_ - m);
   }
 
@@ -121,7 +129,7 @@ __global__ void k_atmExchangeField(CuField hField,
   real3 neighbours[4];
   real Aex[4];
 
-  const int3 rel_coos[4] = { {+1, +1, 0}, {+1, -1, 0}, {-1, +1, 0}, {-1, -1, 0} };
+  const int3 rel_coos[4] = {{+1, +1, 0}, {+1, -1, 0}, {-1, +1, 0}, {-1, -1, 0}};
 
 #pragma unroll
   for (int i = 0; i < 4; i++) {
@@ -132,8 +140,7 @@ __global__ void k_atmExchangeField(CuField hField,
     if (!hField.cellInGeometry(coo_) || msat.valueAt(coo_) == 0) {
       neighbours[i] = real3{0, 0, 0};
       Aex[i] = 0;
-    }
-    else {
+    } else {
       neighbours[i] = mField.vectorAt(coo_);
 
       real inter1 = 0, inter2 = 0;
@@ -149,15 +156,17 @@ __global__ void k_atmExchangeField(CuField hField,
       }
       real ang_ = angle.valueAt(coo_);
       real aex_1 = getExchangeStiffness(inter1, scale1, cs2 * a1,
-                                                        sin(2 * ang_) * A1.valueAt(coo_));
+                                        sin(2 * ang_) * A1.valueAt(coo_));
       real aex_2 = getExchangeStiffness(inter2, scale2, cs2 * a2,
-                                                        sin(2 * ang_) * A2.valueAt(coo_));
+                                        sin(2 * ang_) * A2.valueAt(coo_));
       Aex[i] = (aex_1 - aex_2);
     }
   }
 
-  h += (1.0/4.0) * ((Aex[0] * neighbours[0] + Aex[3] * neighbours[3])
-                  - (Aex[1] * neighbours[1] + Aex[2] * neighbours[2])) * w.x * w.y;
+  h += (1.0 / 4.0) *
+       ((Aex[0] * neighbours[0] + Aex[3] * neighbours[3]) -
+        (Aex[1] * neighbours[1] + Aex[2] * neighbours[2])) *
+       w.x * w.y;
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
 }
 
@@ -181,13 +190,13 @@ Field evalAtmExchangeField(const Ferromagnet* magnet) {
   auto scale2 = host->scaleAlterex_2.cu();
 
   if (host->getSublatticeIndex(magnet) == 0)
-    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(),
-                mag, A1, A2, angle, msat, magnet->world()->mastergrid(),
-                w, inter1, scale1, inter2, scale2);
-  else // Switch A1 and A2
-    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(),
-                mag, A2, A1, angle, msat, magnet->world()->mastergrid(),
-                w, inter2, scale2, inter1, scale1);
+    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(), mag, A1, A2,
+               angle, msat, magnet->world()->mastergrid(), w, inter1, scale1, inter2,
+               scale2);
+  else  // Switch A1 and A2
+    cudaLaunch(hField.grid().ncells(), k_atmExchangeField, hField.cu(), mag, A2, A1,
+               angle, msat, magnet->world()->mastergrid(), w, inter2, scale2, inter1,
+               scale1);
   return hField;
 }
 
@@ -206,8 +215,8 @@ real evalAtmExchangeEnergy(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity atmExchangeFieldQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalAtmExchangeField, 3,
-                          "anisotropic_exchange_field", "T");
+  return FM_FieldQuantity(magnet, evalAtmExchangeField, 3, "anisotropic_exchange_field",
+                          "T");
 }
 
 FM_FieldQuantity atmExchangeEnergyDensityQuantity(const Ferromagnet* magnet) {
@@ -216,6 +225,6 @@ FM_FieldQuantity atmExchangeEnergyDensityQuantity(const Ferromagnet* magnet) {
 }
 
 FM_ScalarQuantity atmExchangeEnergyQuantity(const Ferromagnet* magnet) {
-  return FM_ScalarQuantity(magnet, evalAtmExchangeEnergy,
-                          "anisotropic_exchange_energy", "J");
+  return FM_ScalarQuantity(magnet, evalAtmExchangeEnergy, "anisotropic_exchange_energy",
+                           "J");
 }

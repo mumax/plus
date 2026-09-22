@@ -1,13 +1,15 @@
 from distutils.version import LooseVersion
 import os
+from pathlib import Path
 import platform
 import re
 import subprocess
 import sys
 
-from pathlib import Path
 from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 
 
 class CMakeExtension(Extension):
@@ -50,7 +52,7 @@ class CMakeBuild(build_ext):
             cmake_args += [
                 "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}".format(cfg.upper(), extdir)
             ]
-            if sys.maxsize > 2 ** 32:
+            if sys.maxsize > 2**32:
                 cmake_args += ["-A", "x64"]
             build_args += ["--", "/m"]
         else:
@@ -63,28 +65,92 @@ class CMakeBuild(build_ext):
         )
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        
+
         precision = os.environ.get("MUMAXPLUS_FP_PRECISION")
         aliases = {"SINGLE": ("SINGLE", "1", "32"), "DOUBLE": ("DOUBLE", "2", "64")}
-        precisions = [k for k, v in aliases.items() if precision in v] if precision else aliases.keys()
+        precisions = (
+            [k for k, v in aliases.items() if precision in v]
+            if precision
+            else aliases.keys()
+        )
         for precision in precisions:
             build_temp = Path(self.build_temp) / precision.lower()
             build_temp.mkdir(parents=True, exist_ok=True)
-            cmake_precision_args = [f"-DMUMAX_MODULE_NAME=_mumaxpluscpp_{precision.lower()}", f"-DFP_PRECISION={precision}"]
-            
+            cmake_precision_args = [
+                f"-DMUMAX_MODULE_NAME=_mumaxpluscpp_{precision.lower()}",
+                f"-DFP_PRECISION={precision}",
+            ]
+
             subprocess.check_call(
                 ["cmake", ext.sourcedir] + cmake_args + cmake_precision_args,
-                cwd=build_temp, env=env
+                cwd=build_temp,
+                env=env,
             )
             subprocess.check_call(
-                ["cmake", "--build", ".", "--target", f"_mumaxpluscpp_{precision.lower()}", "install"] + build_args,
+                [
+                    "cmake",
+                    "--build",
+                    ".",
+                    "--target",
+                    f"_mumaxpluscpp_{precision.lower()}",
+                    "install",
+                ]
+                + build_args,
                 cwd=build_temp,
             )
+
+
+def _install_precommit_hook():
+    """Best-effort install of the pre-commit git hook after setup."""
+    env = os.environ.copy()
+    # Remove pip build-isolation leftovers so the pre-commit
+    # subprocess can see the real environment's site-packages.
+    env.pop("PYTHONPATH", None)
+    env.pop("PYTHONNOUSERSITE", None)
+
+    try:
+        subprocess.run(
+            [
+                "pre-commit",
+                "install",
+                "--hook-type",
+                "pre-commit",
+            ],
+            check=True,
+            env=env,
+        )
+    except FileNotFoundError:
+        print(
+            "Note: 'pre-commit' executable not found; skipping git hook install. "
+            "Make sure your conda env is active and includes pre-commit."
+        )
+    except subprocess.CalledProcessError:
+        print("Warning: 'pre-commit install' failed; hook was not installed.")
+
+
+class DevelopWithPreCommit(develop):
+    def run(self):
+        develop.run(self)
+        _install_precommit_hook()
+
+
+class InstallWithPreCommit(install):
+    def run(self):
+        install.run(self)
+        _install_precommit_hook()
+
 
 setup(
     long_description="",
     packages=find_packages(include=["mumaxplus", "mumaxplus.*"]),
-    ext_modules=[CMakeExtension("_mumaxpluscpp_single"), CMakeExtension("_mumaxpluscpp_double")],
-    cmdclass=dict(build_ext=CMakeBuild),
+    ext_modules=[
+        CMakeExtension("_mumaxpluscpp_single"),
+        CMakeExtension("_mumaxpluscpp_double"),
+    ],
+    cmdclass=dict(
+        build_ext=CMakeBuild,
+        install=InstallWithPreCommit,
+        develop=DevelopWithPreCommit,
+    ),
     zip_safe=False,
 )

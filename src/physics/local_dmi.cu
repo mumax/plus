@@ -23,7 +23,7 @@ __global__ void k_homoDmiFieldAFM(CuField hField,
                                   const real symmetry_factor) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const auto system = hField.system;
- 
+
   if (!system.grid.cellInGrid(idx))
     return;
 
@@ -41,11 +41,11 @@ __global__ void k_homoDmiFieldAFM(CuField hField,
 }
 
 __global__ void k_homoDmiFieldNcAfm(CuField hField,
-                                  const CuField m2Field,
-                                  const CuField m3Field,
-                                  const CuVectorParameter dmiVector,
-                                  const CuParameter msat,
-                                  const real symmetry_factor) {
+                                    const CuField m2Field,
+                                    const CuField m3Field,
+                                    const CuVectorParameter dmiVector,
+                                    const CuParameter msat,
+                                    const real symmetry_factor) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const auto system = hField.system;
 

@@ -10,10 +10,10 @@
 #include "grid.hpp"
 #include "parameter.hpp"
 #include "strayfield.hpp"
-#include "variable.hpp"
-#include "world.hpp"
 #include "system.hpp"
 #include "traction.hpp"
+#include "variable.hpp"
+#include "world.hpp"
 
 class Altermagnet;
 class Antiferromagnet;
@@ -25,10 +25,10 @@ class NcAfm;
 class System;
 
 class Magnet {
- friend class MumaxWorld;
+  friend class MumaxWorld;
+
  public:
-  explicit Magnet(std::shared_ptr<System> system_ptr,
-                  std::string name);
+  explicit Magnet(std::shared_ptr<System> system_ptr, std::string name);
   /*explicit Magnet(MumaxWorld* world,
                   Grid grid,
                   std::string name,
@@ -72,7 +72,7 @@ class Magnet {
  public:
   bool enableAsStrayFieldSource;
   bool enableAsStrayFieldDestination;
-  bool enableElastodynamics() const {return enableElastodynamics_;}
+  bool enableElastodynamics() const { return enableElastodynamics_; }
   void setEnableElastodynamics(bool);
 
   // Elasticity
@@ -90,14 +90,15 @@ class Magnet {
   Parameter C12;  // C12 = C13 = C23
   Parameter C44;  // C44 = C55 = C66
 
-  Parameter eta;  // Phenomenological elastic damping constant
+  Parameter eta;               // Phenomenological elastic damping constant
   Parameter stiffnessDamping;  // eta_ij = stiffnessDamping * Cij
-  Parameter eta11;  // viscosity tensor
+  Parameter eta11;             // viscosity tensor
   Parameter eta12;
   Parameter eta44;
   Parameter rho;  // Mass density
 
-  // Delete copy constructor and copy assignment operator to prevent shallow copies
+  // Delete copy constructor and copy assignment operator to prevent shallow
+  // copies
   Magnet(const Magnet&) = delete;
   Magnet& operator=(const Magnet&) = delete;
 

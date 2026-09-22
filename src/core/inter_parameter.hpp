@@ -5,8 +5,6 @@
 #include "reduce.hpp"
 #include "system.hpp"
 
-
-
 class System;
 
 class CuInterParameter;
@@ -14,16 +12,16 @@ class CuInterParameter;
 class InterParameter {
  public:
   explicit InterParameter(std::shared_ptr<const System> system,
-                           real value,
-                           std::string name = "",
-                           std::string unit = "");
-  ~InterParameter() {};
+                          real value,
+                          std::string name = "",
+                          std::string unit = "");
+  ~InterParameter() {}
 
   std::string name() const { return name_; }
   std::string unit() const { return unit_; }
   int ncomp() const { return 1; }
   bool isUniform() const { return valuesBuffer_.size() == 0; }
-  bool assuredZero() const { return isUniform() && uniformValue_ == 0.0; };
+  bool assuredZero() const { return isUniform() && uniformValue_ == 0.0; }
 
   const std::vector<real> eval() const;
 
@@ -36,7 +34,9 @@ class InterParameter {
   CuInterParameter cu() const;
 
   // TODO: these user-convenience functions should probably move
-  const std::vector<unsigned int> uniqueRegions() const { return system_->uniqueRegions; }
+  const std::vector<unsigned int> uniqueRegions() const {
+    return system_->uniqueRegions;
+  }
   int numberOfRegions() const { return system_->uniqueRegions.size(); }
 
  private:
@@ -66,8 +66,7 @@ class CuInterParameter {
 };
 
 inline CuInterParameter::CuInterParameter(const InterParameter* p)
-    : uniformValue_(p->uniformValue_),
-      valuesPtr_(nullptr) {
+    : uniformValue_(p->uniformValue_), valuesPtr_(nullptr) {
   if (!p->isUniform()) {
     valuesPtr_ = p->valuesBuffer_.get();
   }
@@ -84,7 +83,8 @@ __device__ __host__ inline int getLutIndex(int i, int j) {
   return j * (j - 1) / 2 + i;
 }
 
-__device__ inline real CuInterParameter::valueBetween(unsigned int idx1, unsigned int idx2) const {
+__device__ inline real CuInterParameter::valueBetween(unsigned int idx1,
+                                                      unsigned int idx2) const {
   if (isUniform())
     return uniformValue_;
   return valuesPtr_[getLutIndex(idx1, idx2)];

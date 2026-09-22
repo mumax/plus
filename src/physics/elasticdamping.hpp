@@ -5,7 +5,6 @@
 class Magnet;
 class Field;
 
-
 bool elasticDampingAssuredZero(const Magnet*);
 
 Field evalElasticDamping(const Magnet*);

@@ -94,13 +94,19 @@ struct CuSystem {
 };
 
 __device__ inline unsigned int CuSystem::getRegionIdx(int3 coo) const {
-  if (!regions) { return 0; }
-  else { return regions[grid.coord2index(coo)]; }
+  if (!regions) {
+    return 0;
+  } else {
+    return regions[grid.coord2index(coo)];
+  }
 }
 
 __device__ inline unsigned int CuSystem::getRegionIdx(int idx) const {
-  if (!regions) { return 0; }
-  else { return regions[idx]; }
+  if (!regions) {
+    return 0;
+  } else {
+    return regions[idx];
+  }
 }
 
 __device__ inline bool CuSystem::inGeometry(int3 coo) const {
@@ -116,9 +122,10 @@ __device__ inline bool CuSystem::inRegion(unsigned int regionIdx, int3 coo) cons
 }
 
 __device__ inline bool CuSystem::inRegion(unsigned int regionIdx, int idx) const {
-  return grid.cellInGrid(idx) && ( regionIdx == getRegionIdx(idx));
+  return grid.cellInGrid(idx) && (regionIdx == getRegionIdx(idx));
 }
 
-__device__ inline bool CuSystem::inSameRegion(unsigned int idx1, unsigned int idx2) const {
+__device__ inline bool CuSystem::inSameRegion(unsigned int idx1,
+                                              unsigned int idx2) const {
   return (getRegionIdx(idx1) == getRegionIdx(idx2));
 }

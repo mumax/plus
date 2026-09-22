@@ -2,11 +2,10 @@
 in Moreels et al. (2026) (https://arxiv.org/abs/2604.15454). The theoretical model is based
 on Gomonay et al. (2024) (https://www.nature.com/articles/s44306-024-00042-3)."""
 
-from mumaxplus import World, Grid, Altermagnet
-
 import matplotlib.pyplot as plt
 import numpy as np
 
+from mumaxplus import Altermagnet, Grid, World
 
 # ----------- Material and simulation parameters -----------
 

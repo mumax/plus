@@ -1,9 +1,11 @@
 """Classes for solving differential equations in the time domain."""
 
-from typing import Callable
 import os as _os
+from typing import Callable
 import warnings
+
 from tqdm import tqdm as _tqdm
+
 
 class TimeSolverOutput:
     def __init__(self, quantity_dict, file_name=None, store_as_dict=True):
@@ -30,18 +32,20 @@ class TimeSolverOutput:
         self._store_as_dict = store_as_dict
 
         if self._file_name is None and self._store_as_dict is False:
-            warnings.warn("The timesolver output will not be saved or stored if `file_name` "
-            "is not specified and `store_as_dict` is set to `False`. Consider using `run()` instead.")
+            warnings.warn(
+                "The timesolver output will not be saved or stored if `file_name` "
+                "is not specified and `store_as_dict` is set to `False`. Consider using"
+                " `run()` instead."
+            )
 
         if self._file_name is not None:
             if directory := _os.path.dirname(self._file_name):
                 _os.makedirs(directory, exist_ok=True)
-            with open(self._file_name, 'w') as file:  # make new file
+            with open(self._file_name, "w") as file:  # make new file
                 print("# " + "\t".join(self._keys), file=file)
 
     def write_line(self, time):
         """Compute all the specified quantities for the current state."""
-
         # Compute values
         self._values["time"] = time
         for key, func in self._quantities.items():
@@ -54,7 +58,7 @@ class TimeSolverOutput:
 
         # Write to file
         if self._file_name is not None:
-            with open(self._file_name, 'a') as file:
+            with open(self._file_name, "a") as file:
                 print(*[self._values[key] for key in self._keys], sep="\t", file=file)
 
     def __getitem__(self, key):
@@ -95,7 +99,7 @@ class TimeSolver:
         """Set the Runga Kutta method used by the time solver.
 
         Implemented methods are:
-        
+
         * 'Heun'
         * 'BogackiShampine'
         * 'CashKarp'
@@ -106,9 +110,9 @@ class TimeSolver:
         """
         self._impl.set_method(method_name)
 
-    def steps(self, nsteps : int, initial_timestep: float | None = None):
+    def steps(self, nsteps: int, initial_timestep: float | None = None):
         """Make n steps with the time solver.
-        
+
         Parameters
         ----------
         nsteps : int
@@ -131,8 +135,9 @@ class TimeSolver:
 
         self._impl.steps(nsteps)
 
-    def run_while(self, condition: Callable[[], bool],
-                  initial_timestep: float | None = None):
+    def run_while(
+        self, condition: Callable[[], bool], initial_timestep: float | None = None
+    ):
         """Run the solver while the evaluation of the condition is True.
 
         Parameters
@@ -154,7 +159,7 @@ class TimeSolver:
             self._assure_sensible_timestep()
         else:
             self.timestep = initial_timestep
-        
+
         self._impl.run_while(condition)
 
     def run(self, duration: float, initial_timestep: float | None = None):
@@ -179,13 +184,18 @@ class TimeSolver:
             self._assure_sensible_timestep()
         else:
             self.timestep = initial_timestep
-        
+
         self._impl.run(duration)
 
-    def solve(self, timepoints, quantity_dict: dict,
-              file_name : str | None = None, store_as_dict: bool =True,
-              initial_timestep : float | None = None,
-              tqdm: bool = False) -> TimeSolverOutput:
+    def solve(
+        self,
+        timepoints,
+        quantity_dict: dict,
+        file_name: str | None = None,
+        store_as_dict: bool = True,
+        initial_timestep: float | None = None,
+        tqdm: bool = False,
+    ) -> TimeSolverOutput:
         """Solve the differential equation.
 
         The functions collects values of a list of specified quantities
@@ -222,8 +232,12 @@ class TimeSolver:
         _assure_sensible_timestep
         """
         # check if time points are increasing and lie in the future
-        assert all(i1 <= i2 for i1, i2 in zip(timepoints, timepoints[1:])), "The list of timepoints should be increasing."
-        assert self.time <= timepoints[0], "The list of timepoints should lie in the future."
+        assert all(
+            i1 <= i2 for i1, i2 in zip(timepoints, timepoints[1:])
+        ), "The list of timepoints should be increasing."
+        assert (
+            self.time <= timepoints[0]
+        ), "The list of timepoints should lie in the future."
 
         if initial_timestep is None:
             self._assure_sensible_timestep()
@@ -232,7 +246,8 @@ class TimeSolver:
 
         output = TimeSolverOutput(quantity_dict, file_name, store_as_dict)
 
-        if tqdm: timepoints = _tqdm(timepoints)
+        if tqdm:
+            timepoints = _tqdm(timepoints)
         for tp in timepoints:
             # we only need to assure a sensible timestep at the beginning,
             # hence we use here self._impl.run instead of self.run
@@ -277,7 +292,7 @@ class TimeSolver:
     @property
     def max_error(self) -> float:
         """Return the maximum error per step the solver can tollerate.
-        
+
         The default value is 1e-5.
 
         See Also
@@ -285,18 +300,17 @@ class TimeSolver:
         headroom, lower_bound, sensible_factor, sensible_timestep,
         sensible_timestep_default, upper_bound
         """
-
         return self._impl.max_error
 
     @max_error.setter
     def max_error(self, error):
         assert error > 0, "The maximum error should be bigger than 0."
         self._impl.max_error = error
-    
+
     @property
     def headroom(self) -> float:
         """Return the solver headroom.
-        
+
         The default value is 0.8.
 
         See Also
@@ -310,12 +324,12 @@ class TimeSolver:
     def headroom(self, headr):
         assert headr > 0, "The headroom should be bigger than 0."
         self._impl.headroom = headr
-    
+
     @property
     def lower_bound(self) -> float:
         """Return the lower bound which is used to cap the scaling of the time step
         from below.
-        
+
         The default value is 0.5.
 
         See Also
@@ -329,12 +343,12 @@ class TimeSolver:
     def lower_bound(self, lower):
         assert lower > 0, "The lower bound should be bigger than 0."
         self._impl.lower_bound = lower
-    
+
     @property
     def upper_bound(self) -> float:
         """Return the upper bound which is used to cap the scaling of the time step
         from the top.
-        
+
         The default value is 2.0.
 
         See Also
@@ -348,12 +362,12 @@ class TimeSolver:
     def upper_bound(self, upper):
         assert upper > 0, "The upper bound should be bigger than 0."
         self._impl.upper_bound = upper
-    
+
     @property
     def sensible_factor(self) -> float:
         """Return the sensible time step factor which is used as a scaling factor
         when determining a sensible timestep.
-        
+
         The default value is 0.01.
 
         See Also

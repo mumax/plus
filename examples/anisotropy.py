@@ -6,6 +6,7 @@ import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 
+
 def polar(uni, cub):
     zeros = (0, 0, 0)
     if uni:

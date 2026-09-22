@@ -19,6 +19,6 @@ Field evalElectricalPotential(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity electricalPotentialQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalElectricalPotential, 1,
-                          "electrical_potential", "V");
+  return FM_FieldQuantity(magnet, evalElectricalPotential, 1, "electrical_potential",
+                          "V");
 }

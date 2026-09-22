@@ -12,8 +12,8 @@
  *   -  DMI tensor D_ijk, which is antisymmetric on j and k (D_ijk = - D_ikj)
  *   -  spatial derivative d_i(..) along direction i
  *
- * Neumann boundary conditions are assumed, unless specified otherwise (i.e. open
- * boundaries).
+ * Neumann boundary conditions are assumed, unless specified otherwise (i.e.
+ * open boundaries).
  */
 
 #pragma once
@@ -51,7 +51,9 @@ FM_ScalarQuantity dmiEnergyQuantity(const Ferromagnet*);
 //------------------------------------------------------------------------
 
 __device__ static inline real3 getGamma(const CuDmiTensor dmiTensor,
-                                        const int idx, int3 n, real3 m) {
+                                        const int idx,
+                                        int3 n,
+                                        real3 m) {
   // returns the DMI field at the boundary
   real Dxxz = dmiTensor.xxz.valueAt(idx);
   real Dxxy = dmiTensor.xxy.valueAt(idx);
@@ -62,15 +64,21 @@ __device__ static inline real3 getGamma(const CuDmiTensor dmiTensor,
   real Dzxz = dmiTensor.zxz.valueAt(idx);
   real Dzxy = dmiTensor.zxy.valueAt(idx);
   real Dzyz = dmiTensor.zyz.valueAt(idx);
+  // clang-format off
   return real3{
         -Dxxy*n.x*m.y - Dxxz*n.x*m.z - Dyxz*n.y*m.z - Dzxy*n.z*m.y - Dyxy*n.y*m.y - Dzxz*n.z*m.z,
          Dxxy*n.x*m.x - Dzyz*n.z*m.z + Dyxy*n.y*m.x - Dxyz*n.x*m.z + Dzxy*n.z*m.x - Dyyz*n.y*m.z,
          Dxxz*n.x*m.x + Dyyz*n.y*m.y + Dxyz*n.x*m.y + Dyxz*n.y*m.x + Dzxz*n.z*m.x + Dzyz*n.z*m.y};
 }
+// clang-format on
 
 // returns exchange stiffness constant, taking grain boundaries into account
-// (not really DMI-related, but is also used in Neumann BC calculation, along with getGamma)
-__device__ static inline real getExchangeStiffness(real inter, real scale, real a, real a_) {
+// (not really DMI-related, but is also used in Neumann BC calculation, along
+// with getGamma)
+__device__ static inline real getExchangeStiffness(real inter,
+                                                   real scale,
+                                                   real a,
+                                                   real a_) {
   real Aex = (inter != 0) ? inter : harmonicMean(a, a_);
   return Aex * scale;
 }

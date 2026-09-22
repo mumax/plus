@@ -3,12 +3,7 @@
 #include "cudalaunch.hpp"
 #include "vec.hpp"
 
-__global__ void k_add(lsReal* y,
-                      lsReal a1,
-                      lsReal* x1,
-                      lsReal a2,
-                      lsReal* x2,
-                      int N) {
+__global__ void k_add(lsReal* y, lsReal a1, lsReal* x1, lsReal a2, lsReal* x2, int N) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx >= N)
     return;
@@ -61,8 +56,7 @@ lsReal maxAbsValue(const GVec& x) {
     return 0.0;
 
   GpuBuffer<lsReal> d_result(1);
-  cudaLaunchReductionKernel(k_maxAbsValue, d_result.get(), x.get(),
-                            (int)x.size());
+  cudaLaunchReductionKernel(k_maxAbsValue, d_result.get(), x.get(), (int)x.size());
 
   // copy the result to the host and return
   lsReal result;

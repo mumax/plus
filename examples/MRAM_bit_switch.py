@@ -4,13 +4,12 @@ torque. This is based on both the paper "The design and verification of MuMax3"
 https://doi.org/10.1063/1.4899186 and on session 3 example 3 of the MuMax3
 workshop https://mumax.ugent.be/mumax3-workshop/ ."""
 
-import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import Ellipse, get_rgb
-
 
 # --- set up the world ---
 length, width, thickness = 160e-9, 80e-9, 5e-9

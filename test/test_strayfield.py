@@ -11,7 +11,7 @@ def max_relative_error(result, wanted):
 
 
 def extended_grid(grid1, grid2):
-    """ Returns a grid which contains the two grids """
+    """Returns a grid which contains the two grids"""
 
     bottom_left = [min(grid1.origin[c], grid2.origin[c]) for c in [0, 1, 2]]
 
@@ -96,9 +96,11 @@ class TestStrayFields:
         mgrid, hgrid = test_case["mgrid"], test_case["hgrid"]
         box = extended_grid(mgrid, hgrid)
 
-        world = World((1e-9, 2e-9, 3.1e-9),
-                      (0,0,0) if pbc_repetitions is None else pbc_repetitions,
-                      Grid((0,0,0)) if pbc_repetitions is None else box)
+        world = World(
+            (1e-9, 2e-9, 3.1e-9),
+            (0, 0, 0) if pbc_repetitions is None else pbc_repetitions,
+            Grid((0, 0, 0)) if pbc_repetitions is None else box,
+        )
         magnet = Ferromagnet(world, mgrid)
         magnet.msat = 800e3
         magnet.magnetization = (1, -1, 2)
@@ -108,9 +110,11 @@ class TestStrayFields:
         hfield = StrayField(magnet, hgrid).eval()
 
         # Construct an equivalent system against we will check the result.
-        world2 = World(world.cellsize,
-                      (0,0,0) if pbc_repetitions is None else pbc_repetitions,
-                      Grid((0,0,0)) if pbc_repetitions is None else box)
+        world2 = World(
+            world.cellsize,
+            (0, 0, 0) if pbc_repetitions is None else pbc_repetitions,
+            Grid((0, 0, 0)) if pbc_repetitions is None else box,
+        )
         magnet2 = Ferromagnet(world2, box)
 
         mxi, myi, mzi = [mgrid.origin[c] - box.origin[c] for c in [0, 1, 2]]
@@ -138,7 +142,8 @@ class TestStrayFields:
 
 # --------------------------------------------------
 
-@pytest.fixture(scope="class", params=[None, (1,1,0), (0, 0, 1)])
+
+@pytest.fixture(scope="class", params=[None, (1, 1, 0), (0, 0, 1)])
 def multi_magnets(request):
     pbc = request.param
 
@@ -150,8 +155,9 @@ def multi_magnets(request):
     n_magnets = 4
     magnets = []
     for i in range(n_magnets):
-        grid = Grid(size=tuple(np.random.randint(n_min, n_max, (3))),
-                    origin=tuple(i*offset))
+        grid = Grid(
+            size=tuple(np.random.randint(n_min, n_max, (3))), origin=tuple(i * offset)
+        )
         magnet = Ferromagnet(world, grid)
         magnet.aex = 13e-12
         magnet.msat = 800e3

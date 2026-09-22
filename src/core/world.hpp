@@ -14,7 +14,7 @@ class World {
    * @param mastergrid Mastergrid defines a periodic simulation box. If it has
    * zero size in a direction, then it is considered to be infinitely large
    * (no periodicity) in that direction.
-   * 
+   *
    * @param pbcRepetitions The number of repetitions for everything inside
    * mastergrid in the x, y and z directions to create periodic boundary
    * conditions. The number of repetitions determines the cutoff range for the
@@ -23,14 +23,15 @@ class World {
    * all magnets are essentially copied twice to the right, twice to the left,
    * but not in the y direction. That row is then copied once up and once down,
    * creating a 5x1x3 grid.
-   * 
+   *
    * @throws std::invalid_argument Thrown when given a negative number of
    * repetitions.
    * @throws std::invalid_argument Thrown when 0 in mastergrid size does not
    * correspond to a 0 in pbcRepetitions.
    */
   explicit World(real3 cellsize, Grid mastergrid, int3 pbcRepetitions);
-  /** Create a world with a given cell size and no periodic boundary conditions. */
+  /** Create a world with a given cell size and no periodic boundary conditions.
+   */
   explicit World(real3 cellsize);
 
   /** Destroy the world. */

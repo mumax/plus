@@ -5,7 +5,6 @@
 class Magnet;
 class Field;
 
-
 bool strainTensorAssuredZero(const Magnet*);
 
 Field evalStrainTensor(const Magnet*);

@@ -9,6 +9,7 @@ import numpy as np
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import twodomain
 
+
 def line(x, a, b):
     return a * x + b
 

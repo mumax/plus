@@ -5,24 +5,45 @@ import os as _os
 import warnings as _warnings
 
 ## Determine and use the desired floating point precision
-_FP_allowed_vals = {i: k for k, v in {
-    "SINGLE": ["SINGLE", "1", "32"],
-    "DOUBLE": ["DOUBLE", "2", "64"]
-}.items() for i in v}
+_FP_allowed_vals = {
+    i: k
+    for k, v in {
+        "SINGLE": ["SINGLE", "1", "32"],
+        "DOUBLE": ["DOUBLE", "2", "64"],
+    }.items()
+    for i in v
+}
 
 # Was a command line argument passed?
 _parser = _argparse.ArgumentParser()
-_parser.add_argument('--mumaxplus-fp-precision', dest='fp_precision', type=str, nargs='?', default=None,
-                    help='Let mumax+ use single (FP_PRECISION = SINGLE, 1 or 32) or double (DOUBLE, 2 or 64) precision. This argument takes precedence over the environment variable MUMAXPLUS_FP_PRECISION.')
+_parser.add_argument(
+    "--mumaxplus-fp-precision",
+    dest="fp_precision",
+    type=str,
+    nargs="?",
+    default=None,
+    help="Let mumax+ use single (FP_PRECISION = SINGLE, 1 or 32) or double "
+    "(DOUBLE, 2 or 64) precision. This argument takes precedence over the "
+    "environment variable MUMAXPLUS_FP_PRECISION.",
+)
 _args, _ = _parser.parse_known_args()
-FP_PRECISION: str = _args.fp_precision # Can be None
+FP_PRECISION: str = _args.fp_precision  # Can be None
 
 # If not, was an environment variable set?
 if not FP_PRECISION:
     FP_PRECISION = _os.environ.get("MUMAXPLUS_FP_PRECISION")
-elif (mfpenv := _os.environ.get("MUMAXPLUS_FP_PRECISION")): # Both envvar and CLI arg were set: warn user of this
-    if _FP_allowed_vals.get(mfpenv.upper()) != _FP_allowed_vals.get(FP_PRECISION.upper()):
-        _warnings.warn(f"\n\tCLI arg --mumaxplus-fp-precision ({FP_PRECISION}) and envvar MUMAXPLUS_FP_PRECISION ({_os.environ.get('MUMAXPLUS_FP_PRECISION')}) differ.\n\tThe CLI arg takes precedence, so using FP_PRECISION={FP_PRECISION}.", stacklevel=2)
+# Both envvar and CLI arg were set: warn user of this
+elif mfpenv := _os.environ.get("MUMAXPLUS_FP_PRECISION"):
+    if _FP_allowed_vals.get(mfpenv.upper()) != _FP_allowed_vals.get(
+        FP_PRECISION.upper()
+    ):
+        _warnings.warn(
+            f"\n\tCLI arg --mumaxplus-fp-precision ({FP_PRECISION}) and envvar "
+            + f"MUMAXPLUS_FP_PRECISION ({_os.environ.get('MUMAXPLUS_FP_PRECISION')}) "
+            + "differ.\n\tThe CLI arg takes precedence, so using "
+            + f"FP_PRECISION={FP_PRECISION}.",
+            stacklevel=2,
+        )
 
 # If not, default to single precision.
 if not FP_PRECISION:
@@ -54,15 +75,19 @@ from .strayfield import StrayField
 from .timesolver import TimeSolver
 from .traction import BoundaryTraction
 from .variable import Variable
-from .world import World
 from .window import Window
-from . import util
+from .world import World
 
-FP_PRECISION = {1: "SINGLE", 2: "DOUBLE"}.get(_cpp.FP_PRECISION, "UNKNOWN") # Use _cpp value, as that is certainly the correct one
+from . import util  # isort: skip
+
+
+FP_PRECISION = {1: "SINGLE", 2: "DOUBLE"}.get(
+    _cpp.FP_PRECISION, "UNKNOWN"
+)  # Use _cpp value, as that is certainly the correct one
 
 __all__ = [
     "_cpp",
-    "Altermagnet"
+    "Altermagnet",
     "Antiferromagnet",
     "BoundaryTraction",
     "DmiTensor",
@@ -81,6 +106,6 @@ __all__ = [
     "Window",
     "PoissonSystem",
     "util",
-    "FP_PRECISION"
+    "FP_PRECISION",
 ]
 __version__ = "1.2.1"

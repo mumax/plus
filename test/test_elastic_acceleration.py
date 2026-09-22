@@ -1,7 +1,6 @@
 import numpy as np
 
-from mumaxplus import Grid, World, Ferromagnet
-
+from mumaxplus import Ferromagnet, Grid, World
 
 SRTOL = 1e-3
 
@@ -20,6 +19,7 @@ def max_absolute_error(result, wanted):
     """Maximum error for vector quantities."""
     return np.max(np.linalg.norm(result - wanted, axis=0))
 
+
 def max_semirelative_error(result, wanted):
     """Like relative error, but divides by the maximum of wanted.
     Useful when removing units but the results go through zero.
@@ -29,15 +29,14 @@ def max_semirelative_error(result, wanted):
 
 class TestForces:
     def setup_class(self):
-        """Makes a world with a magnet with random elastic parameters.
-        """
+        """Makes a world with a magnet with random elastic parameters."""
         world = World(cellsize)
 
-        self.magnet =  Ferromagnet(world, Grid((nx,ny,nz)))
+        self.magnet = Ferromagnet(world, Grid((nx, ny, nz)))
         self.magnet.enable_elastodynamics = True
 
-        self.magnet.eta = np.random.rand(1, nz,ny,nx)
-        self.magnet.rho = np.random.rand(1, nz,ny,nx)
+        self.magnet.eta = np.random.rand(1, nz, ny, nx)
+        self.magnet.rho = np.random.rand(1, nz, ny, nx)
 
         self.magnet.C11 = C11
         self.magnet.C12 = C12
@@ -46,10 +45,10 @@ class TestForces:
         self.magnet.B1 = B1
         self.magnet.B2 = B2
 
-        self.magnet.elastic_displacement = 1e-15 * np.random.rand(3, nz,ny,nx)
-        self.magnet.elastic_velocity = 1e-2 * np.random.rand(3, nz,ny,nx)
+        self.magnet.elastic_displacement = 1e-15 * np.random.rand(3, nz, ny, nx)
+        self.magnet.elastic_velocity = 1e-2 * np.random.rand(3, nz, ny, nx)
 
-        self.magnet.external_body_force = np.random.rand(3, nz,ny,nx)
+        self.magnet.external_body_force = np.random.rand(3, nz, ny, nx)
 
     def test_stress_tensor(self):
         """Check if the stress tensor is the sum of the other stresses."""
@@ -58,20 +57,34 @@ class TestForces:
 
     def test_effective_force(self):
         """Check if the effective body force is the sum of the other forces."""
-        force = self.magnet.internal_body_force.eval() + self.magnet.external_body_force.eval() + self.magnet.magnetoelastic_force.eval()
-        assert max_semirelative_error(self.magnet.effective_body_force.eval(), force) < SRTOL
+        force = (
+            self.magnet.internal_body_force.eval()
+            + self.magnet.external_body_force.eval()
+            + self.magnet.magnetoelastic_force.eval()
+        )
+        assert (
+            max_semirelative_error(self.magnet.effective_body_force.eval(), force)
+            < SRTOL
+        )
 
     def test_damping_calc(self):
         """Check if damping is correctly calculated."""
-        damping = - self.magnet.eta.eval() * self.magnet.elastic_velocity.eval()
-        assert max_semirelative_error(self.magnet.elastic_damping.eval(), damping) < SRTOL
+        damping = -self.magnet.eta.eval() * self.magnet.elastic_velocity.eval()
+        assert (
+            max_semirelative_error(self.magnet.elastic_damping.eval(), damping) < SRTOL
+        )
 
     def test_damping_add(self):
         """Check if damping is correctly added to the forces. This also checks the division by rho."""
         damping = self.magnet.elastic_damping.eval()
         forces = self.magnet.effective_body_force.eval()
         rho = self.magnet.rho.eval()
-        assert max_semirelative_error(rho*self.magnet.elastic_acceleration.eval(), (forces + damping)) < SRTOL
+        assert (
+            max_semirelative_error(
+                rho * self.magnet.elastic_acceleration.eval(), (forces + damping)
+            )
+            < SRTOL
+        )
 
     def test_default_damping(self):
         """Check that there is viscous damping, even if viscosity tensor has not been set."""

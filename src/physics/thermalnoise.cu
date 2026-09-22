@@ -53,7 +53,7 @@ Field evalThermalNoise(const Ferromagnet* magnet) {
     noise.makeZero();
     return noise;
   }
-  
+
   int N = noise.grid().ncells();
   real mean = 0.0;
   real stddev = 1.0;
@@ -67,8 +67,7 @@ Field evalThermalNoise(const Ferromagnet* magnet) {
       cudaMemcpy(noise.device_ptr(c), tmp, N * sizeof(real), cudaMemcpyDeviceToDevice);
     }
     cudaFree(tmp);
-  }
-  else {
+  } else {
     for (int c = 0; c < 3; c++)
       generateRandNormal(magnet->randomGenerator, noise.device_ptr(c), N, mean, stddev);
   }

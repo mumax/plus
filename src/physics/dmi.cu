@@ -12,22 +12,25 @@
 #include "world.hpp"
 
 bool inhomoDmiAssuredZero(const Ferromagnet* magnet) {
-  if (magnet->msat.assuredZero()) { return true; }
+  if (magnet->msat.assuredZero()) {
+    return true;
+  }
   if (magnet->hostMagnet())
-    return magnet->dmiTensor.assuredZero() && magnet->hostMagnet()->dmiTensor.assuredZero();
+    return magnet->dmiTensor.assuredZero() &&
+           magnet->hostMagnet()->dmiTensor.assuredZero();
   return magnet->dmiTensor.assuredZero();
 }
 
 __global__ void k_dmiFieldFM(CuField hField,
-                           const CuField mField,
-                           const CuDmiTensor dmiTensor,
-                           const CuParameter msat,
-                           const Grid mastergrid,
-                           const CuParameter aex,
-                           bool openBC) {
+                             const CuField mField,
+                             const CuDmiTensor dmiTensor,
+                             const CuParameter msat,
+                             const Grid mastergrid,
+                             const CuParameter aex,
+                             bool openBC) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const auto system = hField.system;
- 
+
   if (!system.grid.cellInGrid(idx))
     return;
 
@@ -37,7 +40,7 @@ __global__ void k_dmiFieldFM(CuField hField,
     return;
   }
 
-	real3 m = mField.vectorAt(idx);
+  real3 m = mField.vectorAt(idx);
   const int3 coo = system.grid.index2coord(idx);
 
   // Accumulate DMI field of cell at idx in h. Divide by msat at the end.
@@ -50,23 +53,25 @@ __global__ void k_dmiFieldFM(CuField hField,
                             int3{0, 1, 0}, int3{0, 0, -1}, int3{0, 0, 1}}) {
     int3 neighbor_coo = mastergrid.wrap(coo + relative_coo);
     int neighbor_idx;
-    if (!system.inGeometry(neighbor_coo)) { neighbor_idx = idx; }
-    else { neighbor_idx = system.grid.coord2index(neighbor_coo); }
+    if (!system.inGeometry(neighbor_coo)) {
+      neighbor_idx = idx;
+    } else {
+      neighbor_idx = system.grid.coord2index(neighbor_coo);
+    }
 
     // If there is no FM-exchange at the boundary, open BC are assumed
     real a = aex.valueAt(idx);
     openBC = (a == 0) ? true : openBC;
 
-    // If we assume open boundary conditions and if there is no neighbor, 
-    // then simply continue without adding to the effective field.    
-    if (openBC && (!system.inGeometry(neighbor_coo)
-               || msat.valueAt(neighbor_idx) == 0))
+    // If we assume open boundary conditions and if there is no neighbor,
+    // then simply continue without adding to the effective field.
+    if (openBC && (!system.inGeometry(neighbor_coo) || msat.valueAt(neighbor_idx) == 0))
       continue;
-    
+
     // Get the dmi strengths between the center cell and the neighbor, which are
     // the harmonic means of the dmi strengths of both cells.
     real Dxz, Dxy, Dyz, Dzx, Dyx, Dzy;
-    
+
     if (relative_coo.x) {  // derivative along x
       Dxz = dmiTensor.xxz.harmonicMean(idx, neighbor_idx);
       Dxy = dmiTensor.xxy.harmonicMean(idx, neighbor_idx);
@@ -91,12 +96,11 @@ __global__ void k_dmiFieldFM(CuField hField,
                  relative_coo.z * system.cellsize.z;
 
     real3 m_;
-    if (!system.inGeometry(neighbor_coo) && !openBC) { // Neumann BC
+    if (!system.inGeometry(neighbor_coo) && !openBC) {  // Neumann BC
       int3 n = relative_coo * relative_coo;
       real3 Gamma = getGamma(dmiTensor, idx, n, m);
-      m_ = m + (Gamma / (2*a)) * delta;
-    }
-    else {
+      m_ = m + (Gamma / (2 * a)) * delta;
+    } else {
       m_ = mField.vectorAt(neighbor_idx);
     }
 
@@ -104,7 +108,6 @@ __global__ void k_dmiFieldFM(CuField hField,
     h.x += (Dxy * m_.y + Dxz * m_.z) / delta;
     h.y += (Dyx * m_.x + Dyz * m_.z) / delta;
     h.z += (Dzx * m_.x + Dzy * m_.y) / delta;
-
   }  // end loop over neighbors
 
   h /= msat.valueAt(idx);
@@ -112,18 +115,18 @@ __global__ void k_dmiFieldFM(CuField hField,
 }
 
 __global__ void k_dmiFieldAFM(CuField hField,
-                           const CuField m1Field,
-                           const CuField m2Field,
-                           const CuDmiTensor dmiTensor,
-                           const CuDmiTensor interDmiTensor,
-                           const CuParameter msat,
-                           const CuParameter msat2,
-                           Grid mastergrid,
-                           const CuParameter aex,
-                           const CuParameter afmex_nn,
-                           const CuInterParameter interExch,
-                           const CuInterParameter scaleExch,
-                           bool openBC) {
+                              const CuField m1Field,
+                              const CuField m2Field,
+                              const CuDmiTensor dmiTensor,
+                              const CuDmiTensor interDmiTensor,
+                              const CuParameter msat,
+                              const CuParameter msat2,
+                              Grid mastergrid,
+                              const CuParameter aex,
+                              const CuParameter afmex_nn,
+                              const CuInterParameter interExch,
+                              const CuInterParameter scaleExch,
+                              bool openBC) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const auto system = hField.system;
 
@@ -151,24 +154,27 @@ __global__ void k_dmiFieldAFM(CuField hField,
     int3 neighbor_coo = mastergrid.wrap(coo + relative_coo);
     int neighbor_idx;
 
-    if (!system.inGeometry(neighbor_coo)) { neighbor_idx = idx; }
-    else { neighbor_idx = system.grid.coord2index(neighbor_coo); }
-    
+    if (!system.inGeometry(neighbor_coo)) {
+      neighbor_idx = idx;
+    } else {
+      neighbor_idx = system.grid.coord2index(neighbor_coo);
+    }
     // If there is no FM-exchange at the boundary, open BC are assumed
     real a = aex.valueAt(idx);
     openBC = (a == 0) ? true : openBC;
 
     // If we assume open boundary conditions and if there is no neighbor,
     // then simply continue without adding to the effective field.
-    if (openBC && (!system.inGeometry(neighbor_coo)
-               || (msat.valueAt(neighbor_idx) == 0 && msat2.valueAt(neighbor_idx) == 0)))
+    if (openBC &&
+        (!system.inGeometry(neighbor_coo) ||
+         (msat.valueAt(neighbor_idx) == 0 && msat2.valueAt(neighbor_idx) == 0)))
       continue;
 
     // Get the dmi strengths between the center cell and the neighbor, which are
     // the harmonic means of the dmi strengths of both cells.
     real Dxz, Dxy, Dyz, Dzx, Dyx, Dzy;
     real Dixz, Dixy, Diyz, Dizx, Diyx, Dizy;
-    
+
     if (relative_coo.x) {  // derivative along x
       Dxz = dmiTensor.xxz.harmonicMean(idx, neighbor_idx);
       Dxy = dmiTensor.xxy.harmonicMean(idx, neighbor_idx);
@@ -205,7 +211,7 @@ __global__ void k_dmiFieldAFM(CuField hField,
                  relative_coo.z * system.cellsize.z;
 
     real3 m1_, m2_;
-    if (!system.inGeometry(neighbor_coo)) { // Neumann BC
+    if (!system.inGeometry(neighbor_coo)) {  // Neumann BC
       int3 n = relative_coo * relative_coo;
       real3 Gamma1 = getGamma(dmiTensor, idx, n, m1);
       real3 Gamma2 = getGamma(dmiTensor, idx, n, m2);
@@ -214,36 +220,37 @@ __global__ void k_dmiFieldAFM(CuField hField,
 
       real3 d_m2{0, 0, 0};
       int3 coo__ = mastergrid.wrap(coo - relative_coo);
-      if(!hField.cellInGeometry(coo__))
+      if (!hField.cellInGeometry(coo__))
         continue;
       int idx__ = system.grid.coord2index(coo__);
 
       unsigned int ridx = system.getRegionIdx(idx);
       unsigned int ridx__ = system.getRegionIdx(idx__);
-      if(hField.cellInGeometry(coo__)) {
+      if (hField.cellInGeometry(coo__)) {
         // Approximate normal derivative of sister sublattice by taking
         // the bulk derivative closest to the edge.
         real3 m2__ = m2Field.vectorAt(coo__);
         d_m2 = (m2 - m2__) / delta;
       }
       real Aex_nn = getExchangeStiffness(interExch.valueBetween(ridx, ridx__),
-                                         scaleExch.valueBetween(ridx, ridx__),
-                                         an,
+                                         scaleExch.valueBetween(ridx, ridx__), an,
                                          afmex_nn.valueAt(idx__));
-      m1_ = m1 + (Aex_nn * cross(cross(d_m2, m1), m1) + Gamma1) * delta / (2*a);
-      m2_ = m2 + (Aex_nn * cross(cross((m1_ - m1)/delta, m2), m2) + Gamma2) * delta / (2*a);
-    }
-    else {
+      m1_ = m1 + (Aex_nn * cross(cross(d_m2, m1), m1) + Gamma1) * delta / (2 * a);
+      m2_ = m2 + (Aex_nn * cross(cross((m1_ - m1) / delta, m2), m2) + Gamma2) * delta /
+                     (2 * a);
+    } else {
       m1_ = m1Field.vectorAt(neighbor_idx);
       m2_ = m2Field.vectorAt(neighbor_idx);
     }
     bool ms1 = (msat.valueAt(neighbor_idx) != 0);
     bool ms2 = (msat2.valueAt(neighbor_idx) != 0);
     // Compute the effective field contribution of the DMI with the neighbor
-    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z) - ms2 * (Dixy * m2_.y - Dixz * m2_.z)) / delta;
-    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z) - ms2 * (Diyx * m2_.x - Diyz * m2_.z)) / delta;
-    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y) - ms2 * (Dizx * m2_.x - Dizy * m2_.y)) / delta;
-
+    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z) - ms2 * (Dixy * m2_.y - Dixz * m2_.z)) /
+           delta;
+    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z) - ms2 * (Diyx * m2_.x - Diyz * m2_.z)) /
+           delta;
+    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y) - ms2 * (Dizx * m2_.x - Dizy * m2_.y)) /
+           delta;
   }  // end loop over neighbors
 
   h /= msat.valueAt(idx);
@@ -285,17 +292,19 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
   // Accumulate DMI field of cell at idx in h. Divide by msat at the end.
   real3 h{0, 0, 0};
 
-  // Loop over the 6 nearest neighbors using the neighbor's relative coordinate.
-  // Compute for each neighbor the DMI effective field term.
-  #pragma unroll
+// Loop over the 6 nearest neighbors using the neighbor's relative coordinate.
+// Compute for each neighbor the DMI effective field term.
+#pragma unroll
   for (int3 relative_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0},
-    int3{0, 1, 0}, int3{0, 0, -1}, int3{0, 0, 1}}) {
-
+                            int3{0, 1, 0}, int3{0, 0, -1}, int3{0, 0, 1}}) {
     int3 neighbor_coo = mastergrid.wrap(coo + relative_coo);
     int neighbor_idx;
 
-    if (!system.inGeometry(neighbor_coo)) { neighbor_idx = idx; }
-    else { neighbor_idx = system.grid.coord2index(neighbor_coo); }
+    if (!system.inGeometry(neighbor_coo)) {
+      neighbor_idx = idx;
+    } else {
+      neighbor_idx = system.grid.coord2index(neighbor_coo);
+    }
 
     // If there is no FM-exchange at the boundary, open BC are assumed
     real a = aex.valueAt(idx);
@@ -303,10 +312,10 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
 
     // If we assume open boundary conditions and if there is no neighbor,
     // then simply continue without adding to the effective field.
-    if (openBC && (!system.inGeometry(neighbor_coo) ||
-                  (msat.valueAt(neighbor_idx) == 0  &&
-                   msat2.valueAt(neighbor_idx) == 0 &&
-                   msat3.valueAt(neighbor_idx) == 0)))
+    if (openBC &&
+        (!system.inGeometry(neighbor_coo) ||
+         (msat.valueAt(neighbor_idx) == 0 && msat2.valueAt(neighbor_idx) == 0 &&
+          msat3.valueAt(neighbor_idx) == 0)))
       continue;
 
     // Get the dmi strengths between the center cell and the neighbor, which are
@@ -351,7 +360,7 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
 
     real3 m1_, m2_, m3_;
 
-    if (!system.inGeometry(neighbor_coo)) { // Neumann BC
+    if (!system.inGeometry(neighbor_coo)) {  // Neumann BC
       int3 n = relative_coo * relative_coo;
       real3 Gamma1 = getGamma(dmiTensor, idx, n, m1);
       real3 Gamma2 = getGamma(dmiTensor, idx, n, m2);
@@ -361,13 +370,13 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
       real3 d_m2{0, 0, 0};
       real3 d_m3{0, 0, 0};
       int3 coo__ = mastergrid.wrap(coo - relative_coo);
-      if(!hField.cellInGeometry(coo__))
+      if (!hField.cellInGeometry(coo__))
         continue;
       int idx__ = system.grid.coord2index(coo__);
 
       unsigned int ridx = system.getRegionIdx(idx);
       unsigned int ridx__ = system.getRegionIdx(idx__);
-      if(hField.cellInGeometry(coo__)) {
+      if (hField.cellInGeometry(coo__)) {
         // Approximate normal derivative of sister sublattices by taking
         // the bulk derivative closest to the edge.
         real3 m2__ = m2Field.vectorAt(coo__);
@@ -376,14 +385,20 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
         d_m3 = (m3 - m3__) / delta;
       }
       real Aex_nn = getExchangeStiffness(interExch.valueBetween(ridx, ridx__),
-                                         scaleExch.valueBetween(ridx, ridx__),
-                                         an,
+                                         scaleExch.valueBetween(ridx, ridx__), an,
                                          ncafmex_nn.valueAt(idx__));
-      m1_ = m1 + (Aex_nn * (cross(cross(d_m2, m1), m1) + cross(cross(d_m3, m1), m1)) + Gamma1) * delta / (2*a);
-      m2_ = m2 + (Aex_nn * (cross(cross((m1_ - m1)/delta, m2), m2) + cross(cross(d_m3, m2), m2)) + Gamma2) * delta / (2*a);
-      m3_ = m3 + (Aex_nn * (cross(cross((m1_ - m1)/delta, m3), m3) + cross(cross(d_m2, m3), m3)) + Gamma3) * delta / (2*a);
-    }
-    else {
+      m1_ = m1 + (Aex_nn * (cross(cross(d_m2, m1), m1) + cross(cross(d_m3, m1), m1)) +
+                  Gamma1) *
+                     delta / (2 * a);
+      m2_ = m2 + (Aex_nn * (cross(cross((m1_ - m1) / delta, m2), m2) +
+                            cross(cross(d_m3, m2), m2)) +
+                  Gamma2) *
+                     delta / (2 * a);
+      m3_ = m3 + (Aex_nn * (cross(cross((m1_ - m1) / delta, m3), m3) +
+                            cross(cross(d_m2, m3), m3)) +
+                  Gamma3) *
+                     delta / (2 * a);
+    } else {
       m1_ = m1Field.vectorAt(neighbor_idx);
       m2_ = m2Field.vectorAt(neighbor_idx);
       m3_ = m3Field.vectorAt(neighbor_idx);
@@ -394,18 +409,16 @@ __global__ void k_dmiFieldNcAfm(CuField hField,
     bool ms3 = (msat3.valueAt(neighbor_idx) != 0);
 
     // Compute the effective field contribution of the DMI with the neighbor
-    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z)
-          - ms2 * (Dixy * m2_.y - Dixz * m2_.z)
-          - ms3 * (Dixy * m3_.y - Dixz * m3_.z)) / delta;
-    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z)
-          - ms2 * (Diyx * m2_.x - Diyz * m2_.z)
-          - ms3 * (Diyx * m3_.x - Diyz * m3_.z)) / delta;
-    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y)
-          - ms2 * (Dizx * m2_.x - Dizy * m2_.y)
-          - ms3 * (Dizx * m3_.x - Dizy * m3_.y)) / delta;
-
+    h.x += (ms1 * (Dxy * m1_.y + Dxz * m1_.z) - ms2 * (Dixy * m2_.y - Dixz * m2_.z) -
+            ms3 * (Dixy * m3_.y - Dixz * m3_.z)) /
+           delta;
+    h.y += (ms1 * (Dyx * m1_.x + Dyz * m1_.z) - ms2 * (Diyx * m2_.x - Diyz * m2_.z) -
+            ms3 * (Diyx * m3_.x - Diyz * m3_.z)) /
+           delta;
+    h.z += (ms1 * (Dzx * m1_.x + Dzy * m1_.y) - ms2 * (Dizx * m2_.x - Dizy * m2_.y) -
+            ms3 * (Dizx * m3_.x - Dizy * m3_.y)) /
+           delta;
   }  // end loop over neighbors
-
   h /= msat.valueAt(idx);
   hField.setVectorInCell(idx, h);
 }
@@ -425,11 +438,11 @@ Field evalDmiField(const Ferromagnet* magnet) {
   auto aex = magnet->aex.cu();
   auto dmiTensor = magnet->dmiTensor.cu();
   auto BC = magnet->enableOpenBC;
-  
-  if (!magnet->isSublattice())
+
+  if (!magnet->isSublattice()) {
     // magnet is stand-alone FM
     cudaLaunch(ncells, k_dmiFieldFM, hField.cu(), mag, dmiTensor, msat, grid, aex, BC);
-  else if (magnet->hostMagnet()->sublattices().size() == 2) {
+  } else if (magnet->hostMagnet()->sublattices().size() == 2) {
     // magnet is sublattice and has exactly 1 sister sublattice (AFM or ATM)
     auto host = magnet->hostMagnet();
     auto mag2 = host->getOtherSublattices(magnet)[0]->magnetization()->field().cu();
@@ -438,10 +451,9 @@ Field evalDmiField(const Ferromagnet* magnet) {
     auto msat2 = host->getOtherSublattices(magnet)[0]->msat.cu();
     auto inter = host->interAfmExchNN.cu();
     auto scale = host->scaleAfmExchNN.cu();
-    cudaLaunch(ncells, k_dmiFieldAFM, hField.cu(), mag, mag2,
-              dmiTensor, interDmiTensor, msat, msat2, grid, aex, afmex_nn, inter, scale, BC);
-  }
-  else if (magnet->hostMagnet()->sublattices().size() == 3) {
+    cudaLaunch(ncells, k_dmiFieldAFM, hField.cu(), mag, mag2, dmiTensor, interDmiTensor,
+               msat, msat2, grid, aex, afmex_nn, inter, scale, BC);
+  } else if (magnet->hostMagnet()->sublattices().size() == 3) {
     // magnet is sublatice and has exactly 2 sister sublattices (NcAfm)
     auto m2 = magnet->hostMagnet()->getOtherSublattices(magnet)[0];
     auto m3 = magnet->hostMagnet()->getOtherSublattices(magnet)[1];
@@ -454,12 +466,14 @@ Field evalDmiField(const Ferromagnet* magnet) {
     auto inter = magnet->hostMagnet()->interAfmExchNN.cu();
     auto scale = magnet->hostMagnet()->scaleAfmExchNN.cu();
     cudaLaunch(ncells, k_dmiFieldNcAfm, hField.cu(), mag, mag2, mag3, dmiTensor,
-               interDmiTensor, msat, msat2, msat3, grid, aex, ncafmex_nn, inter, scale, BC);
+               interDmiTensor, msat, msat2, msat3, grid, aex, ncafmex_nn, inter, scale,
+               BC);
+  } else {
+    throw std::invalid_argument(
+        "Cannot calculate DMI field since magnet is neither "
+        "a Ferromagnet, a (non-collinear) "
+        "Antiferromagnet/Ferrimagnet, nor an Altermagnet.");
   }
-  else
-    throw std::invalid_argument("Cannot calculate DMI field since magnet is neither "
-                                "a Ferromagnet, a (non-collinear) "
-                                "Antiferromagnet/Ferrimagnet, nor an Altermagnet.");
   return hField;
 }
 
