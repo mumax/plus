@@ -182,8 +182,6 @@ void Minimizer::exec() {
     elMagnets_[i]->elasticVelocity()->set(real3{0, 0, 0});
   }
 
-  
-
   // Optional one-time exact cleanup of the initial displacement's rigid
   // rotation. rigidbodymode.cu's per-step removal is a small-rotation
   // (linearized) approximation; if the hand-off state already carries a
@@ -202,7 +200,6 @@ void Minimizer::exec() {
       step();
     return;
   }
-
 
   while (!converged() && nsteps_ < maxSteps_) {
     step();
@@ -297,10 +294,22 @@ struct ElasticBBResult {
 
 static inline ElasticBBResult BarzilianBorweinStepSizeElastic(
     Field& du, Field& dg, const Field& u1, real stepsizeElFallback, int n) {
+      
   real maxDu = maxVecNorm(du);
   real maxDg = maxVecNorm(dg);
-  real duScale = (maxDu > 0) ? real(1.0) / maxDu : real(1.0);
-  real dgScale = (maxDg > 0) ? real(1.0) / maxDg : real(1.0);
+  real duScale;
+  if (maxDu > 0) {
+    duScale = real(1.0) / maxDu;
+  } else {
+    duScale = real(1.0);
+  }
+
+  real dgScale;
+  if (maxDg > 0) {
+    dgScale = real(1.0) / maxDg;
+  } else {
+    dgScale = real(1.0);
+  }
 
   du = duScale * du;   // uses fieldops.hpp's operator*(real, const Field&)
   dg = dgScale * dg;
@@ -330,10 +339,11 @@ static inline ElasticBBResult BarzilianBorweinStepSizeElastic(
   //safety fallbacks, that shouldn't be necessary anymore
   real newHstep;
   if (div != 0.0) {
-    real candidate = nom / div;
-    newHstep = (!std::isnan(candidate) && !std::isinf(candidate))
-                   ? candidate
-                   : stepsizeElFallback;
+    newHstep = nom / div;
+    if (!std::isnan(newHstep) && !std::isinf(newHstep)) {
+    } else {
+      newHstep = stepsizeElFallback;
+    }
   } else {
     newHstep = stepsizeElFallback;
   }
