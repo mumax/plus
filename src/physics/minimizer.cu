@@ -294,16 +294,13 @@ void Minimizer::stepMagnetic() {
 void Minimizer::stepElastic() {
   for (size_t i = 0; i < elMagnets_.size(); i++) {
     u0[i] = elMagnets_[i]->elasticDisplacement()->eval();
-    //if (shouldRemoveRigidBodyModes()) removeRigidBodyModes(u0[i], rigidGeoms_[i], elMagnets_[i],true);
 
     if (nsteps_ == 0) {
-      elMagnets_[i]->elasticDisplacement()->set(u0[i]);
       f0[i] = forces_[i].eval();
     } else {
       f0[i] = f1[i];
     }
 
-    //if (shouldRemoveRigidBodyModes()) removeRigidBodyModes(f0[i], rigidGeoms_[i], elMagnets_[i],true);
     real h = elStepsizes_[i];
     u1[i] = Field(elMagnets_[i]->system(), 3);
     int ncells = u1[i].grid().ncells();
