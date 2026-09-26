@@ -290,6 +290,59 @@ void Minimizer::stepMagnetic() {
   }
 }
 
+struct ElasticBBResult {
+  real stepsize;
+  real relDu;
+};
+
+static inline ElasticBBResult BarzilianBorweinStepSizeElastic(
+    Field& du, Field& dg, const Field& u1, real stepsizeElFallback, int n) {
+  real maxDu = maxVecNorm(du);
+  real maxDg = maxVecNorm(dg);
+  real duScale = (maxDu > 0) ? real(1.0) / maxDu : real(1.0);
+  real dgScale = (maxDg > 0) ? real(1.0) / maxDg : real(1.0);
+
+  du = duScale * du;   // uses fieldops.hpp's operator*(real, const Field&)
+  dg = dgScale * dg;
+
+  // scaling trick to avoid float32 underflow issues in dudu kernel
+  // ultimately the duScale and dgScale factors cancel out in the BB step
+  real dudu = dotSum(du, du) / (duScale * duScale);
+  real dudg = dotSum(du, dg) / (duScale * dgScale);
+  real dgdg = dotSum(dg, dg) / (dgScale * dgScale);
+
+  real nom, div;
+  if (n % 2 == 0) {
+    //BB1
+    nom = dudu;
+    div = dudg;
+    // safety, if BB1 fails, use BB2. Shouldn't be necessary with scaling trick
+    if (nom == 0.0) {
+      nom = dudg;
+      div = dgdg;
+    }
+  } else {
+    //BB2
+    nom = dudg;
+    div = dgdg;
+  }
+
+  //safety fallbacks, that shouldn't be necessary anymore
+  real newHstep;
+  if (div != 0.0) {
+    real candidate = nom / div;
+    newHstep = (!std::isnan(candidate) && !std::isinf(candidate))
+                   ? candidate
+                   : stepsizeElFallback;
+  } else {
+    newHstep = stepsizeElFallback;
+  }
+
+  real maxU = maxVecNorm(u1);
+  real relDu = (maxU > 0) ? (maxDu / maxU) : maxDu;
+
+  return {newHstep, relDu};
+}
 
 void Minimizer::stepElastic() {
   for (size_t i = 0; i < elMagnets_.size(); i++) {
@@ -305,85 +358,24 @@ void Minimizer::stepElastic() {
     u1[i] = Field(elMagnets_[i]->system(), 3);
     int ncells = u1[i].grid().ncells();
     cudaLaunch(ncells, k_stepElastic, u1[i].cu(), u0[i].cu(), f0[i].cu(), h);
-  }
 
-  for (size_t i = 0; i < elMagnets_.size(); i++) {
-   if (shouldRemoveRigidBodyModes()) removeRigidBodyModes(u1[i], rigidGeoms_[i], elMagnets_[i],true);
-  }
-
-  for (size_t i = 0; i < elMagnets_.size(); i++) {
+    if (shouldRemoveRigidBodyModes()) removeRigidBodyModes(u1[i], rigidGeoms_[i], elMagnets_[i],true);
     elMagnets_[i]->elasticDisplacement()->set(u1[i]);
   }
 
   for (size_t i = 0; i < elMagnets_.size(); i++) {
     f1[i] = forces_[i].eval();
     if (shouldRemoveRigidBodyModes()) removeRigidBodyModes(f1[i], rigidGeoms_[i], elMagnets_[i],true);
-  }
 
-  for (size_t i = 0; i < elMagnets_.size(); i++) {
     Field du = add(real(+1), u1[i], real(-1), u0[i]);
     if (shouldRemoveRigidBodyModes()) removeRigidBodyModes(du, rigidGeoms_[i], elMagnets_[i],true);
 
     Field dg = add(real(-1), f1[i], real(+1), f0[i]);
     if (shouldRemoveRigidBodyModes()) removeRigidBodyModes(dg, rigidGeoms_[i], elMagnets_[i],true);
 
-    real maxDu = maxVecNorm(du);
-    real maxDg = maxVecNorm(dg);
-    real duScale;
-    if (maxDu > 0) {
-      duScale = real(1.0) / maxDu;
-    } else {
-      duScale = real(1.0);
-    }
-
-    real dgScale;
-    if (maxDg > 0) {
-      dgScale = real(1.0) / maxDg;
-    } else {
-      dgScale = real(1.0);
-    }
-
-    du = duScale * du;   // uses fieldops.hpp's operator*(real, const Field&)
-    dg = dgScale * dg;
-
-    // scaling trick to avoid float32 underflow issues in dudu kernel
-    // ultimately the duScale and dgScale factors cancel out in the BB step
-    real dudu = dotSum(du, du) / (duScale * duScale);
-    real dudg = dotSum(du, dg) / (duScale * dgScale);
-    real dgdg = dotSum(dg, dg) / (dgScale * dgScale);
-
-    real nom, div;
-    if (nsteps_ % 2 == 0) {
-      //BB1
-      nom = dudu;
-      div = dudg;
-      // safety, if BB1 fails, use BB2. Shouldn't be necessary with scaling trick
-      if (nom == 0.0) {
-        nom = dudg;
-        div = dgdg;
-      }
-    } else {
-      //BB2
-      nom = dudg;
-      div = dgdg;
-    }
-
-    //safety fallbacks, that shouldn't be necessary anymore
-    if (div != 0.0) {
-      real newHstep = nom / div;
-      if (!std::isnan(newHstep) && !std::isinf(newHstep)) {
-        elStepsizes_[i] = newHstep;
-      } else {
-        elStepsizes_[i] = stepsizeElFallback_;
-      }
-    } else {
-      elStepsizes_[i] = stepsizeElFallback_;
-    }
-
-    real maxU = maxVecNorm(u1[i]);
-    real relDu = (maxU > 0) ? (maxDu / maxU) : maxDu;
-
-    addElDiff(relDu);
+    ElasticBBResult bb = BarzilianBorweinStepSizeElastic(du, dg, u1[i], stepsizeElFallback_, nsteps_);
+    elStepsizes_[i] = bb.stepsize;
+    addElDiff(bb.relDu);
   }
 }
 
