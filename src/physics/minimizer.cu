@@ -207,7 +207,6 @@ void Minimizer::exec() {
   while (!converged() && nsteps_ < maxSteps_) {
     step();
   }
-  std::cerr << "steps: " << nsteps_ << " ." << std::endl;
 }
 
 __global__ void k_step(CuField mField,
