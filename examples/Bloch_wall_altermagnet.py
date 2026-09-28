@@ -63,7 +63,7 @@ magnet.minimize()
 fig, axs = plt.subplots(2, 1, sharex=True)
 scale_net = 1e4
 # Theoretical profiles
-dw = np.sqrt((0.5*(A1+A2) - A12) / (2*K)) # Theoretical DW width
+dw = np.sqrt(((A1+A2) - A12) / (2*K)) # Theoretical DW width
 t = np.linspace(-Nx*cs/2, Nx*cs/2, Nx) / dw
 
 # --- NEEL ---
@@ -74,7 +74,7 @@ axs[0].plot(t, np.sin(-theta), 'k--')
 # --- NET ---
 Han = 2 * K / Ms
 Hex = -8 * A0 / ( Ms * (a**2))
-prefactor = 0.5 * (Han/Hex) * (A1-A2) / (0.5*(A1+A2) - A12)
+prefactor = (Han/Hex) * (A1-A2) / ((A1+A2) - A12)
 
 theory_y = -prefactor * np.sinh(t)**2 / np.cosh(t)**3
 theory_z =  prefactor * np.sinh(t)   /  np.cosh(t)**3

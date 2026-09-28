@@ -22,8 +22,8 @@ def compute_second_order_derivative_numpy(magnet, exch):
     m_y_plus  = m_pad[:, :, 2:, 1:-1]
     m_y_minus = m_pad[:, :, :-2, 1:-1]
 
-    deriv = ( exch[1] * (m_y_plus + m_y_minus - 2 * m) / dy2 +
-              exch[0] * (m_x_plus + m_x_minus - 2 * m) / dx2)
+    deriv = ( 2 * exch[1] * (m_y_plus + m_y_minus - 2 * m) / dy2 +
+              2 * exch[0] * (m_x_plus + m_x_minus - 2 * m) / dx2)
     return deriv
 
 def compute_mixed_derivative(magnet, exch):
@@ -40,7 +40,7 @@ def compute_mixed_derivative(magnet, exch):
     m_mp = m_pad[:, :, :-2, 2:]
     m_mm = m_pad[:, :, :-2, :-2]
 
-    deriv = exch * (m_pp - m_pm - m_mp + m_mm) / denom
+    deriv = 2 * exch * (m_pp - m_pm - m_mp + m_mm) / denom
     return deriv
 
 def compute_anisotropic_exchange_numpy(magnet, sub, switch):
@@ -63,7 +63,7 @@ def compute_anisotropic_exchange_numpy(magnet, sub, switch):
 
     return (deriv_diag + deriv_mixed) / sub.msat.uniform_value
 
-class TestAfmExchange:
+class TestAtmExchange:
     def test_anisotropic_exchange(self):
 
         world = World((1e-9, 2e-9, 3e-9))
