@@ -11,7 +11,7 @@ from mumaxplus.util.constants import GAMMALL_DEFAULT
 RTOL = 2e-2  # 2%
 
 @pytest.mark.slow
-def test_spinwave_dispersion_afm():
+def test_spinwave_dispersion_atm():
     # Numerical parameters
     fmax = 1E13           # maximum frequency (in Hz) of the sinc pulse
     T = 20E-12            # simulation time (longer -> better frequency resolution)
