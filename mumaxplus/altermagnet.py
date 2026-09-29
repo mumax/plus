@@ -1,4 +1,4 @@
-"""Altermagnet implementation as described in  https://doi.org/10.1063/5.0341263."""
+"""Altermagnet implementation as described in https://doi.org/10.1063/5.0341263."""
 
 import numpy as _np
 import warnings
