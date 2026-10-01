@@ -31,7 +31,7 @@ def compute_domain_wall_width(magnet):
     A2 = magnet.alterex_2.uniform_value
     A12 = magnet.afmex_nn.uniform_value
     K = magnet.sub1.ku1.uniform_value
-    return np.sqrt((0.5 * (A1 + A2) - A12) / (2 * K))
+    return np.sqrt(((A1 + A2) - A12) / (2 * K))
 
 
 def compute_magnetization_prefactor(magnet):
@@ -45,7 +45,7 @@ def compute_magnetization_prefactor(magnet):
 
     Han = 2 * K / Ms
     Hex = -8 * A0 / (Ms * a**2)
-    return 0.5 * (Han / Hex) * (A1 - A2) / (0.5 * (A1 + A2) - A12)
+    return (Han / Hex) * (A1 - A2) / ((A1 + A2) - A12)
 
 
 def neel_profile(x, position, width, dw_comp, zero_comp):

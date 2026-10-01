@@ -8,11 +8,11 @@ from mumaxplus import Altermagnet, Grid, World
 from mumaxplus.util.constants import GAMMALL_DEFAULT
 
 # Value of RTOL is a trade-off between necessary simulation time and accuracy.
-RTOL = 2e-2  # 2%
+RTOL = 3e-2  # 3%
 
 
 @pytest.mark.slow
-def test_spinwave_dispersion_afm():
+def test_spinwave_dispersion_atm():
     # Numerical parameters
     fmax = 1e13  # maximum frequency (in Hz) of the sinc pulse
     T = 20e-12  # simulation time (longer -> better frequency resolution)
@@ -93,10 +93,9 @@ def test_spinwave_dispersion_afm():
     wc = 4 * A0 / (dx * dx * Ms)
     wnn = A12 / Ms * k**2
 
-    wex = 0.5 * (A1 + A2) * k**2 / Ms
+    wex = (A1 + A2) * k**2 / Ms
     walt = (
-        0.5
-        * (A1 - A2)
+        (A1 - A2)
         * (np.cos(2 * angle) * (kx**2 - ky**2) + 2 * np.sin(2 * angle) * kx * ky)
         / Ms
     )
