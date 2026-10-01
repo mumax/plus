@@ -1,14 +1,18 @@
 """FieldQuantity implementation."""
 
+from pathlib import Path
+
 import numpy as _np
 import pyovf
+
 from .grid import Grid
-from pathlib import Path
 
 
 class FieldQuantity:
     """A functor representing a physical field quantity."""
-    _ovf_counts = {} # It keeps resetting to 0 if it is in the __init__
+
+    _ovf_counts = {}  # It keeps resetting to 0 if it is in the __init__
+
     def __init__(self, impl):
         self._impl = impl
 
@@ -86,7 +90,7 @@ class FieldQuantity:
     def get_rgb(self):
         """Evaluate the vector field quantity and return its rgb representation
         as a numpy ndarray of the same shape (3, nz, ny, nx).
-        
+
         Note
         ----
         The final color scheme is different from mumax³. In this case, the
@@ -96,8 +100,9 @@ class FieldQuantity:
         when crossing the xz- or yz-plane with a normalized length less than 1,
         where the colors will fade through gray.
         """
-        assert self.ncomp == 3, \
-            "The rgb representation can only be calculated for vector fields."
+        assert (
+            self.ncomp == 3
+        ), "The rgb representation can only be calculated for vector fields."
         return self._impl.get_rgb().get()  # Field to ndarray
 
     @property
@@ -131,17 +136,27 @@ class FieldQuantity:
         Parameters
         ----------
         name : str (default="")
-            The name of the OVF file. If the name is empty (the default), the name of the FieldQuantity will be used appended with an integer of 6 digits.
-            
+            The name of the OVF file. If the name is empty (the default), the name of
+            the FieldQuantity will be used appended with an integer of 6 digits.
+
         Warning
         -------
-        The shape of the array in the OVF file is (nz, ny, nx, ncomp) and not (ncomp, nz, ny, nx) in order to have the correct metadata.
-        
+        The shape of the array in the OVF file is (nz, ny, nx, ncomp) and not
+        (ncomp, nz, ny, nx) in order to have the correct metadata.
+
         Warning
         -------
-        self.name returns a string with colons (:). To avoid issues on Windows, these colons are changed to underscores (_)."""
+        self.name returns a string with colons (:). To avoid issues on Windows, these
+        colons are changed to underscores (_).
+        """
         cx, cy, cz = self._impl.system.cellsize
-        ovf = pyovf.create(_np.moveaxis(self.eval(), 0, -1), xstepsize=cx, ystepsize=cy, zstepsize=cz, title=self.name)
+        ovf = pyovf.create(
+            _np.moveaxis(self.eval(), 0, -1),
+            xstepsize=cx,
+            ystepsize=cy,
+            zstepsize=cz,
+            title=self.name,
+        )
         ovf.TotalSimTime = self._impl.system.time
         if name == "":
             count = self._ovf_counts.get(self.name, 0)
@@ -155,18 +170,28 @@ class FieldQuantity:
         Parameters
         ----------
         name : str (default="")
-            The name of the OVF file. If the name is empty (the default), it will look for the most recently saved file with this FieldQuantity name."""
+            The name of the OVF file. If the name is empty (the default), it will look
+            for the most recently saved file with this FieldQuantity name.
+        """
         if name == "":
             name_replace = self.name.replace(":", "_")
             files = Path(".").glob(f"{name_replace}*.ovf")
             try:
-                name = str(max(filter(lambda f: f.stem[-6:].isnumeric(), files), key=lambda f: int(f.stem[-6:])))
+                name = str(
+                    max(
+                        filter(lambda f: f.stem[-6:].isnumeric(), files),
+                        key=lambda f: int(f.stem[-6:]),
+                    )
+                )
             except ValueError:
-                raise FileNotFoundError(F"No files matching '_{name_replace}*.ovf' found.")
+                raise FileNotFoundError(
+                    f"No files matching '_{name_replace}*.ovf' found."
+                )
         ovf = pyovf.read(name)
         if self.ncomp == 1:
             data = _np.array([ovf.data])
         else:
-            # _np.ascontiguousarray is used so data is the transformed array. Otherwise the C++ layer still uses ovf.data
+            # _np.ascontiguousarray is used so data is the transformed array.
+            # Otherwise the C++ layer still uses ovf.data
             data = _np.ascontiguousarray(_np.moveaxis(ovf.data, -1, 0))
         self.set(data)

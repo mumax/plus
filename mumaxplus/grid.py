@@ -5,6 +5,7 @@ from . import _cpp
 
 class Grid:
     """Create a Grid instance."""
+
     def __init__(self, size, origin=(0, 0, 0)):
         """
         Parameters

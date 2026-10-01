@@ -1,16 +1,17 @@
 """Classes for common shapes and their manipulation."""
 
+from PIL import Image as _Image
+from matplotlib.path import Path as _Path
 import numpy as _np
 from scipy.spatial import Delaunay as _Delaunay
-from matplotlib.path import Path as _Path
-from PIL import Image as _Image
 
 # ==================================================
 # Parent Shape class
 
+
 class Shape:
-    def __init__(self, shape_func=(lambda x,y,z: False)):
-        """Base class for all shapes using constructive solid geometry (CSG).
+    def __init__(self, shape_func=(lambda x, y, z: False)):
+        """Provide a base class for all shapes using constructive solid geometry (CSG).
         This mutable class holds and manipulates a given shape function.
 
         Parameters
@@ -21,12 +22,13 @@ class Shape:
         self.shape_func = shape_func
 
     def __call__(self, x, y, z):
-        """Returns True if (x,y,z) is within this shape.
-        ``Calling shape.shape_func(x,y,z)`` or ``shape(x,y,z)`` is the same."""
+        """Return True if (x,y,z) is within this shape.
+        ``Calling shape.shape_func(x,y,z)`` or ``shape(x,y,z)`` is the same.
+        """
         return self.shape_func(x, y, z)
 
     def __contains__(self, coord):
-        """Returns true if the given coordinate is within this shape.
+        """Return true if the given coordinate is within this shape.
         Calling ``shape.shape_func(x,y,z)`` or ``shape(x,y,z)`` is the same.
 
         Parameters
@@ -44,33 +46,35 @@ class Shape:
         which can represent any affine transformation (rotate, scale, shear,
         translate). It is usually of the form [[R, T], [0, 1]], with R a
         3x3 rotation matrix and T a 3x1 translation vector.
-        Returns transformed self.
+        Return transformed self.
         """
         old_func = self.shape_func  # copy old version of self
-        def new_func(x,y,z):
+
+        def new_func(x, y, z):
             coord_vec = _np.array([x, y, z, _np.ones_like(x)])
-            x_,y_,z_,_ = _np.tensordot(transform_matrix, coord_vec, axes=1)
-            return old_func(x_,y_,z_)
+            x_, y_, z_, _ = _np.tensordot(transform_matrix, coord_vec, axes=1)
+            return old_func(x_, y_, z_)
+
         self.shape_func = new_func
         return self
 
     def transform3(self, transform_matrix):
         """Transform this shape according to a given 3x3 matrix (rotate, scale,
         shear).
-        Returns transformed self.
+        Return transformed self.
         """
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(*_np.tensordot(transform_matrix,
-                                                  _np.array([x, y, z]), axes=1))
+        self.shape_func = lambda x, y, z: old_func(
+            *_np.tensordot(transform_matrix, _np.array([x, y, z]), axes=1)
+        )
         return self
-        
 
     def transform(self, transform_matrix):
         """Transform this shape according to a given 3x3 matrix (rotate, scale,
         shear) or 4x4 matrix (like 3x3 plus translations). It is usually of the
         form [[R, T], [0, 1]], with R a 3x3 rotation matrix and T a 3x1
         translation vector.
-        Returns transformed self.
+        Return transformed self.
         """
         if transform_matrix.shape == (4, 4):
             return self.transform4(transform_matrix)
@@ -78,39 +82,51 @@ class Shape:
 
     def rotate_x(self, theta):
         """Rotate this shape theta radians counter-clockwise around the x-axis."""
-        rotmat = _np.array([[1, 0, 0],
-                            [0, _np.cos(theta), _np.sin(theta)],
-                            [0, -_np.sin(theta), _np.cos(theta)]])
+        rotmat = _np.array(
+            [
+                [1, 0, 0],
+                [0, _np.cos(theta), _np.sin(theta)],
+                [0, -_np.sin(theta), _np.cos(theta)],
+            ]
+        )
         return self.transform3(rotmat)
 
     def rotate_y(self, theta):
         """Rotate this shape theta radians counter-clockwise around the y-axis."""
-        rotmat = _np.array([[_np.cos(theta), 0, -_np.sin(theta)],
-                            [0, 1, 0],
-                            [_np.sin(theta), 0, _np.cos(theta)]])
+        rotmat = _np.array(
+            [
+                [_np.cos(theta), 0, -_np.sin(theta)],
+                [0, 1, 0],
+                [_np.sin(theta), 0, _np.cos(theta)],
+            ]
+        )
         return self.transform3(rotmat)
 
     def rotate_z(self, theta):
         """Rotate this shape theta radians counter-clockwise around the z-axis."""
-        rotmat = _np.array([[_np.cos(theta), _np.sin(theta), 0],
-                            [-_np.sin(theta), _np.cos(theta), 0],
-                            [0, 0, 1]])
+        rotmat = _np.array(
+            [
+                [_np.cos(theta), _np.sin(theta), 0],
+                [-_np.sin(theta), _np.cos(theta), 0],
+                [0, 0, 1],
+            ]
+        )
         return self.transform3(rotmat)
 
     def translate(self, dx, dy, dz):
         """Translate this shape by the vector (dx,dy,dz)."""
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(x-dx, y-dy, z-dz)
+        self.shape_func = lambda x, y, z: old_func(x - dx, y - dy, z - dz)
         return self
 
     def translate_x(self, dx):
         """Translate this shape by dx along the x-axis."""
         return self.translate(dx, 0, 0)
-    
+
     def translate_y(self, dy):
         """Translate this shape by dy along the y-axis."""
         return self.translate(0, dy, 0)
-    
+
     def translate_z(self, dz):
         """Translate this shape by dz along the z-axis."""
         return self.translate(0, 0, dz)
@@ -127,26 +143,25 @@ class Shape:
         if sy is None:
             sy = sz = sx
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(x/sx, y/sy, z/sz)
+        self.shape_func = lambda x, y, z: old_func(x / sx, y / sy, z / sz)
         return self
-
 
     def mirror_xy(self):
         """Mirror this shape with respect to the xy-plane."""
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(x, y, -z)
+        self.shape_func = lambda x, y, z: old_func(x, y, -z)
         return self
 
     def mirror_yz(self):
         """Mirror this shape with respect to the yz-plane."""
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(-x, y, z)
+        self.shape_func = lambda x, y, z: old_func(-x, y, z)
         return self
 
     def mirror_zx(self):
         """Mirror this shape with respect to the zx-plane."""
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(x, -y, z)
+        self.shape_func = lambda x, y, z: old_func(x, -y, z)
         return self
 
     # -------------------------
@@ -155,7 +170,7 @@ class Shape:
     def invert(self):
         """Invert this shape (logical NOT)."""
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: _np.logical_not(old_func(x, y, z))
+        self.shape_func = lambda x, y, z: _np.logical_not(old_func(x, y, z))
         return self
 
     def repeat(self, min_point, max_point):
@@ -169,96 +184,108 @@ class Shape:
             Smallest x, y and z coordinates of the bounding box (inclusive).
         max_point : tuple[float] of size 3
             Largest x, y and z coordinates of the bounding box (exclusive).
-        
+
         Notes
         -----
         Setting any coordinate to None will not repeat the shape in this direction.
         """
         for min_p, max_p in zip(min_point, max_point):
             if min_p is not None and max_p is not None:
-                assert min_p < max_p, \
-                "All coordinates of min_point must be strictly smaller than " + \
-                "all coordinates of max_point. Use None instead if you do " + \
-                "not want to repeat the shape in a particular direction."
+                assert min_p < max_p, (
+                    "All coordinates of min_point must be strictly smaller than "
+                    + "all coordinates of max_point. Use None instead if you do "
+                    + "not want to repeat the shape in a particular direction."
+                )
 
         def none_mod(x, x_min, x_max):
             if x_min is None or x_max is None:
                 return x
-            return (x-x_min)%(x_max-x_min) + x_min
+            return (x - x_min) % (x_max - x_min) + x_min
 
         x0, y0, z0 = min_point
         x1, y1, z1 = max_point
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(none_mod(x, x0, x1),
-                                                 none_mod(y, y0, y1),
-                                                 none_mod(z, z0, z1))
+        self.shape_func = lambda x, y, z: old_func(
+            none_mod(x, x0, x1), none_mod(y, y0, y1), none_mod(z, z0, z1)
+        )
         return self
 
     # -------------------------
     # operations on single shape returning new shape
 
     def __neg__(self):
-        """Returns a new shape as the inverse of given shape (logical NOT)."""
-        return Shape(lambda x,y,z: _np.logical_not(self(x, y, z)))
+        """Return a new shape as the inverse of given shape (logical NOT)."""
+        return Shape(lambda x, y, z: _np.logical_not(self(x, y, z)))
 
     def copy(self):
-        """Returns a new shape which is a copy of this shape."""
+        """Return a new shape which is a copy of this shape."""
         func_copy = self.shape_func
         return Shape(func_copy)
-        
+
     # -------------------------
     # operations between shapes altering this shape
-    
+
     def add(self, other: "Shape"):
         """Add given shape to this shape (logical OR).
-        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same."""
+        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same.
+        """
         old_func = self.shape_func  # copy old version of self
         self.shape_func = lambda x, y, z: old_func(x, y, z) | other(x, y, z)
         return self
 
     def __iadd__(self, other: "Shape"):
         """Add given shape to this shape (logical OR).
-        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same."""
+        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same.
+        """
         return self.add(other)
 
     def __ior__(self, other: "Shape"):
         """Add given shape to this shape (logical OR).
-        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same."""
+        Calling ``a.add(b)``, ``a += b`` or ``a |= b`` is the same.
+        """
         return self.add(other)
 
     def sub(self, other: "Shape"):
         """Subtract given shape from this shape (logical AND NOT).
-        Calling ``a.sub(b)`` or ``a -= b`` is the same."""
+        Calling ``a.sub(b)`` or ``a -= b`` is the same.
+        """
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(x,y,z) & _np.logical_not(other(x,y,z))
+        self.shape_func = lambda x, y, z: old_func(x, y, z) & _np.logical_not(
+            other(x, y, z)
+        )
         return self
-    
+
     def __isub__(self, other: "Shape"):
         """Subtract given shape from this shape (logical AND NOT).
-        Calling ``a.sub(b)`` or ``a -= b`` is the same."""
+        Calling ``a.sub(b)`` or ``a -= b`` is the same.
+        """
         return self.sub(other)
 
     def intersect(self, other: "Shape"):
         """Intersect given shape with this shape (logical AND).
-        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same."""
+        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same.
+        """
         old_func = self.shape_func  # copy old version of self
-        self.shape_func = lambda x,y,z: old_func(x,y,z) & other(x,y,z)
+        self.shape_func = lambda x, y, z: old_func(x, y, z) & other(x, y, z)
         return self
-    
+
     def __iand__(self, other: "Shape"):
         """Intersect given shape with this shape (logical AND).
-        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same."""
+        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same.
+        """
         return self.intersect(other)
 
     def __itruediv__(self, other: "Shape"):
         """Intersect given shape with this shape (logical AND).
-        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same."""
+        Calling ``a.intersect(b)``, ``a &= b`` and ``a /= b`` are the same.
+        """
         return self.intersect(other)
 
     def xor(self, other: "Shape"):
         """Keep everything from this shape and the given shape, except the
         intersection (logical XOR).
-        Calling ``a.xor(b)`` or ``a ^= b`` is the same."""
+        Calling ``a.xor(b)`` or ``a ^= b`` is the same.
+        """
         old_func = self.shape_func  # copy old version of self
         self.shape_func = lambda x, y, z: old_func(x, y, z) ^ other(x, y, z)
         return self
@@ -266,62 +293,75 @@ class Shape:
     def __ixor__(self, other: "Shape"):
         """Keep everything from this shape and the given shape, except the
         intersection (logical XOR).
-        Calling ``a.xor(b)`` or ``a ^= b`` is the same."""
+        Calling ``a.xor(b)`` or ``a ^= b`` is the same.
+        """
         return self.xor(other)
-    
+
     # -------------------------
     # operations between shapes returning new shape
 
     def __add__(self, other: "Shape"):
-        """Returns new shape as union of given shapes (logical OR).
-        Calling ``a + b`` or ``a | b`` is the same."""
+        """Return new shape as union of given shapes (logical OR).
+        Calling ``a + b`` or ``a | b`` is the same.
+        """
         return Shape(lambda x, y, z: self(x, y, z) | other(x, y, z))
 
     def __or__(self, other: "Shape"):
-        """Returns new shape as union of given shapes (logical OR).
-        Calling ``a + b`` or ``a | b`` is the same."""
+        """Return new shape as union of given shapes (logical OR).
+        Calling ``a + b`` or ``a | b`` is the same.
+        """
         return self + other
 
     def __sub__(self, other: "Shape"):
-        """Returns new shape as the first shape with the second shape removed
-        (logical AND NOT)."""
-        return Shape(lambda x,y,z: self(x,y,z) & _np.logical_not(other(x,y,z)))
+        """Return new shape as the first shape with the second shape removed
+        (logical AND NOT).
+        """
+        return Shape(lambda x, y, z: self(x, y, z) & _np.logical_not(other(x, y, z)))
 
     def __and__(self, other: "Shape"):
-        """Returns new shape as intersection of given shapes (logical AND).
-        Calling ``a & b`` or ``a / b`` is the same."""
+        """Return new shape as intersection of given shapes (logical AND).
+        Calling ``a & b`` or ``a / b`` is the same.
+        """
         return Shape(lambda x, y, z: self(x, y, z) & other(x, y, z))
 
     def __truediv__(self, other: "Shape"):
-        """Returns new shape as intersection of given shapes (logical AND).
-        Calling ``a & b`` or ``a / b`` is the same."""
+        """Return new shape as intersection of given shapes (logical AND).
+        Calling ``a & b`` or ``a / b`` is the same.
+        """
         return self & other
 
     def __xor__(self, other: "Shape"):
-        """Returns a new shape which is everything from both shapes, except
-        their intersection (logical XOR)."""
+        """Return a new shape which is everything from both shapes, except
+        their intersection (logical XOR).
+        """
         return Shape(lambda x, y, z: self(x, y, z) ^ other(x, y, z))
 
 
 # ==================================================
 # Child shapes
 
+
 class Empty(Shape):
     def __init__(self):
         """Empty space."""
-        super().__init__(lambda x,y,z: False)
+        super().__init__(lambda x, y, z: False)
+
 
 class Universe(Shape):
     def __init__(self):
         """All of space."""
-        super().__init__(lambda x,y,z: True)
+        super().__init__(lambda x, y, z: True)
+
 
 class Ellipsoid(Shape):
     def __init__(self, diamx, diamy, diamz):
         """Ellipsoid with given diameters diamx, diamy, diamz."""
+
         def shape_func(x, y, z):
-            return (x/diamx)**2 + (y/diamy)**2 + (z/diamz)**2 <= 0.25
+            return (x / diamx) ** 2 + (y / diamy) ** 2 + (z / diamz) ** 2 <= 0.25
+
         super().__init__(shape_func)
+
 
 class Sphere(Ellipsoid):
     def __init__(self, diam=None, radius=None):
@@ -330,53 +370,78 @@ class Sphere(Ellipsoid):
             diam = 2 * radius
         super().__init__(diam, diam, diam)
 
+
 class Ellipse(Shape):
     def __init__(self, diamx, diamy):
         """Ellipse in the xy-plane with given diameters diamx and diamy."""
+
         def shape_func(x, y, z):
-            return (x/diamx)**2 + (y/diamy)**2 <= 0.25
+            return (x / diamx) ** 2 + (y / diamy) ** 2 <= 0.25
+
         super().__init__(shape_func)
+
 
 class Circle(Ellipse):
     def __init__(self, diam):
         """Circle in the xy-plane with given diameter."""
         super().__init__(diam, diam)
 
+
 class Cone(Shape):
     def __init__(self, diam, height):
         """3D cone with the vertex down. It has a given diameter at a given height."""
+
         def shape_func(x, y, z):
-            return (z >= 0) & ((x/diam)**2 + (y/diam)**2 <= 0.25*(z/height)**2)
+            return (z >= 0) & (
+                (x / diam) ** 2 + (y / diam) ** 2 <= 0.25 * (z / height) ** 2
+            )
+
         super().__init__(shape_func)
+
 
 class Cylinder(Shape):
     def __init__(self, diam, height):
         """Cylinder along z with given diameter and height."""
+
         def shape_func(x, y, z):
-            return (z <= 0.5*height) & (z >= -0.5*height) & \
-                   ((x/diam)**2+(y/diam)**2<=0.25)
+            return (
+                (z <= 0.5 * height)
+                & (z >= -0.5 * height)
+                & ((x / diam) ** 2 + (y / diam) ** 2 <= 0.25)
+            )
+
         super().__init__(shape_func)
+
 
 class Cuboid(Shape):
     def __init__(self, sidex, sidey, sidez):
-        """3D rectangular slab with given sides, including minimum, excluding maximum."""
+        """3D rectangular slab with given sides, including minimum, excluding
+        maximum.
+        """
+
         def shape_func(x, y, z):
-            rx, ry, rz = 0.5*sidex, 0.5*sidey, 0.5*sidez
-            return (-rx <= x)&(x < rx) & (-ry <= y)&(y < ry) & (-rz <= z)&(z < rz)
+            rx, ry, rz = 0.5 * sidex, 0.5 * sidey, 0.5 * sidez
+            return (-rx <= x) & (x < rx) & (-ry <= y) & (y < ry) & (-rz <= z) & (z < rz)
+
         super().__init__(shape_func)
+
 
 class Cube(Cuboid):
     def __init__(self, side):
         """Cube with given side length."""
         super().__init__(side, side, side)
 
+
 class Rectangle(Shape):
     def __init__(self, sidex, sidey):
         """2D Rectangle in the xy-plane with given sides."""
+
         def shape_func(x, y, z):
-            rx, ry = 0.5*sidex, 0.5*sidey
-            return (-rx <= x)&(x < rx) & (-ry <= y)&(y < ry)
+            rx, ry = 0.5 * sidex, 0.5 * sidey
+            return (-rx <= x) & (x < rx) & (-ry <= y) & (y < ry)
+
         super().__init__(shape_func)
+
 
 class Square(Rectangle):
     def __init__(self, side):
@@ -387,38 +452,46 @@ class Square(Rectangle):
 class XRange(Shape):
     def __init__(self, xmin, xmax):
         """Range of x-values: xmin <= x < xmax"""
-        super().__init__(lambda x,y,z: (xmin <= x) & (x < xmax))
+        super().__init__(lambda x, y, z: (xmin <= x) & (x < xmax))
+
 
 class YRange(Shape):
     def __init__(self, ymin, ymax):
         """Range of y-values: ymin <= y < ymax"""
-        super().__init__(lambda x,y,z: (ymin <= y) & (y < ymax))
+        super().__init__(lambda x, y, z: (ymin <= y) & (y < ymax))
+
 
 class ZRange(Shape):
     def __init__(self, zmin, zmax):
         """Range of z-values: zmin <= z < zmax"""
-        super().__init__(lambda x,y,z: (zmin <= z) & (z < zmax))
+        super().__init__(lambda x, y, z: (zmin <= z) & (z < zmax))
+
 
 class Torus(Shape):
     def __init__(self, major_diam, minor_diam):
         """Torus with given major and minor diameters.
-    
+
         Parameters
         ----------
         major_diam : float
             Distance between opposite centers of the tube.
         minor_diam : float
             Diameter of the tube.
-            
+
         Notes
         -----
         The torus is major_diam + minor_diam wide and minor_diam high.
         When major_diam = minor_diam, there will be no hole.
         """
         D, d = major_diam, minor_diam
+
         def shape_func(x, y, z):
-            return (x**2 + y**2 + z**2 + 0.25*D**2 - 0.25*d**2)**2 <= D**2*(x**2 + y**2)
+            return (
+                x**2 + y**2 + z**2 + 0.25 * D**2 - 0.25 * d**2
+            ) ** 2 <= D**2 * (x**2 + y**2)
+
         super().__init__(shape_func)
+
 
 class Superball(Shape):
     def __init__(self, diam, p):
@@ -439,15 +512,20 @@ class Superball(Shape):
         instead of radius.
         """
         if p <= 0:  # Yields empty shape
-            super().__init__(lambda x,y,z: False)
+            super().__init__(lambda x, y, z: False)
         else:
             r = diam / 2
+
             def shape_func(x, y, z):
-                norm = pow(abs(x/r), 2*p) + \
-                       pow(abs(y/r), 2*p) + \
-                       pow(abs(z/r), 2*p)
+                norm = (
+                    pow(abs(x / r), 2 * p)
+                    + pow(abs(y / r), 2 * p)
+                    + pow(abs(z / r), 2 * p)
+                )
                 return norm <= 1
+
             super().__init__(shape_func)
+
 
 class Line2D(Shape):
     def __init__(self, p1, p2, diam, linecap):
@@ -473,8 +551,7 @@ class Line2D(Shape):
         --------
         Line
         """
-
-        if diam <= 0: 
+        if diam <= 0:
             raise ValueError("`diam` should be strictly greater than 0.")
 
         radSq = (diam / 2) ** 2
@@ -484,46 +561,54 @@ class Line2D(Shape):
         if x1 == x2 and y1 == y2:
             raise ValueError("Points `p1` and `p2` should be different.")
 
-        dx, dy = x2-x1, y2-y1
-        lenSq = dx*dx + dy*dy
+        dx, dy = x2 - x1, y2 - y1
+        lenSq = dx * dx + dy * dy
 
         match linecap:
             case "infinite":
+
                 def infinite_func(x, y, z):
-                    return radSq >= pow((x-x1)*(y-y2) - (x-x2)*(y-y1), 2) / lenSq
+                    return (
+                        radSq
+                        >= pow((x - x1) * (y - y2) - (x - x2) * (y - y1), 2) / lenSq
+                    )
+
                 super().__init__(infinite_func)
 
             case "flat":
+
                 def flat_func(x, y, z):
-                    param = ((x-x1)*dx + (y-y1)*dy) / lenSq
+                    param = ((x - x1) * dx + (y - y1) * dy) / lenSq
 
                     # If param is not in [0,1], then point is beyond line segment
                     valid = (0 <= param) & (param <= 1)
                     # still continue for numpy array support
 
-                    xx, yy = x1 + param*dx, y1 + param*dy  # closest point on line
-                    dxx, dyy = x-xx, y-yy
+                    xx, yy = x1 + param * dx, y1 + param * dy  # closest point on line
+                    dxx, dyy = x - xx, y - yy
 
-                    return valid & (dxx*dxx + dyy*dyy <= radSq)
+                    return valid & (dxx * dxx + dyy * dyy <= radSq)
 
                 super().__init__(flat_func)
 
             case "round":
+
                 def round_func(x, y, z):
-                    param = ((x-x1)*dx + (y-y1)*dy) / lenSq
+                    param = ((x - x1) * dx + (y - y1) * dy) / lenSq
 
                     # closest point on the line segment
                     param = _np.clip(param, 0, 1)
-                    xx, yy = x1+param*dx, y1+param*dy
+                    xx, yy = x1 + param * dx, y1 + param * dy
 
                     dxx, dyy = x - xx, y - yy
 
-                    return dxx*dxx + dyy*dyy <= radSq
+                    return dxx * dxx + dyy * dyy <= radSq
 
                 super().__init__(round_func)
 
             case _:
-                raise ValueError(f"Line capping method \"{linecap}\" is not implemented.")
+                raise ValueError(f'Line capping method "{linecap}" is not implemented.')
+
 
 class Line(Shape):
     def __init__(self, p1, p2, diam, linecap):
@@ -546,8 +631,7 @@ class Line(Shape):
         --------
         Line2D
         """
-
-        if diam <= 0: 
+        if diam <= 0:
             raise ValueError("`diam` should be strictly greater than 0.")
 
         radSq = (diam / 2) ** 2
@@ -557,135 +641,199 @@ class Line(Shape):
         if x1 == x2 and y1 == y2 and z1 == z2:
             raise ValueError("Points `p1` and `p2` should be different.")
 
-        dx, dy, dz = x2-x1, y2-y1, z2-z1
-        lenSq = dx*dx + dy*dy + dz*dz
+        dx, dy, dz = x2 - x1, y2 - y1, z2 - z1
+        lenSq = dx * dx + dy * dy + dz * dz
 
         match linecap:
             case "infinite":
-                def infinite_func(x, y, z):
-                    dx1, dy1, dz1 = x-x1, y-y1, z-z1
-                    dx2, dy2, dz2 = x-x2, y-y2, z-z2
-                    cross1, cross2, cross3 = dy1*dz2-dy2*dz1, dx1*dz2-dx2*dz1, dx1*dy2-dx2*dy1
 
-                    return radSq >= (cross1*cross1 + cross2*cross2 + cross3*cross3) / lenSq
+                def infinite_func(x, y, z):
+                    dx1, dy1, dz1 = x - x1, y - y1, z - z1
+                    dx2, dy2, dz2 = x - x2, y - y2, z - z2
+                    cross1, cross2, cross3 = (
+                        dy1 * dz2 - dy2 * dz1,
+                        dx1 * dz2 - dx2 * dz1,
+                        dx1 * dy2 - dx2 * dy1,
+                    )
+
+                    return (
+                        radSq
+                        >= (cross1 * cross1 + cross2 * cross2 + cross3 * cross3) / lenSq
+                    )
 
                 super().__init__(infinite_func)
 
             case "flat":
+
                 def flat_func(x, y, z):
-                    param = ((x-x1)*dx + (y-y1)*dy + (z-z1)*dz) / lenSq
+                    param = ((x - x1) * dx + (y - y1) * dy + (z - z1) * dz) / lenSq
 
                     # If param is not in [0,1], then point is beyond line segment
                     valid = (0 <= param) & (param <= 1)
                     # still continue for numpy array support
 
                     # closest point on line
-                    xx, yy, zz = x1 + param*dx, y1 + param*dy, z1 + param*dz
-                    dxx, dyy, dzz = x-xx, y-yy, z-zz
+                    xx, yy, zz = x1 + param * dx, y1 + param * dy, z1 + param * dz
+                    dxx, dyy, dzz = x - xx, y - yy, z - zz
 
-                    return valid & (dxx*dxx + dyy*dyy + dzz*dzz <= radSq)
+                    return valid & (dxx * dxx + dyy * dyy + dzz * dzz <= radSq)
 
                 super().__init__(flat_func)
 
             case "round":
+
                 def round_func(x, y, z):
-                    param = ((x-x1)*dx + (y-y1)*dy + (z-z1)*dz) / lenSq
+                    param = ((x - x1) * dx + (y - y1) * dy + (z - z1) * dz) / lenSq
 
                     # closest point on the line segment
                     param = _np.clip(param, 0, 1)
-                    xx, yy, zz = x1+param*dx, y1+param*dy, z1+param*dz
+                    xx, yy, zz = x1 + param * dx, y1 + param * dy, z1 + param * dz
 
                     dxx, dyy, dzz = x - xx, y - yy, z - zz
 
-                    return dxx*dxx + dyy*dyy + dzz*dzz <= radSq
+                    return dxx * dxx + dyy * dyy + dzz * dzz <= radSq
 
                 super().__init__(round_func)
 
             case _:
-                raise ValueError(f"Line capping method \"{linecap}\" is not implemented.")
+                raise ValueError(f'Line capping method "{linecap}" is not implemented.')
+
 
 # =========================
 # Convex polyhedra
 
+
 class DelaunayHull(Shape):
     def __init__(self, points):
-        """The Delaunay hull of a list of 3D points. These points can serve as the
-        vertices of a convex polyhedron.
-        
+        """Compute the Delaunay hull of a list of 3D points. These points can serve as
+        the vertices of a convex polyhedron.
+
         Parameters
         ----------
         points : ndarray of double, ``shape (npoints, 3)``
         """
         hull = _Delaunay(points)
+
         def shape_func(x, y, z):
-            return hull.find_simplex(_np.stack([x,y,z], axis=-1)) >= 0
+            return hull.find_simplex(_np.stack([x, y, z], axis=-1)) >= 0
+
         super().__init__(shape_func)
+
 
 class Tetrahedron(DelaunayHull):
     def __init__(self, diam):
         """Tetrahedron (4-faced platonic solid) where all vertices lie on a sphere
-        with the given diameter."""
+        with the given diameter.
+        """
         d_circumsphere = 2
-        vertices = diam*_np.asarray([[2*_np.sqrt(2)/3, 0, -1/3],
-                                    [-_np.sqrt(2)/3, _np.sqrt(2/3), -1/3],
-                                    [-_np.sqrt(2)/3, -_np.sqrt(2/3), -1/3],
-                                    [0, 0, 1]])
-        super().__init__(vertices/d_circumsphere)
+        vertices = diam * _np.asarray(
+            [
+                [2 * _np.sqrt(2) / 3, 0, -1 / 3],
+                [-_np.sqrt(2) / 3, _np.sqrt(2 / 3), -1 / 3],
+                [-_np.sqrt(2) / 3, -_np.sqrt(2 / 3), -1 / 3],
+                [0, 0, 1],
+            ]
+        )
+        super().__init__(vertices / d_circumsphere)
+
 
 class Octahedron(Shape):  # Shape, not DelauneyHull, as there is a simple formula
     def __init__(self, diam):
         """Octahedron (8-faced platonic solid) where all vertices lie on a sphere
-        with the given diameter."""
-        super().__init__(lambda x,y,z: _np.abs(x)+_np.abs(y)+_np.abs(z) <= 0.5*diam)
+        with the given diameter.
+        """
+        super().__init__(
+            lambda x, y, z: _np.abs(x) + _np.abs(y) + _np.abs(z) <= 0.5 * diam
+        )
+
 
 class Dodecahedron(DelaunayHull):
     def __init__(self, diam):
         """Dodecahedron (12-faced platonic solid) where all vertices lie on a sphere
-        with the given diameter."""
-        phi = (1 + _np.sqrt(5))/2
-        d_circumsphere = 2*_np.sqrt(3)
-        vertices = diam*_np.asarray([[1, 1, 1], [1, 1, -1], [1, -1, 1],
-                                     [1, -1, -1], [-1, 1, 1], [-1, 1, -1],
-                                     [-1, -1, 1], [-1, -1, -1], [0, phi, 1/phi],
-                                     [0, phi, -1/phi], [0, -phi, 1/phi],
-                                     [0, -phi, -1/phi], [1/phi, 0, phi],
-                                     [1/phi, 0, -phi], [-1/phi, 0, phi],
-                                     [-1/phi, 0, -phi], [phi, 1/phi, 0],
-                                     [phi, -1/phi, 0], [-phi, 1/phi, 0],
-                                     [-phi, -1/phi, 0]])
-        super().__init__(vertices/d_circumsphere)
+        with the given diameter.
+        """
+        phi = (1 + _np.sqrt(5)) / 2
+        d_circumsphere = 2 * _np.sqrt(3)
+        vertices = diam * _np.asarray(
+            [
+                [1, 1, 1],
+                [1, 1, -1],
+                [1, -1, 1],
+                [1, -1, -1],
+                [-1, 1, 1],
+                [-1, 1, -1],
+                [-1, -1, 1],
+                [-1, -1, -1],
+                [0, phi, 1 / phi],
+                [0, phi, -1 / phi],
+                [0, -phi, 1 / phi],
+                [0, -phi, -1 / phi],
+                [1 / phi, 0, phi],
+                [1 / phi, 0, -phi],
+                [-1 / phi, 0, phi],
+                [-1 / phi, 0, -phi],
+                [phi, 1 / phi, 0],
+                [phi, -1 / phi, 0],
+                [-phi, 1 / phi, 0],
+                [-phi, -1 / phi, 0],
+            ]
+        )
+        super().__init__(vertices / d_circumsphere)
+
 
 class Icosahedron(DelaunayHull):
     def __init__(self, diam):
         """Dodecahedron (20-faced platonic solid) where all vertices lie on a sphere
-        with the given diameter."""
-        phi = (1 + _np.sqrt(5))/2
-        d_circumsphere = 2*_np.sqrt(phi**2 + 1)
-        vertices = diam*_np.asarray([[0, 1, phi], [0, 1, -phi], [0, -1, phi],
-                                     [0, -1, -phi], [phi, 0, 1], [phi, 0, -1],
-                                     [-phi, 0, 1], [-phi, 0, -1], [1, phi, 0],
-                                     [1, -phi, 0], [-1, phi, 0], [-1, -phi, 0]])
-        super().__init__(vertices/d_circumsphere)
+        with the given diameter.
+        """
+        phi = (1 + _np.sqrt(5)) / 2
+        d_circumsphere = 2 * _np.sqrt(phi**2 + 1)
+        vertices = diam * _np.asarray(
+            [
+                [0, 1, phi],
+                [0, 1, -phi],
+                [0, -1, phi],
+                [0, -1, -phi],
+                [phi, 0, 1],
+                [phi, 0, -1],
+                [-phi, 0, 1],
+                [-phi, 0, -1],
+                [1, phi, 0],
+                [1, -phi, 0],
+                [-1, phi, 0],
+                [-1, -phi, 0],
+            ]
+        )
+        super().__init__(vertices / d_circumsphere)
+
 
 class Icosidodecahedron(DelaunayHull):
     def __init__(self, diam):
         """Icosidodecahedron  where all vertices lie on a sphere with the given
-        diameter."""
-        phi = (1 + _np.sqrt(5))/2
-        phiSq = phi*phi
-        a = 1
-        d_circumsphere = 4/(_np.sqrt(5) - 1)
-        vertices = [[0, 0, phi], [0, 0, -phi]] + [[i*.5, j*phi/2, k*phiSq/2] \
-                    for i in (-1, 1) for j in (-1, 1) for k in (-1, 1)]
-        vertices += [[y,z,x] for x,y,z in vertices] + [[z, x, y] for x,y,z in vertices]
-        super().__init__(diam*_np.asarray(vertices)/d_circumsphere)
+        diameter.
+        """
+        phi = (1 + _np.sqrt(5)) / 2
+        phiSq = phi * phi
+        d_circumsphere = 4 / (_np.sqrt(5) - 1)
+        vertices = [[0, 0, phi], [0, 0, -phi]] + [
+            [i * 0.5, j * phi / 2, k * phiSq / 2]
+            for i in (-1, 1)
+            for j in (-1, 1)
+            for k in (-1, 1)
+        ]
+        vertices += [[y, z, x] for x, y, z in vertices] + [
+            [z, x, y] for x, y, z in vertices
+        ]
+        super().__init__(diam * _np.asarray(vertices) / d_circumsphere)
+
 
 # =========================
 # Polygons
 
+
 class Polygon(Shape):
     def __init__(self, vertices):
-        """A polygon in the xy-plane, with a given list of vertices.
+        """Create a polygon in the xy-plane, with a given list of vertices.
 
         Parameters
         ----------
@@ -697,24 +845,35 @@ class Polygon(Shape):
             vertices = vertices[:][:2]  # ignore z-values
 
         path = _Path(vertices)
+
         def shape_func(x, y, z):
             if hasattr(x, "__iter__"):  # ndarray
                 x_, y_ = x.flatten(), y.flatten()
-                bools = path.contains_points(_np.stack([x_,y_], axis=-1))
+                bools = path.contains_points(_np.stack([x_, y_], axis=-1))
                 return _np.reshape(bools, x.shape)
-            return path.contains_point((x,y))  # single value
+            return path.contains_point((x, y))  # single value
+
         super().__init__(shape_func)
+
 
 class RegularPolygon(Polygon):
     def __init__(self, N, diam):
-        """A regular polygon in the xy-plane with N vertices which lie on a circle
-        with given diameter. One point is located at (diam/2, 0)."""
-        vertices = [(diam/2*_np.cos(i/N*2*_np.pi), diam/2*_np.sin(i/N*2*_np.pi))
-                    for i in range(N)]
+        """Create a regular polygon in the xy-plane with N vertices which lie on a
+        circle with given diameter. One point is located at (diam/2, 0).
+        """
+        vertices = [
+            (
+                diam / 2 * _np.cos(i / N * 2 * _np.pi),
+                diam / 2 * _np.sin(i / N * 2 * _np.pi),
+            )
+            for i in range(N)
+        ]
         super().__init__(vertices)
+
 
 # =========================
 # ImageShape
+
 
 class ImageShape(Shape):
     def __init__(self, fname: str, min_point: tuple, max_point: tuple):
@@ -738,19 +897,25 @@ class ImageShape(Shape):
         img = _Image.open(fname).convert("RGBA")
         img_arr = _np.array(img)  # like matrix: [row, col, rgba]
         # pretty opaque and pretty dark
-        img_bools = (img_arr[:, :, 3] >= 128) & \
-                    (_np.sum(img_arr[:,:,0:3], axis=2) < 256*3/2)
+        img_bools = (img_arr[:, :, 3] >= 128) & (
+            _np.sum(img_arr[:, :, 0:3], axis=2) < 256 * 3 / 2
+        )
 
         w, h = img.width, img.height
         x0, y0, x1, y1 = min_point[0], min_point[1], max_point[0], max_point[1]
-        dx, dy = (x1-x0)/(w-1), (y1-y0)/(h-1)  # pixel width and height in world
-         
+        # pixel width and height in world
+        dx, dy = (x1 - x0) / (w - 1), (y1 - y0) / (h - 1)
+
         def shape_func(x, y, z):
-            inside = (x >= x0 - 0.5*dx) & (x < x1 + 0.5*dx) & \
-            (y >= y0 - 0.5*dy) & (y < y1 + 0.5*dy)
-            
-            col = _np.int32(_np.clip(_np.rint((x-x0)/dx), 0, w-1))
-            row = _np.int32(_np.clip(_np.rint((y1-y)/dy), 0, h-1))
+            inside = (
+                (x >= x0 - 0.5 * dx)
+                & (x < x1 + 0.5 * dx)
+                & (y >= y0 - 0.5 * dy)
+                & (y < y1 + 0.5 * dy)
+            )
+
+            col = _np.int32(_np.clip(_np.rint((x - x0) / dx), 0, w - 1))
+            row = _np.int32(_np.clip(_np.rint((y1 - y) / dy), 0, h - 1))
 
             return inside & img_bools[row, col]
 
@@ -760,11 +925,20 @@ class ImageShape(Shape):
 # =========================
 # ObjShape
 
+
 class ObjShape(Shape):
-    def __init__(self, fname: str,
-                 min_point: tuple = None, max_point: tuple = None,
-                 center: tuple = None, scale: tuple|float = None, size: tuple|float = None,
-                 keep_aspect: bool = False, repair: bool = False, rotate_z_up: bool = True):
+    def __init__(
+        self,
+        fname: str,
+        min_point: tuple = None,
+        max_point: tuple = None,
+        center: tuple = None,
+        scale: tuple | float = None,
+        size: tuple | float = None,
+        keep_aspect: bool = False,
+        repair: bool = False,
+        rotate_z_up: bool = True,
+    ):
         """Use a .obj file as a shape. Exactly two parameters of (min_point,
         max_point, center, scale, size) must be provided to define the bounding
         box. The object will be stretched to fill that box unless keep_aspect
@@ -798,47 +972,77 @@ class ObjShape(Shape):
             you can set `rotate_z_up=True` to rotate your 3D object correctly
             in mumax, where the Z-axis represents the out-of-plane direction.
         """
-        import pyvista as pv # Only attempt import if this shape is used, since this is an optional dependency
+        # Only attempt import if this shape is used, since these are optional
+        # dependencies
+        import pyvista as pv
         import trimesh
-        
+
         ## Load the mesh in the correct orientation
         mesh = trimesh.load(fname)
-        if repair: trimesh.repair.fill_holes(mesh)
-        if rotate_z_up: # Rotate Y-up to Z-up
-            rotation_matrix = trimesh.transformations.rotation_matrix(_np.pi/2, [1, 0, 0]) # 90° rotation around X-axis
+        if repair:
+            trimesh.repair.fill_holes(mesh)
+        if rotate_z_up:  # Rotate Y-up to Z-up
+            rotation_matrix = trimesh.transformations.rotation_matrix(
+                _np.pi / 2, [1, 0, 0]
+            )  # 90° rotation around X-axis
             mesh.apply_transform(rotation_matrix)
         mesh_size = mesh.bounds[1] - mesh.bounds[0]
-        
+
         ## Parse the positioning arguments
         toarray = lambda arg: _np.asarray(arg) if arg is not None else None
-        min_point, max_point, center, scale, size = toarray(min_point), toarray(max_point), toarray(center), toarray(scale), toarray(size)
+        min_point, max_point = toarray(min_point), toarray(max_point)
+        center, scale, size = toarray(center), toarray(scale), toarray(size)
         if size is not None:
-            if scale is not None: raise ValueError("You can either specify 'scale' or 'size', not both at the same time.")
+            if scale is not None:
+                raise ValueError(
+                    "You can either specify 'scale' or 'size', not both at the same "
+                    "time."
+                )
             scale = size / mesh_size
-        if (min_point is not None) + (max_point is not None) + (center is not None) + (scale is not None) != 2:
-            raise ValueError("Exactly 2 arguments of 'min_point', 'max_point', 'center' and 'scale'/'size' should be provided.")
-        match (min_point, max_point, center, scale): # Reduce parameters to just (min_point, max_point)
-            case (_, _, None, None): pass
-            case (None, None, _, _): min_point, max_point = center - scale*mesh_size/2, center + scale*mesh_size/2
-            case (_, None, _, None): max_point = min_point + (center - min_point)*2
-            case (None, _, _, None): min_point = max_point - (max_point - center)*2
-            case (_, None, None, _): max_point = min_point + scale*mesh_size
-            case (None, _, None, _): min_point = max_point - scale*mesh_size
+        if (min_point is not None) + (max_point is not None) + (center is not None) \
+           + (scale is not None) != 2:  # fmt: skip
+            raise ValueError(
+                "Exactly 2 arguments of 'min_point', 'max_point', 'center' and "
+                "'scale'/'size' should be provided."
+            )
+        # Reduce parameters to just (min_point, max_point)
+        match (min_point, max_point, center, scale):
+            case (_, _, None, None):
+                pass
+            case (None, None, _, _):
+                min_point, max_point = (
+                    center - scale * mesh_size / 2,
+                    center + scale * mesh_size / 2,
+                )
+            case (_, None, _, None):
+                max_point = min_point + (center - min_point) * 2
+            case (None, _, _, None):
+                min_point = max_point - (max_point - center) * 2
+            case (_, None, None, _):
+                max_point = min_point + scale * mesh_size
+            case (None, _, None, _):
+                min_point = max_point - scale * mesh_size
         if keep_aspect:
-            center = (min_point + max_point)/2
-            scale = min((max_point - min_point)/mesh_size) # Isotropic scaling, defined by smallest factor needed to fit in box
-            min_point, max_point = center - scale*mesh_size/2, center + scale*mesh_size/2
-        
+            center = (min_point + max_point) / 2
+            # Isotropic scaling, defined by smallest factor needed to fit in box
+            scale = min((max_point - min_point) / mesh_size)
+            min_point, max_point = (
+                center - scale * mesh_size / 2,
+                center + scale * mesh_size / 2,
+            )
+
         ## Move the mesh to the desired position
-        mesh.apply_scale((max_point - min_point)/(mesh.bounds[1] - mesh.bounds[0]))
+        mesh.apply_scale((max_point - min_point) / (mesh.bounds[1] - mesh.bounds[0]))
         mesh.apply_translation(min_point - mesh.bounds[0])
 
         ## Use PyVista mesh in hape_func
-        mesh_pv = pv.wrap(mesh) # PyVista provides far more efficient checks than trimesh
+        # PyVista provides far more efficient checks than trimesh
+        mesh_pv = pv.wrap(mesh)
+
         def shape_func(x, y, z):
-            if hasattr(x, "__iter__"): # ndarray
+            if hasattr(x, "__iter__"):  # ndarray
                 x_, y_, z_ = x.flatten(), y.flatten(), z.flatten()
-                points = _np.stack([x_,y_,z_], axis=-1)
+                points = _np.stack([x_, y_, z_], axis=-1)
             else:
                 points = _np.asarray([[x, y, z]])
             cloud = pv.PolyData(points)
@@ -848,6 +1052,7 @@ class ObjShape(Shape):
 
         super().__init__(shape_func)
 
+
 # ==================================================
 # TODO List of Mumax3 shapes to add
 # Layers
@@ -856,47 +1061,67 @@ class ObjShape(Shape):
 # GrainRoughness
 # ==================================================
 
-if __name__=="__main__":
+if __name__ == "__main__":
     # Code for testing purposes
 
-    import pyvista as pv
     import matplotlib.pyplot as plt
+    import pyvista as pv
 
     def plot_shape_3D(shape, x, y, z, title=""):
         """Show a shape given x, y and z coordinate arrays. This uses PyVista."""
         X, Y, Z = _np.meshgrid(x, y, z, indexing="ij")  # the logical indexing
         S = shape(X, Y, Z)
-        dx, dy, dz = (x[1]-x[0]), (y[1]-y[0]), (z[1]-z[0])
-                     # [::-1] for [x,y,z] not [z,y,x] and +1 for cells, not points
-        image_data = pv.ImageData(dimensions=(len(x)+1, len(y)+1, len(z)+1),  
-                     spacing=(dx,dy,dz), origin=(x[0]-0.5*dx, y[0]-0.5*dy, z[0]-0.5*dz))
+        dx, dy, dz = (x[1] - x[0]), (y[1] - y[0]), (z[1] - z[0])
+        # [::-1] for [x,y,z] not [z,y,x] and +1 for cells, not points
+        image_data = pv.ImageData(
+            dimensions=(len(x) + 1, len(y) + 1, len(z) + 1),
+            spacing=(dx, dy, dz),
+            origin=(x[0] - 0.5 * dx, y[0] - 0.5 * dy, z[0] - 0.5 * dz),
+        )
         image_data.cell_data["values"] = _np.float32(S.flatten("F"))
         threshed = image_data.threshold_percent(0.5)  # only show True
 
         plotter = pv.Plotter()
-        plotter.add_mesh(threshed, color="white", show_edges=True,
-                         show_scalar_bar=False, smooth_shading=True)
+        plotter.add_mesh(
+            threshed,
+            color="white",
+            show_edges=True,
+            show_scalar_bar=False,
+            smooth_shading=True,
+        )
         plotter.show_axes()
         plotter.show_bounds()
-        if len(title) > 0: plotter.add_title(title)
+        if len(title) > 0:
+            plotter.add_title(title)
         plotter.show()
 
     def plot_shape_2D(shape, x, y, title="", ax=None):
         """Show a shape in the xy-plane at z=0, given x and y coordinate arrays.
-        This uses matplotlib."""
+        This uses matplotlib.
+        """
         X, Y = _np.meshgrid(x, y)
         S = shape(X, Y, _np.zeros_like(X))
 
         fig, ax = plt.subplots()
 
-        dx, dy = (x[1]-x[0]), (y[1]-y[0])
-        ax.imshow(S, extent=(x[0]-0.5*dx, x[-1]+0.5*dx, y[0]-0.5*dy, y[-1]+0.5*dy),
-                    origin="lower", cmap="binary_r")
-        ax.set_xlabel("x"); ax.set_ylabel("y")
+        dx, dy = (x[1] - x[0]), (y[1] - y[0])
+        ax.imshow(
+            S,
+            extent=(
+                x[0] - 0.5 * dx,
+                x[-1] + 0.5 * dx,
+                y[0] - 0.5 * dy,
+                y[-1] + 0.5 * dy,
+            ),
+            origin="lower",
+            cmap="binary_r",
+        )
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
         ax.set_aspect("equal")
-        if len(title) > 0: ax.set_title(title)
+        if len(title) > 0:
+            ax.set_title(title)
         plt.show()
-
 
     shape = Line((-0.9, -0.8, -0.7), (0.5, 0.6, 0.7), 0.1, "infinite")
     shape.mirror_xy()
@@ -905,5 +1130,4 @@ if __name__=="__main__":
     a = 1
     x = y = z = _np.linspace(-a, a, res)
 
-    plot_shape_3D(shape, x,y,z)
-
+    plot_shape_3D(shape, x, y, z)

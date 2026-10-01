@@ -1,28 +1,31 @@
 """This test is based on the 2D case in
    https://iopscience.iop.org/article/10.1088/1367-2630/aaea1c"""
 
-import pytest
-import numpy as np
-from mumaxplus import Ferromagnet, Grid, World
 from mumax3 import Mumax3Simulation
-from mumaxplus.util.shape import Cylinder
-from mumaxplus.util.config import neelskyrmion
+import numpy as np
+import pytest
 
+from mumaxplus import Ferromagnet, Grid, World
+from mumaxplus.util.config import neelskyrmion
+from mumaxplus.util.shape import Cylinder
 
 ATOL = 1e-3
+
+
 def max_absolute_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
     return np.max(err)
 
+
 def simulations(openBC):
     """This simulates a 2D circle with interfacial DMI and a Neél skyrmion
-       in both mumax³ and mumax⁺."""
-    
+    in both mumax³ and mumax⁺."""
+
     # constants
     A = 13e-12
     D = 3e-3
     Ku = 0.4e6
-    anisU = (0,0,1)
+    anisU = (0, 0, 1)
     Ms = 0.86e6
 
     # charge and polarization of the skyrmion
@@ -41,7 +44,7 @@ def simulations(openBC):
 
     # mumax⁺ simulation
     world = World(cellsize=cellsize)
-    geo = Cylinder(diam, thickness).translate((nx*dx-dx)/2, (ny*dy-dy)/2, 0)
+    geo = Cylinder(diam, thickness).translate((nx * dx - dx) / 2, (ny * dy - dy) / 2, 0)
     magnet = Ferromagnet(world, Grid(gridsize), geometry=geo)
 
     magnet.enable_demag = False
@@ -82,13 +85,12 @@ def simulations(openBC):
         """
     )
 
-    return  magnet, mumax3sim
+    return magnet, mumax3sim
 
 
 @pytest.mark.mumax3
 class TestDMI2D:
-    """Compare the results of the simulations by comparing the magnetizations.
-    """
+    """Compare the results of the simulations by comparing the magnetizations."""
 
     def test_closed(self):
         magnet, mumax3sim = simulations(False)

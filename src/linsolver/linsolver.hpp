@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include "gpubuffer.hpp"
 #include "linsystem.hpp"

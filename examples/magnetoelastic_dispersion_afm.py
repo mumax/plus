@@ -6,11 +6,13 @@ https://arxiv.org/abs/2411.18194v2
 This script will take a few minutes, then save the data.
 """
 
+import os.path
+
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-from mumaxplus import World, Grid, Antiferromagnet
-import os.path
+
+from mumaxplus import Antiferromagnet, Grid, World
 from mumaxplus.util.constants import GAMMALL_DEFAULT, MU0
 
 # angle between magnetization and wave propagation

@@ -18,8 +18,7 @@ World::World(real3 cellsize, Grid mastergrid, int3 pbcRepetitions)
   checkPbcCompatibility(mastergrid, pbcRepetitions);
 }
 
-World::World(real3 cellsize)
-    : World(cellsize, Grid(int3{0,0,0}), int3{0,0,0}) {}
+World::World(real3 cellsize) : World(cellsize, Grid(int3{0, 0, 0}), int3{0, 0, 0}) {}
 
 World::~World() {}
 
@@ -60,9 +59,8 @@ TimeSolver& World::timesolver() const {
 }
 
 void World::checkPbcRepetitions(const int3 pbcRepetitions) const {
-  if ((pbcRepetitions.x < 0) || (pbcRepetitions.y < 0) || (pbcRepetitions.z <0))
-    throw std::invalid_argument(
-        "Number of pbcRepetitions should not be negative.");
+  if ((pbcRepetitions.x < 0) || (pbcRepetitions.y < 0) || (pbcRepetitions.z < 0))
+    throw std::invalid_argument("Number of pbcRepetitions should not be negative.");
 }
 
 void World::checkPbcCompatibility(const Grid mastergrid,
@@ -70,7 +68,8 @@ void World::checkPbcCompatibility(const Grid mastergrid,
   if (((mastergrid.size().x == 0) ^ (pbcRepetitions.x == 0)) ||
       ((mastergrid.size().y == 0) ^ (pbcRepetitions.y == 0)) ||
       ((mastergrid.size().z == 0) ^ (pbcRepetitions.z == 0))) {
-    throw std::invalid_argument("0 in size of mastergrid should match 0 in "
-                                "pbcRepetitions.");
+    throw std::invalid_argument(
+        "0 in size of mastergrid should match 0 in "
+        "pbcRepetitions.");
   }
 }

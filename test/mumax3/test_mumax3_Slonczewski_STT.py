@@ -1,13 +1,15 @@
-import pytest
-import numpy as np
 import math
 
 from mumax3 import Mumax3Simulation
+import numpy as np
+import pytest
+
 from mumaxplus import Ferromagnet, Grid, World
 
 # fairly large tolerance because timepoints don't exactly match up
 # => large error for large change in magnetization
 ATOL = 2e-2  # 2%
+
 
 def max_absolute_error(result, wanted):
     return np.max(abs(result - wanted))
@@ -17,11 +19,11 @@ def max_absolute_error(result, wanted):
 def simulations(request):
     """Sets up and runs a Slonczewski STT test for mumax⁺ and mumax³.
     This is based on a test in the paper "The design and verification of MuMax3".
-    https://doi.org/10.1063/1.4899186 """
+    https://doi.org/10.1063/1.4899186"""
 
     length, width, thickness = 160e-9, 80e-9, 5e-9
     nx, ny, nz = 64, 32, 1
-    cx, cy, cz = length/nx, width/ny, thickness/nz
+    cx, cy, cz = length / nx, width / ny, thickness / nz
 
     # permalloy-like
     msat = 800e3
@@ -33,13 +35,12 @@ def simulations(request):
     pol = 0.5669
     Lambda = 2
     epsilon_prime = 1
-    jz = -6e-3/(length*width)
+    jz = -6e-3 / (length * width)
     jcur = (0, 0, jz)
-    mp = (math.cos(20*np.pi/180), math.sin(20*np.pi/180), 0)  # fixed layer mag
+    mp = (math.cos(20 * np.pi / 180), math.sin(20 * np.pi / 180), 0)  # fixed layer mag
 
     max_time = 0.5e-9
     step_time = 0.5e-12
-
 
     # === mumax⁺ ===
     world = World(cellsize=(cx, cy, cz))
@@ -57,12 +58,13 @@ def simulations(request):
     magnet.fixed_layer = mp
     magnet.fixed_layer_on_top = request.param
 
-    timepoints = np.arange(0, max_time + 0.5*step_time, step_time)
-    outputquantities = {"mx": lambda: magnet.magnetization.average()[0],
-                        "my": lambda: magnet.magnetization.average()[1],
-                        "mz": lambda: magnet.magnetization.average()[2]}
+    timepoints = np.arange(0, max_time + 0.5 * step_time, step_time)
+    outputquantities = {
+        "mx": lambda: magnet.magnetization.average()[0],
+        "my": lambda: magnet.magnetization.average()[1],
+        "mz": lambda: magnet.magnetization.average()[2],
+    }
     mumaxplusoutput = world.timesolver.solve(timepoints, outputquantities)
-
 
     # === mumax³ ===
     if request.param:
@@ -91,7 +93,7 @@ def simulations(request):
             TableAutoSave({step_time})
             Run({max_time})
             """
-        )
+    )
     return mumaxplusoutput, mumax3sim
 
 
@@ -99,25 +101,28 @@ def simulations(request):
 class TestSlonczewskiSTT:
     """Compare the results of a Slonczewski STT test of mumax⁺ against mumax³.
     This is based on a test in the paper "The design and verification of MuMax3".
-    https://doi.org/10.1063/1.4899186 """
+    https://doi.org/10.1063/1.4899186"""
 
     def test_magnetization_x(self, simulations):
         # absolute error: mx goes through 0, but is unitless
         mumaxplusoutput, mumax3sim = simulations
-        err = max_absolute_error(result=mumaxplusoutput["mx"],
-                                 wanted=mumax3sim.get_column("mx"))
+        err = max_absolute_error(
+            result=mumaxplusoutput["mx"], wanted=mumax3sim.get_column("mx")
+        )
         assert err < ATOL
 
     def test_magnetization_y(self, simulations):
         # absolute error: my goes through 0, but is unitless
         mumaxplusoutput, mumax3sim = simulations
-        err = max_absolute_error(result=mumaxplusoutput["my"],
-                                 wanted=mumax3sim.get_column("my"))
+        err = max_absolute_error(
+            result=mumaxplusoutput["my"], wanted=mumax3sim.get_column("my")
+        )
         assert err < ATOL
 
     def test_magnetization_z(self, simulations):
         # absolute error: mz goes through 0, but is unitless
         mumaxplusoutput, mumax3sim = simulations
-        err = max_absolute_error(result=mumaxplusoutput["mz"],
-                                 wanted=mumax3sim.get_column("mz"))
+        err = max_absolute_error(
+            result=mumaxplusoutput["mz"], wanted=mumax3sim.get_column("mz")
+        )
         assert err < ATOL

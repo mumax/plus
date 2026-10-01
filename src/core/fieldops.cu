@@ -64,8 +64,8 @@ __global__ void k_addFields(CuField y,
 
   for (int c = 0; c < y.ncomp; c++) {
     int c_a2 = (a2.ncomp == y.ncomp) ? c : 0;
-    y.setValueInCell(idx, c, x1.valueAt(idx, c)
-                            + a2.valueAt(idx, c_a2) * x2.valueAt(idx, c));
+    y.setValueInCell(idx, c,
+                     x1.valueAt(idx, c) + a2.valueAt(idx, c_a2) * x2.valueAt(idx, c));
   }
 }
 
@@ -75,7 +75,7 @@ inline void add(Field& y, real a1, const Field& x1, real a2, const Field& x2) {
         "Fields can not be added together because they belong to different "
         "systems.");
   }
-  if ((x1.ncomp() != y.ncomp() || x1.ncomp() != y.ncomp()) ) {
+  if ((x1.ncomp() != y.ncomp() || x1.ncomp() != y.ncomp())) {
     throw std::invalid_argument(
         "Fields can not be added because they do not have the same number of "
         "components.");
@@ -84,11 +84,7 @@ inline void add(Field& y, real a1, const Field& x1, real a2, const Field& x2) {
   cudaLaunch(ncells, k_addFields, y.cu(), a1, x1.cu(), a2, x2.cu());
 }
 
-inline void add(Field& y,
-                real3 a1,
-                const Field& x1,
-                real3 a2,
-                const Field& x2) {
+inline void add(Field& y, real3 a1, const Field& x1, real3 a2, const Field& x2) {
   if (x1.system() != y.system() || x2.system() != y.system()) {
     throw std::invalid_argument(
         "Fields can not be added together because they belong to different "
@@ -114,8 +110,8 @@ inline void add(Field& y,
   if (x1.system() != y.system() || x2.system() != y.system() ||
       a1.system() != y.system() || a2.system() != y.system()) {
     throw std::invalid_argument(
-        "Fields can not be multiplied and added together because they belong to "
-        "different systems.");
+        "Fields can not be multiplied and added together because they belong "
+        "to different systems.");
   }
   if (x1.ncomp() != y.ncomp() || x2.ncomp() != y.ncomp()) {
     throw std::invalid_argument(
@@ -126,8 +122,7 @@ inline void add(Field& y,
       !(a2.ncomp() == 1 || a2.ncomp() == x2.ncomp())) {
     throw std::invalid_argument(
         "Weights need to be scalar (1 component) or have the same number of "
-        "components as the fields."
-    );
+        "components as the fields.");
   }
 
   int ncells = y.grid().ncells();
@@ -172,8 +167,8 @@ void addTo(Field& y, real3 a, const Field& x) {
 void addTo(Field& y, const Field& a, const Field& x) {
   if (x.system() != y.system() || a.system() != y.system()) {
     throw std::invalid_argument(
-        "Fields can not be multiplied and added together because they belong to "
-        "different systems.");
+        "Fields can not be multiplied and added together because they belong "
+        "to different systems.");
   }
   if (x.ncomp() != y.ncomp()) {
     throw std::invalid_argument(
@@ -183,8 +178,7 @@ void addTo(Field& y, const Field& a, const Field& x) {
   if (!(a.ncomp() == 1 || a.ncomp() == x.ncomp())) {
     throw std::invalid_argument(
         "Weights need to be scalar (1 component) or have the same number of "
-        "components as the fields."
-    );
+        "components as the fields.");
   }
 
   int ncells = y.grid().ncells();
@@ -211,10 +205,7 @@ Field operator*(real a, const Field& x) {
   return add(0, x, a, x);
 }
 
-__global__ void k_addConstant(CuField y,
-                              const CuField x,
-                              real value,
-                              int comp) {
+__global__ void k_addConstant(CuField y, const CuField x, real value, int comp) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!y.cellInGeometry(idx))
     return;
@@ -246,7 +237,6 @@ __global__ void k_normalize(CuField dst, const CuField src) {
   }
 }
 
-
 Field normalized(const Field& src) {
   Field dst(Field(src.system(), src.ncomp()));
   cudaLaunch(dst.grid().ncells(), k_normalize, dst.cu(), src.cu());
@@ -264,9 +254,7 @@ Field operator*(real3 a, const Field& x) {
   return y;
 }
 
-__global__ void k_multiplyFields(CuField y,
-                            const CuField a,
-                            const CuField x) {
+__global__ void k_multiplyFields(CuField y, const CuField a, const CuField x) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!y.cellInGeometry(idx))
     return;
@@ -290,8 +278,7 @@ inline void multiply(Field& y, const Field& a, const Field& x) {
   if (!(a.ncomp() == 1 || a.ncomp() == x.ncomp())) {
     throw std::invalid_argument(
         "Weights need to be scalar (1 component) or have the same number of "
-        "components as the fields."
-    );
+        "components as the fields.");
   }
   int ncells = y.grid().ncells();
   cudaLaunch(ncells, k_multiplyFields, y.cu(), a.cu(), x.cu());
@@ -324,10 +311,13 @@ __device__ real3 getRGB(real3 vec) {
   float L = 0.5f + 0.5f * vec.z;
 
   // HSL to RGB
-  float Hp = 3.f * H/pi;
-  if (Hp < 0.f) {Hp += 6.f;}  // in [0, 6)
-  else if (Hp >= 6.f) {Hp -= 6.f;}
-  float C = (L<=0.5f) ? 2.f*L*S : 2.f*(1.f-L)*S;
+  float Hp = 3.f * H / pi;
+  if (Hp < 0.f) {  // in [0, 6)
+    Hp += 6.f;
+  } else if (Hp >= 6.f) {
+    Hp -= 6.f;
+  }
+  float C = (L <= 0.5f) ? 2.f * L * S : 2.f * (1.f - L) * S;
   float X = C * (1.f - fabs(fmodf(Hp, 2.f) - 1.f));
   float m = L - C / 2.f;
 
@@ -365,7 +355,7 @@ __global__ void k_fieldGetRGB(CuField dst, const CuField src) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (!dst.cellInGeometry(idx)) {
     if (dst.cellInGrid(idx))
-    // not in geometry, so make grey instead
+      // not in geometry, so make grey instead
       dst.setVectorInCell(idx, real3{0.5, 0.5, 0.5});
   } else {
     dst.setVectorInCell(idx, getRGB(src.vectorAt(idx)));
@@ -373,12 +363,13 @@ __global__ void k_fieldGetRGB(CuField dst, const CuField src) {
 }
 
 Field fieldGetRGB(const Field& src) {
-  if (src.ncomp() == 3) {  // 3D
-    Field dst =  (1./maxVecNorm(src)) * src;  // rescale to make maximum norm 1
-    cudaLaunch(dst.grid().ncells(), k_fieldGetRGB, dst.cu(), dst.cu());  // src is dst
+  if (src.ncomp() == 3) {                      // 3D
+    Field dst = (1. / maxVecNorm(src)) * src;  // rescale to make maximum norm 1
+    cudaLaunch(dst.grid().ncells(), k_fieldGetRGB, dst.cu(),
+               dst.cu());  // src is dst
     return dst;
   } else {
     throw std::invalid_argument(
-            "getRGB can only operate on vector fields with 3 components.");
+        "getRGB can only operate on vector fields with 3 components.");
   }
 }

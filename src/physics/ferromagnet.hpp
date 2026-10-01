@@ -17,9 +17,9 @@
 #include "magnet.hpp"
 #include "parameter.hpp"
 #include "poissonsystem.hpp"
+#include "system.hpp"
 #include "variable.hpp"
 #include "world.hpp"
-#include "system.hpp"
 
 class HostMagnet;
 
@@ -46,9 +46,10 @@ class Ferromagnet : public Magnet {
   void relax(real tol);
 
   int getThermalSeed() const { return thermalSeed; }
-  void setThermalSeed(int value) { thermalSeed = value;
-                                   curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
-                                  }
+  void setThermalSeed(int value) {
+    thermalSeed = value;
+    curandSetPseudoRandomGeneratorSeed(randomGenerator, thermalSeed);
+  }
   void resetNoiseGenerator();
 
  private:
@@ -95,13 +96,13 @@ class Ferromagnet : public Magnet {
   Parameter amrRatio;
   Parameter frozenSpins;
   real RelaxTorqueThreshold;
-  
+
   curandGenerator_t randomGenerator;
 
   DmiTensor dmiTensor;
 
   // Magnetoelasticity
-  Parameter B1;  // First magnetoelastic coupling constant
-  Parameter B2;  // Second magnetoelastic coupling constant
+  Parameter B1;       // First magnetoelastic coupling constant
+  Parameter B2;       // Second magnetoelastic coupling constant
   Parameter BChiral;  // Chiral magnetoelastic coupling constant
 };

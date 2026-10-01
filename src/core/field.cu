@@ -1,5 +1,3 @@
-#include "field.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -9,6 +7,7 @@
 #include "cudaerror.hpp"
 #include "cudalaunch.hpp"
 #include "cudastream.hpp"
+#include "field.hpp"
 #include "fieldops.hpp"
 #include "fieldquantity.hpp"
 #include "gpubuffer.hpp"
@@ -82,11 +81,10 @@ void Field::updateDevicePointersBuffer() {
 void Field::allocate() {
   free();
 
-  if(empty())
+  if (empty())
     return;
 
-  buffers_ =
-      std::vector<GpuBuffer<real>>(ncomp_, GpuBuffer<real>(grid().ncells()));
+  buffers_ = std::vector<GpuBuffer<real>>(ncomp_, GpuBuffer<real>(grid().ncells()));
 
   updateDevicePointersBuffer();
 }
@@ -168,7 +166,9 @@ __global__ void k_setVectorValue(CuField f, real3 value) {
   }
 }
 
-__global__ void k_setVectorValueInRegion(CuField f, real3 value, unsigned int region_idx) {
+__global__ void k_setVectorValueInRegion(CuField f,
+                                         real3 value,
+                                         unsigned int region_idx) {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
   if (!f.cellInGrid(idx) || !f.cellInRegion(region_idx, idx))
     return;

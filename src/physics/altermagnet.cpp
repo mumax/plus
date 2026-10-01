@@ -1,9 +1,10 @@
 #include "altermagnet.hpp"
 
-#include <algorithm>
-#include <memory>
 #include <math.h>
+
+#include <algorithm>
 #include <cfloat>
+#include <memory>
 #include <vector>
 
 #include "fieldquantity.hpp"
@@ -12,8 +13,7 @@
 #include "mumaxworld.hpp"
 #include "relaxer.hpp"
 
-Altermagnet::Altermagnet(std::shared_ptr<System> system_ptr,
-                         std::string name)
+Altermagnet::Altermagnet(std::shared_ptr<System> system_ptr, std::string name)
     : HostMagnet(system_ptr, name),
       sub1_(Ferromagnet(system_ptr, name + ":sublattice_1", this)),
       sub2_(Ferromagnet(system_ptr, name + ":sublattice_2", this)),
@@ -24,10 +24,10 @@ Altermagnet::Altermagnet(std::shared_ptr<System> system_ptr,
       scaleAlterex_1(system(), 1.0, name + ":scale_alterex_1", ""),
       interAlterex_2(system(), 0.0, name + ":inter_alterex_2", "J/m"),
       scaleAlterex_2(system(), 1.0, name + ":scale_alterex_2", "") {
-        addSublattice(&sub1_);
-        addSublattice(&sub2_);
-      }
-      
+  addSublattice(&sub1_);
+  addSublattice(&sub2_);
+}
+
 Altermagnet::Altermagnet(MumaxWorld* world,
                          Grid grid,
                          std::string name,
@@ -51,13 +51,13 @@ void Altermagnet::minimize(real tol, int nSamples) {
 void Altermagnet::relax(real tol) {
   std::vector<real> threshold = {sub1()->RelaxTorqueThreshold,
                                  sub2()->RelaxTorqueThreshold};
-    // If only one sublattice has a user-set threshold, then both
-    // sublattices are relaxed using the same threshold.
-    if (threshold[0] > 0.0 && threshold[1] <= 0.0)
-      threshold[1] = threshold[0];
-    else if (threshold[0] <= 0.0 && threshold[1] > 0.0)
-      threshold[0] = threshold[1];
+  // If only one sublattice has a user-set threshold, then both
+  // sublattices are relaxed using the same threshold.
+  if (threshold[0] > 0.0 && threshold[1] <= 0.0)
+    threshold[1] = threshold[0];
+  else if (threshold[0] <= 0.0 && threshold[1] > 0.0)
+    threshold[0] = threshold[1];
 
-    Relaxer relaxer(this, threshold, tol);
-    relaxer.exec();
+  Relaxer relaxer(this, threshold, tol);
+  relaxer.exec();
 }

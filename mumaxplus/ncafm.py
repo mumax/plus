@@ -1,15 +1,15 @@
 """Non-collinear antiferromagnet implementation."""
 
-import numpy as _np
 import warnings
 
-from . import _cpp
+import numpy as _np
 
+from . import _cpp
 from .dmitensor import DmiTensor, DmiTensorGroup
-from .magnet import Magnet
-from .fieldquantity import FieldQuantity
 from .ferromagnet import Ferromagnet
+from .fieldquantity import FieldQuantity
 from .interparameter import InterParameter
+from .magnet import Magnet
 from .parameter import Parameter
 from .scalarquantity import ScalarQuantity
 
@@ -29,22 +29,22 @@ class NcAfm(Magnet):
         geometry : None, ndarray, or callable (default=None)
             The geometry of the non-collinear antiferromagnet can be set in three ways.
 
-            1. If the geometry contains all cells in the grid, then use None (the default)
+            1. If the geometry contains all cells in the grid, then use None
+               (the default)
             2. Use an ndarray which specifies for each cell wheter or not it is in the
                geometry.
-            3. Use a function which takes x, y, and z coordinates as arguments and returns
-               true if this position is inside the geometry and false otherwise.
-        
+            3. Use a function which takes x, y, and z coordinates as arguments and
+               returns true if this position is inside the geometry and false otherwise.
+
         regions : None, ndarray, or callable (default=None)
             The regional structure of a non-collinear antiferromagnet can be set in the
             same three ways as the geometry. This parameter indexes each grid cell to a
             certain region.
         name : str (default="")
-            The non-collinear antiferromagnet's identifier. If the name is empty (the default),
-            a name for the non-collinear antiferromagnet will be created.
+            The non-collinear antiferromagnet's identifier. If the name is empty
+            (the default), a name for the non-collinear antiferromagnet will be created.
         """
-        super().__init__(world._impl.add_ncafm,
-                         world, grid, name, geometry, regions)
+        super().__init__(world._impl.add_ncafm, world, grid, name, geometry, regions)
 
     def __repr__(self):
         """Return non-collinear antiferromagnet string representation."""
@@ -52,16 +52,16 @@ class NcAfm(Magnet):
 
     def __setattr__(self, name, value):
         """Set non-collinear antiferromagnet or sublattice properties.
-        
-            If the non-collinear antiferromagnet doesn't have the named attribute, then the corresponding
-            attributes of all sublattices are set.
-            e.g. to set the saturation magnetization of all sublattices to the
-            same value, one could use:
-                NcAfm.msat = 800e3
-            which is equal to
-                NcAfm.sub1.msat = 800e3
-                NcAfm.sub2.msat = 800e3
-                NcAfm.sub3.msat = 800e3
+
+        If the non-collinear antiferromagnet doesn't have the named attribute, then the
+        corresponding attributes of all sublattices are set.
+        e.g. to set the saturation magnetization of all sublattices to the
+        same value, one could use:
+            NcAfm.msat = 800e3
+        which is equal to
+            NcAfm.sub1.msat = 800e3
+            NcAfm.sub2.msat = 800e3
+            NcAfm.sub3.msat = 800e3
         """
         if hasattr(NcAfm, name) or name == "_impl":
             # set attribute of yourself, without causing recursion
@@ -72,13 +72,15 @@ class NcAfm(Magnet):
             setattr(self.sub3, name, value)
         else:
             raise AttributeError(
-                r'Both non-collinear antiferromagnet and Ferromagnet have no attribute "{}".'.format(name))
+                "Both non-collinear antiferromagnet and Ferromagnet have no attribute"
+                + f' "{name}".'
+            )
 
     @property
     def sub1(self) -> Ferromagnet:
         """First sublattice instance."""
         return Ferromagnet._from_impl(self._impl.sub1())
-    
+
     @property
     def sub2(self) -> Ferromagnet:
         """Second sublattice instance."""
@@ -88,18 +90,20 @@ class NcAfm(Magnet):
     def sub3(self) -> Ferromagnet:
         """Third sublattice instance."""
         return Ferromagnet._from_impl(self._impl.sub3())
-    
+
     @property
     def sublattices(self) -> tuple[Ferromagnet]:
+        """Return all three sublattice instances"""
         return (self.sub1, self.sub2, self.sub3)
 
     def other_sublattices(self, sub: "Ferromagnet") -> tuple[Ferromagnet]:
-        """Returns sister sublattices of given sublattice."""
+        """Return sister sublattices of given sublattice."""
         return self._impl.other_sublattices(sub._impl)
 
     @property
     def bias_magnetic_field(self) -> Parameter:
-        """Uniform bias magnetic field which will affect a non-collinear antiferromagnet.
+        """Uniform bias magnetic field which will affect a non-collinear
+        antiferromagnet.
 
         The value should be specifed in Teslas.
         """
@@ -168,11 +172,13 @@ class NcAfm(Magnet):
         minimize
         """
         if tol >= 1e-5:
-            warnings.warn("The set tolerance is greater than or equal to the default value"
-                          + " used for the timesolver (1e-5). Using this value results"
-                          + " in no torque minimization, only energy minimization.", UserWarning)
+            warnings.warn(
+                "The set tolerance is greater than or equal to the default value"
+                + " used for the timesolver (1e-5). Using this value results"
+                + " in no torque minimization, only energy minimization.",
+                UserWarning,
+            )
         self._impl.relax(tol)
-
 
     # ----- MATERIAL PARAMETERS -----------
 
@@ -182,7 +188,7 @@ class NcAfm(Magnet):
         This parameter plays the role of exchange constant of the
         antiferromagnetic homogeneous exchange interaction in a single
         simulation cell.
-        
+
         See Also
         --------
         ncafmex_nn
@@ -199,11 +205,14 @@ class NcAfm(Magnet):
             warn = self.ncafmex_cell.uniform_value > 0
         else:
             warn = _np.any(self.ncafmex_cell.eval() > 0)
-        
+
         if warn:
-            warnings.warn("The non-collinear antiferromagnetic exchange constant ncafmex_cell"
-                          + " is set to a positive value, instead of negative (or zero)."
-                          + " Make sure this is intentional!", UserWarning)
+            warnings.warn(
+                "The non-collinear antiferromagnetic exchange constant ncafmex_cell"
+                + " is set to a positive value, instead of negative (or zero)."
+                + " Make sure this is intentional!",
+                UserWarning,
+            )
 
     @property
     def ncafmex_nn(self) -> Parameter:
@@ -211,7 +220,7 @@ class NcAfm(Magnet):
         This parameter plays the role of exchange constant of the
         antiferromagnetic inhomogeneous exchange interaction between
         neighbouring simulation cells.
-        
+
         See Also
         --------
         ncafmex_cell
@@ -227,11 +236,14 @@ class NcAfm(Magnet):
             warn = self.ncafmex_nn.uniform_value > 0
         elif _np.any(self.ncafmex_nn.eval() > 0):
             warn = True
-        
+
         if warn:
-            warnings.warn("The non-collinear antiferromagnet exchange constant ncafmex_nn"
-                          + " is set to a positive value, instead of negative (or zero)."
-                          + " Make sure this is intentional!", UserWarning)
+            warnings.warn(
+                "The non-collinear antiferromagnet exchange constant ncafmex_nn"
+                + " is set to a positive value, instead of negative (or zero)."
+                + " Make sure this is intentional!",
+                UserWarning,
+            )
 
     @property
     def inter_ncafmex_nn(self) -> Parameter:
@@ -256,9 +268,12 @@ class NcAfm(Magnet):
     @inter_ncafmex_nn.setter
     def inter_ncafmex_nn(self, value):
         if value > 0:
-            warnings.warn("The non-collinear antiferromagnetic exchange constant"
-                          + " inter_ncafmex_nn is set to a positive value, instead"
-                          + "of negative (or zero). Make sure this is intentional!", UserWarning)
+            warnings.warn(
+                "The non-collinear antiferromagnetic exchange constant"
+                + " inter_ncafmex_nn is set to a positive value, instead"
+                + "of negative (or zero). Make sure this is intentional!",
+                UserWarning,
+            )
         self.inter_ncafmex_nn.set(value)
 
     @property
@@ -303,7 +318,7 @@ class NcAfm(Magnet):
         ncafmex_cell
         """
         return Parameter(self._impl.latcon)
-    
+
     @latcon.setter
     def latcon(self, value):
         self.latcon.set(value)
@@ -321,7 +336,7 @@ class NcAfm(Magnet):
         -------
         DmiTensor
             The DMI tensor of this non-collinear antiferromagnet.
-        
+
         See Also
         --------
         DmiTensor, dmi_tensors
@@ -330,7 +345,7 @@ class NcAfm(Magnet):
 
     @property
     def dmi_tensors(self) -> DmiTensorGroup:
-        """ Returns the DMI tensor of self, self.sub1, self.sub2 and self.sub3.
+        """Returns the DMI tensor of self, self.sub1, self.sub2 and self.sub3.
 
         This group can be used to set the intersublattice and all intrasublattice
         DMI tensors at the same time.
@@ -342,27 +357,33 @@ class NcAfm(Magnet):
         >>> magnet.dmi_tensors.set_interfacial_dmi(1e-3)
 
         Or to set an individual tensor element, one could use
-        
+
         >>> magnet.dmi_tensors.xxy = 1e-3
 
         See Also
         --------
         DmiTensor, dmi_tensor
         """
-        return DmiTensorGroup([
-            self.dmi_tensor, self.sub1.dmi_tensor, self.sub2.dmi_tensor, self.sub3.dmi_tensor
-            ])
+        return DmiTensorGroup(
+            [
+                self.dmi_tensor,
+                self.sub1.dmi_tensor,
+                self.sub2.dmi_tensor,
+                self.sub3.dmi_tensor,
+            ]
+        )
 
     @property
     def dmi_vector(self) -> Parameter:
-        """ DMI vector D (J/m³) associated with the homogeneous DMI (in a single simulation cell),
-         defined by the energy density ε = D . (m1 x m2 + m2 x m3 + m3 x m1) with m1, m2
-         and m3 being the sublattice magnetizations.
+        """DMI vector D (J/m³) associated with the homogeneous DMI (in a single
+        simulation cell), defined by the energy density
+        ε = D . (m1 x m2 + m2 x m3 + m3 x m1) with m1, m2 and m3 being the sublattice
+        magnetizations.
 
         See Also
         --------
         DmiTensor, dmi_tensor, dmi_tensors
-         """
+        """
         return Parameter(self._impl.dmi_vector)
 
     @dmi_vector.setter
@@ -380,7 +401,7 @@ class NcAfm(Magnet):
     @property
     def full_magnetization(self) -> FieldQuantity:
         """Full non-collinear antiferromagnetic magnetization M1 + M2 + M3 (A/m).
-        
+
         See Also
         --------
         Ferromagnet.full_magnetization
@@ -404,9 +425,10 @@ class NcAfm(Magnet):
         """
         return FieldQuantity(_cpp.angle_field(self._impl))
 
-    def max_intracell_angle_between(self, sub_i : "Ferromagnet", sub_j : "Ferromagnet"):
-        """The maximal deviation from 120° between sublattice spins in the same simulation
-        cell (rad). Input should be two integers from {1, 2, 3} denoting a sublattice index.
+    def max_intracell_angle_between(self, sub_i: "Ferromagnet", sub_j: "Ferromagnet"):
+        """Maximal deviation from 120° between sublattice spins in the same simulation
+        cell (rad). Input should be two integers from {1, 2, 3} denoting a sublattice
+        index.
 
         See Also
         --------

@@ -3,9 +3,9 @@ magnetizations as a function of the angle between neighboring spins. This is a
 recreation of figure 5 of the paper "The design and verification of MuMax3".
 https://doi.org/10.1063/1.4899186 """
 
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 

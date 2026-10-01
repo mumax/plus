@@ -1,8 +1,8 @@
 #include "conductivitytensor.hpp"
 #include "cudalaunch.hpp"
-#include "quantityevaluator.hpp"
 #include "ferromagnet.hpp"
 #include "field.hpp"
+#include "quantityevaluator.hpp"
 
 bool conductivityTensorAssuredZero(const Ferromagnet* magnet) {
   return magnet->conductivity.assuredZero();
@@ -41,6 +41,6 @@ Field evalConductivityTensor(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity conductivityTensorQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalConductivityTensor, 6,
-                          "conductivity_tensor", "S/m");
+  return FM_FieldQuantity(magnet, evalConductivityTensor, 6, "conductivity_tensor",
+                          "S/m");
 }
