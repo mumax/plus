@@ -15,25 +15,30 @@
 #include "magnet.hpp"
 #include "minimizer.hpp"
 #include "ncafm.hpp"
+#include "reduce.hpp"
 #include "relaxer.hpp"
+#include "shift.hpp"
 #include "system.hpp"
 #include "thermalnoise.hpp"
 #include "timesolver.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 
 MumaxWorld::MumaxWorld(real3 cellsize)
     : World(cellsize),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::MumaxWorld(real3 cellsize, Grid mastergrid, int3 pbcRepetitions)
     : World(cellsize, mastergrid, pbcRepetitions),
       biasMagneticField({0, 0, 0}),
-      RelaxTorqueThreshold(-1.0) {}
+      RelaxTorqueThreshold(-1.0),
+      window_(std::make_unique<Window>(*this)) {}
 
 MumaxWorld::~MumaxWorld() {}
 
-void MumaxWorld::checkAddibility(Grid grid, std::string name) const {
+void MumaxWorld::checkAddibility(Grid grid, const GpuBuffer<bool>& geometry, std::string name) const {
   if (!inMastergrid(grid)) {
       throw std::out_of_range(
           "Can not add magnet because the grid does not fit in the "
@@ -42,7 +47,7 @@ void MumaxWorld::checkAddibility(Grid grid, std::string name) const {
 
   for (const auto& namedMagnet : magnets_) {
     Magnet* m = namedMagnet.second;
-    if (grid.overlaps(m->grid())) {
+    if (MumaxWorld::overlaps(grid, geometry, m->grid(), m->system()->geometry())) {
       throw std::out_of_range(
           "Can not add magnet because it overlaps with another "
           "magnet.");
@@ -327,3 +332,80 @@ void MumaxWorld::unsetPBC() {
 }
 
 // --------------------------------------------------
+// Moving simulation window
+
+void MumaxWorld::centerDomainWall(int comp, int axis) {
+  if (magnets_.size() > 1)
+    throw std::runtime_error("Moving the simulation window is only possible when only one "
+                             "magnet lives in the world.");
+  if (magnets_.size() < 1)
+    throw std::runtime_error("Moving the simulation window is not possible when there is no "
+                             "magnet in the world.");
+
+  Magnet* magnet = magnets_.begin()->second;
+  timesolver_->setPostStepFunction([this, magnet, comp, axis]() {
+  const Field& mag = magnet->asHost() ? magnet->asHost()->sublattices()[0]->magnetization()->field()
+                                      : magnet->asFM()->magnetization()->field();
+  int dir = calculateShiftDirection(mag,
+                                    comp, axis,
+                                    window_->getMagValues()[0],
+                                    window_->getMagValues()[1]);
+    if (dir != 0) {
+      window_->move(dir, axis, comp);
+      // Shift magnetization
+      auto shifted = window_->centerOnExcitation(mag, dir, axis, comp);
+
+      // Multi-sublattice systems
+      if (auto host = magnet->asHost()) {
+        auto sub0 = host->sublattices()[0];
+        sub0->magnetization()->set(shifted);
+        for (auto sub : host->getOtherSublattices(sub0)) {
+          auto shifted = window_->centerOnExcitation(sub->magnetization()->field(), dir, axis, comp);
+          sub->magnetization()->set(shifted);
+        }
+      }
+
+      // Ferromagnet
+      else
+        magnet->asFM()->magnetization()->set(shifted);
+    }
+  });
+}
+
+// --------------------------------------------------
+// Overlapping magnets
+
+bool MumaxWorld::overlaps(Grid grid1, const GpuBuffer<bool>& geometry1,
+                          Grid grid2, const GpuBuffer<bool>& geometry2) {
+  // Cheap bounding-box rejection first.
+  if (!grid1.overlaps(grid2))
+    return false;
+
+  // There is no geometry
+
+  bool hasGeo1 = geometry1.size() != 0;
+  bool hasGeo2 = geometry2.size() != 0;
+  if (!hasGeo1 && !hasGeo2)
+    return true;
+
+  int3 o1 = grid1.origin(), s1 = grid1.size();
+  int3 o2 = grid2.origin(), s2 = grid2.size();
+
+  // Overlapping box
+  int3 overlapOrigin{std::max(o1.x, o2.x),
+                     std::max(o1.y, o2.y),
+                     std::max(o1.z, o2.z)};
+  int3 overlapMaximum{std::min(o1.x + s1.x, o2.x + s2.x),
+          std::min(o1.y + s1.y, o2.y + s2.y),
+          std::min(o1.z + s1.z, o2.z + s2.z)};
+  int3 overlapCells{overlapMaximum.x - overlapOrigin.x,
+         overlapMaximum.y - overlapOrigin.y,
+         overlapMaximum.z - overlapOrigin.z};
+
+  Grid overlapGrid(overlapCells, overlapOrigin);
+
+  // Check all cells in the overlapping box on GPU
+  return geometriesOverlap(grid1, geometry1.get(),
+                           grid2, geometry2.get(),
+                           overlapGrid);
+}

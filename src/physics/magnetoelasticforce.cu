@@ -11,6 +11,7 @@ __global__ void k_magnetoelasticForce(CuField fField,
                                       const CuField m,
                                       const CuParameter B1,
                                       const CuParameter B2,
+                                      const CuParameter BChiral,
                                       const real3 w,  // w = 1/cellsize
                                       const Grid mastergrid) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -89,6 +90,7 @@ __global__ void k_magnetoelasticForce(CuField fField,
     real f_i = 2 * B1.valueAt(idx) * m_here[i] * der[i][i];
     f_i += B2.valueAt(idx) * m_here[i] * (der[ip1][ip1] + der[ip2][ip2]);
     f_i += B2.valueAt(idx) * (m_here[ip1] * der[ip1][i] + m_here[ip2] * der[ip2][i]);
+    f_i += BChiral.valueAt(idx) * (m_here[ip1] * der[i][ip1] - m_here[ip2] * der[i][ip2]);
     fField.setValueInCell(idx, i, f_i);
   }
 }
@@ -104,9 +106,10 @@ Field evalMagnetoelasticForce(const Ferromagnet* magnet) {
   CuField m = magnet->magnetization()->field().cu();
   CuParameter B1 = magnet->B1.cu();
   CuParameter B2 = magnet->B2.cu();
+  CuParameter BChiral = magnet->BChiral.cu();
   real3 w = 1 / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
-  cudaLaunch(ncells, k_magnetoelasticForce, fField.cu(), m, B1, B2, w, mastergrid);
+  cudaLaunch(ncells, k_magnetoelasticForce, fField.cu(), m, B1, B2, BChiral, w, mastergrid);
   return fField;
 }
 

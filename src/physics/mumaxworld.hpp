@@ -11,6 +11,7 @@
 #include "gpubuffer.hpp"
 #include "grid.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 #include "world.hpp"
 
 class Altermagnet;
@@ -37,7 +38,7 @@ class MumaxWorld : public World {
   /** Uniform bias magnetic field which will affect all magnets in the world. */
   real3 biasMagneticField;
 
-  void checkAddibility(Grid grid, std::string name) const;
+  void checkAddibility(Grid grid, const GpuBuffer<bool>& geometry, std::string name) const;
 
   /** Add a ferromagnet to the world. */
   Ferromagnet* addFerromagnet(Grid grid,
@@ -118,7 +119,7 @@ class MumaxWorld : public World {
     if (name.empty())
       name = prefix + "_" + std::to_string(idxUnnamed++);
     // Check if magnet can be added to this world.
-    checkAddibility(grid, name);
+    checkAddibility(grid, geometry, name);
 
     // Create the magnet and add it to this world
     auto mag = std::make_unique<T>(this, grid, name, geometry, regions);
@@ -128,6 +129,7 @@ class MumaxWorld : public World {
     magnets_[name] = raw;
 
     handleNewStrayfield(raw);
+    window_->setOrigin(int3_to_real3(grid.origin()) * this->cellsize());
     return raw;
   }
 
@@ -259,6 +261,16 @@ class MumaxWorld : public World {
 
   // --------------------------------------------------
 
+  // Moving simulation window
+  Window& window() const { return *window_; }
+  void centerDomainWall(int comp, int axis);
+
+  // --------------------------------------------------
+  
+  // Check overlapping magnets
+  static bool overlaps(Grid grid1, const GpuBuffer<bool>& geometry1,
+                       Grid grid2, const GpuBuffer<bool>& geometry2);
+
 
  private:
   std::map<std::string, Magnet*> magnets_;
@@ -267,4 +279,6 @@ class MumaxWorld : public World {
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
   std::map<std::string, std::unique_ptr<Altermagnet>> altermagnets_;
   std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
+
+  std::unique_ptr<Window> window_;
 };

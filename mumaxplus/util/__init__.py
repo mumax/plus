@@ -27,7 +27,7 @@ __all__ = [
     "show_magnet_geometry",
     "show_field_3D",
     "show_regions",
-    # voronoi
+    # misc
     "VoronoiTessellator",
     "MFM"
 ]

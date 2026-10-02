@@ -26,11 +26,11 @@ class StrayField(FieldQuantity):
 
     def set_method(self, method):
         """Set the computation method for the stray field.
+        The default method is "fft".
 
         Parameters
         ----------
-        method : {"brute", "fft"}, optional
-            The default value is "fft".
+        method : {"brute", "fft"}
         """
         self._impl.set_method(method)
 

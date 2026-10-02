@@ -103,4 +103,5 @@ class Ferromagnet : public Magnet {
   // Magnetoelasticity
   Parameter B1;  // First magnetoelastic coupling constant
   Parameter B2;  // Second magnetoelastic coupling constant
+  Parameter BChiral;  // Chiral magnetoelastic coupling constant
 };

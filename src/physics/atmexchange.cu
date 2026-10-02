@@ -65,7 +65,7 @@ __global__ void k_atmExchangeField(CuField hField,
   real s = sin(angle.valueAt(idx));
   real c2 = c * c;
   real s2 = s * s;
-  real cs2 = 4 * c * s;
+  real cs2 = 2 * c * s;
 
   real3 h{0, 0, 0};
 
@@ -152,7 +152,7 @@ __global__ void k_atmExchangeField(CuField hField,
                                                         sin(2 * ang_) * A1.valueAt(coo_));
       real aex_2 = getExchangeStiffness(inter2, scale2, cs2 * a2,
                                                         sin(2 * ang_) * A2.valueAt(coo_));
-      Aex[i] = (aex_1 - aex_2);
+      Aex[i] = 2 * (aex_1 - aex_2);
     }
   }
 

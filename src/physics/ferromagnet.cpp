@@ -59,7 +59,8 @@ Ferromagnet::Ferromagnet(std::shared_ptr<System> system_ptr,
       poissonSystem(this), 
       // magnetoelasticity
       B1(system(), 0.0, name + ":B1", "J/m3"),
-      B2(system(), 0.0, name + ":B1", "J/m3") {
+      B2(system(), 0.0, name + ":B2", "J/m3"),
+      BChiral(system(), 0.0, name + ":BChiral", "J/m3") {
     {// Initialize random magnetization
     // TODO: this can be done much more efficient somewhere else
     int nvalues = 3 * this->grid().ncells();

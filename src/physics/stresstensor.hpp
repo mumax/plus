@@ -10,9 +10,9 @@ bool viscousDampingTensorAssuredZero(const Magnet*);
 bool viscousDampingRayleighAssuredZero(const Magnet*);
 bool stressTensorAssuredZero(const Magnet*);
 
-Field evalElasticStress(const Magnet*);
+Field evalElasticStress(const Magnet* magnet, const Field* inputStrain = nullptr);
 Field evalViscousStress(const Magnet*);
-Field evalStressTensor(const Magnet*);
+Field evalStressTensor(const Magnet* magnet, const Field* inputStrain = nullptr);
 
 // Elastic stress tensor quantity with 6 symmetric stress components  
 // calculated according to σ = c:ε. 

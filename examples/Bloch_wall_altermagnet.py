@@ -1,5 +1,5 @@
 """This script computes the Néel and net magnetization profiles of a Bloch wall as described
-in Moreels et al. (2026) (https://arxiv.org/abs/2604.15454). The theoretical model is based
+in Moreels et al. (2026) (https://doi.org/10.1063/5.0341263). The theoretical model is based
 on Gomonay et al. (2024) (https://www.nature.com/articles/s44306-024-00042-3)."""
 
 from mumaxplus import World, Grid, Altermagnet
@@ -21,13 +21,10 @@ A0  = -5e-13
 A12 = A0/2
 
 length = 256e-9
-width = 64e-9
 
 # ----------- Create altermagnet -----------
 
 Nx = int(length / cs)
-Ny = int(width / cs)
-
 world  = World((cs, cs, cs))
 grid   = Grid((Nx, 1, 1))
 magnet = Altermagnet(world, grid)
@@ -66,7 +63,7 @@ magnet.minimize()
 fig, axs = plt.subplots(2, 1, sharex=True)
 scale_net = 1e4
 # Theoretical profiles
-dw = np.sqrt((0.5*(A1+A2) - A12) / (2*K)) # Theoretical DW width
+dw = np.sqrt(((A1+A2) - A12) / (2*K)) # Theoretical DW width
 t = np.linspace(-Nx*cs/2, Nx*cs/2, Nx) / dw
 
 # --- NEEL ---
@@ -77,7 +74,7 @@ axs[0].plot(t, np.sin(-theta), 'k--')
 # --- NET ---
 Han = 2 * K / Ms
 Hex = -8 * A0 / ( Ms * (a**2))
-prefactor = 0.5 * (Han/Hex) * (A1-A2) / (0.5*(A1+A2) - A12)
+prefactor = (Han/Hex) * (A1-A2) / ((A1+A2) - A12)
 
 theory_y = -prefactor * np.sinh(t)**2 / np.cosh(t)**3
 theory_z =  prefactor * np.sinh(t)   /  np.cosh(t)**3

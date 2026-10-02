@@ -21,3 +21,7 @@ html[data-theme="dark"] .navbar-brand img {
    display: block;
    width: 100%;
 }
+
+.bd-sidebar-primary .navbar-icon-links {
+  justify-content: space-evenly !important;
+}
