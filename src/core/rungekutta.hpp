@@ -31,6 +31,8 @@ class RungeKuttaStepper::RungeKuttaStageExecutor {
   void setFinalX();
   void resetX();
   real getError() const;
+  real maxError() const;
+  real getScaledError() const;
 
  private:
   Field x0;

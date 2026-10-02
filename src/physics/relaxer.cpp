@@ -93,7 +93,7 @@ void Relaxer::exec() {
   real time = timesolver_.time();
   real timestep = timesolver_.timestep();
   bool adaptive = timesolver_.hasAdaptiveTimeStep();
-  real maxerr = timesolver_.maxError();
+  real maxerr = timesolver_.magnetizationMaxError();
   std::string method = getRungeKuttaNameFromMethod(timesolver_.getRungeKuttaMethod());
   auto eqs = timesolver_.equations();
 
@@ -123,11 +123,11 @@ void Relaxer::exec() {
     real t0 = 0;
     real t1 = calcTorque(torque);
   
-    real err = timesolver_.maxError();
+    real err = timesolver_.magnetizationMaxError();
 
     while (err > tol_) {
       err /= std::sqrt(2);
-      timesolver_.setMaxError(err);
+      timesolver_.setMagnetizationMaxError(err);
 
       timesolver_.steps(N);
       t0 = t1;
@@ -147,7 +147,7 @@ void Relaxer::exec() {
   // If threshold is set by user: relax until torque is smaller than or equal to threshold.
   else {
 
-    real err = timesolver_.maxError();
+    real err = timesolver_.magnetizationMaxError();
     std::vector<FM_FieldQuantity> torque = getTorque();
 
     while (err > tol_) {
@@ -161,7 +161,7 @@ void Relaxer::exec() {
 
       if (torqueConverged) {    
         err /= std::sqrt(2);
-        timesolver_.setMaxError(err);
+        timesolver_.setMagnetizationMaxError(err);
       }
       timesolver_.steps(N);
     }
@@ -169,7 +169,7 @@ void Relaxer::exec() {
 
   // Restore solver settings after relaxing
   timesolver_.setRungeKuttaMethod(method);
-  timesolver_.setMaxError(maxerr);
+  timesolver_.setMagnetizationMaxError(maxerr);
   if (!adaptive) { timesolver_.disableAdaptiveTimeStep(); }
   timesolver_.setTime(time);
   timesolver_.setTimeStep(timestep); 
