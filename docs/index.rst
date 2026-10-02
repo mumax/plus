@@ -28,7 +28,7 @@ GPU
 ---
 
 mumax\ :sup:`+` is cross-platform and runs on Linux, Windows and Mac platforms. You need an 
-NVIDIA GPU with compute capability 5.2 or higher, as listed `here <https://developer.nvidia.com/cuda/gpus>`. You also need to use 
+NVIDIA GPU with compute capability 5.2 or higher, as listed `here <https://developer.nvidia.com/cuda/gpus>`_. You also need to use 
 NVIDIA's proprietary graphics driver, which may already be installed on your system. 
 The benchmark below may guide your GPU choice.
 
