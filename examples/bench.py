@@ -15,6 +15,7 @@ def simple_bench(grid, nsteps=100):
     magnet.aex = 13e-12
     magnet.alpha = 0.5
 
+    world.timesolver.set_method('Fehlberg')
     world.timesolver.timestep = 1e-13
     world.timesolver.adaptive_timestep = False
 
