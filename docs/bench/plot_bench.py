@@ -1,4 +1,5 @@
-import json 
+import json
+import math
 
 # --- load data: group rows by the first column (cell count) ---
 groups = {}
@@ -33,9 +34,9 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 </style>
 <svg id="gpubench-svg" viewBox="0 0 %W% %H%" width="100%" role="img"></svg>
 <div class="ctl">
-  <span>number of cells:</span>
+  <span>cells:</span>
   <input id="gpubench-slider" type="range" min="0" max="%MAX%" step="1" value="%MAX%">
-  <span id="gpubench-size" style="min-width:7em"></span>
+  <span id="gpubench-size" style="min-width:4em"></span>
 </div>
 <div class="ctl">
   <label><input id="gpubench-keep" type="checkbox">
@@ -55,6 +56,18 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
   var label=document.getElementById("gpubench-size");
   var keep=document.getElementById("gpubench-keep");
   var frozen=null;
+
+  var SUP={"0":"\\u2070","1":"\\u00b9","2":"\\u00b2","3":"\\u00b3","4":"\\u2074",
+           "5":"\\u2075","6":"\\u2076","7":"\\u2077","8":"\\u2078","9":"\\u2079"};
+
+  // 4194304 -> "2" followed by superscript 22; non-powers of 2 fall back to 1,234,567
+  function pow2(n){
+    var e=Math.round(Math.log(n)/Math.LN2);
+    if(!(n>=1) || Math.pow(2,e)!==n) return n.toLocaleString("en-US");
+    var s="2", digits=String(e);
+    for(var k=0; k<digits.length; k++) s+=SUP[digits.charAt(k)];
+    return s;
+  }
 
   function esc(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
@@ -83,7 +96,7 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
   }
 
   function niceMax(m){
-    var raw=m/5, mag=Math.pow(10,Math.floor(Math.log10(raw))), step=mag;
+    var raw=m/5, mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)), step=mag;
     [1,2,5,10].some(function(k){ step=k*mag; return step>=raw; });
     return {ymax:Math.ceil(m/step)*step, step:step};
   }
@@ -123,13 +136,13 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
     });
 
     o.push('<text x="'+(L+PW/2)+'" y="24" text-anchor="middle" font-size="14" fill="currentColor">'+
-           'mumax⁺ GPU performance for 2D simulations containing '+
-           sizes[i].toLocaleString("en-US")+' cells.</text>');
+           'mumax\\u207a GPU performance for 2D simulations containing '+
+           pow2(sizes[i])+' cells.</text>');
     o.push('<text transform="translate(16 '+(T+PH/2)+') rotate(-90)" text-anchor="middle" '+
            'font-size="12" fill="currentColor">throughput (M cells/s)</text>');
 
     svg.innerHTML=o.join("\\n");
-    label.textContent=sizes[i].toLocaleString("en-US");
+    label.textContent=pow2(sizes[i]);
     tip.style.display="none";
   }
 
@@ -160,11 +173,11 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 </div>
 """
 
-out = (template.replace("%DATA%", data_js)
-               .replace("%W%", str(W)).replace("%H%", str(H))
+out = (template.replace("%W%", str(W)).replace("%H%", str(H))
                .replace("%LEFT%", str(left)).replace("%RIGHT%", str(right))
                .replace("%TOP%", str(top)).replace("%BOTTOM%", str(bottom))
-               .replace("%MAX%", str(len(sizes) - 1)))
+               .replace("%MAX%", str(len(sizes) - 1))
+               .replace("%DATA%", data_js))      # data last, so labels can't be altered
 
 with open("bench.html", "w", encoding="utf-8") as f:
     f.write(out)
