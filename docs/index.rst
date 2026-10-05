@@ -35,6 +35,8 @@ The benchmark below may guide your GPU choice.
   .. raw:: html
      :file: bench/bench.html
 
+If you want to contribute your GPU benchmark to this figure you can run
+:file:`examples/bench.py` and send us the output together with the used GPU.
 
 Contents
 --------
