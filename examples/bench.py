@@ -52,7 +52,7 @@ if __name__ == "__main__":
             throughput = grid.ncells * NSTEPS / walltime
 
             print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput))
-            file.write(f"{grid.ncells}    {walltime}    {throughput}    {gpu_name}\n")
+            file.write(f"{grid.ncells}    {walltime}    {throughput}    {gpu_name}")
 
             ncells.append(grid.ncells)
             throughputs.append(throughput)
