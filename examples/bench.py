@@ -1,7 +1,6 @@
 import time
-
+import subprocess
 import matplotlib.pyplot as plt
-
 from mumaxplus import Ferromagnet, Grid, World
 
 
@@ -29,22 +28,34 @@ def simple_bench(grid, nsteps=100):
 
 
 if __name__ == "__main__":
-    NSTEPS = 100
+    # Get the used GPU name
+    result = subprocess.run(
+        ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+        capture_output=True,
+        text=True
+    )
 
-    ncells = []
-    throughputs = []
+    gpu_name = result.stdout.strip()
 
-    print("\n{:>10} {:>10} {:>12}".format("ncells", "walltime", "throughput"))
+    with open("bench.txt", "w") as file:
+        NSTEPS = 100
 
-    for p in range(2, 12):
-        grid = Grid((2 ** p, 2 ** p, 1))
-        walltime = simple_bench(grid, NSTEPS)
-        throughput = grid.ncells * NSTEPS / walltime
+        ncells = []
+        throughputs = []
 
-        print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput))
+        print("GPU: ", gpu_name)
+        print("\n{:>10} {:>10} {:>12}".format("ncells", "walltime", "throughput"))
 
-        ncells.append(grid.ncells)
-        throughputs.append(throughput)
+        for p in range(2, 12):
+            grid = Grid((2 ** p, 2 ** p, 1))
+            walltime = simple_bench(grid, NSTEPS)
+            throughput = grid.ncells * NSTEPS / walltime
+
+            print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput))
+            file.write(f"{grid.ncells}    {walltime}    {throughput}    {gpu_name}\n")
+
+            ncells.append(grid.ncells)
+            throughputs.append(throughput)
 
     print()
 

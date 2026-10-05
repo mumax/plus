@@ -34,9 +34,9 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 </style>
 <svg id="gpubench-svg" viewBox="0 0 %W% %H%" width="100%" role="img"></svg>
 <div class="ctl">
-  <span>cells:</span>
+  <span>Number of cells:</span>
   <input id="gpubench-slider" type="range" min="0" max="%MAX%" step="1" value="%MAX%">
-  <span id="gpubench-size" style="min-width:4em"></span>
+  <span id="gpubench-size" style="min-width:9em"></span>
 </div>
 <div class="ctl">
   <label><input id="gpubench-keep" type="checkbox">
@@ -60,13 +60,23 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
   var SUP={"0":"\\u2070","1":"\\u00b9","2":"\\u00b2","3":"\\u00b3","4":"\\u2074",
            "5":"\\u2075","6":"\\u2076","7":"\\u2077","8":"\\u2078","9":"\\u2079"};
 
-  // 4194304 -> "2" followed by superscript 22; non-powers of 2 fall back to 1,234,567
-  function pow2(n){
+  function sup(e){
+    var s="", d=String(e);
+    for(var k=0; k<d.length; k++) s+=SUP[d.charAt(k)];
+    return s;
+  }
+
+  // n = 2^e. For even e the grid is square: 2^(e/2) x 2^(e/2) x 1.
+  // 4194304 -> "2^11 x 2^11 x 1" (with superscripts).
+  // Odd e (no square grid) shows as 2^e; other numbers as 1,234,567.
+  function cells(n){
     var e=Math.round(Math.log(n)/Math.LN2);
     if(!(n>=1) || Math.pow(2,e)!==n) return n.toLocaleString("en-US");
-    var s="2", digits=String(e);
-    for(var k=0; k<digits.length; k++) s+=SUP[digits.charAt(k)];
-    return s;
+    if(e%2===0){
+      var p="2"+sup(e/2);
+      return p+" \\u00d7 "+p+" \\u00d7 1";
+    }
+    return "2"+sup(e);
   }
 
   function esc(s){
@@ -137,12 +147,12 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 
     o.push('<text x="'+(L+PW/2)+'" y="24" text-anchor="middle" font-size="14" fill="currentColor">'+
            'mumax\\u207a GPU performance for 2D simulations containing '+
-           pow2(sizes[i])+' cells.</text>');
+           cells(sizes[i])+' cells.</text>');
     o.push('<text transform="translate(16 '+(T+PH/2)+') rotate(-90)" text-anchor="middle" '+
            'font-size="12" fill="currentColor">throughput (M cells/s)</text>');
 
     svg.innerHTML=o.join("\\n");
-    label.textContent=pow2(sizes[i]);
+    label.textContent=cells(sizes[i]);
     tip.style.display="none";
   }
 
