@@ -35,7 +35,7 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 <svg id="gpubench-svg" viewBox="0 0 %W% %H%" width="100%" role="img"></svg>
 <div class="ctl">
   <span>Number of cells:</span>
-  <input id="gpubench-slider" type="range" min="0" max="%MAX%" step="1" value="%MAX%">
+  <input id="gpubench-slider" type="range" min="0" max="%MAX%" step="1" value="9">
   <span id="gpubench-size" style="min-width:9em"></span>
 </div>
 <div class="ctl">
@@ -189,5 +189,5 @@ out = (template.replace("%W%", str(W)).replace("%H%", str(H))
                .replace("%MAX%", str(len(sizes) - 1))
                .replace("%DATA%", data_js))      # data last, so labels can't be altered
 
-with open("bench.html", "w", encoding="utf-8") as f:
+with open("../_static/bench.html", "w", encoding="utf-8") as f:
     f.write(out)

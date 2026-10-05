@@ -27,17 +27,17 @@ All demonstrations in the paper were simulated using version `v1.1.0 <https://gi
 GPU
 ---
 
-mumax\ :sup:`+` is cross-platform and runs on Linux, Windows and Mac platforms. You need an 
+mumax\ :sup:`+` is cross-platform and runs on Linux and Windows platforms. You need an 
 NVIDIA GPU with compute capability 5.2 or higher, as listed `here <https://developer.nvidia.com/cuda/gpus>`_. You also need to use 
 NVIDIA's proprietary graphics driver, which may already be installed on your system. 
 The benchmark below may guide your GPU choice.
 
   .. raw:: html
-     :file: bench/bench.html
+     :file: _static/bench.html
 
 If you want to contribute your GPU benchmark to this figure you can run
 :file:`examples/bench.py` and send us the :file:`bench.txt` output file. To push your
-GPU to its limits we recommend to increase the number of cells in the for loop untill
+GPU to its limits we recommend to increase the number of cells in the for loop until
 you get an out of memory error.
 
 Contents
