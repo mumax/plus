@@ -110,7 +110,7 @@ __global__ void k_afmExchangeFieldNN(CuField hField,
   // accumulate exchange field in h for cell at idx, divide by msat at the end
   real3 h{0, 0, 0};
 
-  // neighbour parameters
+  // neighbor parameters
   int3 coo_;
   int idx_;
   bool outside;
@@ -197,7 +197,7 @@ __global__ void k_afmExchangeFieldNN(CuField hField,
       real ann__ = afmex_nn.valueAt(idx__);
       real afmex_nn__ = getExchangeStiffness(inter, scale, ann, ann__);
 
-      // fill in fake neighbouring magnetization
+      // fill in fake neighboring magnetization
       m2_ = m2 + (afmex_nn__ * cross(cross(d_m1, m2), m2) + Gamma2) * delta / (2*a);
       exch_nn = ann;
     }
