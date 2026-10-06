@@ -171,7 +171,7 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 
     o.push('<text x="'+(L+PW/2)+'" y="24" text-anchor="middle" font-size="14" fill="currentColor">'+
            'mumax\\u207a GPU performance for 2D simulations containing '+
-           cells(sizes[i])+' cells.</text>');
+           sizes[i].toLocaleString("en-US")+' cells.</text>');
     o.push('<text transform="translate(16 '+(T+PH/2)+') rotate(-90)" text-anchor="middle" '+
            'font-size="12" fill="currentColor">throughput (M cells/s)</text>');
 
