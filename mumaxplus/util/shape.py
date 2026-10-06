@@ -82,9 +82,13 @@ class Shape:
 
     def rotate_x(self, theta):
         """Rotate this shape theta radians counter-clockwise around the x-axis."""
-        rotmat = _np.array([[1, 0, 0],
-                            [0, _np.cos(theta), _np.sin(theta)],
-                            [0, -_np.sin(theta), _np.cos(theta)]])  # fmt: skip
+        rotmat = _np.array(
+            [
+                [1, 0, 0],
+                [0, _np.cos(theta), _np.sin(theta)],
+                [0, -_np.sin(theta), _np.cos(theta)],
+            ]
+        )
         return self.transform3(rotmat)
 
     def rotate_y(self, theta):
@@ -483,9 +487,8 @@ class Torus(Shape):
 
         def shape_func(x, y, z):
             return (
-                (x**2 + y**2 + z**2 + 0.25 * D**2 - 0.25 * d**2) ** 2
-                <= D**2 * (x**2 + y**2)
-            )  # fmt: skip
+                x**2 + y**2 + z**2 + 0.25 * D**2 - 0.25 * d**2
+            ) ** 2 <= D**2 * (x**2 + y**2)
 
         super().__init__(shape_func)
 
@@ -565,8 +568,10 @@ class Line2D(Shape):
             case "infinite":
 
                 def infinite_func(x, y, z):
-                    return (radSq >= pow((x - x1) * (y - y2) - (x - x2) * (y - y1), 2)
-                            / lenSq)  # fmt: skip
+                    return (
+                        radSq
+                        >= pow((x - x1) * (y - y2) - (x - x2) * (y - y1), 2) / lenSq
+                    )
 
                 super().__init__(infinite_func)
 
@@ -654,7 +659,7 @@ class Line(Shape):
                     return (
                         radSq
                         >= (cross1 * cross1 + cross2 * cross2 + cross3 * cross3) / lenSq
-                    )  # fmt: skip
+                    )
 
                 super().__init__(infinite_func)
 
