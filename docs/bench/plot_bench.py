@@ -1,8 +1,9 @@
 import json
 import math
+import statistics
 
-# --- load data: group rows by the first column (cell count) ---
-groups = {}
+# --- load data: group rows by cell count, collect all runs per GPU ---
+runs = {}
 with open("gpus.txt") as f:
     for line in f:
         line = line.strip()
@@ -10,7 +11,18 @@ with open("gpus.txt") as f:
             continue
         parts = line.split(maxsplit=3)
         size = int(float(parts[0]))
-        groups.setdefault(size, {})[parts[3]] = float(parts[2]) / 1e6
+        runs.setdefault(size, {}).setdefault(parts[3], []).append(float(parts[2]) / 1e6)
+
+# mean, standard deviation and number of runs per GPU
+# (a single run has no spread, so its standard deviation is 0 and no error bar is drawn)
+groups = {}
+for size, gpus in runs.items():
+    groups[size] = {
+        lab: [statistics.mean(v),
+              statistics.stdev(v) if len(v) > 1 else 0.0,
+              len(v)]
+        for lab, v in gpus.items()
+    }
 
 sizes = sorted(groups)
 
@@ -48,7 +60,7 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
   var D=%DATA%;
   var W=%W%, H=%H%, L=%LEFT%, R=%RIGHT%, T=%TOP%, B=%BOTTOM%;
   var PW=W-L-R, PH=H-T-B;
-  var sizes=D.sizes, vals=D.vals;
+  var sizes=D.sizes, vals=D.vals;      // vals[size][gpu] = [mean, std, runs]
 
   var box=document.getElementById("gpubench"), tip=box.querySelector(".tip");
   var svg=document.getElementById("gpubench-svg");
@@ -67,8 +79,7 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
   }
 
   // n = 2^e. For even e the grid is square: 2^(e/2) x 2^(e/2) x 1.
-  // 4194304 -> "2^11 x 2^11 x 1" (with superscripts).
-  // Odd e (no square grid) shows as 2^e; other numbers as 1,234,567.
+  // Odd e shows as 2^e; other numbers as 1,234,567.
   function cells(n){
     var e=Math.round(Math.log(n)/Math.LN2);
     if(!(n>=1) || Math.pow(2,e)!==n) return n.toLocaleString("en-US");
@@ -85,20 +96,20 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
   }
   function group(i){ return vals[String(sizes[i])]; }
 
-  // labels of one group, sorted low to high
+  // labels of one group, sorted low to high by mean
   function sortedLabels(i){
     var g=group(i);
-    return Object.keys(g).sort(function(a,b){return g[a]-g[b];});
+    return Object.keys(g).sort(function(a,b){return g[a][0]-g[b][0];});
   }
 
-  // order of group i, followed by every other GPU (sorted by its value in
+  // order of group i, followed by every other GPU (sorted by its mean in
   // the largest group where it appears) so that missing GPUs keep a slot
   function buildFrozen(i){
     var cur=sortedLabels(i), seen={}, ref={};
     cur.forEach(function(l){seen[l]=true;});
     sizes.forEach(function(s){
       var g=vals[String(s)];
-      for(var l in g){ ref[l]=g[l]; }
+      for(var l in g){ ref[l]=g[l][0]; }
     });
     var rest=Object.keys(ref).filter(function(l){return !seen[l];})
                    .sort(function(a,b){return ref[a]-ref[b];});
@@ -115,7 +126,10 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
     var i=+slider.value, g=group(i);
     var labels=frozen?frozen:sortedLabels(i);
     var n=labels.length;
-    var m=0; labels.forEach(function(l){ if(g[l]!==undefined) m=Math.max(m,g[l]); });
+    // axis maximum includes the top of the error bars
+    var m=0; labels.forEach(function(l){
+      if(g[l]!==undefined) m=Math.max(m,g[l][0]+g[l][1]);
+    });
     var a=niceMax(m), ymax=a.ymax, step=a.step;
     function ypix(v){ return T+PH-v/ymax*PH; }
 
@@ -132,12 +146,22 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 
     var slot=PW/n, bw=0.6*slot;
     labels.forEach(function(lab,j){
-      var cx=L+(j+0.5)*slot, v=g[lab], has=(v!==undefined);
+      var cx=L+(j+0.5)*slot, e=g[lab], has=(e!==undefined);
       if(has){
-        var tp=esc(esc(lab)+"<br><b>"+v.toFixed(2)+"</b> M cells/s");
+        var v=e[0], sd=e[1], cnt=e[2];
+        var html=esc(lab)+"<br><b>"+v.toFixed(2)+"</b>"+
+                 (cnt>1?" \\u00b1 "+sd.toFixed(2):"")+" M cells/s<br>"+
+                 cnt+(cnt===1?" run":" runs");
         o.push('<rect class="bar" x="'+(cx-bw/2).toFixed(1)+'" y="'+ypix(v).toFixed(1)+
                '" width="'+bw.toFixed(1)+'" height="'+(T+PH-ypix(v)).toFixed(1)+
-               '" data-tip="'+tp+'"/>');
+               '" data-tip="'+esc(html)+'"/>');
+        if(cnt>1 && sd>0){
+          var yt=ypix(v+sd).toFixed(1), yb=ypix(Math.max(v-sd,0)).toFixed(1);
+          var c=(bw*0.25).toFixed(1), x0=(cx-c).toFixed(1), x1=(+cx+ +c).toFixed(1);
+          o.push('<path d="M'+cx.toFixed(1)+' '+yt+'V'+yb+
+                 'M'+x0+' '+yt+'H'+x1+'M'+x0+' '+yb+'H'+x1+
+                 '" stroke="currentColor" stroke-width="1.5" fill="none" pointer-events="none"/>');
+        }
       }
       var ty=T+PH+8;
       o.push('<text x="'+cx.toFixed(1)+'" y="'+ty+'" font-size="11" fill="currentColor" '+
