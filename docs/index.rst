@@ -28,7 +28,7 @@ GPU Performance
 ---------------
 
 mumax\ :sup:`+` is cross-platform and runs on Linux and Windows platforms. All installation
-instructions can be found in the :doc:`installation instructions <install>`. You will
+instructions can be found on the :doc:`installation page <install>`. You will
 need an NVIDIA GPU and the benchmark below may guide your GPU choice.
 
   .. raw:: html
