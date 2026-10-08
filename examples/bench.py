@@ -156,6 +156,6 @@ if __name__ == "__main__":
         throughputs = [r[2] for r in run["results"]]
         plt.loglog(ncells, throughputs, "-o", label=f"{run['gpu']} (#{i})")
     plt.xlabel("Number of cells")
-    plt.ylabel("Throughput")
+    plt.ylabel("Throughput (cells/s)")
     plt.legend()
     plt.show()
