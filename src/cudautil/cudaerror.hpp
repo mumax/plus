@@ -18,8 +18,8 @@ inline void gpuAssert(cudaError_t code,
     fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file,
             line);
     const char* v = std::getenv("GPU_ABORT");
-    bool abort = abort || !(v && v[0] == '0');
-    if (abort)
+    bool quit = abort && !(v && v[0] == '0');
+    if (quit)
       exit(code);
   }
 }
