@@ -91,7 +91,7 @@ __global__ void k_exchangeField(CuField hField,
       // Neumann BC
       real3 Gamma = getGamma(dmiTensor, idx, normal, m);
       real delta = dot(rel_coo, system.cellsize);
-      m_ = m + (Gamma / (2*a)) * delta;  // fake neighboring magnetization
+      m_ = m + (Gamma / (2*a)) * delta;  // ghost neighboring magnetization
       Aex = a;
     }
 
