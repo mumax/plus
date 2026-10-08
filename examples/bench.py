@@ -134,6 +134,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="mumax+ GPU throughput benchmark")
     parser.add_argument("--all", action="store_true",
                         help="benchmark every GPU on the machine, one after another")
+    parser.add_argument("--worker", action="store_true",
+                        help=argparse.SUPPRESS)
     args = parser.parse_args()
 
     with open("bench.txt", "w") as file:
@@ -144,16 +146,15 @@ if __name__ == "__main__":
         for idx, name in list_gpus():
             env = dict(os.environ, CUDA_DEVICE_ORDER="PCI_BUS_ID", CUDA_VISIBLE_DEVICES=idx)
             size_before = os.path.getsize("bench.txt")
-            subprocess.run(
-                [sys.executable, os.path.abspath(__file__)],
-                env=env,
-            )
+            subprocess.run([sys.executable, os.path.abspath(__file__), "--worker"],
+                            env=env)
             if os.path.getsize("bench.txt") == size_before:
                 print(f"WARNING: benchmark failed on GPU {idx} ({name}), skipping")
 
     else:
         run_benchmark()
-        sys.exit(0)
+        if args.worker:
+            sys.exit(0)  # ensure workers don't plot
 
     all_runs = read_runs("bench.txt")
     if not all_runs:
