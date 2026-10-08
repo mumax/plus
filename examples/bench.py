@@ -2,10 +2,8 @@ import os
 os.environ["GPU_ABORT"] = "0"  # make GPU out-of-memory a catchable RuntimeError instead of aborting
 
 import argparse
-import json
 import subprocess
 import sys
-import tempfile
 import time
 
 import matplotlib.pyplot as plt
@@ -54,6 +52,26 @@ def get_used_gpu_name():
     return names[0] if len(names) == 1 else "unknown (default GPU of " + ", ".join(names) + ")"
 
 
+def read_runs(path):
+    """Read bench.txt back into [{"gpu": name, "results": [(ncells, walltime, throughput), ...]}, ...].
+    A new run starts when the GPU name changes or ncells stops increasing,
+    so two identical GPUs are still kept apart."""
+    runs = []
+    with open(path) as f:
+        for line in f:
+            if line.lstrip().startswith("#"):
+                continue  # header line
+            parts = line.split(None, 3)
+            if len(parts) < 4:
+                continue
+            ncells, walltime, throughput = int(parts[0]), float(parts[1]), float(parts[2])
+            gpu = parts[3].strip()
+            if not runs or runs[-1]["gpu"] != gpu or ncells <= runs[-1]["results"][-1][0]:
+                runs.append({"gpu": gpu, "results": []})
+            runs[-1]["results"].append((ncells, walltime, throughput))
+    return runs
+
+
 def simple_bench(grid, nsteps=100):
     """Returns the walltime of a simple simulation using the specified grid
     and number of steps"""
@@ -80,8 +98,7 @@ def simple_bench(grid, nsteps=100):
 
 
 def run_benchmark(nsteps=100):
-    """Benchmark on whatever GPU this process uses.
-    Returns (gpu_name, [(ncells, walltime, throughput), ...])."""
+    """Benchmark on whatever GPU this process uses."""
     from mumaxplus import Grid
 
     simple_bench(Grid((4, 4, 1)), 1)  # tiny run to initialize CUDA so the GPU can be identified
@@ -90,7 +107,6 @@ def run_benchmark(nsteps=100):
     print("\nGPU: ", gpu_name)
     print("{:>10} {:>10} {:>12}".format("ncells", "walltime", "throughput"))
 
-    results = []
     p = 2
     while True:
         try:
@@ -100,57 +116,44 @@ def run_benchmark(nsteps=100):
             break
         throughput = grid.ncells * nsteps / walltime
         print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput))
-        results.append((grid.ncells, walltime, throughput))
+        with open("bench.txt", "a") as file:
+            file.write(f"{grid.ncells}    {walltime}    {throughput}    {gpu_name}\n")
+
         p += 1
 
     print()
-    return gpu_name, results
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="mumax+ GPU throughput benchmark")
     parser.add_argument("--all", action="store_true",
                         help="benchmark every GPU on the machine, one after another")
-    parser.add_argument("--out", help=argparse.SUPPRESS)  # internal: worker writes JSON here
     args = parser.parse_args()
 
-    if args.out:
-        # Worker mode: benchmark the single visible GPU and hand results to the parent
-        gpu_name, results = run_benchmark(args.nsteps)
-        with open(args.out, "w") as f:
-            json.dump({"gpu": gpu_name, "results": results}, f)
-        sys.exit(0)
+    with open("bench.txt", "w") as file:  # start a fresh results file with its header
+        file.write("# cells    walltime(ms)    throughput    device\n")
 
     if args.all:
-        # Parent mode: one subprocess per GPU
+        # One subprocess per GPU
         all_runs = []
         for idx, name in list_gpus():
             env = dict(os.environ, CUDA_DEVICE_ORDER="PCI_BUS_ID", CUDA_VISIBLE_DEVICES=idx)
-            with tempfile.TemporaryDirectory() as tmp:
-                out = os.path.join(tmp, "result.json")
-                subprocess.run(
-                    [sys.executable, os.path.abspath(__file__),
-                     "--out", out],
-                    env=env,
-                )
-                if not os.path.exists(out):
-                    print(f"WARNING: benchmark failed on GPU {idx} ({name}), skipping")
-                    continue
-                with open(out) as f:
-                    all_runs.append(json.load(f))
+            size_before = os.path.getsize("bench.txt")
+            subprocess.run(
+                [sys.executable, os.path.abspath(__file__)],
+                env=env,
+            )
+            if os.path.getsize("bench.txt") == size_before:
+                print(f"WARNING: benchmark failed on GPU {idx} ({name}), skipping")
+
     else:
-        # Single GPU: the user's choice via CUDA_VISIBLE_DEVICES, or the default GPU
-        gpu_name, results = run_benchmark()
-        all_runs = [{"gpu": gpu_name, "results": results}]
+        # Single GPU
+        run_benchmark()
 
-    if not any(run["results"] for run in all_runs):
+    all_runs = read_runs("bench.txt")
+    if not all_runs:
         sys.exit("No benchmark results were collected.")
-
-    with open("bench.txt", "w") as file:
-        for run in all_runs:
-            for ncells, walltime, throughput in run["results"]:
-                file.write(f"{ncells}    {walltime}    {throughput}    {run['gpu']}\n")
-
+ 
     for i, run in enumerate(all_runs):
         ncells = [r[0] for r in run["results"]]
         throughputs = [r[2] for r in run["results"]]
@@ -159,3 +162,4 @@ if __name__ == "__main__":
     plt.ylabel("Throughput (cells/s)")
     plt.legend()
     plt.show()
+
