@@ -40,15 +40,15 @@ if __name__ == "__main__":
 
     gpu_name = result.stdout.strip()
 
+    NSTEPS = 100
+
+    ncells = []
+    throughputs = []
+
+    print("\nGPU: ", gpu_name)
+    print("{:>10} {:>10} {:>12}".format("ncells", "walltime", "throughput"))
+
     with open("bench.txt", "w") as file:
-        NSTEPS = 100
-
-        ncells = []
-        throughputs = []
-
-        print("\nGPU: ", gpu_name)
-        print("{:>10} {:>10} {:>12}".format("ncells", "walltime", "throughput"))
-
         crash = False
         p = 2
         while not crash:

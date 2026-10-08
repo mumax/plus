@@ -52,7 +52,7 @@ template = """<div id="gpubench" style="position:relative;max-width:800px;margin
 </div>
 <div class="ctl">
   <label><input id="gpubench-keep" type="checkbox">
-  keep the order of the current slider position</label>
+  keep current (GPU) order</label>
 </div>
 <div class="tip"></div>
 <script>
