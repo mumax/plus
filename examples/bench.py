@@ -107,19 +107,25 @@ def run_benchmark(nsteps=100):
     print("\nGPU: ", gpu_name)
     print("{:>10} {:>10} {:>12}".format("ncells", "walltime", "throughput"))
 
-    p = 2
-    while True:
-        try:
-            grid = Grid((2 ** p, 2 ** p, 1))
-            walltime = simple_bench(grid, nsteps)
-        except RuntimeError:
-            break
-        throughput = grid.ncells * nsteps / walltime
-        print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput))
-        with open("bench.txt", "a") as file:
-            file.write(f"{grid.ncells}    {walltime}    {throughput}    {gpu_name}\n")
-
-        p += 1
+    # Magic to capture GPU errors
+    saved_stderr = os.dup(2)
+    os.dup2(os.open(os.devnull, os.O_WRONLY), 2)
+    try:
+        p = 2
+        while True:
+            try:
+                grid = Grid((2 ** p, 2 ** p, 1))
+                walltime = simple_bench(grid, nsteps)
+            except RuntimeError:
+                print("GPU out of Memory.")
+                break
+            throughput = grid.ncells * nsteps / walltime
+            print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput), flush=True)
+            with open("bench.txt", "a") as file:
+                file.write(f"{grid.ncells}    {walltime * 1e3}    {throughput}    {gpu_name}\n")
+            p += 1
+    finally:
+        os.dup2(saved_stderr, 2)  # always restore stderr, so real Python errors stay visible
 
     print()
 
@@ -130,12 +136,11 @@ if __name__ == "__main__":
                         help="benchmark every GPU on the machine, one after another")
     args = parser.parse_args()
 
-    with open("bench.txt", "w") as file:  # start a fresh results file with its header
+    with open("bench.txt", "w") as file:
         file.write("# cells    walltime(ms)    throughput    device\n")
 
     if args.all:
         # One subprocess per GPU
-        all_runs = []
         for idx, name in list_gpus():
             env = dict(os.environ, CUDA_DEVICE_ORDER="PCI_BUS_ID", CUDA_VISIBLE_DEVICES=idx)
             size_before = os.path.getsize("bench.txt")
@@ -147,13 +152,13 @@ if __name__ == "__main__":
                 print(f"WARNING: benchmark failed on GPU {idx} ({name}), skipping")
 
     else:
-        # Single GPU
         run_benchmark()
+        sys.exit(0)
 
     all_runs = read_runs("bench.txt")
     if not all_runs:
         sys.exit("No benchmark results were collected.")
- 
+
     for i, run in enumerate(all_runs):
         ncells = [r[0] for r in run["results"]]
         throughputs = [r[2] for r in run["results"]]
