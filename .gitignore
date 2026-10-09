@@ -18,3 +18,5 @@ docs/_build/*
 test/test.ovf
 test/*_000000.ovf
 docs/diagrams/puml
+examples/bench.txt
+docs/_static/bench.html
