@@ -117,7 +117,7 @@ def run_benchmark(nsteps=100):
                 grid = Grid((2 ** p, 2 ** p, 1))
                 walltime = simple_bench(grid, nsteps)
             except RuntimeError:
-                print(f"GPU out of memory for {grid.ncells}.")
+                print(f"GPU out of memory for {grid.ncells} cells.")
                 break
             throughput = grid.ncells * nsteps / walltime
             print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput), flush=True)
@@ -138,8 +138,9 @@ if __name__ == "__main__":
                         help=argparse.SUPPRESS)
     args = parser.parse_args()
 
-    with open("bench.txt", "w") as file:
-        file.write("# cells    walltime(ms)    throughput    device\n")
+    if not args.worker:  # only the parent creates the file; workers must not wipe it
+        with open("bench.txt", "w") as file:
+            file.write("# cells    walltime(ms)    throughput    device\n")
 
     if args.all:
         # One subprocess per GPU
