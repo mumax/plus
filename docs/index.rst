@@ -37,7 +37,8 @@ need an NVIDIA GPU and the benchmark below may guide your GPU choice.
 If you would like to contribute your GPU benchmark to this figure, run
 :file:`examples/bench.py` and share the contents of the resulting
 :file:`bench.txt` file `here <https://github.com/mumax/plus/discussions/categories/benchmarks>`_.
-Even if your GPU is already included in the list, we appreciate additional
+If you have multiple different GPUs in your system, you can use the optional flag `--all`
+to benchmark them all. Even if your GPU is already included in the list, we appreciate additional
 benchmarks, as they allow us to estimate and display error bars in the figure.
 
 Contents
