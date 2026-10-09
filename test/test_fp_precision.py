@@ -13,7 +13,7 @@ from typing import Literal
 import numpy as np
 
 import mumaxplus
-from mumaxplus.util.constants import GAMMALL_DEFAULT, MU0 as gamma, mu0
+from mumaxplus.util.constants import GAMMALL_DEFAULT as gamma, MU0 as mu0
 
 
 def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping):
