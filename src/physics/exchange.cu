@@ -169,18 +169,16 @@ __global__ void k_exchangeField(CuField hField,
       if (a == 0)
         continue;
 
-      // TODO: what if msat2 == 0 at coo?
-      real3 m2 = m2Field.vectorAt(idx);
       real3 Gamma1 = getGamma(dmiTensor, idx, normal, m);
-
       real delta = dot(rel_coo, system.cellsize);
 
       real3 d_m2{0, 0, 0};
       int3 coo__ = mastergrid.wrap(coo - rel_coo);
-      if(hField.cellInGeometry(coo__)) {
+      if(hField.cellInGeometry(coo__) && msat.valueAt(coo__) != 0) {
         // Approximate normal derivative of sister sublattice by taking
         // the bulk derivative closest to the edge.
-        // TODO: what if msat or msat2 == 0 at coo__?
+        // d_m2 will be 0 if "msat2" is 0 at both coo and coo__
+        real3 m2 = m2Field.vectorAt(idx);
         real3 m2__ = m2Field.vectorAt(coo__);
         d_m2 = (m2 - m2__) / delta;
       }
