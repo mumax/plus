@@ -1,39 +1,53 @@
 repos:
--   repo: https://github.com/python/black
-    rev: 20.8b1
+  # Black — settings come from pyproject.toml [tool.black]
+  # (using the official mirror: ~2x faster, mypyc-compiled)
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 24.10.0
     hooks:
-    -   id: black
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
+      - id: black
+        language_version: python3
+
+  # Flake8 — settings come from setup.cfg [flake8]
+  # NOTE: moved from gitlab.com/pycqa/flake8 -> github.com/pycqa/flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
     hooks:
-    -   id: flake8
+      - id: flake8
         additional_dependencies: [flake8-docstrings]
--   repo: https://github.com/PyCQA/isort
-    rev: 5.6.4
+        args: ["--extend-ignore=E266,E402,D101,D205,D400,D105,D214,D215,F403,F405,E731"]
+
+  # isort — settings come from setup.cfg [isort]
+  # NOTE: old pin (9.0.0b2) was a pre-release; pinned to a real stable tag
+  - repo: https://github.com/PyCQA/isort
+    rev: 6.0.1
     hooks:
-    -   id: isort
+      - id: isort
         name: isort (python)
--   repo: https://github.com/kynan/nbstripout
-    rev: master
+
+  # Strip notebook outputs before commit
+  - repo: https://github.com/kynan/nbstripout
+    rev: "0.8.1"
     hooks:
-    -   id: nbstripout
--   repo: https://github.com/cpplint/cpplint
-    rev: develop # change to a #version once they update their package
+      - id: nbstripout
+
+  # C++ lint (Google style checks, line length overridden to match project)
+  - repo: https://github.com/cpplint/cpplint
+    rev: 2.0.2
     hooks:
-    -   id: cpplint
-        args: [
-            "--verbose=3",
-            "--counting=toplevel",
-            "--filter=-legal/copyright",
-            "--linelength=80"
-            ]
--   repo: local
+      - id: cpplint
+        args:
+          - "--verbose=3"
+          - "--counting=toplevel"
+          - "--filter=-legal/copyright,-build/include_subdir,-build/include_what_you_use,-whitespace/braces,-build/include_order,-readability/casting"
+          - "--linelength=88"
+
+  # clang-format for C/C++/CUDA sources (custom style)
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v23.1.1
     hooks:
-    # FYI https://gitlab.com/daverona/pre-commit/cpp
-    -   id: clang-format
+      - id: clang-format
         name: clang-format
-        description: Run `clang-format` against C/C++ header and source files
-        language: python
+        description: Run `clang-format` against C/C++/CUDA header and source files
         files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
-        entry: clang-format
-        args: ["-i", "-style=Chromium"]
+        args: ["-i", "-style=file"]
+

@@ -177,8 +177,7 @@ __CUDAOP__ real dot(const real3& a, const real3& b) {
 }
 
 __CUDAOP__ real3 cross(const real3& a, const real3& b) {
-  return real3{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z,
-               a.x * b.y - a.y * b.x};
+  return real3{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
 }
 
 __CUDAOP__ real norm(const real3& a) {

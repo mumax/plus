@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import Circle, VoronoiTessellator, vortex, plot_field, show_regions
+from mumaxplus.util import Circle, VoronoiTessellator, plot_field, show_regions, vortex
 
 # Set up simulation parameters
 N = 256

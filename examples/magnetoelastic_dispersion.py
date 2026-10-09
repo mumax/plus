@@ -6,11 +6,13 @@ https://arxiv.org/abs/2003.12099
 This script will take a few minutes, then save the data.
 """
 
+import os.path
+
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-from mumaxplus import World, Grid, Ferromagnet
-import os.path
+
+from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util.constants import GAMMALL_DEFAULT, MU0
 from mumaxplus.util.formulary import exchange_length
 from mumaxplus.util.shape import XRange

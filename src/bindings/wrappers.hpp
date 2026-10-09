@@ -1,11 +1,11 @@
 #pragma once
 
 #include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
 
 #include "cast.hpp"
-#include "fieldToArray.hpp" // Seperate header file for template declaration
+#include "fieldToArray.hpp"  // Seperate header file for template declaration
 
 namespace py = pybind11;
 
@@ -43,4 +43,5 @@ void wrap_linsolver(py::module& m);
 void wrap_system(py::module& m);
 void wrap_dmitensor(py::module& m);
 void wrap_voronoi(py::module& m);
+void wrap_window(py::module& m);
 void wrap_traction(py::module& m);

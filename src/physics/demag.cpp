@@ -32,8 +32,8 @@ real evalDemagEnergy(const Ferromagnet* magnet) {
 }
 
 FM_FieldQuantity demagEnergyDensityQuantity(const Ferromagnet* magnet) {
-  return FM_FieldQuantity(magnet, evalDemagEnergyDensity, 1,
-                          "demag_energy_density", "J/m3");
+  return FM_FieldQuantity(magnet, evalDemagEnergyDensity, 1, "demag_energy_density",
+                          "J/m3");
 }
 
 FM_ScalarQuantity demagEnergyQuantity(const Ferromagnet* magnet) {

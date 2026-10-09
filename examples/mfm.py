@@ -2,7 +2,7 @@
    magnetic force microscopy."""
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import MFM, vortex, plot_field
+from mumaxplus.util import MFM, plot_field, vortex
 
 # define parameters
 msat = 566e3

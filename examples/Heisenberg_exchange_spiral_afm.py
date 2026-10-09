@@ -11,6 +11,7 @@ import numpy as np
 from mumaxplus import Antiferromagnet, Grid, World
 from mumaxplus.util import *
 
+
 def sub1helical():
     """Assumes X to be array from meshgrid, then returns three helical
     magnetization arrays for fast magnetization setting."""

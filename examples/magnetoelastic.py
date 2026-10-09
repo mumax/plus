@@ -6,15 +6,15 @@ of the y-magnetization and the amplified displacement.
 The animation might take a while.
 """
 
-import numpy as np
 import math
-from tqdm import tqdm
-import matplotlib.pyplot as plt
+
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy as np
+from tqdm import tqdm
 
-from mumaxplus import World, Grid, Ferromagnet
+from mumaxplus import Ferromagnet, Grid, World
 import mumaxplus.util.shape as shapes
-
 
 length, width, thickness = 1e-6, 1e-6, 20e-9
 nx, ny, nz = 256, 256, 1
