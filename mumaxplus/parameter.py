@@ -3,7 +3,6 @@
 import numpy as _np
 
 from . import _cpp
-
 from .fieldquantity import FieldQuantity
 
 
@@ -25,7 +24,7 @@ class Parameter(FieldQuantity):
     @property
     def is_uniform(self) -> bool:
         """Return True if a Parameter instance is uniform, otherwise False.
-        
+
         See Also
         --------
         uniform_value
@@ -40,7 +39,7 @@ class Parameter(FieldQuantity):
     @property
     def uniform_value(self) -> float:
         """Return the uniform value of the Parameter instance if it exists.
-        
+
         See Also
         --------
         is_uniform
@@ -51,7 +50,7 @@ class Parameter(FieldQuantity):
     def uniform_value(self, value):
         """Set the Parameter to a uniform value. This functions the same as
         simply setting the Parameter with `= value` or `set(value)`.
-        
+
         See Also
         --------
         set
@@ -115,12 +114,12 @@ class Parameter(FieldQuantity):
     def _eval_mask(self, mask):
         """Evaluate the mask as a function."""
         try:
-            return_ncomp = len(mask(0,0,0))
-        except:  # can not take len(), so must be scalar mask
+            return_ncomp = len(mask(0, 0, 0))
+        except TypeError:  # can not take len(), so must be scalar mask
             return_ncomp = 1
 
         X, Y, Z = self.meshgrid
-        return _np.array(_np.vectorize(mask, otypes=[float]*return_ncomp)(X, Y, Z))
+        return _np.array(_np.vectorize(mask, otypes=[float] * return_ncomp)(X, Y, Z))
 
     def _check_mask_shape(self, mask):
         """Change mask shape to have 4 dimensions and correct components."""
@@ -211,16 +210,17 @@ class Parameter(FieldQuantity):
         --------
         :func:`set`
         """
-
         # uniform value
         if isinstance(value, (float, int)) or (
-           (isinstance(value, tuple) or isinstance(value, _np.ndarray)) and len(value) == 3):
+            (isinstance(value, tuple) or isinstance(value, _np.ndarray))
+            and len(value) == 3
+        ):
             self._impl.set_in_region(region_idx, value)
 
         # evaluate value based on function
         elif callable(value):
             regions = self._impl.system.regions
-            mask = (regions == region_idx)
+            mask = regions == region_idx
             x, y, z = self.meshgrid
 
             field = self.eval().copy()
@@ -232,8 +232,10 @@ class Parameter(FieldQuantity):
                 field[0][mask] = data
             else:
                 if len(data) != self.ncomp:
-                    raise ValueError(f"Function must return values with {self.ncomp} components, "+
-                                     f"got {len(data)} instead.")
+                    raise ValueError(
+                        f"Function must return values with {self.ncomp} components, "
+                        + f"got {len(data)} instead."
+                    )
                 for c in range(self.ncomp):
                     field[c][mask] = data[c]
             self._impl.set(field)
@@ -243,7 +245,7 @@ class Parameter(FieldQuantity):
 
     def _set_func(self, func):
         X, Y, Z = self.meshgrid
-        values = _np.vectorize(func, otypes=[float]*self.shape[0])(X, Y, Z)
+        values = _np.vectorize(func, otypes=[float] * self.shape[0])(X, Y, Z)
         if self.shape[0] == 1:
             values = [values]
         self._impl.set(values)

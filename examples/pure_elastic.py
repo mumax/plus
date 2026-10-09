@@ -1,10 +1,11 @@
 """This example creates an elastic magnet without any magnetization.
 It then shows an animation of the displacement and kinetic and potential energy."""
 
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from mumaxplus import World, Grid, Ferromagnet
+import matplotlib.pyplot as plt
+import numpy as np
+
+from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util.config import gaussian_spherical_IP
 from mumaxplus.util.formulary import Rayleigh_damping_coefficients
 

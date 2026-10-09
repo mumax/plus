@@ -5,7 +5,6 @@
 class Magnet;
 class Field;
 
-
 bool kineticEnergyAssuredZero(const Magnet*);
 
 Field evalKineticEnergyDensity(const Magnet*);

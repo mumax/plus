@@ -10,5 +10,5 @@ class ScalarQuantity {
   virtual real eval() const = 0;
   virtual std::string name() const;
   virtual std::string unit() const;
-  virtual bool assuredZero() const { return false; };
+  virtual bool assuredZero() const { return false; }
 };

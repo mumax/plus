@@ -3,7 +3,6 @@ import numpy as np
 from mumaxplus import Ferromagnet, Grid, World
 
 
-
 class TestAverage:
     def test_average_magnetization(self):
         world = World((1, 1, 1))
@@ -17,7 +16,7 @@ class TestAverage:
     def test_average_zeeman_energy_geometry(self):
         gridsize = (4, 5, 6)
         geo = np.zeros(gridsize[::-1])
-        geo[:3, :, :] = 1 # geometry spans half of grid
+        geo[:3, :, :] = 1  # geometry spans half of grid
 
         w = World((1, 1, 1))
         m1 = Ferromagnet(w, Grid(gridsize))
@@ -26,4 +25,6 @@ class TestAverage:
 
         w.bias_magnetic_field = (0, 0, 1)
 
-        assert np.isclose(0.5 * m1.zeeman_energy(), m2.zeeman_energy(), rtol=1e-12, atol=1e-12)
+        assert np.isclose(
+            0.5 * m1.zeeman_energy(), m2.zeeman_energy(), rtol=1e-12, atol=1e-12
+        )

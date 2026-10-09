@@ -1,12 +1,12 @@
 """StrayField implementation."""
 
 from . import _cpp
-
 from .fieldquantity import FieldQuantity
 
 
 class StrayField(FieldQuantity):
     """Represent a stray field of a magnet in a specific grid."""
+
     def __init__(self, magnet, grid):
         """
         Parameters

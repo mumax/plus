@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
-from mumaxplus.util.shape import Ellipsoid
+
 from mumaxplus import Ferromagnet, Grid, World
+from mumaxplus.util.shape import Ellipsoid
 
 
 class TestGeometry:
@@ -35,7 +36,7 @@ class TestGeometry:
         """Test if a geometry is correctly set when using a function."""
         world = World(cellsize=(3e-9, 4e-9, 5e-9))
         grid = Grid((128, 64, 4))
-        geomfunc = lambda x, y, z: x ** 2 + y ** 2 < (40e-9) ** 2
+        geomfunc = lambda x, y, z: x**2 + y**2 < (40e-9) ** 2
         magnet = Ferromagnet(world=world, grid=grid, geometry=geomfunc)
 
         # let's compute the geometry array ourselves here
@@ -69,10 +70,10 @@ class TestGeometry:
         world = World(cellsize=(cs, cs, cs))
         grid = Grid((20, 20, 1))
 
-        magnet = Ferromagnet(world, grid)  
-    
+        magnet = Ferromagnet(world, grid)
+
         with pytest.raises(Exception):
-            Ferromagnet(world, grid, geometry=np.ones(grid.shape)) 
+            Ferromagnet(world, grid, geometry=np.ones(grid.shape))
 
     def test_overlap_fail_corner(self):
         cs = 1e-9
@@ -80,22 +81,22 @@ class TestGeometry:
         grid1 = Grid((20, 20, 1))
 
         magnet = Ferromagnet(world, grid1)
-    
+
         with pytest.raises(Exception):
-            grid2 = Grid((20, 20, 1), origin=(19,19,0))
-            Ferromagnet(world, grid2, geometry=np.ones(grid2.shape)) 
+            grid2 = Grid((20, 20, 1), origin=(19, 19, 0))
+            Ferromagnet(world, grid2, geometry=np.ones(grid2.shape))
 
     def test_overlap_succeed_oval(self):
         cs = 1e-9
-        ellipsoid_geom1 = Ellipsoid(15, 10, 5).translate(15/2,10/2,5/2)
-        ellipsoid_geom2 = Ellipsoid(10, 15, 3).translate(10/2,15/2,3/2)
+        ellipsoid_geom1 = Ellipsoid(15, 10, 5).translate(15 / 2, 10 / 2, 5 / 2)
+        ellipsoid_geom2 = Ellipsoid(10, 15, 3).translate(10 / 2, 15 / 2, 3 / 2)
 
         world = World(cellsize=(cs, cs, cs))
         grid1 = Grid((20, 20, 10))
-        grid2 = Grid((20, 20, 10), origin=(10,10,0))
+        grid2 = Grid((20, 20, 10), origin=(10, 10, 0))
 
         magnet1 = Ferromagnet(world, grid1, geometry=ellipsoid_geom1)
-        magnet2 = Ferromagnet(world, grid2, geometry=ellipsoid_geom2) 
+        magnet2 = Ferromagnet(world, grid2, geometry=ellipsoid_geom2)
 
         assert magnet1 is not None
         assert magnet2 is not None

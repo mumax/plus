@@ -5,7 +5,6 @@
 class Ferromagnet;
 class Field;
 
-
 // Assure that the magnetoelastic field and force are 0
 bool magnetoelasticAssuredZero(const Ferromagnet*);
 bool dynamicMagnetoelasticAssuredZero(const Ferromagnet*);

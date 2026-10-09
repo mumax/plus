@@ -4,25 +4,28 @@
    with that of a ferromagnet. All AFM exchanges are set to 0 for this test."""
 
 import numpy as np
-from mumaxplus import Antiferromagnet, Ferromagnet, Grid, World
-from mumaxplus.util.shape import Cylinder
-from mumaxplus.util.config import neelskyrmion
 
+from mumaxplus import Antiferromagnet, Ferromagnet, Grid, World
+from mumaxplus.util.config import neelskyrmion
+from mumaxplus.util.shape import Cylinder
 
 ATOL = 1e-4
+
+
 def max_absolute_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
     return np.max(err)
 
+
 def simulations(openBC):
     """This simulates a 2D circle with interfacial DMI and a Neél skyrmion
-       in a ferromagnet and an antiferromagnet."""
-    
+    in a ferromagnet and an antiferromagnet."""
+
     # constants
     A = 13e-12
     D = 3e-3
     Ku = 0.4e6
-    anisU = (0,0,1)
+    anisU = (0, 0, 1)
     Ms = 0.86e6
 
     # charge and polarization of the skyrmion
@@ -41,7 +44,7 @@ def simulations(openBC):
 
     # ferromagnet simulation
     world = World(cellsize=cellsize)
-    geo = Cylinder(diam, thickness).translate((nx*dx-dx)/2, (ny*dy-dy)/2, 0)
+    geo = Cylinder(diam, thickness).translate((nx * dx - dx) / 2, (ny * dy - dy) / 2, 0)
     magnet = Ferromagnet(world, Grid(gridsize), geometry=geo)
 
     magnet.enable_demag = False
@@ -58,7 +61,7 @@ def simulations(openBC):
 
     # antiferromagnet simulation
     world_AFM = World(cellsize=cellsize)
-    geo = Cylinder(diam, thickness).translate((nx*dx-dx)/2, (ny*dy-dy)/2, 0)
+    geo = Cylinder(diam, thickness).translate((nx * dx - dx) / 2, (ny * dy - dy) / 2, 0)
     magnet_AFM = Antiferromagnet(world_AFM, Grid(gridsize), geometry=geo)
 
     magnet_AFM.enable_demag = False
@@ -76,23 +79,30 @@ def simulations(openBC):
     magnet_AFM.magnetization = neelskyrmion(magnet.center, skyrmion_radius, charge, pol)
     magnet_AFM.minimize()
 
-    return  magnet, magnet_AFM
+    return magnet, magnet_AFM
 
 
 class TestDMI2D:
-    """Compare the results of the simulations by comparing the magnetizations.
-    """
+    """Compare the results of the simulations by comparing the magnetizations."""
 
     def test_closed(self):
         magnet, magnet_AFM = simulations(False)
-        err = max_absolute_error(magnet.magnetization.eval(), magnet_AFM.sub1.magnetization.eval())
+        err = max_absolute_error(
+            magnet.magnetization.eval(), magnet_AFM.sub1.magnetization.eval()
+        )
         assert err < ATOL
-        err = max_absolute_error(magnet.magnetization.eval(), magnet_AFM.sub2.magnetization.eval())
+        err = max_absolute_error(
+            magnet.magnetization.eval(), magnet_AFM.sub2.magnetization.eval()
+        )
         assert err < ATOL
 
     def test_open(self):
         magnet, magnet_AFM = simulations(True)
-        err = max_absolute_error(magnet.magnetization.eval(), magnet_AFM.sub1.magnetization.eval())
+        err = max_absolute_error(
+            magnet.magnetization.eval(), magnet_AFM.sub1.magnetization.eval()
+        )
         assert err < ATOL
-        err = max_absolute_error(magnet.magnetization.eval(), magnet_AFM.sub2.magnetization.eval())
+        err = max_absolute_error(
+            magnet.magnetization.eval(), magnet_AFM.sub2.magnetization.eval()
+        )
         assert err < ATOL

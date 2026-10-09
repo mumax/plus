@@ -9,7 +9,7 @@ import numpy as np
 from tqdm import tqdm
 
 from mumaxplus import Ferromagnet, Grid, World
-from mumaxplus.util import vortex, show_field_3D, plot_field
+from mumaxplus.util import plot_field, show_field_3D, vortex
 
 # A cube with edge length, L, expressed in units lex = (A/Km)1/2
 # where Km is a magnetostatic energy density, Km = 1/2 µ0 Msat² (SI)

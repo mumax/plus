@@ -3,11 +3,11 @@
    based on the method used in
    https://journals.aps.org/prb/abstract/10.1103/PhysRevB.108.104420."""
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-from mumaxplus import World, Grid, Ferromagnet
-from mumaxplus.util import twodomain, plot_field
+from mumaxplus import Ferromagnet, Grid, World
+from mumaxplus.util import plot_field, twodomain
 
 # simulation time
 run = 10e-9

@@ -7,9 +7,8 @@
 #include <string>
 
 RKmethod getRungeKuttaMethodFromName(const std::string& name) {
-  auto it =
-      std::find_if(RungeKuttaMethodNames.begin(), RungeKuttaMethodNames.end(),
-                   [name](const auto& kv) { return kv.second == name; });
+  auto it = std::find_if(RungeKuttaMethodNames.begin(), RungeKuttaMethodNames.end(),
+                         [name](const auto& kv) { return kv.second == name; });
 
   if (it == RungeKuttaMethodNames.end())
     throw std::invalid_argument("'" + name +
@@ -202,8 +201,7 @@ const ButcherTableau ButcherTableau::DormandPrince = []() {
   rkMatrix[4] = {19372. / 6561., -25360. / 2187., 64448. / 6561., -212. / 729.};
   rkMatrix[5] = {9017. / 3168., -355. / 33., 46732. / 5247., 49. / 176.,
                  -5103. / 18656.};
-  rkMatrix[6] = {35. / 384.,     0.,       500. / 1113., 125. / 192.,
-                 -2187. / 6784., 11. / 84.};
+  rkMatrix[6] = {35. / 384., 0., 500. / 1113., 125. / 192., -2187. / 6784., 11. / 84.};
   std::vector<real> weights1(N);
   weights1[0] = 35. / 384.;
   weights1[1] = 0.;

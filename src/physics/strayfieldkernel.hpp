@@ -12,8 +12,17 @@ class World;
 
 class StrayFieldKernel {
  public:
-  StrayFieldKernel(Grid grid, const World* world, int order, double eps, double switchingradius);
-  StrayFieldKernel(Grid dst, Grid src, const World* world, int order, double eps, double switchingradius);
+  StrayFieldKernel(Grid grid,
+                   const World* world,
+                   int order,
+                   double eps,
+                   double switchingradius);
+  StrayFieldKernel(Grid dst,
+                   Grid src,
+                   const World* world,
+                   int order,
+                   double eps,
+                   double switchingradius);
   ~StrayFieldKernel();
 
   Grid grid() const;
