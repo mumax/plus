@@ -135,30 +135,32 @@ html_theme_options = {
 }
 
 def setup(app):
-    if shutil.which("clang-uml") is None:
-        warnings.warn(
-            "clang-uml not found. Skipping UML diagram generation. "
-            "Install it from https://github.com/bkryza/clang-uml or via your package manager.",
-            UserWarning
-        )
-        return
-    
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    uml = not os.environ.get("UML", "").strip().lower() in ("0", "false", "no", "off")
+    if uml:
+        if shutil.which("clang-uml") is None:
+            warnings.warn(
+                "clang-uml not found. Skipping UML diagram generation. "
+                "Install it from https://github.com/bkryza/clang-uml or via your package manager.",
+                UserWarning
+            )
+            return
+        
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    subprocess.run([
-        "cmake",
-        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-        "-B", "build"
-    ], check=True, cwd=project_root)
+        subprocess.run([
+            "cmake",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-B", "build"
+        ], check=True, cwd=project_root)
 
-    clang_resource_dir = subprocess.check_output(
-        ["clang", "-print-resource-dir"], text=True
-    ).strip()
+        clang_resource_dir = subprocess.check_output(
+            ["clang", "-print-resource-dir"], text=True
+        ).strip()
 
-    subprocess.run([
-        'clang-uml',
-        '--add-compile-flag', f'-resource-dir={clang_resource_dir}'
-    ], cwd=project_root)
+        subprocess.run([
+            'clang-uml',
+            '--add-compile-flag', f'-resource-dir={clang_resource_dir}'
+        ], cwd=project_root)
 
 plantuml = "plantuml"
 
