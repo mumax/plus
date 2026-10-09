@@ -117,7 +117,7 @@ def run_benchmark(nsteps=100):
                 grid = Grid((2 ** p, 2 ** p, 1))
                 walltime = simple_bench(grid, nsteps)
             except RuntimeError:
-                print("GPU out of Memory.")
+                print(f"GPU out of memory for {grid.ncells}.")
                 break
             throughput = grid.ncells * nsteps / walltime
             print("{:>10} {:>10.5f} {:>12.3E}".format(grid.ncells, walltime, throughput), flush=True)
