@@ -109,8 +109,14 @@ bool Ferromagnet::isSublattice() const {
   return !(hostMagnet_ == nullptr);
 }
 
-void Ferromagnet::minimize(real tol, int nSamples) {
-  Minimizer minimizer(this, tol, nSamples);
+void Ferromagnet::minimize(real tol,
+                           int nSamples,
+                           int lineSearchMode,
+                           double maxStepAngle,
+                           int maxStall,
+                           int verbose) {
+  Minimizer minimizer(this, tol, nSamples, lineSearchMode, maxStepAngle, maxStall,
+                      verbose);
   minimizer.exec();
 }
 

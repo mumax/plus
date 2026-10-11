@@ -76,7 +76,9 @@ void wrap_ferromagnet(py::module& m) {
       .def_readonly("B_chiral", &Ferromagnet::BChiral)
 
       .def("reset_noise_generator", &Ferromagnet::resetNoiseGenerator)
-      .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
+      .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"),
+           py::arg("line_search_mode"), py::arg("max_step_angle"), py::arg("max_stall"),
+           py::arg("verbose"))
       .def("relax", &Ferromagnet::relax, py::arg("tol"));
 
   m.def("torque", &torqueQuantity);

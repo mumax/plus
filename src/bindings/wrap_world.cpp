@@ -122,7 +122,9 @@ void wrap_world(py::module& m) {
       .def_property_readonly("timesolver", &MumaxWorld::timesolver,
                              py::return_value_policy::reference)
 
-      .def("minimize", &MumaxWorld::minimize, py::arg("tol"), py::arg("nsamples"))
+      .def("minimize", &MumaxWorld::minimize, py::arg("tol"), py::arg("nsamples"),
+           py::arg("line_search_mode"), py::arg("max_step_angle"), py::arg("max_stall"),
+           py::arg("verbose"))
       .def("relax", &MumaxWorld::relax, py::arg("tol"))
 
       // PBC
