@@ -3,6 +3,20 @@
 API
 ===
 
+.. list-table:: Environment Variables
+   :header-rows: 1
+
+   * - Environment variable
+     - Optional value
+     - Meaning
+   * - GPU_ABORT
+     - "OFF"
+     - Continue after a C++ error instead of exiting (the default).
+   * - MUMAXPLUS_FP_PRECISION
+     - "SINGLE"/"1"/"32" or "DOUBLE"/"2"/"64"
+     - Set the floating-point precision. See this :doc:`tutorial <tutorial/precision>`.
+
+
 .. currentmodule:: mumaxplus
 
 .. toctree::

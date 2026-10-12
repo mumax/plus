@@ -1,5 +1,5 @@
 import os
-os.environ["GPU_ABORT"] = "0"  # make GPU out-of-memory a catchable RuntimeError instead of aborting
+os.environ["GPU_ABORT"] = "OFF"  # make GPU out-of-memory a catchable RuntimeError instead of aborting
 
 import argparse
 import subprocess
