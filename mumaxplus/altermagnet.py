@@ -200,9 +200,13 @@ class Altermagnet(Magnet):
     @property
     def afmex_nn(self) -> Parameter:
         """Intercell antiferromagnetic exchange constant (J/m).
-        This parameter plays the role of exchange constant of
-        the antiferromagnetic inhomogeneous exchange interaction
-        between neighbouring simulation cells.
+        This parameter plays the role of exchange constant of the antiferromagnetic
+        inhomogeneous exchange interaction between neighbouring simulation cells.
+
+        For a cell adjacent to a boundary, Neumann boundary conditions cannot be
+        properly applied in the following conditions. If :py:attr:`Ferromagnet.msat` of
+        either sublattice is 0 in that cell, or the next cell inward (e.g. on the left
+        if the boundary is on the right), open boundary conditions are applied instead.
         
         See Also
         --------
