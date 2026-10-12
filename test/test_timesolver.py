@@ -21,9 +21,9 @@ def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping=0.
     moment and an applied field along the z direction.
     """
     mx, my, mz = initial_magnetization
-    theta0 = arccos(mz / sqrt(mx ** 2 + my ** 2 + mz ** 2))
+    theta0 = arccos(mz / sqrt(mx**2 + my**2 + mz**2))
     phi0 = arctan(my / mx)
-    freq = GAMMALL_DEFAULT * hfield_z / (1 + damping ** 2)
+    freq = GAMMALL_DEFAULT * hfield_z / (1 + damping**2)
     phi = phi0 + freq * time
     theta = pi - 2 * arctan(exp(damping * freq * time) * tan(pi / 2 - theta0 / 2))
     return {"mx": sin(theta) * cos(phi), "my": sin(theta) * sin(phi), "mz": cos(theta)}
@@ -169,10 +169,19 @@ def test_solve_multiple_systems(test_world, method):
             assert max_error < 1e-4
 
 
-@pytest.mark.parametrize("invalid_timepoints, expected_error_message", [
-    (np.array([10, 5, 3, 2]), "The list of timepoints should be increasing."),  # Non-increasing timepoints
-    (np.array([3, 5, 7, 9]), "The list of timepoints should lie in the future.")  # Valid timepoints but time > timepoints[0]
-])
+@pytest.mark.parametrize(
+    "invalid_timepoints, expected_error_message",
+    [
+        (
+            np.array([10, 5, 3, 2]),
+            "The list of timepoints should be increasing.",
+        ),  # Non-increasing timepoints
+        (
+            np.array([3, 5, 7, 9]),
+            "The list of timepoints should lie in the future.",
+        ),  # Valid timepoints but time > timepoints[0]
+    ],
+)
 def test_set_invalid_timepoints(test_world, invalid_timepoints, expected_error_message):
     test_world.timesolver.time = 5
     # Catch the specific AssertionError and match its message
@@ -210,6 +219,7 @@ def test_steps_initial_timestep(arbitrary_system, adaptive):
     # before_timestep is changed to initial_timestep
     assert isclose(timesolver.timestep, initial_timestep, rel_tol=1e-5)
 
+
 def test_steps_sensible_timestep(arbitrary_system):
     """Test adaptive steps without an initial timestep."""
     timesolver = arbitrary_system[0].timesolver
@@ -224,6 +234,7 @@ def test_steps_sensible_timestep(arbitrary_system):
 
     # before_timestep is changed to sensible_timestep
     assert isclose(timesolver.timestep, sensible_timestep, rel_tol=1e-5)
+
 
 def test_steps_initial_timestep_none(arbitrary_system):
     """Test fixed steps without an initial timestep."""
@@ -256,6 +267,7 @@ def test_run_initial_timestep(arbitrary_system, adaptive):
     # before_timestep is changed to initial_timestep
     assert isclose(timesolver.timestep, initial_timestep, rel_tol=1e-5)
 
+
 def test_run_sensible_timestep(arbitrary_system):
     """Test adaptive run without an initial timestep."""
     timesolver = arbitrary_system[0].timesolver
@@ -270,6 +282,7 @@ def test_run_sensible_timestep(arbitrary_system):
 
     # before_timestep is changed to sensible_timestep
     assert isclose(timesolver.timestep, sensible_timestep, rel_tol=1e-5)
+
 
 def test_run_initial_timestep_none(arbitrary_system):
     """Test fixed run without an initial timestep."""

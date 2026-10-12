@@ -5,7 +5,6 @@
 class Magnet;
 class Field;
 
-
 Field evalPoyntingVector(const Magnet*);
 
 // poynting vector

@@ -24,9 +24,7 @@ Minimizer::Minimizer(const Ferromagnet* magnet,
   // TODO: check if input arguments are sane
 }
 
-Minimizer::Minimizer(const HostMagnet* magnet,
-                     real stopMaxMagDiff,
-                     int nMagDiffSamples)
+Minimizer::Minimizer(const HostMagnet* magnet, real stopMaxMagDiff, int nMagDiffSamples)
     : magnets_(magnet->sublattices()),
       nMagDiffSamples_(nMagDiffSamples),
       stopMaxMagDiff_(stopMaxMagDiff),
@@ -39,19 +37,16 @@ Minimizer::Minimizer(const HostMagnet* magnet,
     torques_.push_back(relaxTorqueQuantity(sub));
 }
 
-Minimizer::Minimizer(const MumaxWorld* world,
-                     real stopMaxMagDiff,
-                     int nMagDiffSamples)
-    : nMagDiffSamples_(nMagDiffSamples),
-      stopMaxMagDiff_(stopMaxMagDiff) {
+Minimizer::Minimizer(const MumaxWorld* world, real stopMaxMagDiff, int nMagDiffSamples)
+    : nMagDiffSamples_(nMagDiffSamples), stopMaxMagDiff_(stopMaxMagDiff) {
   // Find all ferromagnets (FM instances or sublattices)
   for (const auto pair : world->magnets()) {
     if (auto host = pair.second->asHost()) {
       for (auto sub : host->sublattices())
         magnets_.push_back(sub);
-    }
-    else if (const Ferromagnet* mag = pair.second->asFM())
+    } else if (const Ferromagnet* mag = pair.second->asFM()) {
       magnets_.push_back(mag);
+    }
   }
 
   for (auto magnet : magnets_)
@@ -65,7 +60,7 @@ Minimizer::Minimizer(const MumaxWorld* world,
   m0.resize(N);
   m1.resize(N);
 }
-      
+
 void Minimizer::exec() {
   nsteps_ = 0;
   lastMagDiffs_.clear();
@@ -93,7 +88,8 @@ __global__ void k_step(CuField mField,
 }
 
 static inline real BarzilaiBorweinStepSize(std::vector<Field>& dm,
-                                           std::vector<Field>& dtorque, int n) {
+                                           std::vector<Field>& dtorque,
+                                           int n) {
   real nom = 0, div = 0;
   for (size_t i = 0; i < dm.size(); i++) {
     if (n % 2 == 0) {
@@ -113,7 +109,6 @@ static inline real BarzilaiBorweinStepSize(std::vector<Field>& dm,
 
 void Minimizer::step() {
   for (size_t i = 0; i < magnets_.size(); i++) {
-
     m0[i] = magnets_[i]->magnetization()->eval();
 
     if (nsteps_ == 0) {
@@ -126,15 +121,15 @@ void Minimizer::step() {
     int ncells = m1[i].grid().ncells();
     cudaLaunch(ncells, k_step, m1[i].cu(), m0[i].cu(), t0[i].cu(), stepsize_);
   }
-  
+
   for (size_t i = 0; i < magnets_.size(); i++)
     magnets_[i]->magnetization()->set(m1[i]);  // normalizes
-    
+
   for (size_t i = 0; i < magnets_.size(); i++)
     t1[i] = torques_[i].eval();
 
   // Reuse m0 and t0 for efficiency, but declare alias for clarity
-  std::vector<Field> &dm = m0, &dt = t0;
+  std::vector<Field>&dm = m0, &dt = t0;
   real magDiff = 0;
   for (size_t i = 0; i < magnets_.size(); i++) {
     add(dm[i], real(+1), m1[i], real(-1), m0[i]);
@@ -154,7 +149,7 @@ void Minimizer::step() {
 bool Minimizer::converged() const {
   if (lastMagDiffs_.size() < nMagDiffSamples_)
     return false;
- 
+
   for (auto dm : lastMagDiffs_)
     if (dm > stopMaxMagDiff_)
       return false;

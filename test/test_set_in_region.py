@@ -5,6 +5,7 @@ import pytest
 
 from mumaxplus import Ferromagnet, Grid, World
 
+
 @pytest.fixture
 def test_parameters() -> Tuple[Ferromagnet, np.ndarray]:
     nx, ny, nz = 4, 7, 3
@@ -13,6 +14,7 @@ def test_parameters() -> Tuple[Ferromagnet, np.ndarray]:
     r = np.random.randint(0, 12345, size=g.shape)
     magnet = Ferromagnet(w, g, regions=r)
     return magnet, r
+
 
 def test_uniform_parameter_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
     magnet, regions = test_parameters
@@ -25,7 +27,10 @@ def test_uniform_parameter_in_region(test_parameters: Tuple[Ferromagnet, np.ndar
     assert np.all(magnet.ku1()[0, mask] == ku1_value)
     assert np.all(magnet.ku1()[0, ~mask] == 0.0)
 
-def test_uniform_vectorparameter_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
+
+def test_uniform_vectorparameter_in_region(
+    test_parameters: Tuple[Ferromagnet, np.ndarray]
+):
     magnet, regions = test_parameters
     bias_value = np.array((1, 0.1, 3))
 
@@ -35,6 +40,7 @@ def test_uniform_vectorparameter_in_region(test_parameters: Tuple[Ferromagnet, n
     mask = regions == some_index
     assert np.allclose(magnet.bias_magnetic_field()[:, mask], bias_value[:, None])
     assert np.all(magnet.bias_magnetic_field()[:, ~mask] == 0.0)
+
 
 def test_uniform_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
     magnet, regions = test_parameters
@@ -51,7 +57,10 @@ def test_uniform_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarr
     assert np.allclose(magnet.magnetization()[:, mask], region_value[:, None])
     assert np.allclose(magnet.magnetization()[:, ~mask], initial_vector[:, None])
 
-def test_functional_parameter_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
+
+def test_functional_parameter_in_region(
+    test_parameters: Tuple[Ferromagnet, np.ndarray]
+):
     magnet, regions = test_parameters
 
     def func(x, y, z):
@@ -66,11 +75,14 @@ def test_functional_parameter_in_region(test_parameters: Tuple[Ferromagnet, np.n
     assert np.allclose(magnet.ku1()[0, mask], func(x[mask], y[mask], z[mask]))
     assert np.all(magnet.ku1()[0, ~mask] == 0.0)
 
-def test_functional_vectorparameter_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
+
+def test_functional_vectorparameter_in_region(
+    test_parameters: Tuple[Ferromagnet, np.ndarray]
+):
     magnet, regions = test_parameters
 
     def func(x, y, z):
-        return (x, y**2, 3*x)
+        return (x, y**2, 3 * x)
 
     some_index = np.random.choice(np.unique(regions))
     magnet.bias_magnetic_field.set_in_region(some_index, func)
@@ -78,9 +90,12 @@ def test_functional_vectorparameter_in_region(test_parameters: Tuple[Ferromagnet
     x, y, z = magnet.bias_magnetic_field.meshgrid
     mask = regions == some_index
 
-    assert np.allclose(magnet.bias_magnetic_field()[:, mask],
-                       np.array(func(x[mask], y[mask], z[mask]))[:, None])
+    assert np.allclose(
+        magnet.bias_magnetic_field()[:, mask],
+        np.array(func(x[mask], y[mask], z[mask]))[:, None],
+    )
     assert np.all(magnet.bias_magnetic_field()[:, ~mask] == 0.0)
+
 
 def test_functional_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
     magnet, regions = test_parameters
@@ -99,7 +114,8 @@ def test_functional_variable_in_region(test_parameters: Tuple[Ferromagnet, np.nd
     mask = regions == some_index
 
     assert np.allclose(magnet.magnetization()[:, mask], func(x[mask], y[mask], z[mask]))
-    assert np.all(magnet.magnetization()[:, ~mask] == initial_vector[:,None])
+    assert np.all(magnet.magnetization()[:, ~mask] == initial_vector[:, None])
+
 
 def test_incompatible_uniform_value_in_region_scalar_parameter(test_parameters):
     magnet, regions = test_parameters
@@ -108,6 +124,7 @@ def test_incompatible_uniform_value_in_region_scalar_parameter(test_parameters):
     with pytest.raises(TypeError):
         magnet.ku1.set_in_region(some_index, (1.0, 2.0))
 
+
 def test_incompatible_uniform_value_in_region_vector_parameter(test_parameters):
     magnet, regions = test_parameters
     some_index = np.random.choice(np.unique(regions))
@@ -115,12 +132,14 @@ def test_incompatible_uniform_value_in_region_vector_parameter(test_parameters):
     with pytest.raises(TypeError):
         magnet.bias_magnetic_field.set_in_region(some_index, (1.0, 2.0))
 
+
 def test_incompatible_uniform_value_in_region_variable(test_parameters):
     magnet, regions = test_parameters
     some_index = np.random.choice(np.unique(regions))
 
     with pytest.raises(TypeError):
         magnet.magnetization.set_in_region(some_index, (2.0, 2.0))
+
 
 def test_incompatible_function_in_region_scalar_parameter(test_parameters):
     magnet, regions = test_parameters
@@ -133,6 +152,7 @@ def test_incompatible_function_in_region_scalar_parameter(test_parameters):
     with pytest.raises(ValueError):
         magnet.ku1.set_in_region(some_index, bad_func)
 
+
 def test_incompatible_function_in_region_vector_parameter(test_parameters):
     magnet, regions = test_parameters
 
@@ -143,6 +163,7 @@ def test_incompatible_function_in_region_vector_parameter(test_parameters):
 
     with pytest.raises(ValueError):
         magnet.bias_magnetic_field.set_in_region(some_index, bad_func)
+
 
 def test_incompatible_function_in_region_variable(test_parameters):
     magnet, regions = test_parameters

@@ -1,9 +1,11 @@
 """Common magnetization configurations."""
 
-import numpy as _np
 import math as _math
 
-def twodomain(m1, mw, m2, wallposition, wallthickness=0.) -> callable:
+import numpy as _np
+
+
+def twodomain(m1, mw, m2, wallposition, wallthickness=0.0) -> callable:
     """Create a two-domain state magnetization configuration
     with a domain wall which is perpendicular to the x-axis.
 
@@ -37,10 +39,12 @@ def twodomain(m1, mw, m2, wallposition, wallthickness=0.) -> callable:
             m = m2
         if wallthickness <= 0:
             return m
-        gauss = _np.exp(-((x - wallposition)/wallthickness)**2)
-        return ((1-gauss) * m[0] + gauss * mw[0],
-                (1-gauss) * m[1] + gauss * mw[1],
-                (1-gauss) * m[2] + gauss * mw[2])
+        gauss = _np.exp(-(((x - wallposition) / wallthickness) ** 2))
+        return (
+            (1 - gauss) * m[0] + gauss * mw[0],
+            (1 - gauss) * m[1] + gauss * mw[1],
+            (1 - gauss) * m[2] + gauss * mw[2],
+        )
 
     return func
 
@@ -77,7 +81,7 @@ def vortex(position, diameter, circulation, polarization) -> callable:
         x -= x0
         y -= y0
 
-        r2 = x ** 2 + y ** 2
+        r2 = x**2 + y**2
         r = _np.sqrt(r2)
 
         if r == 0.0:
@@ -85,8 +89,8 @@ def vortex(position, diameter, circulation, polarization) -> callable:
 
         mx = -y * circulation / r
         my = x * circulation / r
-        mz = 2 * polarization * _np.exp(-r2 / diameter ** 2)
-        nrm = _np.sqrt(mx ** 2 + my ** 2 + mz ** 2)
+        mz = 2 * polarization * _np.exp(-r2 / diameter**2)
+        nrm = _np.sqrt(mx**2 + my**2 + mz**2)
 
         return (mx / nrm, my / nrm, mz / nrm)
 
@@ -125,7 +129,7 @@ def antivortex(position, diameter, circulation, polarization) -> callable:
         x -= x0
         y -= y0
 
-        r2 = x ** 2 + y ** 2
+        r2 = x**2 + y**2
         r = _np.sqrt(r2)
 
         if r == 0.0:
@@ -133,8 +137,8 @@ def antivortex(position, diameter, circulation, polarization) -> callable:
 
         mx = -x * circulation / r
         my = y * circulation / r
-        mz = 2 * polarization * _np.exp(-r2 / diameter ** 2)
-        nrm = _np.sqrt(mx ** 2 + my ** 2 + mz ** 2)
+        mz = 2 * polarization * _np.exp(-r2 / diameter**2)
+        nrm = _np.sqrt(mx**2 + my**2 + mz**2)
 
         return (mx / nrm, my / nrm, mz / nrm)
 
@@ -172,7 +176,7 @@ def neelskyrmion(position, radius, charge, polarization) -> callable:
     def func(x, y, z):
         x -= x0
         y -= y0
-        r = _np.sqrt(x ** 2 + y ** 2)
+        r = _np.sqrt(x**2 + y**2)
         if r == 0.0:
             return (0, 0, polarization)
         mz = 2 * polarization * (_np.exp(-((r / radius) ** 2)) - 0.5)
@@ -214,7 +218,7 @@ def blochskyrmion(position, radius, charge, polarization) -> callable:
     def func(x, y, z):
         x -= x0
         y -= y0
-        r = _np.sqrt(x ** 2 + y ** 2)
+        r = _np.sqrt(x**2 + y**2)
         if r == 0.0:
             return (0, 0, polarization)
         mz = 2 * polarization * (_np.exp(-((r / radius) ** 2)) - 0.5)
@@ -224,15 +228,18 @@ def blochskyrmion(position, radius, charge, polarization) -> callable:
 
     return func
 
+
 # --------------------------------------------------
 # elastic displacement initial states
+
 
 def gaussian_spherical_OoP(position, amplitude, sigma_x, sigma_y) -> callable:
     r"""Create an out-of-xy-plane gaussian distribution centered on the specified
     position with given standard deviations.
-    
-    .. math:: 
-        A \exp\left(- \frac{(x - x_0)^2}{2\sigma_x^2} \frac{(y - y_0)^2}{2\sigma_y^2}\right) (0, 0, 1)
+
+    .. math::
+        A \exp\left(- \frac{(x - x_0)^2}{2\sigma_x^2}
+        \frac{(y - y_0)^2}{2\sigma_y^2}\right) (0, 0, 1)
 
     Parameters
     ----------
@@ -251,24 +258,25 @@ def gaussian_spherical_OoP(position, amplitude, sigma_x, sigma_y) -> callable:
         a function which takes x-, y- and z-coordinates and returns a 3-tuple
         containing u_x, u_y and u_z.
     """
-    
     x0, y0, _ = position
-    denom = (4 * sigma_x*sigma_x * sigma_y*sigma_y)
+    denom = 4 * sigma_x * sigma_x * sigma_y * sigma_y
 
     def func(x, y, z):
-        uz = amplitude * _math.exp(- (x - x0)*(x - x0) * (y - y0)*(y - y0) / denom)
+        uz = amplitude * _math.exp(-(x - x0) * (x - x0) * (y - y0) * (y - y0) / denom)
         return (0, 0, uz)
-    
+
     return func
+
 
 def gaussian_spherical_IP(position, amplitude, angle, sigma_x, sigma_y) -> callable:
     r"""Create an in-xy-plane vector field with uniform orientation specified by
     the given angle. The amplitude is modified by a gaussian distribution
     centered on the specified position with given standard deviations.
-    
+
     .. math ::
 
-        A \exp\left(- \frac{(x - x_0)^2}{2\sigma_x^2} \frac{(y - y_0)^2}{2\sigma_y^2}\right)
+        A \exp\left(- \frac{(x - x_0)^2}{2\sigma_x^2}
+        \frac{(y - y_0)^2}{2\sigma_y^2}\right)
         (\cos(\theta), \sin(\theta), 0)
 
     Parameters
@@ -283,23 +291,23 @@ def gaussian_spherical_IP(position, amplitude, angle, sigma_x, sigma_y) -> calla
         The standard deviation in the x-direction of the Gaussian distribution.
     sigma_y : float
         The standard deviation in the y-direction of the Gaussian distribution.
-    
+
     Returns
     -------
     Gaussian : callable
         a function which takes x-, y- and z-coordinates and returns a 3-tuple
         containing u_x, u_y and u_z.
     """
-    
     x0, y0, _ = position
-    denom = 4 * sigma_x*sigma_x * sigma_y*sigma_y
+    denom = 4 * sigma_x * sigma_x * sigma_y * sigma_y
     AC, AS = amplitude * _math.cos(angle), amplitude * _math.sin(angle)
 
     def func(x, y, z):
-        E = _math.exp(- (x - x0)*(x - x0) * (y - y0)*(y - y0) / denom)
-        return (AC*E, AS*E, 0)
+        E = _math.exp(-(x - x0) * (x - x0) * (y - y0) * (y - y0) / denom)
+        return (AC * E, AS * E, 0)
 
     return func
+
 
 def gaussian_uniform_IP(amplitude, theta, gausspos, sigma, phi) -> callable:
     r"""Create an in-xy-plane vector field with uniform orientation specified by
@@ -307,12 +315,12 @@ def gaussian_uniform_IP(amplitude, theta, gausspos, sigma, phi) -> callable:
     Gaussian distribution centered on gausspos, which varies along the
     transverse direction in the xy-plane specified by angle phi.
 
-    .. math:: 
+    .. math::
         A \exp\left(-\frac{(x'-x_0)^2}{2\sigma^2}\right)
         (\cos(\theta) ,\sin(\theta), 0)
-    
+
     with x0 = gausspos and x' = x*cos(ϕ) + y*sin(ϕ)
-    
+
     Parameters
     ----------
     amplitude : float
@@ -325,21 +333,20 @@ def gaussian_uniform_IP(amplitude, theta, gausspos, sigma, phi) -> callable:
         The gaussian standard deviation.
     phi : float
         The angle in radians of the transverse direction.
-    
+
     Returns
     -------
     Gaussian : callable
         a function which takes x-, y- and z-coordinates and returns a 3-tuple
         containing u_x, u_y and u_z.
     """
-
-    denom = 2 * sigma*sigma
+    denom = 2 * sigma * sigma
     Cphi, Sphi = _math.cos(phi), _math.sin(phi)
     ACtheta, AStheta = amplitude * _math.cos(theta), amplitude * _math.sin(theta)
 
     def func(x, y, z):
-        x_ = Cphi*x + Sphi*y
-        E = _math.exp(- (x_ - gausspos)*(x_ - gausspos) / denom)
+        x_ = Cphi * x + Sphi * y
+        E = _math.exp(-(x_ - gausspos) * (x_ - gausspos) / denom)
         return (ACtheta * E, AStheta * E, 0)
-    
+
     return func

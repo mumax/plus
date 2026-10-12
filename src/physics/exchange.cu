@@ -1,7 +1,7 @@
 #include "antiferromagnet.hpp"
 #include "atmexchange.hpp"
 #include "cudalaunch.hpp"
-#include "dmi.hpp" // used for Neumann BC
+#include "dmi.hpp"  // used for Neumann BC
 #include "dmitensor.hpp"
 #include "energy.hpp"
 #include "exchange.hpp"
@@ -14,8 +14,8 @@
 #include "world.hpp"
 
 bool exchangeAssuredZero(const Ferromagnet* magnet) {
-  return ((magnet->aex.assuredZero() && magnet->interExch.assuredZero())
-        || magnet->msat.assuredZero());
+  return ((magnet->aex.assuredZero() && magnet->interExch.assuredZero()) ||
+          magnet->msat.assuredZero());
 }
 
 // Independent FM lattice
@@ -48,7 +48,7 @@ __global__ void k_exchangeField(CuField hField,
 
   // If there is no FM-exchange at the boundary, open BC are assumed
   openBC = (a == 0) ? true : openBC;
-  
+
   // accumulate exchange field in h for cell at idx, divide by msat at the end
   real3 h{0, 0, 0};
 
@@ -57,7 +57,7 @@ __global__ void k_exchangeField(CuField hField,
   int idx_;
   real3 m_;
   real a_;
-  
+
   // regions
   unsigned int ridx_;
   const unsigned int ridx = system.getRegionIdx(idx);
@@ -66,8 +66,8 @@ __global__ void k_exchangeField(CuField hField,
 
   // FM exchange in NN cells
 #pragma unroll
-  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0},
-                            int3{0, 1, 0}, int3{0, 0, -1}, int3{0, 0, 1}}) {
+  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0},
+                       int3{0, 0, -1}, int3{0, 0, 1}}) {
     coo_ = mastergrid.wrap(coo + rel_coo);
     idx_ = grid.coord2index(coo_);  // only use inside geometry
     normal = rel_coo * rel_coo;
@@ -86,12 +86,13 @@ __global__ void k_exchangeField(CuField hField,
       }
       Aex = getExchangeStiffness(inter, scale, a, a_);
     } else {  // outside
-      if (openBC) continue;
+      if (openBC)
+        continue;
 
       // Neumann BC
       real3 Gamma = getGamma(dmiTensor, idx, normal, m);
       real delta = dot(rel_coo, system.cellsize);
-      m_ = m + (Gamma / (2*a)) * delta;  // ghost neighboring magnetization
+      m_ = m + (Gamma / (2 * a)) * delta;  // ghost neighboring magnetization
       Aex = a;
     }
 
@@ -145,14 +146,14 @@ __global__ void k_exchangeField(CuField hField,
 
   // FM exchange in NN cells
 #pragma unroll
-  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0},
-                            int3{0, 1, 0}, int3{0, 0, -1}, int3{0, 0, 1}}) {
+  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0},
+                       int3{0, 0, -1}, int3{0, 0, 1}}) {
     coo_ = mastergrid.wrap(coo + rel_coo);
     idx_ = grid.coord2index(coo_);  // only use inside geometry
     normal = rel_coo * rel_coo;
 
     // msat is only evaluated if inside the geometry
-    if(hField.cellInGeometry(coo_) && msat.valueAt(idx_) != 0) {  // inside
+    if (hField.cellInGeometry(coo_) && msat.valueAt(idx_) != 0) {  // inside
       m_ = m1Field.vectorAt(idx_);
       a_ = aex.valueAt(idx_);
 
@@ -164,8 +165,7 @@ __global__ void k_exchangeField(CuField hField,
         inter = interEx.valueBetween(ridx, ridx_);
       }
       Aex = getExchangeStiffness(inter, scale, a, a_);
-    }
-    else { // Neumann BC
+    } else {  // Neumann BC
       if (a == 0)
         continue;
 
@@ -174,7 +174,7 @@ __global__ void k_exchangeField(CuField hField,
 
       real3 d_m2{0, 0, 0};
       int3 coo__ = mastergrid.wrap(coo - rel_coo);
-      if(hField.cellInGeometry(coo__) && msat.valueAt(coo__) != 0) {
+      if (hField.cellInGeometry(coo__) && msat.valueAt(coo__) != 0) {
         // Approximate normal derivative of sister sublattice by taking
         // the bulk derivative closest to the edge.
         // d_m2 will be 0 if "msat2" is 0 at both coo and coo__
@@ -182,7 +182,7 @@ __global__ void k_exchangeField(CuField hField,
         real3 m2__ = m2Field.vectorAt(coo__);
         d_m2 = (m2 - m2__) / delta;
       }
-      m_ = m + (cross(cross(d_m2, m), m) + Gamma1) * delta / (2*a);
+      m_ = m + (cross(cross(d_m2, m), m) + Gamma1) * delta / (2 * a);
       Aex = a;
     }
 
@@ -213,17 +213,17 @@ __global__ void k_effectiveSublattice(CuField netSub,
   real3 result = netSub.vectorAt(idx);
 
 #pragma unroll
-  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0},
-                       int3{0, 1, 0}, int3{0, 0, -1}, int3{0, 0, 1}}) {
+  for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0},
+                       int3{0, 0, -1}, int3{0, 0, 1}}) {
     const int3 coo_ = mastergrid.wrap(coo - rel_coo);
-    if(!netSub.cellInGeometry(coo_))
+    if (!netSub.cellInGeometry(coo_))
       continue;
     const int idx_ = grid.coord2index(coo_);
     const unsigned int ridx_ = system.getRegionIdx(idx_);
 
     real A = getExchangeStiffness(inter_nn.valueBetween(ridx, ridx_),
-                                  scale_nn.valueBetween(ridx, ridx_),
-                                  ann, afmex_nn.valueAt(idx_));
+                                  scale_nn.valueBetween(ridx, ridx_), ann,
+                                  afmex_nn.valueAt(idx_));
     result += (m * A);
   }
   netSub.setVectorInCell(idx, result);
@@ -241,16 +241,15 @@ Field evalEffectiveSublattice(const Ferromagnet* magnet) {
   for (auto sub : host->getOtherSublattices(magnet)) {
     auto m = sub->magnetization()->field().cu();
     auto msat = sub->msat.cu();
-    cudaLaunch(netSub.grid().ncells(), k_effectiveSublattice, netSub.cu(), m, msat,
-               Ann, inter, scale, magnet->world()->mastergrid());
+    cudaLaunch(netSub.grid().ncells(), k_effectiveSublattice, netSub.cu(), m, msat, Ann,
+               inter, scale, magnet->world()->mastergrid());
   }
   return netSub;
 }
 
 Field evalExchangeField(const Ferromagnet* magnet) {
-
   Field hField(magnet->system(), 3);
-  
+
   if (exchangeAssuredZero(magnet)) {
     hField.makeZero();
     return hField;
@@ -260,17 +259,20 @@ Field evalExchangeField(const Ferromagnet* magnet) {
   if (!warned) {
     if (!atmExchangeAssuredZero(magnet) &&
         (!inhomoDmiAssuredZero(magnet) && !magnet->enableOpenBC)) {
-      std::cerr << "Warning: regular exchange uses different boundaries (Robin boundary conditions) "
-                    "than anisotropic exchange (Dirichlet boundary conditions). This can cause "
-                    "unexpected behaviour at the edges. Consider using open or periodic boundaries "
-                    "instead.\n";
+      std::cerr << "Warning: regular exchange uses different boundaries (Robin "
+                   "boundary conditions) "
+                   "than anisotropic exchange (Dirichlet boundary conditions). "
+                   "This can cause "
+                   "unexpected behaviour at the edges. Consider using open or "
+                   "periodic boundaries "
+                   "instead.\n";
       warned = true;
     }
   }
 
   real3 c = magnet->cellsize();
   real3 w = {1 / (c.x * c.x), 1 / (c.y * c.y), 1 / (c.z * c.z)};
-  
+
   int ncells = hField.grid().ncells();
   auto mag = magnet->magnetization()->field().cu();
   auto msat = magnet->msat.cu();
@@ -280,15 +282,15 @@ Field evalExchangeField(const Ferromagnet* magnet) {
   auto interEx = magnet->interExch.cu();
   auto scaleEx = magnet->scaleExch.cu();
 
-  if (!magnet->isSublattice() || magnet->enableOpenBC)
+  if (!magnet->isSublattice() || magnet->enableOpenBC) {
     cudaLaunch(ncells, k_exchangeField, hField.cu(), mag, aex, msat, w, grid,
                magnet->enableOpenBC, dmiTensor, interEx, scaleEx);
-  else {
+  } else {
     // In case `magnet` is a sublattice, it's sister sublattice(s) affect(s)
     // the Neumann BC. There are no open boundaries when in this scope.
     auto sister = evalEffectiveSublattice(magnet);
-    cudaLaunch(ncells, k_exchangeField, hField.cu(), mag, sister.cu(), aex,
-              msat, w, grid, dmiTensor, interEx, scaleEx);
+    cudaLaunch(ncells, k_exchangeField, hField.cu(), mag, sister.cu(), aex, msat, w,
+               grid, dmiTensor, interEx, scaleEx);
   }
   return hField;
 }
@@ -329,7 +331,7 @@ __global__ void k_maxangle(CuField maxAngleField,
 
   // When outside the geometry, set to zero and return early
   if (!maxAngleField.cellInGeometry(idx)) {
-    if (maxAngleField.cellInGrid(idx)) 
+    if (maxAngleField.cellInGrid(idx))
       maxAngleField.setValueInCell(idx, 0, 0);
     return;
   }
@@ -346,9 +348,8 @@ __global__ void k_maxangle(CuField maxAngleField,
 
   real maxAngle{0};  // maximum angle in this cell
 
-  int3 neighborRelativeCoordinates[6] = {int3{-1, 0, 0}, int3{0, -1, 0},
-                                         int3{0, 0, -1}, int3{1, 0, 0},
-                                         int3{0, 1, 0},  int3{0, 0, 1}};
+  int3 neighborRelativeCoordinates[6] = {int3{-1, 0, 0}, int3{0, -1, 0}, int3{0, 0, -1},
+                                         int3{1, 0, 0},  int3{0, 1, 0},  int3{0, 0, 1}};
 
 #pragma unroll
   for (int3 relcoo : neighborRelativeCoordinates) {
@@ -371,8 +372,8 @@ __global__ void k_maxangle(CuField maxAngleField,
 real evalMaxAngle(const Ferromagnet* magnet) {
   Field maxAngleField(magnet->system(), 1);
   cudaLaunch(maxAngleField.grid().ncells(), k_maxangle, maxAngleField.cu(),
-             magnet->magnetization()->field().cu(), magnet->aex.cu(),
-             magnet->msat.cu(), magnet->world()->mastergrid());
+             magnet->magnetization()->field().cu(), magnet->aex.cu(), magnet->msat.cu(),
+             magnet->world()->mastergrid());
   return maxAbsValue(maxAngleField);
 }
 

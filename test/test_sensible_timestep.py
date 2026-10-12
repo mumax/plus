@@ -1,12 +1,15 @@
 import numpy as np
 import pytest
-from mumaxplus import World, Grid, Ferromagnet
+
+from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util.config import neelskyrmion
 
 RTOL = 1e-6
 
+
 def relative_error(result, wanted):
     return np.abs((wanted - result) / result)
+
 
 @pytest.fixture(scope="module")  # reuse across tests
 def magnet():
@@ -28,6 +31,7 @@ def magnet():
 
     return magnet
 
+
 # === Magnet states ===
 def set_skyrmion_state(magnet: Ferromagnet):
     """
@@ -36,15 +40,18 @@ def set_skyrmion_state(magnet: Ferromagnet):
     """
     magnet.magnetization = neelskyrmion(magnet.center, 20e-9, -1, 1)
 
+
 def set_uniform_state(magnet: Ferromagnet):
     """This state results in no torque at all."""
     magnet.magnetization = (0, 0, 1)
+
 
 # === Noise and time step getters ===
 def consistent_max_noise(magnet):
     magnet.reset_noise_generator()
     thermal_noise = magnet.thermal_noise.eval()
     return np.max(np.linalg.norm(thermal_noise, axis=0))
+
 
 def consistent_sensible_timestep(magnet: Ferromagnet):
     magnet.reset_noise_generator()
@@ -68,7 +75,7 @@ class TestSensibleTimestep:
 
         sens_dt_mumax = consistent_sensible_timestep(magnet)
         assert relative_error(sens_dt_mumax, factor / max_torque) < RTOL
-        
+
     def test_torque_and_noise(self, magnet):
         """Torque and noise are of about equal importance."""
         set_skyrmion_state(magnet)  # torque
@@ -80,7 +87,10 @@ class TestSensibleTimestep:
         max_torque = magnet.max_torque()
 
         sens_dt_mumax = consistent_sensible_timestep(magnet)
-        sens_dt = ((np.sqrt(max_noise**2 + 4*factor*max_torque) - max_noise) / (2 * max_torque))**2
+        sens_dt = (
+            (np.sqrt(max_noise**2 + 4 * factor * max_torque) - max_noise)
+            / (2 * max_torque)
+        ) ** 2
         assert relative_error(sens_dt_mumax, sens_dt) < RTOL
 
     def test_high_noise_limit(self, magnet):
@@ -89,7 +99,9 @@ class TestSensibleTimestep:
         magnet.temperature = 1e3  # a lot of noise
 
         sens_dt_mumax = consistent_sensible_timestep(magnet)
-        sens_dt = (magnet.world.timesolver.sensible_factor / consistent_max_noise(magnet))**2
+        sens_dt = (
+            magnet.world.timesolver.sensible_factor / consistent_max_noise(magnet)
+        ) ** 2
         assert relative_error(sens_dt_mumax, sens_dt) < RTOL
 
     def test_only_noise(self, magnet):
@@ -97,5 +109,7 @@ class TestSensibleTimestep:
         magnet.temperature = 100  # any amount of noise
 
         sens_dt_mumax = consistent_sensible_timestep(magnet)
-        sens_dt = (magnet.world.timesolver.sensible_factor / consistent_max_noise(magnet))**2
+        sens_dt = (
+            magnet.world.timesolver.sensible_factor / consistent_max_noise(magnet)
+        ) ** 2
         assert relative_error(sens_dt_mumax, sens_dt) < RTOL

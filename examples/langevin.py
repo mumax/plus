@@ -3,6 +3,7 @@ import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 
+
 @np.vectorize
 def expectation_mz_langevin(msat, bext, temperature, cellvolume):
     kB = 1.381e-23

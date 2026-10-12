@@ -1,14 +1,14 @@
 """This script simulates the dispersion of spinwaves
-in a 1D altermagnet as described in https://arxiv.org/abs/2604.15454.
+in a 1D altermagnet as described in https://doi.org/10.1063/5.0341263.
 """
-from mumaxplus import Altermagnet, Grid, World
-from mumaxplus.util.constants import GAMMALL_DEFAULT
+import os.path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import os.path
 from tqdm import tqdm
 
+from mumaxplus import Altermagnet, Grid, World
+from mumaxplus.util.constants import GAMMALL_DEFAULT
 
 # Numerical parameters
 fmax = 1E13               # maximum frequency (in Hz) of the sinc pulse
@@ -129,8 +129,8 @@ wani = 2 * K / Ms
 wc   = 4 * A0 / (a*a*Ms)
 wnn  = A12 / Ms * k**2
 
-wex  = 0.5 * (A1 + A2) * k**2 / Ms
-walt = 0.5 * (A1 - A2) * (np.cos(2*angle) * (kx**2 - ky**2) + 2 * np.sin(2*angle) * kx * ky) / Ms
+wex  = (A1 + A2) * k**2 / Ms
+walt = (A1 - A2) * (np.cos(2*angle) * (kx**2 - ky**2) + 2 * np.sin(2*angle) * kx * ky) / Ms
 
 wmagnon = np.sqrt((wani + wex - wnn) * (wani + wex - 2*wc + wnn))
 

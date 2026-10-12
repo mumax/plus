@@ -22,7 +22,10 @@ class StrayFieldBruteExecutor : public StrayFieldExecutor {
    * @param system the system in which to compute the stray field
    */
   StrayFieldBruteExecutor(const Magnet* magnet,
-                          std::shared_ptr<const System> system, int order, double eps, double switchingradius);
+                          std::shared_ptr<const System> system,
+                          int order,
+                          double eps,
+                          double switchingradius);
 
   /** Compute and return the stray field. */
   Field exec() const;
@@ -39,9 +42,9 @@ class StrayFieldBruteExecutor : public StrayFieldExecutor {
   double eps() const { return kernel_.eps(); }
 
   /** Return the switching radius. */
-  double switchingradius() const { return kernel_.switchingradius();}
+  double switchingradius() const { return kernel_.switchingradius(); }
 
-  const StrayFieldKernel& kernel() const { return kernel_;};
+  const StrayFieldKernel& kernel() const { return kernel_; }
 
  private:
   StrayFieldKernel kernel_;

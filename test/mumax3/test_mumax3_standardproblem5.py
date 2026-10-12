@@ -1,15 +1,19 @@
-import pytest
-import numpy as np
-
 from mumax3 import Mumax3Simulation
+import numpy as np
+import pytest
+
 from mumaxplus import Ferromagnet, Grid, World
 
 ATOL = 1e-3  # 0.1%
 
+
 def max_absolute_error(result, wanted):
     return np.max(abs(result - wanted))
 
+
 xi1, xi2, xi3, xi4 = 0.0, 0.05, 0.1, 0.5
+
+
 @pytest.fixture(scope="class", params=[xi1, xi2, xi3, xi4])
 def simulations(request):
     """Sets up and runs standard problem 5 for both mumax⁺ and mumax³, given
@@ -21,7 +25,7 @@ def simulations(request):
     # === specifications ===
     length, width, thickness = 100e-9, 100e-9, 10e-9
     nx, ny, nz = 50, 50, 5  # following mumax³ paper
-    cellsize = (length/nx, width/ny, thickness/nz)
+    cellsize = (length / nx, width / ny, thickness / nz)
     gridsize = (nx, ny, nz)
 
     msat = 800e3
@@ -74,7 +78,7 @@ def simulations(request):
     magnet.pol = pol
     magnet.jcur = jcur
 
-    timepoints = np.arange(0, max_time + 0.5*step_time, step_time)
+    timepoints = np.arange(0, max_time + 0.5 * step_time, step_time)
     outputquantities = {
         "t": lambda: world.timesolver.time,
         "mx": lambda: magnet.magnetization.average()[0],
@@ -84,6 +88,7 @@ def simulations(request):
     mumaxplusoutput = world.timesolver.solve(timepoints, outputquantities)
 
     return mumaxplusoutput, mumax3sim
+
 
 @pytest.mark.slow
 @pytest.mark.mumax3
