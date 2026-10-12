@@ -67,6 +67,8 @@ class Minimizer {
   int verbose_;
   int nLineSearches_;  // number of sdLineSearch calls (diagnostic)
   int nGllRescues_;    // number of GLL-rejected BB steps (diagnostic)
+  double
+      hCheck_;  // |h| above which the BB step clamp must check max|t| (set in exec())
 
   std::vector<Field> tTrial_;      // torque at the most recent trial point
   std::deque<real> lastEnergies_;  // energy history for the non-monotone (GLL) test

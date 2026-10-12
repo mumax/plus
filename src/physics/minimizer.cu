@@ -24,6 +24,8 @@
 // Max per-cell |dm| tried in order (as d/maxDirNorm along the torque) when a line
 // search fails. The first one that passes the GLL test is accepted.
 static const std::array<real, 3> fallbackDisplacements = {0.1, 0.05, 0.01};
+// Largest |B_perp| (T) for which skipping the BB clamp check is assumed safe.
+static const double minimizerBMax = 1e6;
 
 Minimizer::Minimizer(const Ferromagnet* magnet,
                      real stopMaxMagDiff,
@@ -136,6 +138,18 @@ void Minimizer::exec() {
   nLineSearches_ = 0;
   nGllRescues_ = 0;
 
+  // Gate for the BB step clamp: |h|*max|t| can only exceed 1/eps when
+  // |h| > 1/(eps * gammaMax * bMax), with t = gamma * B_perp.
+  double gammaMax = 0;
+  for (const Ferromagnet* magnet : magnets_) {
+    const Parameter& g = magnet->gamma;
+    double gm = g.isUniform() ? std::abs(double(g.getUniformValue()))
+                              : double(maxAbsValue(g.eval()));
+    gammaMax = std::max(gammaMax, gm);
+  }
+  hCheck_ = gammaMax > 0 ? 1 / (realEps * gammaMax * minimizerBMax)
+                         : std::numeric_limits<double>::infinity();
+
   while (!converged() && !stuck_)
     step();
 
@@ -225,14 +239,16 @@ void Minimizer::step() {
     } else {
       if (std::abs(hf) > hMax)
         hf = std::copysign(hMax, hf);
-      double tMax = maxVecNormAll(t0);
-      if (tMax > 0 && std::abs(hf) * tMax > 1 / realEps)
-        hf = std::copysign(1 / (realEps * tMax), hf);
+      // Only compute max|t| when the clamp could possibly fire (see hCheck_ in exec()).
+      if (std::abs(hf) > hCheck_) {
+        double tMax = maxVecNormAll(t0);
+        if (tMax > 0 && std::abs(hf) * tMax > 1 / realEps)
+          hf = std::copysign(1 / (realEps * tMax), hf);
+      }
       h = hf;
     }
   }
   hBadNext_ = false;
-
   real trialF = 0;
   bool moved = true;
 
