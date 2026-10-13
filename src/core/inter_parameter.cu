@@ -19,6 +19,7 @@ InterParameter::InterParameter(std::shared_ptr<const System> system,
 }
 
 const std::vector<real> InterParameter::eval() const {
+  // TODO: eval should include intraRegionValue_
   if (isUniform())
     return std::vector<real>(valuesLimit_, uniformValue_);
   return valuesBuffer_.getData();
@@ -42,13 +43,24 @@ void InterParameter::set(real value) {
     valuesBuffer_.recycle();
 }
 
+void InterParameter::setIntraRegionValue(real value) {
+  if (isUniform()) {
+    if (value == uniformValue_)
+      return;  // nothing to update
+
+    valuesBuffer_.allocate(valuesLimit_);  // make memory available
+    setBuffer(uniformValue_);              // keep old uniform value
+  }
+  intraRegionValue_ = value;
+}
+
 void InterParameter::setBetween(unsigned int i, unsigned int j, real value) {
   system_->checkIdxInRegions(i);
   system_->checkIdxInRegions(j);
   if (i == j) {
     throw std::invalid_argument(
-        "Can not set " + name_ +
-        ", region indexes must be different: " + std::to_string(i) + ".");
+        "Can not set " + name_ + ", region indexes must be different: " +
+        std::to_string(i) + "." + "Set intra-region value instead.");
   }
 
   if (isUniform()) {
@@ -57,6 +69,7 @@ void InterParameter::setBetween(unsigned int i, unsigned int j, real value) {
 
     valuesBuffer_.allocate(valuesLimit_);  // make memory available
     setBuffer(uniformValue_);              // keep old uniform value
+    intraRegionValue_ = uniformValue_;     // also on diagonal
   }
 
   // Update GPU memory directly at (i, j)
@@ -73,17 +86,21 @@ real InterParameter::getUniformValue() const {
   return uniformValue_;
 }
 
+real InterParameter::getIntraRegionValue() const {
+  if (isUniform())
+    return uniformValue_;
+  return intraRegionValue_;
+}
+
 real InterParameter::getBetween(unsigned int i, unsigned int j) const {
   system_->checkIdxInRegions(i);
   system_->checkIdxInRegions(j);
-  if (i == j) {
-    throw std::invalid_argument(
-        "Can not get " + name_ +
-        ", region indexes must be different: " + std::to_string(i) + ".");
-  }
 
   if (isUniform())
     return uniformValue_;
+
+  if (i == j)
+    return intraRegionValue_;
 
   // legally copy single value from device to host
   real hostValue;
