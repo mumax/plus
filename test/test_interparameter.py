@@ -73,11 +73,11 @@ class TestUniformState:
         i_s, j_s = np.tril_indices(n_regions, k=-1)  # lower triangle, no diagonal
         assert np.all(matrix[i_s, j_s] == val)
 
-    def test_diagonal_is_zero(self, interex):
+    def test_diagonal_is_intra_region_value(self, interex):
         """Diagonal has no physical meaning for inter-region parameters."""
-        interex.set(5.0)
+        interex.intra_region_value = 5.0
         matrix = interex.eval()
-        assert np.all(np.diag(matrix) == 0.0)
+        assert np.all(np.diag(matrix) == 5.0)
 
 
 class TestSetGetBetween:
@@ -113,10 +113,6 @@ class TestSetGetBetween:
         with pytest.raises(Exception):
             interex.set_between(2, 2, 1.0)
 
-    def test_get_between_same_index_exception(self, interex):
-        with pytest.raises(Exception):
-            interex.get_between(3, 3)
-
     def test_set_between_with_uniform_value(self, interex):
         """Setting a pair to the current uniform value should keep is_uniform True."""
         interex.set(5.0)
@@ -125,6 +121,34 @@ class TestSetGetBetween:
 
     def test_uniform_value_exception_when_not_uniform(self, interex):
         interex.set_between(0, 1, 99.0)
+        assert interex.is_uniform is False
+        with pytest.raises(Exception):
+            _ = interex.uniform_value
+
+
+class TestIntraRegionValue:
+    def test_setting_intra_region_makes_non_uniform(self, interex):
+        interex.intra_region_value = 99.0
+        assert interex.is_uniform is False
+
+    def test_intra_region_value_get_after_set(self, interex):
+        interex.intra_region_value = 42.0
+        assert interex.intra_region_value == 42.0
+
+    def test_get_between_same_index(self, interex):
+        interex.intra_region_value = 27.0
+        for i in interex.region_indices:
+            assert interex.get_between(i, i) == 27.0
+
+    def test_setting_intra_region_value_with_uniform_value(self, interex):
+        """Setting intra_region_value to the current uniform value should keep
+        is_uniform True."""
+        interex.set(5.0)
+        interex.intra_region_value = 5.0
+        assert interex.is_uniform is True
+
+    def test_uniform_value_exception_when_not_uniform(self, interex):
+        interex.intra_region_value = 99.0
         assert interex.is_uniform is False
         with pytest.raises(Exception):
             _ = interex.uniform_value
