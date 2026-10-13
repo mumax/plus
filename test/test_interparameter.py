@@ -74,7 +74,7 @@ class TestUniformState:
         assert np.all(matrix[i_s, j_s] == val)
 
     def test_diagonal_is_intra_region_value(self, interex):
-        """Diagonal has no physical meaning for inter-region parameters."""
+        """Diagonal elements equal intra-region parameters."""
         interex.intra_region_value = 5.0
         matrix = interex.eval()
         assert np.all(np.diag(matrix) == 5.0)
