@@ -11,7 +11,7 @@ API
      - Meaning
    * - GPU_ABORT
      - "OFF"
-     - Continue after a C++ error instead of exiting (the default).
+     - Continue after a CUDA error instead of exiting (the default).
    * - MUMAXPLUS_FP_PRECISION
      - "SINGLE"/"1"/"32" or "DOUBLE"/"2"/"64"
      - Set the floating-point precision. See this :doc:`tutorial <tutorial/precision>`.
