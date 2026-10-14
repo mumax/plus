@@ -1,9 +1,9 @@
 #include "effectivefield.hpp"
 
 #include "afmexchange.hpp"
-#include "atmexchange.hpp"
 #include "anisotropy.hpp"
 #include "antiferromagnet.hpp"
+#include "atmexchange.hpp"
 #include "demag.hpp"
 #include "dmi.hpp"
 #include "exchange.hpp"
@@ -17,20 +17,38 @@
 Field evalEffectiveField(const Ferromagnet* magnet) {
   // there will probably be exchange, otherwise safely initialized as 0
   Field h = evalExchangeField(magnet);
-  if (!anisotropyAssuredZero(magnet)) {h += evalAnisotropyField(magnet);}
-  if (!externalFieldAssuredZero(magnet)) {h += evalExternalField(magnet);}
-  if (!inhomoDmiAssuredZero(magnet)) {h += evalDmiField(magnet);}
-  if (!demagFieldAssuredZero(magnet)) {h += evalDemagField(magnet);}
+  if (!anisotropyAssuredZero(magnet)) {
+    h += evalAnisotropyField(magnet);
+  }
+  if (!externalFieldAssuredZero(magnet)) {
+    h += evalExternalField(magnet);
+  }
+  if (!inhomoDmiAssuredZero(magnet)) {
+    h += evalDmiField(magnet);
+  }
+  if (!demagFieldAssuredZero(magnet)) {
+    h += evalDemagField(magnet);
+  }
   if (!magnetoelasticAssuredZero(magnet)) {
-      h += evalMagnetoelasticField(magnet);}
-  if (magnet->isSublattice())
-      // AFM exchange terms
-      if (!inHomoAfmExchangeAssuredZero(magnet)) {h += evalInHomogeneousAfmExchangeField(magnet);}
-      if (!homoAfmExchangeAssuredZero(magnet)) {h += evalHomogeneousAfmExchangeField(magnet);}
-      // Homogeneous (local) DMI term
-      if (!homoDmiAssuredZero(magnet)) {h += evalHomoDmiField(magnet);}
-      // ATM anisotropic exchange
-      if (!atmExchangeAssuredZero(magnet)) {h += evalAtmExchangeField(magnet);}
+    h += evalMagnetoelasticField(magnet);
+  }
+  if (magnet->isSublattice()) {
+    // AFM exchange terms
+    if (!inHomoAfmExchangeAssuredZero(magnet)) {
+      h += evalInHomogeneousAfmExchangeField(magnet);
+    }
+  }
+  if (!homoAfmExchangeAssuredZero(magnet)) {
+    h += evalHomogeneousAfmExchangeField(magnet);
+  }
+  // Homogeneous (local) DMI term
+  if (!homoDmiAssuredZero(magnet)) {
+    h += evalHomoDmiField(magnet);
+  }
+  // ATM anisotropic exchange
+  if (!atmExchangeAssuredZero(magnet)) {
+    h += evalAtmExchangeField(magnet);
+  }
   return h;
 }
 

@@ -40,8 +40,7 @@ class DynamicParameter {
    * @param mask define how the magnitude of the time-dependent function should
    *             depend on cell coordinates. The input value will be copied.
    */
-  void addTimeDependentTerm(const std::function<T(real)>& term,
-                            const Field& mask) {
+  void addTimeDependentTerm(const std::function<T(real)>& term, const Field& mask) {
     time_dep_terms.emplace_back(std::function<T(real)>(term), Field(mask));
   }
   /** Remove all time-dependet terms and their masks. */

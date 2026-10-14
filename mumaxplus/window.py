@@ -1,4 +1,4 @@
-class Window:
+class Window:  # noqa: D100
     """Simulation window of the world.
 
     Each world already has its own Window. This Window can be accessed through
@@ -44,8 +44,8 @@ class Window:
     @property
     def position(self):
         """Returns the current position of the simulation window (m).
-        The origin of the window coincides (when unmoved) with the origin of a `Grid` instance,
-        i.e. it is determined by the coordinate of the lower left cell.
+        The origin of the window coincides (when unmoved) with the origin of a `Grid`
+        instance, i.e. it is determined by the coordinate of the lower left cell.
         """
         return self._impl.position
 

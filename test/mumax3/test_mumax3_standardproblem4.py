@@ -1,16 +1,19 @@
-import pytest
-import numpy as np
-
 from mumax3 import Mumax3Simulation
+import numpy as np
+import pytest
+
 from mumaxplus import Ferromagnet, Grid, World
 
 RTOL = 3e-2  # 3% is quite large :(
 
+
 def max_absolute_error(result, wanted):
     return np.max(abs(result - wanted))
 
+
 def max_relative_error(result, wanted):
-    return np.max(abs((result - wanted)/wanted))
+    return np.max(abs((result - wanted) / wanted))
+
 
 def max_semirelative_error(result, wanted):
     """Like relative error, but divides by the maximum of wanted.
@@ -21,6 +24,8 @@ def max_semirelative_error(result, wanted):
 
 B1 = (-24.6e-3, 4.3e-3, 0)  # field 1
 B2 = (-35.5e-3, -6.3e-3, 0)  # field 2
+
+
 @pytest.fixture(scope="class", params=[B1, B2])
 def simulations(request):
     """Sets up and runs standard problem 4 for both mumax⁺ and mumax³, given
@@ -41,12 +46,11 @@ def simulations(request):
 
     max_time = 1e-9
     step_time = 1e-12
-    
 
     # === mumax⁺ ===
     world = World(cellsize=(length / nx, width / ny, thickness / nz))
     magnet = Ferromagnet(world, Grid((nx, ny, nz)))
-    
+
     magnet.msat = msat
     magnet.aex = aex
     magnet.alpha = alpha
@@ -56,7 +60,7 @@ def simulations(request):
 
     world.bias_magnetic_field = B_mag
 
-    timepoints = np.arange(0, max_time + 0.5*step_time, step_time)
+    timepoints = np.arange(0, max_time + 0.5 * step_time, step_time)
     outputquantities = {
         "t": lambda: world.timesolver.time,
         "mx": lambda: magnet.magnetization.average()[0],
@@ -65,10 +69,9 @@ def simulations(request):
         "E_total": magnet.total_energy,
         "E_exch": magnet.exchange_energy,
         "E_Zeeman": magnet.zeeman_energy,
-        "E_demag": magnet.demag_energy
+        "E_demag": magnet.demag_energy,
     }
     mumaxplusoutput = world.timesolver.solve(timepoints, outputquantities)
-
 
     # === mumax³ ===
     mumax3sim = Mumax3Simulation(
@@ -96,6 +99,7 @@ def simulations(request):
     )
 
     return mumaxplusoutput, mumax3sim
+
 
 @pytest.mark.mumax3
 class TestStandardProblem4:

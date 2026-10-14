@@ -1,9 +1,8 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import plot_field
-
 
 world = World(cellsize=(3e-9, 3e-9, 3e-9))
 

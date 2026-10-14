@@ -3,7 +3,6 @@
 #include "poyntingvector.hpp"
 #include "stresstensor.hpp"
 
-
 __global__ void k_poyntingVector(CuField poyntingField,
                                  const CuField stress,
                                  const CuField velocity) {
@@ -23,8 +22,8 @@ __global__ void k_poyntingVector(CuField poyntingField,
   for (int i = 0; i < 3; i++) {
     value = 0;
     for (int j = 0; j < 3; j++) {
-      stressComp = (i == j) ? i : i+j+2;
-      value += - stress.valueAt(idx, stressComp) * velocity.valueAt(idx, j);
+      stressComp = (i == j) ? i : i + j + 2;
+      value += -stress.valueAt(idx, stressComp) * velocity.valueAt(idx, j);
     }
     poyntingField.setValueInCell(idx, i, value);
   }

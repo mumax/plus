@@ -6,9 +6,10 @@ https://doi.org/10.1063/1.4899186
 """
 
 
+from math import acos, atan, cos, exp, pi, sin, sqrt, tan
+
 import matplotlib.pyplot as plt
 import numpy as np
-from math import acos, atan, pi, exp, tan, sin, cos, sqrt
 
 from mumaxplus import *
 from mumaxplus.util import *

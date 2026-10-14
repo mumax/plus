@@ -29,7 +29,7 @@ class Mumax3Simulation:
 
         if os.path.exists(self.outputdir + "/table.txt"):
             self._table = read_table(self.outputdir + "/table.txt")
-            self._table.columns = ' '.join(self._table.columns).split()[1::2]
+            self._table.columns = " ".join(self._table.columns).split()[1::2]
         else:
             self._table = None
 

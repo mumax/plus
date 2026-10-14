@@ -8,8 +8,10 @@
 #include "fieldops.hpp"
 #include "system.hpp"
 
-Variable::Variable(std::shared_ptr<const System> system, int ncomp,
-                   std::string name, std::string unit)
+Variable::Variable(std::shared_ptr<const System> system,
+                   int ncomp,
+                   std::string name,
+                   std::string unit)
     : name_(name), unit_(unit) {
   field_ = new Field(system, ncomp);
 }
@@ -80,7 +82,6 @@ void Variable::setInRegion(const unsigned int region_idx, real3 value) const {
                              "components instead of 3");
   field_->setUniformValueInRegion(region_idx, value);
 }
-
 
 NormalizedVariable::NormalizedVariable(std::shared_ptr<const System> system,
                                        int ncomp,

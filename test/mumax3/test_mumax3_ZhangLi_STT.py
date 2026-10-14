@@ -1,18 +1,22 @@
-import pytest
-import numpy as np
-
 from mumax3 import Mumax3Simulation
+import numpy as np
+import pytest
+
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import *
 
 RTOL = 1e-5  # 0.001%
+
 
 def max_relative_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
     relerr = err / np.linalg.norm(wanted, axis=0)
     return np.max(relerr)
 
+
 xi1, xi2, xi3, xi4 = 0.0, 0.05, 0.1, 0.5
+
+
 @pytest.fixture(scope="class", params=[xi1, xi2, xi3, xi4])
 def simulations(request):
     """Sets up a simulation to check the STT for both mumax⁺ and mumax³, given
@@ -22,7 +26,7 @@ def simulations(request):
     # === specifications ===
     length, width, thickness = 100e-9, 100e-9, 10e-9
     nx, ny, nz = 50, 50, 5  # following mumax³ paper
-    cellsize = (length/nx, width/ny, thickness/nz)
+    cellsize = (length / nx, width / ny, thickness / nz)
     gridsize = (nx, ny, nz)
 
     msat = 800e3
@@ -72,7 +76,8 @@ def simulations(request):
     magnet.pol = pol
     magnet.jcur = jcur
 
-    return  world, magnet, mumax3sim
+    return world, magnet, mumax3sim
+
 
 @pytest.mark.mumax3
 class TestZhangLi:
@@ -80,12 +85,16 @@ class TestZhangLi:
 
     def test_STT(self, simulations):
         world, magnet, mumax3sim = simulations
-        err = max_relative_error(magnet.spin_transfer_torque.eval(),
-                                 mumax3sim.get_field("STT") * GAMMALL_DEFAULT)
+        err = max_relative_error(
+            magnet.spin_transfer_torque.eval(),
+            mumax3sim.get_field("STT") * GAMMALL_DEFAULT,
+        )
         assert err < RTOL
-    
+
     def test_total(self, simulations):
         world, magnet, mumax3sim = simulations
-        err = max_relative_error(magnet.torque.eval() - magnet.llg_torque.eval(),
-                                 magnet.spin_transfer_torque.eval())
+        err = max_relative_error(
+            magnet.torque.eval() - magnet.llg_torque.eval(),
+            magnet.spin_transfer_torque.eval(),
+        )
         assert err < RTOL
