@@ -153,6 +153,21 @@ class TestIntraRegionValue:
         with pytest.raises(Exception):
             _ = interex.uniform_value
 
+    def test_intra_region_value_is_uniform_without_regions(self):
+        """When there is only region 0 (default), the only possible value is the intra
+        region value. Setting intra region value should thus be the same as setting a
+        uniform value.
+        """
+        world = World((1e-9, 1e-9, 1e-9))
+        magnet = Ferromagnet(world, Grid((nx, ny, nz)))  # magnet without regions
+
+        interex = magnet.inter_exchange
+        interex.set(0.0)  # set default
+        interex.intra_region_value = 36.0
+
+        assert interex.is_uniform
+        assert interex.uniform_value == 36.0
+
 
 class TestEval:
     def test_eval_shape(self, interex):
