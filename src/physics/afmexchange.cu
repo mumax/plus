@@ -123,7 +123,6 @@ __global__ void k_afmExchangeFieldNN(CuField hField,
   real delta;
   real ann_;
   real exch_nn;
-  real inter, scale;
 
   // AFM exchange in NN cells
 #pragma unroll
@@ -155,14 +154,9 @@ __global__ void k_afmExchangeFieldNN(CuField hField,
       ann_ = afmex_nn.valueAt(idx_);
 
       // get scaled exchange between coo and coo_
-      inter = 0;
-      scale = 1;
       unsigned int ridx_ = system.getRegionIdx(idx_);
-      if (ridx != ridx_) {
-        scale = scaleExch.valueBetween(ridx, ridx_);
-        inter = interExch.valueBetween(ridx, ridx_);
-      }
-      exch_nn = getExchangeStiffness(inter, scale, ann, ann_);
+      exch_nn = getExchangeStiffness(interExch.valueBetween(ridx, ridx_),
+                                     scaleExch.valueBetween(ridx, ridx_), ann, ann_);
 
     } else {  // Boundary
       if (openBC)
@@ -192,15 +186,11 @@ __global__ void k_afmExchangeFieldNN(CuField hField,
       real3 d_m1 = (m1 - m1__) / delta;
 
       // get scaled exchange between coo and coo__
-      inter = 0;
-      scale = 1;
       unsigned int ridx__ = system.getRegionIdx(idx__);
-      if (ridx != ridx__) {
-        scale = scaleExch.valueBetween(ridx, ridx__);
-        inter = interExch.valueBetween(ridx, ridx__);
-      }
       real ann__ = afmex_nn.valueAt(idx__);
-      real afmex_nn__ = getExchangeStiffness(inter, scale, ann, ann__);
+      real afmex_nn__ =
+          getExchangeStiffness(interExch.valueBetween(ridx, ridx__),
+                               scaleExch.valueBetween(ridx, ridx__), ann, ann__);
 
       // fill in ghost neighboring magnetization
       m2_ = m2 + (afmex_nn__ * cross(cross(d_m1, m2), m2) + Gamma2) * delta / (2 * a);

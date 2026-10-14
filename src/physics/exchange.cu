@@ -61,7 +61,6 @@ __global__ void k_exchangeField(CuField hField,
   // regions
   unsigned int ridx_;
   const unsigned int ridx = system.getRegionIdx(idx);
-  real inter, scale;
   real Aex;  // final scaled exchange
 
   // FM exchange in NN cells
@@ -77,14 +76,9 @@ __global__ void k_exchangeField(CuField hField,
       m_ = mField.vectorAt(idx_);
       a_ = aex.valueAt(idx_);
 
-      inter = 0;
-      scale = 1;
       ridx_ = system.getRegionIdx(idx_);
-      if (ridx != ridx_) {
-        scale = scaleEx.valueBetween(ridx, ridx_);
-        inter = interEx.valueBetween(ridx, ridx_);
-      }
-      Aex = getExchangeStiffness(inter, scale, a, a_);
+      Aex = getExchangeStiffness(interEx.valueBetween(ridx, ridx_),
+                                 scaleEx.valueBetween(ridx, ridx_), a, a_);
     } else {  // outside
       if (openBC)
         continue;
@@ -141,7 +135,6 @@ __global__ void k_exchangeField(CuField hField,
   // regions
   unsigned int ridx_;
   const unsigned int ridx = system.getRegionIdx(idx);
-  real inter, scale;
   real Aex;  // final scaled exchange
 
   // FM exchange in NN cells
@@ -157,14 +150,9 @@ __global__ void k_exchangeField(CuField hField,
       m_ = m1Field.vectorAt(idx_);
       a_ = aex.valueAt(idx_);
 
-      inter = 0;
-      scale = 1;
       ridx_ = system.getRegionIdx(idx_);
-      if (ridx != ridx_) {
-        scale = scaleEx.valueBetween(ridx, ridx_);
-        inter = interEx.valueBetween(ridx, ridx_);
-      }
-      Aex = getExchangeStiffness(inter, scale, a, a_);
+      Aex = getExchangeStiffness(interEx.valueBetween(ridx, ridx_),
+                                 scaleEx.valueBetween(ridx, ridx_), a, a_);
     } else {  // Neumann BC
       if (a == 0)
         continue;
