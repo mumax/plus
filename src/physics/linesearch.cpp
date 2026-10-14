@@ -207,19 +207,32 @@ LineSearchResult MTLineSearch(double f0,
     std::printf("ls entry: f0=%e slope0=%e step0=%e maxDirNorm=%e\n", f0, slope0, step0,
                 maxDirNorm);
 
-  // Step limits. With maxDirNorm known, limit the displacement step*|s|: below
-  // ~4 float32 ulps of |m|=1 the move is rounded away, and above ~1e3 the trial
-  // point on the sphere has saturated.
+  // Step limits, as limits on the displacement alpha*|s|, so they mean the same
+  // thing whatever the torque scale.
+#if LS_CAYLEY
+  // Cayley curve: the rotation is 2*atan(alpha*|s|/2), which saturates at pi.
+  // Beyond alpha*|s| ~ 1e2 (rotation > 177 deg) a larger step adds nothing.
+  const double maxDisp = 1e3;  // tunable
+#else
+  const double maxDisp = 1e3;
+#endif
   double minStep = 1e-15;
   double maxStep = 1e15;
-  if (maxDirNorm > 0)
+  if (maxDirNorm > 0) {
     minStep = 1e-15 / maxDirNorm;
-  maxStep = 1e3 / maxDirNorm;
+    maxStep = maxDisp / maxDirNorm;
+  }
 
-  // Angle cap: s is ~tangent to m, so a step α rotates a cell by atan(α|s|).
+  // Angle cap on the rotation of any cell.
   if (maxStepAngle > 0 && maxDirNorm > 0) {
     double effAngle = std::min(maxStepAngle, maxAngleLimit);
+#if LS_CAYLEY
+    // exact rotation 2*atan(alpha*|s|/2)  =>  alpha_max = 2*tan(theta/2)/|s|
+    double capStep = 2.0 * std::tan(0.5 * effAngle * M_PI / 180.0) / maxDirNorm;
+#else
+    // s is ~tangent, so a step alpha rotates a cell by atan(alpha*|s|)
     double capStep = std::tan(effAngle * M_PI / 180.0) / maxDirNorm;
+#endif
     if (capStep < maxStep)
       maxStep = capStep;
   }

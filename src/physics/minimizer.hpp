@@ -67,8 +67,7 @@ class Minimizer {
   int verbose_;
   int nLineSearches_;  // number of sdLineSearch calls (diagnostic)
   int nGllRescues_;    // number of GLL-rejected BB steps (diagnostic)
-  double
-      hCheck_;  // |h| above which the BB step clamp must check max|t| (set in exec())
+  double hCheck_;  // |h| above which the BB step clamp must check max|t|(set in exec())
 
   std::vector<Field> tTrial_;      // torque at the most recent trial point
   std::deque<real> lastEnergies_;  // energy history for the non-monotone (GLL) test
@@ -77,9 +76,8 @@ class Minimizer {
 
   bool firstStep_;  // true only before the first step has been taken
   bool stuck_;      // no descent step exists at working precision
-  bool
-      hBadNext_;  // BB formula degenerate; force recovery on the next step (modes 2, 3)
-  bool gllOff_;   // GLL rescues disabled until progress is made (mode 3)
+  bool hBadNext_;  // BB formula degenerate; force recovery on the next step(modes 2, 3)
+  bool gllOff_;    // GLL rescues disabled until progress is made (mode 3)
   int stallCount_;  // consecutive GLL rescues without progress
   real fRef_;       // energy at the start of the current no-progress streak
 
@@ -91,6 +89,7 @@ class Minimizer {
   int rescueStall_;  // consecutive convergence candidates without progress (mode 2)
   real fRescue_;     // energy at the last accepted convergence-rescue point (mode 2)
   bool haveRescue_;
+  int lsEvals_ = 0;
 
   real energyScale_;  // max(|E|, sum|E_i|) from the most recent energy evaluation
   real minimizerEnergy();

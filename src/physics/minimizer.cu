@@ -27,6 +27,10 @@ static const std::array<real, 3> fallbackDisplacements = {0.1, 0.05, 0.01};
 // Largest |B_perp| (T) for which skipping the BB clamp check is assumed safe.
 static const double minimizerBMax = 1e6;
 
+// With verbose >= 3, line search summaries are only printed for the first
+// lsLogMaxStep minimizer steps, to keep the output manageable.
+static const int lsLogMaxStep = 200;
+
 Minimizer::Minimizer(const Ferromagnet* magnet,
                      real stopMaxMagDiff,
                      int nMagDiffSamples,
@@ -406,12 +410,26 @@ __global__ void k_slopePartial(real* partials,
     if (!baseField.cellInGeometry(i))
       continue;
     real3 s = dirField.vectorAt(i);
+    real3 t = torqueField.vectorAt(i);  // torque at the trial point
+    real gam = gamma.valueAt(i);        // torque = gam * B_perp
+    if (gam == 0)
+      continue;
+#if LS_CAYLEY
+    // phi'(a) = Ms * g . dm/da with g = -t/gam and
+    // dm/da = 4[(4 - a^2 S) s - 4 a S m0] / (4 + a^2 S)^2,  S = |s|^2
+    real3 m0 = baseField.vectorAt(i);
+    real S = dot(s, s);
+    real a2S = step * step * S;
+    real D = 4 + a2S;
+    kahanAdd(acc[0], comp[0],
+             -4 * msat.valueAt(i) *
+                 ((4 - a2S) * dot(t, s) - 4 * step * S * dot(t, m0)) / (gam * D * D));
+#else
     real3 x = baseField.vectorAt(i) + step * s;
     real n2 = dot(x, x);
-    real g = gamma.valueAt(i);
-    if (n2 > 0 && g != 0)
-      kahanAdd(acc[0], comp[0],
-               -msat.valueAt(i) * dot(torqueField.vectorAt(i), s) / (g * sqrt(n2)));
+    if (n2 > 0)
+      kahanAdd(acc[0], comp[0], -msat.valueAt(i) * dot(t, s) / (gam * sqrt(n2)));
+#endif
   }
 
   blockReduceSum<real, 1>(acc);
@@ -499,17 +517,27 @@ bool Minimizer::sdLineSearch(const std::vector<Field>& base,
   double slope0 = slopeAlongLine(base, dir, dir, 0);
 
   auto eval = [&](double alpha) -> std::pair<double, double> {
+    lsEvals_++;
+#if LS_CAYLEY
+    stepAlong(base, dir, real(alpha));  // same curve as the BB step
+#else
     stepStraight(base, dir, real(alpha));
+#endif
     double f = trialEnergyAndTorque();
     double slope = slopeAlongLine(base, dir, tTrial_, real(alpha));
     return {f, slope};
   };
-
+  const int evals0 = lsEvals_;
   LineSearchResult res = MTLineSearch(f0, slope0, maxDirNorm, step0, maxStepAngle_,
-                                      f0Scale, eval, verbose_);
+                                      f0Scale, eval, verbose_ > 2 ? 1 : verbose_);
 
   bool ok = res.step > 0 && std::isfinite(res.f) &&
             (res.info == LS_CONVERGED || res.info == LS_AT_MAX_STEP || res.f < f0);
+
+  if (verbose_ > 2 && nsteps_ < lsLogMaxStep)
+    std::printf("LS @%d: seed_d=%.3e acc_d=%.3e f-f0=%.3e info=%d evals=%d ok=%d\n",
+                nsteps_, step0 * maxDirNorm, res.step * maxDirNorm, res.f - f0,
+                res.info, lsEvals_ - evals0, int(ok));
   if (!ok) {
     // M may be at a trial point (step > 0 with lsAtMinStep / lsNoProgress /
     // lsMaxEvals and f >= f0, or a non-finite trial). Put it back; t1 was never
@@ -581,6 +609,8 @@ bool Minimizer::gllRescue(real f0, real f0Scale, real h, real& newF) {
 
   setMagnetization(m0);  // early returns of the search leave M untouched
   double step;
+  if (verbose_ > 2 && nsteps_ < lsLogMaxStep)
+    std::printf("  (BB h %s)\n", h < 0 ? "negative" : "positive");
   if (sdLineSearch(m0, t0, f0, f0Scale, std::abs(double(h)), newF, step))
     return true;
 

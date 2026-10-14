@@ -21,6 +21,15 @@ enum LineSearchInfo {
   LS_NO_PROGRESS = 6   // cstep failed, or trial left the bracket
 };
 
+// A/B switch for the curve the line search moves along.
+//   0: m(alpha) = normalize(base + alpha*dir)         (original)
+//   1: m(alpha) = Cayley rotation, as in the BB step  (k_step in minimizer.cu)
+// Override at build time with -DLS_CAYLEY=0 or 1. This header is included by
+// both linesearch.cpp and minimizer.cu, so both pick it up.
+#ifndef LS_CAYLEY
+#define LS_CAYLEY 1
+#endif
+
 struct LineSearchResult {
   double f;     // energy at the returned step
   double step;  // 0 means no improvement was found, callers must treat as failure
