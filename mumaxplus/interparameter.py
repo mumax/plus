@@ -115,6 +115,7 @@ class InterParameter:
         """Return the InterParameter value within a single region of any index.
 
         This acts as a safe fall-back when evaluating two equal region indices.
+        By default, this has the same value as :attr:`uniform_value`.
 
         See Also
         --------
