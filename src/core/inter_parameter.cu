@@ -44,6 +44,12 @@ void InterParameter::set(real value) {
 }
 
 void InterParameter::setIntraRegionValue(real value) {
+  if (valuesLimit_ == 0) {
+    // There is only region 0: intraRegionValue is the only possible value
+    set(value);
+    return;
+  }
+
   if (isUniform()) {
     if (value == uniformValue_)
       return;  // nothing to update
