@@ -216,9 +216,9 @@ class Altermagnet(Magnet):
         inhomogeneous exchange interaction between neighboring simulation cells.
 
         For a cell adjacent to a boundary, Neumann boundary conditions cannot be
-        properly applied in the following conditions. If :py:attr:`Ferromagnet.msat` of
-        either sublattice is 0 in that cell, or the next cell inward (e.g. on the left
-        if the boundary is on the right), open boundary conditions are applied instead.
+        properly applied if :py:attr:`Ferromagnet.msat` of either sublattice is 0 in
+        that cell, or the next cell inward. In this case, open boundary conditions are
+        applied instead.
 
         See Also
         --------
