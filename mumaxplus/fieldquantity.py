@@ -126,7 +126,7 @@ class FieldQuantity:
         return (stop - start) / ntimes
 
     def save_ovf(self, name=""):
-        """Save the FieldQuantity as an OVF file.
+        """Save the FieldQuantity as an OVF 2.0 Binary 4 file.
 
         Parameters
         ----------
@@ -140,14 +140,43 @@ class FieldQuantity:
         Warning
         -------
         self.name returns a string with colons (:). To avoid issues on Windows, these colons are changed to underscores (_)."""
-        cx, cy, cz = self._impl.system.cellsize
-        ovf = pyovf.create(_np.moveaxis(self.eval(), 0, -1), xstepsize=cx, ystepsize=cy, zstepsize=cz, title=self.name)
-        ovf.TotalSimTime = self._impl.system.time
+        # pyovf 0.2.14's native writer retains a full field buffer per export.
+        # Write the binary payload directly so repeated exports stay bounded.
+        data = _np.ascontiguousarray(_np.moveaxis(self.eval(), 0, -1), dtype="<f4")
         if name == "":
             count = self._ovf_counts.get(self.name, 0)
             name = self.name.replace(":", "_") + f"_{count:06d}.ovf"
             self._ovf_counts[self.name] = count + 1
-        pyovf.write(name, ovf)
+
+        header = [
+            "# OOMMF OVF 2.0",
+            "# Segment count: 1",
+            "# Begin: Segment",
+            "# Begin: Header",
+            f"# Title: {self.name}",
+            "# meshtype: rectangular",
+            "# meshunit: m",
+            f"# valuedim: {self.ncomp}",
+            "# valuelabels: " + " ".join(f"component_{i}" for i in range(self.ncomp)),
+            "# valueunits: " + " ".join([self.unit or "1"] * self.ncomp),
+            f"# Desc: Total simulation time: {self._impl.system.time} s",
+        ]
+        for axis, count, origin, step in zip(
+            "xyz", self.grid.size, self.grid.origin, self._impl.system.cellsize
+        ):
+            header.extend([
+                f"# {axis}nodes: {count}",
+                f"# {axis}stepsize: {step:.17g}",
+                f"# {axis}base: {origin * step:.17g}",
+                f"# {axis}min: {(origin - 0.5) * step:.17g}",
+                f"# {axis}max: {(origin + count - 0.5) * step:.17g}",
+            ])
+        header.extend(["# End: Header", "# Begin: Data Binary 4", ""])
+        with open(name, "wb") as stream:
+            stream.write("\n".join(header).encode("utf-8"))
+            _np.array([1234567.0], dtype="<f4").tofile(stream)
+            data.tofile(stream)
+            stream.write(b"\n# End: Data Binary 4\n# End: Segment\n")
 
     def load_ovf(self, name=""):
         """Load an OVF file as a FieldQuantity.
