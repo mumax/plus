@@ -174,6 +174,7 @@ class FieldQuantity:
         header.extend(["# End: Header", "# Begin: Data Binary 4", ""])
         with open(name, "wb") as stream:
             stream.write("\n".join(header).encode("utf-8"))
+            # OVF 2.0 byte-order check value for "Data Binary 4" (little-endian float32)
             _np.array([1234567.0], dtype="<f4").tofile(stream)
             data.tofile(stream)
             stream.write(b"\n# End: Data Binary 4\n# End: Segment\n")
