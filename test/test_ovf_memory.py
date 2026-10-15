@@ -2,7 +2,6 @@
 
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
 import textwrap
@@ -42,8 +41,6 @@ def test_repeated_ovf_exports_have_bounded_memory(tmp_path):
         """
     )
     env = os.environ.copy()
-    root = str(Path(__file__).resolve().parents[1])
-    env["PYTHONPATH"] = os.pathsep.join(filter(None, (root, env.get("PYTHONPATH"))))
     env["OMP_NUM_THREADS"] = env["OPENBLAS_NUM_THREADS"] = "1"
     result = subprocess.run(
         [sys.executable, "-c", code], cwd=tmp_path, env=env,
