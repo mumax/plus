@@ -70,7 +70,7 @@ class TestUniformState:
         interex.set(val)
         matrix = interex.eval()
 
-        i_s, j_s = np.tril_indices(n_regions, k=-1)  # lower triangle, no diagonal
+        i_s, j_s = np.tril_indices(n_regions, k=0)  # lower triangle, with diagonal
         assert np.all(matrix[i_s, j_s] == val)
 
     def test_diagonal_is_intra_region_value(self, interex):
@@ -88,6 +88,14 @@ class TestSetGetBetween:
     def test_get_between_after_set_between(self, interex):
         interex.set_between(1, 3, 42.0)
         assert interex.get_between(1, 3) == 42.0
+
+    @pytest.mark.parametrize("first_non_uniform", [False, True])
+    def test_get_between_after_setting_uniform_value(self, interex, first_non_uniform):
+        if first_non_uniform:
+            interex.set_between(1, 2, 9.0)
+
+        interex.set(37.0)
+        assert interex.get_between(1, 0) == 37.0
 
     def test_get_between_is_symmetric(self, interex):
         interex.set_between(2, 4, 7.0)
@@ -146,6 +154,16 @@ class TestIntraRegionValue:
         interex.set(5.0)
         interex.intra_region_value = 5.0
         assert interex.is_uniform is True
+
+    @pytest.mark.parametrize("first_non_uniform", [False, True])
+    def test_intra_region_value_after_setting_uniform_value(
+        self, interex, first_non_uniform
+    ):
+        if first_non_uniform:
+            interex.set_between(1, 2, 9.0)
+
+        interex.set(37.0)
+        assert interex.intra_region_value == 37.0
 
     def test_uniform_value_exception_when_not_uniform(self, interex):
         interex.intra_region_value = 99.0
