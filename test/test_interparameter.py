@@ -95,7 +95,7 @@ class TestSetGetBetween:
             interex.set_between(1, 2, 9.0)
 
         interex.set(37.0)
-        assert interex.get_between(1, 0) == 37.0
+        assert interex.get_between(1, 2) == 37.0
 
     def test_get_between_is_symmetric(self, interex):
         interex.set_between(2, 4, 7.0)
