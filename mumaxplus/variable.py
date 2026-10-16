@@ -63,8 +63,9 @@ class Variable(FieldQuantity):
             x, y, z = self.meshgrid
 
             field = self.eval().copy()
-            data = value(x[mask], y[mask], z[mask])
-
+            data = _np.vectorize(value, otypes=[float] * self.shape[0])(
+                x[mask], y[mask], z[mask]
+            )
             if self.ncomp == 1:
                 if isinstance(data, (tuple, list)):
                     raise ValueError("Function must return a scalar value.")
