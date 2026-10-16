@@ -1,12 +1,12 @@
 """StrayField implementation."""
 
 from . import _cpp
-
 from .fieldquantity import FieldQuantity
 
 
 class StrayField(FieldQuantity):
     """Represent a stray field of a magnet in a specific grid."""
+
     def __init__(self, magnet, grid):
         """
         Parameters
@@ -26,11 +26,11 @@ class StrayField(FieldQuantity):
 
     def set_method(self, method):
         """Set the computation method for the stray field.
+        The default method is "fft".
 
         Parameters
         ----------
-        method : {"brute", "fft"}, optional
-            The default value is "fft".
+        method : {"brute", "fft"}
         """
         self._impl.set_method(method)
 

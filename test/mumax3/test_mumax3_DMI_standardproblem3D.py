@@ -1,23 +1,26 @@
 """This test is based on the 3D case in
    https://iopscience.iop.org/article/10.1088/1367-2630/aaea1c"""
 
-import pytest
-import numpy as np
-from mumaxplus import Ferromagnet, Grid, World
 from mumax3 import Mumax3Simulation
-from mumaxplus.util.shape import Cylinder
-from mumaxplus.util.config import blochskyrmion
+import numpy as np
+import pytest
 
+from mumaxplus import Ferromagnet, Grid, World
+from mumaxplus.util.config import blochskyrmion
+from mumaxplus.util.shape import Cylinder
 
 ATOL = 2e-3
+
+
 def max_absolute_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
     return np.max(err)
 
+
 def simulations(openBC):
     """This simulates a 3D cylinder with bulk DMI and a bloch skyrmion
-       in both mumax³ and mumax⁺."""
-    
+    in both mumax³ and mumax⁺."""
+
     # constants
     A = 8.78e-12
     D = 1.58e-3
@@ -39,7 +42,9 @@ def simulations(openBC):
 
     # mumax⁺ simulation
     world = World(cellsize=cellsize)
-    geo = Cylinder(diam, thickness).translate((nx*dx-dx)/2, (ny*dy-dy)/2, (nz*dz-dz)/2)
+    geo = Cylinder(diam, thickness).translate(
+        (nx * dx - dx) / 2, (ny * dy - dy) / 2, (nz * dz - dz) / 2
+    )
     magnet = Ferromagnet(world, Grid(gridsize), geometry=geo)
 
     magnet.enable_demag = False
@@ -48,7 +53,7 @@ def simulations(openBC):
     magnet.aex = A
     magnet.dmi_tensor.set_bulk_dmi(D)
 
-    magnet.bias_magnetic_field = (0,0,Bz)
+    magnet.bias_magnetic_field = (0, 0, Bz)
 
     magnet.magnetization = blochskyrmion(magnet.center, skyrmion_radius, charge, pol)
 
@@ -87,20 +92,19 @@ def simulations(openBC):
         """
     )
 
-    return  magnet, mumax3sim
+    return magnet, mumax3sim
 
 
 @pytest.mark.mumax3
 @pytest.mark.slow
 class TestDMI3D:
-    """Compare the results of the simulations by comparing the magnetizations.
-    """
+    """Compare the results of the simulations by comparing the magnetizations."""
 
     def test_closed(self):
         magnet, mumax3sim = simulations(False)
         err = max_absolute_error(magnet.magnetization.eval(), mumax3sim.get_field("m"))
         assert err < ATOL
-    
+
     def test_open(self):
         magnet, mumax3sim = simulations(True)
         err = max_absolute_error(magnet.magnetization.eval(), mumax3sim.get_field("m"))

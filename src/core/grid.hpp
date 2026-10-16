@@ -84,8 +84,8 @@ __device__ __host__ inline int3 Grid::wrap(int3 idx) const {
 
 __device__ __host__ inline bool Grid::cellInGrid(int3 coo) const {
   coo -= origin_;
-  return coo.x >= 0 && coo.x < size_.x && coo.y >= 0 && coo.y < size_.y &&
-         coo.z >= 0 && coo.z < size_.z;
+  return coo.x >= 0 && coo.x < size_.x && coo.y >= 0 && coo.y < size_.y && coo.z >= 0 &&
+         coo.z < size_.z;
 }
 
 __device__ __host__ inline bool Grid::overlaps(Grid other) const {

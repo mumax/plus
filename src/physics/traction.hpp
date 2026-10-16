@@ -5,7 +5,8 @@
 
 struct CuBoundaryTraction;
 
-/** BoundaryTraction holds the external traction applied on the 6 faces of each cell. */
+/** BoundaryTraction holds the external traction applied on the 6 faces of each
+ * cell. */
 struct BoundaryTraction {
   VectorParameter posXside;
   VectorParameter negXside;
@@ -15,7 +16,8 @@ struct BoundaryTraction {
   VectorParameter negZside;
 
   /** Construct the boundary traction for a given system */
-  explicit BoundaryTraction(std::shared_ptr<const System> system, std::string name = "");
+  explicit BoundaryTraction(std::shared_ptr<const System> system,
+                            std::string name = "");
 
   /** Return CuBoundaryTraction */
   CuBoundaryTraction cu() const;
@@ -23,7 +25,6 @@ struct BoundaryTraction {
   /** Returns true if all 6 VectorParameters are equal to zero. */
   bool assuredZero() const;
 };
-
 
 struct CuBoundaryTraction {
   CuVectorParameter posXside;
@@ -36,10 +37,13 @@ struct CuBoundaryTraction {
   __device__ const CuVectorParameter& getSide(int orientation, int sense) const;
 };
 
-
-__device__ inline const CuVectorParameter& CuBoundaryTraction::getSide(int orientation, int sense) const {
+__device__ inline const CuVectorParameter& CuBoundaryTraction::getSide(
+    int orientation,
+    int sense) const {
   // no safety measures
-  if (orientation == 0) return (sense == 1) ? posXside : negXside;
-  if (orientation == 1) return (sense == 1) ? posYside : negYside;
+  if (orientation == 0)
+    return (sense == 1) ? posXside : negXside;
+  if (orientation == 1)
+    return (sense == 1) ? posYside : negYside;
   return (sense == 1) ? posZside : negZside;
 }

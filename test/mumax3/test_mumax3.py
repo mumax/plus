@@ -1,7 +1,7 @@
-import pytest
-import numpy as np
-
 from mumax3 import Mumax3Simulation
+import numpy as np
+import pytest
+
 from mumaxplus import Ferromagnet, Grid, World
 
 
@@ -13,7 +13,7 @@ def max_relative_error(result, wanted):
 
 @pytest.mark.mumax3
 class TestMumax3:
-    """ Test the effective fields of mumax⁺ against mumax³ """
+    """Test the effective fields of mumax⁺ against mumax³"""
 
     def setup_class(self):
         """1. Creates a magnet with arbitrary material parameters and grid

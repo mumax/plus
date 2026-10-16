@@ -1,5 +1,5 @@
 #include <cmath>
-#include <filesystem>
+#include <filesystem>  // NOLINT (build/c++17)
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -18,8 +18,8 @@ void spinwave_dispersion() {
   std::cout << "*********** Spinwave Dispersion ***********" << std::endl;
 
   // NUMERICAL PARAMETERS
-  real fmax = 20E9;  // maximum frequency(in Hz) of the sinc pulse
-  real T = 1E-8;     // simulation time(longer->better frequency resolution)
+  real fmax = 20E9;            // maximum frequency(in Hz) of the sinc pulse
+  real T = 1E-8;               // simulation time(longer->better frequency resolution)
   real dt = 1 / (2.0 * fmax);  // the sample time
   real dx = 4E-9;              // cellsize
   int nx = 1024;               // number of cells
@@ -92,8 +92,8 @@ void spinwave_dispersion() {
   for (int i = 0; i < n_timepoints; i++) {
     mWorld.timesolver().run(dt);
     auto m = magnet->magnetization()->average();
-    magn_csv << mWorld.time() << "," << m[0] << "," << m[1] << "," << m[2]
-             << "," << Bt(i * dt).x << "," << std::endl;
+    magn_csv << mWorld.time() << "," << m[0] << "," << m[1] << "," << m[2] << ","
+             << Bt(i * dt).x << "," << std::endl;
   }
 
   std::cout << "Simulation results were saved into\n"

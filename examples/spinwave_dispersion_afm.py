@@ -1,9 +1,11 @@
+import os.path
+
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+
 from mumaxplus import Antiferromagnet, Grid, World
 from mumaxplus.util.constants import GAMMALL_DEFAULT
-import os.path
 
 # Antiferromagnetic spinwave dispersion relation
 

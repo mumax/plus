@@ -1,8 +1,8 @@
+import numpy as np
+import pytest
+
 from mumaxplus import Grid, World
 from mumaxplus.util import VoronoiTessellator
-
-import pytest
-import numpy as np
 
 
 @pytest.fixture
@@ -11,13 +11,16 @@ def test_parameters(request):
     grid = Grid((request.param))
     return world, grid
 
+
 @pytest.mark.parametrize("test_parameters", [(13, 17, 1), (5, 51, 87)], indirect=True)
 class TestVoronoiTessellation:
     """Unit tests of the VoronoiTessellator."""
 
     def test_pbc(self, test_parameters):
         world_nopbc, grid = test_parameters
-        world_pbc = World(world_nopbc.cellsize, pbc_repetitions=(1, 1, 1), mastergrid=Grid(grid.size))
+        world_pbc = World(
+            world_nopbc.cellsize, pbc_repetitions=(1, 1, 1), mastergrid=Grid(grid.size)
+        )
         tess = VoronoiTessellator(grainsize=5e-9)
         result_pbc = tess.generate(world_pbc, grid)
         result_nopbc = tess.generate(world_nopbc, grid)
@@ -25,7 +28,9 @@ class TestVoronoiTessellation:
 
     def test_region_of_center(self, test_parameters):
         world, grid = test_parameters
-        tess = VoronoiTessellator(grainsize=5e-9, region_of_center=lambda coo: int(coo[0]) % 5)
+        tess = VoronoiTessellator(
+            grainsize=5e-9, region_of_center=lambda coo: int(coo[0]) % 5
+        )
         result = np.ravel(tess.generate(world, grid))
         assert np.all((0 <= result) & (result < 5))
 

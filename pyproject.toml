@@ -51,7 +51,6 @@ Issues = "https://github.com/mumax/plus/issues"
 Paper = "https://doi.org/10.1038/s41524-025-01893-y"
 
 [tool.black]
-target-version = ['py37', 'py38']
 force-exclude = '''
 (
   /(
