@@ -224,7 +224,12 @@ class Parameter(FieldQuantity):
             x, y, z = self.meshgrid
 
             field = self.eval().copy()
-            data = value(x[mask], y[mask], z[mask])
+            try:  # If function is already vectorized
+                data = value(x[mask], y[mask], z[mask])
+            except Exception:
+                data = _np.vectorize(value, otypes=[float] * self.shape[0])(
+                    x[mask], y[mask], z[mask]
+                )
 
             if self.ncomp == 1:
                 if isinstance(data, (tuple, list)):
