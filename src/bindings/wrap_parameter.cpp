@@ -111,6 +111,8 @@ void wrap_parameter(py::module& m) {
       .def_property_readonly("is_uniform", &InterParameter::isUniform)
       .def_property("uniform_value", &InterParameter::getUniformValue,
                     &InterParameter::set)
+      .def_property("intra_region_value", &InterParameter::getIntraRegionValue,
+                    &InterParameter::setIntraRegionValue)
 
       .def("set", &InterParameter::set, py::arg("value"))
       .def("set_between", &InterParameter::setBetween, py::arg("i"), py::arg("j"),

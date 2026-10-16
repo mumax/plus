@@ -217,9 +217,13 @@ class NcAfm(Magnet):
     @property
     def ncafmex_nn(self) -> Parameter:
         """Intercell non-collinear antiferromagnetic exchange constant (J/m).
-        This parameter plays the role of exchange constant of the
-        antiferromagnetic inhomogeneous exchange interaction between
-        neighbouring simulation cells.
+        This parameter plays the role of exchange constant of the antiferromagnetic
+        inhomogeneous exchange interaction between neighboring simulation cells.
+
+        For a cell adjacent to a boundary, Neumann boundary conditions cannot be
+        properly applied if :py:attr:`Ferromagnet.msat` of any sublattice is 0 in that
+        cell, or the next cell inward. In this case, open boundary conditions are
+        applied instead.
 
         See Also
         --------

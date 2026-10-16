@@ -33,7 +33,8 @@ __global__ void k_exchangeField(CuField hField,
   const auto system = hField.system;
 
   // When outside the geometry, set to zero and return early
-  if (!hField.cellInGeometry(idx)) {
+  // msat is only evaluated when inside geometry and is thus safe
+  if (!hField.cellInGeometry(idx) || msat.valueAt(idx) == 0) {
     if (hField.cellInGrid(idx)) {
       hField.setVectorInCell(idx, real3{0, 0, 0});
     }
@@ -41,64 +42,55 @@ __global__ void k_exchangeField(CuField hField,
   }
 
   const Grid grid = mField.system.grid;
-  if (!grid.cellInGrid(idx))
-    return;
-
-  if (msat.valueAt(idx) == 0) {
-    hField.setVectorInCell(idx, real3{0, 0, 0});
-    return;
-  }
-
   const int3 coo = grid.index2coord(idx);
   const real3 m = mField.vectorAt(idx);
   const real a = aex.valueAt(idx);
 
+  // If there is no FM-exchange at the boundary, open BC are assumed
+  openBC = (a == 0) ? true : openBC;
+
   // accumulate exchange field in h for cell at idx, divide by msat at the end
   real3 h{0, 0, 0};
+
+  // neighbor parameters
+  int3 coo_, normal;
+  int idx_;
+  real3 m_;
+  real a_;
+
+  // regions
+  unsigned int ridx_;
+  const unsigned int ridx = system.getRegionIdx(idx);
+  real Aex;  // final scaled exchange
 
   // FM exchange in NN cells
 #pragma unroll
   for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0},
                        int3{0, 0, -1}, int3{0, 0, 1}}) {
-    const int3 coo_ = mastergrid.wrap(coo + rel_coo);
-    if (!hField.cellInGeometry(coo_) && openBC)
-      continue;
+    coo_ = mastergrid.wrap(coo + rel_coo);
+    idx_ = grid.coord2index(coo_);  // only use inside geometry
+    normal = rel_coo * rel_coo;
 
-    const int idx_ = grid.coord2index(coo_);
+    // msat is only evaluated if inside the geometry
+    if (hField.cellInGeometry(coo_) && msat.valueAt(idx_) != 0) {  // inside
+      m_ = mField.vectorAt(idx_);
+      a_ = aex.valueAt(idx_);
 
-    if (msat.valueAt(idx_) != 0 || !openBC) {
-      real3 m_;
-      real a_;
-      int3 normal = rel_coo * rel_coo;
+      ridx_ = system.getRegionIdx(idx_);
+      Aex = getExchangeStiffness(interEx.valueBetween(ridx, ridx_),
+                                 scaleEx.valueBetween(ridx, ridx_), a, a_);
+    } else {  // outside
+      if (openBC)
+        continue;
 
-      real inter = 0;
-      real scale = 1;
-      real Aex;
-
-      if (hField.cellInGeometry(coo_)) {
-        m_ = mField.vectorAt(idx_);
-        a_ = aex.valueAt(idx_);
-
-        unsigned int ridx = system.getRegionIdx(idx);
-        unsigned int ridx_ = system.getRegionIdx(idx_);
-
-        if (ridx != ridx_) {
-          scale = scaleEx.valueBetween(ridx, ridx_);
-          inter = interEx.valueBetween(ridx, ridx_);
-        }
-      } else {  // Neumann BC
-        if (a == 0)
-          continue;
-
-        real3 Gamma = getGamma(dmiTensor, idx, normal, m);
-        real delta = dot(rel_coo, system.cellsize);
-        m_ = m + (Gamma / (2 * a)) * delta;
-        a_ = a;
-      }
-
-      Aex = getExchangeStiffness(inter, scale, a, a_);
-      h += 2 * Aex * dot(normal, w) * (m_ - m);
+      // Neumann BC
+      real3 Gamma = getGamma(dmiTensor, idx, normal, m);
+      real delta = dot(rel_coo, system.cellsize);
+      m_ = m + (Gamma / (2 * a)) * delta;  // ghost neighboring magnetization
+      Aex = a;
     }
+
+    h += 2 * Aex * dot(normal, w) * (m_ - m);
   }
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
 }
@@ -118,7 +110,8 @@ __global__ void k_exchangeField(CuField hField,
   const auto system = hField.system;
 
   // When outside the geometry, set to zero and return early
-  if (!hField.cellInGeometry(idx)) {
+  // msat is only evaluated when inside geometry and is thus safe
+  if (!hField.cellInGeometry(idx) || msat.valueAt(idx) == 0) {
     if (hField.cellInGrid(idx)) {
       hField.setVectorInCell(idx, real3{0, 0, 0});
     }
@@ -126,14 +119,6 @@ __global__ void k_exchangeField(CuField hField,
   }
 
   const Grid grid = m1Field.system.grid;
-  if (!grid.cellInGrid(idx))
-    return;
-
-  if (msat.valueAt(idx) == 0) {
-    hField.setVectorInCell(idx, real3{0, 0, 0});
-    return;
-  }
-
   const int3 coo = grid.index2coord(idx);
   const real3 m = m1Field.vectorAt(idx);
   const real a = aex.valueAt(idx);
@@ -141,55 +126,54 @@ __global__ void k_exchangeField(CuField hField,
   // accumulate exchange field in h for cell at idx, divide by msat at the end
   real3 h{0, 0, 0};
 
+  // neighbor parameters
+  int3 coo_, normal;
+  int idx_;
+  real3 m_;
+  real a_;
+
+  // regions
+  unsigned int ridx_;
+  const unsigned int ridx = system.getRegionIdx(idx);
+  real Aex;  // final scaled exchange
+
   // FM exchange in NN cells
 #pragma unroll
   for (int3 rel_coo : {int3{-1, 0, 0}, int3{1, 0, 0}, int3{0, -1, 0}, int3{0, 1, 0},
                        int3{0, 0, -1}, int3{0, 0, 1}}) {
-    const int3 coo_ = mastergrid.wrap(coo + rel_coo);
-    const int idx_ = grid.coord2index(coo_);
+    coo_ = mastergrid.wrap(coo + rel_coo);
+    idx_ = grid.coord2index(coo_);  // only use inside geometry
+    normal = rel_coo * rel_coo;
 
-    real3 m_;
-    real a_;
-    int3 normal = rel_coo * rel_coo;
-
-    real inter = 0;
-    real scale = 1;
-    real Aex;
-
-    if (hField.cellInGeometry(coo_)) {
-      if (msat.valueAt(idx_) == 0)
-        continue;
-
+    // msat is only evaluated if inside the geometry
+    if (hField.cellInGeometry(coo_) && msat.valueAt(idx_) != 0) {  // inside
       m_ = m1Field.vectorAt(idx_);
       a_ = aex.valueAt(idx_);
-      unsigned int ridx = system.getRegionIdx(idx);
-      unsigned int ridx_ = system.getRegionIdx(idx_);
-      if (ridx != ridx_) {
-        scale = scaleEx.valueBetween(ridx, ridx_);
-        inter = interEx.valueBetween(ridx, ridx_);
-      }
+
+      ridx_ = system.getRegionIdx(idx_);
+      Aex = getExchangeStiffness(interEx.valueBetween(ridx, ridx_),
+                                 scaleEx.valueBetween(ridx, ridx_), a, a_);
     } else {  // Neumann BC
       if (a == 0)
         continue;
 
-      real3 m2 = m2Field.vectorAt(idx);
       real3 Gamma1 = getGamma(dmiTensor, idx, normal, m);
-
       real delta = dot(rel_coo, system.cellsize);
 
       real3 d_m2{0, 0, 0};
       int3 coo__ = mastergrid.wrap(coo - rel_coo);
-      if (hField.cellInGeometry(coo__)) {
+      if (hField.cellInGeometry(coo__) && msat.valueAt(coo__) != 0) {
         // Approximate normal derivative of sister sublattice by taking
         // the bulk derivative closest to the edge.
+        // d_m2 will be 0 if "msat2" is 0 at both coo and coo__
+        real3 m2 = m2Field.vectorAt(idx);
         real3 m2__ = m2Field.vectorAt(coo__);
         d_m2 = (m2 - m2__) / delta;
       }
       m_ = m + (cross(cross(d_m2, m), m) + Gamma1) * delta / (2 * a);
-      a_ = a;
+      Aex = a;
     }
 
-    Aex = getExchangeStiffness(inter, scale, a, a_);
     h += 2 * Aex * dot(normal, w) * (m_ - m);
   }
   hField.setVectorInCell(idx, h / msat.valueAt(idx));
