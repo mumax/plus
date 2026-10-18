@@ -14,10 +14,11 @@ class MumaxWorld;
 //   1: line search for the first step only.
 //   2: as 1, and also recover from bad BB steps (NaN/Inf/0), and try a line
 //      search when the magnetization difference criterion would declare convergence.
-//   3: as 1, and also recover from bad BB steps, and apply the non-monotone
-//      (GLL) energy test over the last nMagDiffSamples energies to every BB step.
+//   3: as 2, and also apply the non-monotone (GLL) energy test over the last
+//      nMagDiffSamples energies to every BB step.
 // maxStepAngle: max rotation (degrees) per line-search trial step, <=0 disables.
-// maxStall: consecutive no-progress rescues before rescues are switched off.
+// maxStall: consecutive no-progress rescues before rescues (GLL or convergence) are
+// switched off.
 
 class Minimizer {
  public:
@@ -86,8 +87,9 @@ class Minimizer {
                     // haveF_
   bool haveF_;
 
-  int rescueStall_;  // consecutive convergence candidates without progress (mode 2)
-  real fRescue_;     // energy at the last accepted convergence-rescue point (mode 2)
+  int rescueStall_;  // consecutive convergence candidates without progress (mode 2, 3)
+  real fRescue_;     // lowest energy seen at a convergence candidate or rescued point;
+                     // a running minimum, never rises (modes 2, 3)
   bool haveRescue_;
   int lsEvals_ = 0;
 

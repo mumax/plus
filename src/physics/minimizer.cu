@@ -362,9 +362,9 @@ void Minimizer::step() {
     hBadNext_ = true;  // let recoverStep handle it
   addMagDiff(magDiff);
 
-  // Mode 2: the magnetization differences say "converged"; try one line search
+  // Mode 2 and 3: the magnetization differences say "converged"; try one line search
   // before exiting.
-  if (mode_ == 2 && converged())
+  if (mode_ >= 2 && converged())
     convergenceRescue();
 
   nsteps_ += 1;
@@ -617,22 +617,32 @@ bool Minimizer::gllRescue(real f0, real f0Scale, real h, real& newF) {
   return recoverStep(m0, t0, f0, f0Scale, newF);
 }
 
-// Called (mode 2) when the magnetization-difference criterion says "converged".
+// Called (modes 2 and 3) when the magnetization-difference criterion says "converged".
 // Tries one line search along the current torque. If that finds a real energy
 // decrease with a displacement larger than stopMaxMagDiff_, the BB iteration had
 // stalled: take the step, clear the history and carry on. Otherwise leave the
 // history full so the run stops. On return M and t1 are consistent in every case.
 void Minimizer::convergenceRescue() {
-  real f0 = energyAtAccepted();
-  real f0Scale = energyScale_;
+  // Energy at the current (accepted) M. Mode 3 cached it when it accepted this
+  // step; mode 2's plain BB step did not, so compute it.
+  real f0, f0Scale;
+  if (haveF_) {
+    f0 = lastF_;
+    f0Scale = lastScale_;
+  } else {
+    f0 = energyAtAccepted();
+    f0Scale = energyScale_;  // set by the evaluation on the line above
+  }
   real noise = 4 * realEps * f0Scale;
 
-  // Did the BB phase since the last rescue make energy progress?
-  if (haveRescue_) {
-    if (f0 < fRescue_ - noise)
-      rescueStall_ = 0;
-    else
-      rescueStall_++;
+  // Is this candidate a new record?
+  if (!haveRescue_ || f0 < fRescue_ - noise) {
+    // new record energy at a convergence candidate
+    fRescue_ = f0;
+    haveRescue_ = true;
+    rescueStall_ = 0;
+  } else {
+    rescueStall_++;
     if (rescueStall_ >= maxStall_)
       return;  // bottomed out: let the run converge
   }
@@ -645,15 +655,30 @@ void Minimizer::convergenceRescue() {
   real newF;
   double step;
   if (!sdLineSearch(mBase, t1, f0, f0Scale, 0, newF, step))
-    return;        // M, t1 untouched: converged
-  haveF_ = false;  // M moved, so the cached energy is stale
+    return;  // M, t1 untouched: converged
+
+  // M moved: keep the cache and the GLL state consistent with the new point.
+  // (M is at the last evaluated trial, so energyScale_ matches newF.)
+  lastF_ = newF;
+  lastScale_ = energyScale_;
+  haveF_ = true;
+  if (mode_ == 3) {
+    addEnergy(newF);
+    // same GLL streak-ending rule as in step()
+    if (stallCount_ > 0 && newF < fRef_ - 4 * realEps * lastScale_) {
+      stallCount_ = 0;
+      gllOff_ = false;
+    }
+  }
 
   if (newF < f0 - noise && step * dirNorm > stopMaxMagDiff_) {
     // real progress available: BB had stalled
-    fRescue_ = newF;
-    haveRescue_ = true;
-    lastMagDiffs_.clear();  // re-arm the convergence check
-    stepsize_ = step;       // restart BB from the step the search accepted
+    if (newF < fRescue_ - noise)
+      rescueStall_ = 0;                   // the rescue itself set a new record
+    fRescue_ = std::min(fRescue_, newF);  // running minimum: never rises
+    lastMagDiffs_.clear();                // re-arm the convergence check
+    stepsize_ = step;   // restart BB from the step the search accepted
+    hBadNext_ = false;  // stepsize_ is now a valid BB seed
   }
   // else: the step was accepted (it did not raise E) but there is nothing
   // significant left, so the history stays full and the run exits.

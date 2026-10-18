@@ -34,6 +34,7 @@ int cstep(lsPoint& best,
           bool& bracketed,
           double stpmin,
           double stpmax,
+          double fref,
           double fnoise,
           double& newStep) {
   // check: 1) bracketed, 2) min<step<max, 3) slope points toward trial, 4)
@@ -45,7 +46,7 @@ int cstep(lsPoint& best,
     return 0;
   }
 
-  bool higher = trial.f > best.f + fnoise;
+  bool higher = trial.f > best.f && trial.f > fref + fnoise;
   double sgnd = trial.slope * (best.slope / std::abs(best.slope));
   double chosen, cubic, quad, theta, gamma, p, q, r;
   int casecode;
@@ -251,6 +252,8 @@ LineSearchResult MTLineSearch(double f0,
 
   lsPoint bestPoint{0, f0, slope0};
   lsPoint otherEndPoint = bestPoint;
+  double fLow = f0;    // lowest phi seen in this search
+  double psiLow = f0;  // lowest psi seen (toPsi does not subtract f0, so psi(0) = f0)
 
   double step = step0;
   bool bracketed = false, stage1 = true;
@@ -353,18 +356,21 @@ LineSearchResult MTLineSearch(double f0,
       stage1 = false;
 
     lsPoint trial{step, f, slope};
+    fLow = std::min(fLow, f);
+    psiLow = std::min(psiLow, f - step * armijoSlope);
     // if stage1, f is better than bestp, and psi>0, bracket on psi
-    if (stage1 && f <= bestPoint.f + fnoise && f > ftest1) {
+    if (stage1 && f <= fLow + fnoise && f > ftest1) {
       // Stage 1: apply the updating algorithm to ψ instead of φ.
       lsPoint b = toPsi(bestPoint), o = toPsi(otherEndPoint);
-      casecode = cstep(b, o, toPsi(trial), bracketed, stmin, stmax, fnoise, step);
+      casecode =
+          cstep(b, o, toPsi(trial), bracketed, stmin, stmax, psiLow, fnoise, step);
       bestPoint = fromPsi(b);
       otherEndPoint = fromPsi(o);
     } else {
       // Work on φ itself: stage 2, or stage 1 when the trial is worse than best/trial
       // satisfies Armijo
-      casecode =
-          cstep(bestPoint, otherEndPoint, trial, bracketed, stmin, stmax, fnoise, step);
+      casecode = cstep(bestPoint, otherEndPoint, trial, bracketed, stmin, stmax, fLow,
+                       fnoise, step);
     }
     // Bisection safeguard: if the bracket hasn't shrunk to <66% of its width two
     // iterations ago, discard cstep's proposal and bisect. new trial point is midway
