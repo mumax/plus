@@ -66,7 +66,7 @@ class Variable(FieldQuantity):
             try:  # If function is already vectorized
                 data = value(x[mask], y[mask], z[mask])
             except Exception:
-                data = _np.vectorize(value, otypes=[float] * self.shape[0])(
+                data = _np.vectorize(value, otypes=[float] * self.ncomp)(
                     x[mask], y[mask], z[mask]
                 )
 
