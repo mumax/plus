@@ -92,6 +92,15 @@ class Minimizer {
                      // a running minimum, never rises (modes 2, 3)
   bool haveRescue_;
   int lsEvals_ = 0;
+  double energyNoise_ = 0;  // last measured noise std in E (0 = not measured yet)
+  int noiseAge_ = 0;        // line searches since the last measurement
+
+  // --- energy noise estimate (ECnoise-lite, diagnostic for now) ---
+  double estimateEnergyNoise(const std::vector<Field>& base,
+                             const std::vector<Field>& dir,
+                             double f0,
+                             double* rawSigma = nullptr,
+                             double* d4 = nullptr);
 
   real energyScale_;  // max(|E|, sum|E_i|) from the most recent energy evaluation
   real minimizerEnergy();

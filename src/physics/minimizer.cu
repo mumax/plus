@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdio>
 #include <iostream>
 #include <stdexcept>
 
@@ -30,6 +31,11 @@ static const double minimizerBMax = 1e6;
 // With verbose >= 3, line search summaries are only printed for the first
 // lsLogMaxStep minimizer steps, to keep the output manageable.
 static const int lsLogMaxStep = 200;
+
+// ECnoise-lite: max |dm| per cell of the sample spacing, number of line searches
+// between re-measurements.
+static const double noiseSampleDisp = 1e-3;
+static const int noiseRemeasure = 1;
 
 Minimizer::Minimizer(const Ferromagnet* magnet,
                      real stopMaxMagDiff,
@@ -141,6 +147,8 @@ void Minimizer::exec() {
   energyScale_ = 0;
   nLineSearches_ = 0;
   nGllRescues_ = 0;
+  energyNoise_ = 0;
+  noiseAge_ = 0;
 
   // Gate for the BB step clamp: |h|*max|t| can only exceed 1/eps when
   // |h| > 1/(eps * gammaMax * bMax), with t = gamma * B_perp.
@@ -516,6 +524,22 @@ bool Minimizer::sdLineSearch(const std::vector<Field>& base,
   // dir is the torque at base, so it is also the torque at step 0
   double slope0 = slopeAlongLine(base, dir, dir, 0);
 
+  // Diagnostic: compare the measured energy noise with the current formula.
+  // Only measured at verbose > 1 for now, so default behavior is unchanged.
+  if (verbose_ > 1) {
+    double raw, d4[3];
+    double sigma = estimateEnergyNoise(base, dir, f0, &raw, d4);
+    energyNoise_ = sigma;
+    noiseAge_ = 0;
+    double absE = std::max(std::abs(double(f0)), 1e-300);
+    double oldNoise = realEps * f0Scale;
+    std::printf(
+        "ECnoise @%d: |E|=%.3e raw sigma=%.3e (rel %.2e) floor=%.3e | "
+        "old eps*scale=%.3e | old/max(raw,floor)=%.2f | d4=[%.2e %.2e %.2e]\n",
+        nsteps_, absE, raw, raw / absE, realEps * absE, oldNoise, oldNoise / sigma,
+        d4[0], d4[1], d4[2]);
+  }
+
   auto eval = [&](double alpha) -> std::pair<double, double> {
     lsEvals_++;
 #if LS_CAYLEY
@@ -699,6 +723,58 @@ real Minimizer::minimizerEnergy() {
   }
   energyScale_ = std::max(std::abs(E), sum);
   return E;
+}
+
+// Estimates the std of the noise in E near base: E is sampled at 7 equally spaced
+// tiny steps along dir (same Cayley curve as the line search). For a smooth E the
+// 4th finite difference is ~0, so what remains is noise; for white noise of std
+// sigma, Var(4th difference) = 70 sigma^2 (1+16+36+16+1 = 70). Moré & Wild, ECnoise.
+// f0 = E(base). Leaves M at base. Does not touch t1/tTrial_ and preserves
+// energyScale_ (minimizerEnergy overwrites it).
+double Minimizer::estimateEnergyNoise(const std::vector<Field>& base,
+                                      const std::vector<Field>& dir,
+                                      double f0,
+                                      double* rawSigma,
+                                      double* d4) {
+  const double floorNoise = realEps * std::abs(f0);  // rounding of E to real
+  if (rawSigma)
+    *rawSigma = 0;
+  if (d4)
+    d4[0] = d4[1] = d4[2] = 0;
+  const double maxDirNorm = maxVecNormAll(dir);
+  if (!(maxDirNorm > 0))
+    return floorNoise;
+
+  const double savedScale = energyScale_;
+  const double h = noiseSampleDisp / maxDirNorm;
+
+  double f[7];
+  f[0] = f0;
+  bool ok = true;
+  for (int j = 1; j < 7; j++) {
+    stepAlong(base, dir, real(j * h));
+    f[j] = minimizerEnergy();  // energy only, no torque
+    if (!std::isfinite(f[j])) {
+      ok = false;
+      break;
+    }
+  }
+  setMagnetization(base);
+  energyScale_ = savedScale;
+  if (!ok)
+    return floorNoise;
+
+  double ss = 0;
+  for (int k = 0; k < 3; k++) {
+    double d = f[k] - 4 * f[k + 1] + 6 * f[k + 2] - 4 * f[k + 3] + f[k + 4];
+    if (d4)
+      d4[k] = d;
+    ss += d * d;
+  }
+  double sigma = std::sqrt(ss / 3.0 / 70.0);
+  if (rawSigma)
+    *rawSigma = sigma;
+  return std::max(sigma, floorNoise);
 }
 
 // minimizerEnergy for the current (accepted) magnetization. A non-finite energy
