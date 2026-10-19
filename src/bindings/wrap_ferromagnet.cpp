@@ -79,65 +79,84 @@ void wrap_ferromagnet(py::module& m) {
       .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Ferromagnet::relax, py::arg("tol"));
 
-  m.def("torque", &torqueQuantity);
-  m.def("llg_torque", &llgTorqueQuantity);
-  m.def("damping_torque", &relaxTorqueQuantity);
-  m.def("spin_transfer_torque", &spinTransferTorqueQuantity);
-  m.def("max_torque", &maxTorqueQuantity);
+  // Evaluators store raw magnet pointers, so keep the argument alive.
+  m.def("torque", &torqueQuantity, py::keep_alive<0, 1>());
+  m.def("llg_torque", &llgTorqueQuantity, py::keep_alive<0, 1>());
+  m.def("damping_torque", &relaxTorqueQuantity, py::keep_alive<0, 1>());
+  m.def("spin_transfer_torque", &spinTransferTorqueQuantity, py::keep_alive<0, 1>());
+  m.def("max_torque", &maxTorqueQuantity, py::keep_alive<0, 1>());
 
-  m.def("demag_energy_density", &demagEnergyDensityQuantity);
-  m.def("demag_energy", &demagEnergyQuantity);
+  m.def("demag_energy_density", &demagEnergyDensityQuantity, py::keep_alive<0, 1>());
+  m.def("demag_energy", &demagEnergyQuantity, py::keep_alive<0, 1>());
 
-  m.def("anisotropy_field", &anisotropyFieldQuantity);
-  m.def("anisotropy_energy_density", &anisotropyEnergyDensityQuantity);
-  m.def("anisotropy_energy", &anisotropyEnergyQuantity);
+  m.def("anisotropy_field", &anisotropyFieldQuantity, py::keep_alive<0, 1>());
+  m.def("anisotropy_energy_density", &anisotropyEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
+  m.def("anisotropy_energy", &anisotropyEnergyQuantity, py::keep_alive<0, 1>());
 
   // normal Ferromagnet
-  m.def("exchange_field", &exchangeFieldQuantity);
-  m.def("exchange_energy_density", &exchangeEnergyDensityQuantity);
-  m.def("exchange_energy", &exchangeEnergyQuantity);
-  m.def("max_angle", py::overload_cast<const Ferromagnet*>(&maxAngle));
+  m.def("exchange_field", &exchangeFieldQuantity, py::keep_alive<0, 1>());
+  m.def("exchange_energy_density", &exchangeEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
+  m.def("exchange_energy", &exchangeEnergyQuantity, py::keep_alive<0, 1>());
+  m.def("max_angle", py::overload_cast<const Ferromagnet*>(&maxAngle),
+        py::keep_alive<0, 1>());
   // ferromagnetic sublattice
-  m.def("homogeneous_exchange_field", &homoAfmExchangeFieldQuantity);
-  m.def("inhomogeneous_exchange_field", &inHomoAfmExchangeFieldQuantity);
-  m.def("homogeneous_exchange_energy_density", &homoAfmExchangeEnergyDensityQuantity);
+  m.def("homogeneous_exchange_field", &homoAfmExchangeFieldQuantity,
+        py::keep_alive<0, 1>());
+  m.def("inhomogeneous_exchange_field", &inHomoAfmExchangeFieldQuantity,
+        py::keep_alive<0, 1>());
+  m.def("homogeneous_exchange_energy_density", &homoAfmExchangeEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
   m.def("inhomogeneous_exchange_energy_density",
-        &inHomoAfmExchangeEnergyDensityQuantity);
-  m.def("homogeneous_exchange_energy", &homoAfmExchangeEnergyQuantity);
-  m.def("inhomogeneous_exchange_energy", &inHomoAfmExchangeEnergyQuantity);
+        &inHomoAfmExchangeEnergyDensityQuantity, py::keep_alive<0, 1>());
+  m.def("homogeneous_exchange_energy", &homoAfmExchangeEnergyQuantity,
+        py::keep_alive<0, 1>());
+  m.def("inhomogeneous_exchange_energy", &inHomoAfmExchangeEnergyQuantity,
+        py::keep_alive<0, 1>());
 
-  m.def("anisotropic_exchange_field", &atmExchangeFieldQuantity);
-  m.def("anisotropic_exchange_energy_density", &atmExchangeEnergyDensityQuantity);
-  m.def("anisotropic_exchange_energy", &atmExchangeEnergyQuantity);
+  m.def("anisotropic_exchange_field", &atmExchangeFieldQuantity,
+        py::keep_alive<0, 1>());
+  m.def("anisotropic_exchange_energy_density", &atmExchangeEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
+  m.def("anisotropic_exchange_energy", &atmExchangeEnergyQuantity,
+        py::keep_alive<0, 1>());
 
-  m.def("homogeneous_dmi_field", &homoDmiFieldQuantity);
-  m.def("homogeneous_dmi_energy_density", &homoDmiEnergyDensityQuantity);
-  m.def("homogeneous_dmi_energy", &homoDmiEnergyQuantity);
+  m.def("homogeneous_dmi_field", &homoDmiFieldQuantity, py::keep_alive<0, 1>());
+  m.def("homogeneous_dmi_energy_density", &homoDmiEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
+  m.def("homogeneous_dmi_energy", &homoDmiEnergyQuantity, py::keep_alive<0, 1>());
   //
-  m.def("dmi_field", &dmiFieldQuantity);
-  m.def("dmi_energy_density", &dmiEnergyDensityQuantity);
-  m.def("dmi_energy", &dmiEnergyQuantity);
+  m.def("dmi_field", &dmiFieldQuantity, py::keep_alive<0, 1>());
+  m.def("dmi_energy_density", &dmiEnergyDensityQuantity, py::keep_alive<0, 1>());
+  m.def("dmi_energy", &dmiEnergyQuantity, py::keep_alive<0, 1>());
 
-  m.def("external_field", &externalFieldQuantity);
-  m.def("zeeman_energy_density", &zeemanEnergyDensityQuantity);
-  m.def("zeeman_energy", &zeemanEnergyQuantity);
+  m.def("external_field", &externalFieldQuantity, py::keep_alive<0, 1>());
+  m.def("zeeman_energy_density", &zeemanEnergyDensityQuantity, py::keep_alive<0, 1>());
+  m.def("zeeman_energy", &zeemanEnergyQuantity, py::keep_alive<0, 1>());
 
-  m.def("effective_field", &effectiveFieldQuantity);
-  m.def("total_energy_density",
-        [](const Ferromagnet* m) { return totalEnergyDensityQuantity(m); });
-  m.def("total_energy", [](const Ferromagnet* m) { return totalEnergyQuantity(m); });
+  m.def("effective_field", &effectiveFieldQuantity, py::keep_alive<0, 1>());
+  m.def(
+      "total_energy_density",
+      [](const Ferromagnet* m) { return totalEnergyDensityQuantity(m); },
+      py::keep_alive<0, 1>());
+  m.def(
+      "total_energy", [](const Ferromagnet* m) { return totalEnergyQuantity(m); },
+      py::keep_alive<0, 1>());
 
-  m.def("conductivity_tensor", &conductivityTensorQuantity);
-  m.def("electrical_potential", &electricalPotentialQuantity);
+  m.def("conductivity_tensor", &conductivityTensorQuantity, py::keep_alive<0, 1>());
+  m.def("electrical_potential", &electricalPotentialQuantity, py::keep_alive<0, 1>());
 
-  m.def("thermal_noise", &thermalNoiseQuantity);
+  m.def("thermal_noise", &thermalNoiseQuantity, py::keep_alive<0, 1>());
 
   m.def("full_magnetization",
-        py::overload_cast<const Ferromagnet*>(&fullMagnetizationQuantity));
+        py::overload_cast<const Ferromagnet*>(&fullMagnetizationQuantity),
+        py::keep_alive<0, 1>());
 
   // Magnetoelasticity
-  m.def("magnetoelastic_field", &magnetoelasticFieldQuantity);
-  m.def("magnetoelastic_energy_density", &magnetoelasticEnergyDensityQuantity);
-  m.def("magnetoelastic_energy", &magnetoelasticEnergyQuantity);
-  m.def("magnetoelastic_force", &magnetoelasticForceQuantity);
+  m.def("magnetoelastic_field", &magnetoelasticFieldQuantity, py::keep_alive<0, 1>());
+  m.def("magnetoelastic_energy_density", &magnetoelasticEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
+  m.def("magnetoelastic_energy", &magnetoelasticEnergyQuantity, py::keep_alive<0, 1>());
+  m.def("magnetoelastic_force", &magnetoelasticForceQuantity, py::keep_alive<0, 1>());
 }

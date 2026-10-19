@@ -63,22 +63,24 @@ void wrap_magnet(py::module& m) {
         });
 
   // Elasticity
-  m.def("strain_tensor", &strainTensorQuantity);
-  m.def("strain_rate", &strainRateQuantity);
+  m.def("strain_tensor", &strainTensorQuantity, py::keep_alive<0, 1>());
+  m.def("strain_rate", &strainRateQuantity, py::keep_alive<0, 1>());
 
-  m.def("elastic_stress", &elasticStressQuantity);
-  m.def("viscous_stress", &viscousStressQuantity);
-  m.def("stress_tensor", &stressTensorQuantity);
+  m.def("elastic_stress", &elasticStressQuantity, py::keep_alive<0, 1>());
+  m.def("viscous_stress", &viscousStressQuantity, py::keep_alive<0, 1>());
+  m.def("stress_tensor", &stressTensorQuantity, py::keep_alive<0, 1>());
 
-  m.def("internal_body_force", &internalBodyForceQuantity);
-  m.def("effective_body_force", &effectiveBodyForceQuantity);
-  m.def("elastic_damping", &elasticDampingQuantity);
-  m.def("elastic_acceleration", &elasticAccelerationQuantity);
+  m.def("internal_body_force", &internalBodyForceQuantity, py::keep_alive<0, 1>());
+  m.def("effective_body_force", &effectiveBodyForceQuantity, py::keep_alive<0, 1>());
+  m.def("elastic_damping", &elasticDampingQuantity, py::keep_alive<0, 1>());
+  m.def("elastic_acceleration", &elasticAccelerationQuantity, py::keep_alive<0, 1>());
 
-  m.def("kinetic_energy_density", &kineticEnergyDensityQuantity);
-  m.def("kinetic_energy", &kineticEnergyQuantity);
-  m.def("elastic_energy_density", &elasticEnergyDensityQuantity);
-  m.def("elastic_energy", &elasticEnergyQuantity);
+  m.def("kinetic_energy_density", &kineticEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
+  m.def("kinetic_energy", &kineticEnergyQuantity, py::keep_alive<0, 1>());
+  m.def("elastic_energy_density", &elasticEnergyDensityQuantity,
+        py::keep_alive<0, 1>());
+  m.def("elastic_energy", &elasticEnergyQuantity, py::keep_alive<0, 1>());
 
-  m.def("poynting_vector", &poyntingVectorQuantity);
+  m.def("poynting_vector", &poyntingVectorQuantity, py::keep_alive<0, 1>());
 }
