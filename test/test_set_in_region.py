@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from mumaxplus import Ferromagnet, Grid, World
+from mumaxplus.util.config import vortex
 
 
 @pytest.fixture
@@ -58,7 +59,7 @@ def test_uniform_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarr
     assert np.allclose(magnet.magnetization()[:, ~mask], initial_vector[:, None])
 
 
-def test_functional_parameter_in_region(
+def test_vectorized_function_parameter_in_region(
     test_parameters: Tuple[Ferromagnet, np.ndarray]
 ):
     magnet, regions = test_parameters
@@ -76,7 +77,33 @@ def test_functional_parameter_in_region(
     assert np.all(magnet.ku1()[0, ~mask] == 0.0)
 
 
-def test_functional_vectorparameter_in_region(
+def test_non_vectorized_function_parameter_in_region(
+    test_parameters: Tuple[Ferromagnet, np.ndarray]
+):
+    magnet, regions = test_parameters
+
+    initial_value = 1e-12
+    magnet.aex = initial_value
+
+    def values_function(x, y, z):
+        return x + y + z
+
+    def set_func(x, y, z):
+        return values_function(x, y, z)
+
+    x, y, z = magnet.aex.meshgrid
+
+    some_index = np.random.choice(np.unique(regions))
+    magnet.aex.set_in_region(some_index, set_func)
+    mask = regions == some_index
+
+    assert np.allclose(
+        magnet.aex()[0, mask], values_function(x[mask], y[mask], z[mask])
+    )
+    assert np.all(magnet.aex()[0, ~mask] == initial_value)
+
+
+def test_vectorized_function_vectorparameter_in_region(
     test_parameters: Tuple[Ferromagnet, np.ndarray]
 ):
     magnet, regions = test_parameters
@@ -97,7 +124,34 @@ def test_functional_vectorparameter_in_region(
     assert np.all(magnet.bias_magnetic_field()[:, ~mask] == 0.0)
 
 
-def test_functional_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
+def test_non_vectorized_function_vectorparameter_in_region(
+    test_parameters: Tuple[Ferromagnet, np.ndarray]
+):
+    magnet, regions = test_parameters
+
+    initial_vector = np.array((1.0, 0.0, 0.0))
+    magnet.bias_magnetic_field = initial_vector
+
+    def values_func(x, y, z):
+        return (x, y**2, 3 * x)
+
+    def set_func(x, y, z):
+        return values_func(x, y, z)
+
+    x, y, z = magnet.magnetization.meshgrid
+    some_index = np.random.choice(np.unique(regions))
+    magnet.bias_magnetic_field.set_in_region(some_index, set_func)
+    mask = regions == some_index
+
+    assert np.allclose(
+        magnet.bias_magnetic_field()[:, mask], values_func(x[mask], y[mask], z[mask])
+    )
+    assert np.all(magnet.bias_magnetic_field()[:, ~mask] == initial_vector[:, None])
+
+
+def test_vectorized_function_variable_in_region(
+    test_parameters: Tuple[Ferromagnet, np.ndarray]
+):
     magnet, regions = test_parameters
 
     def func(x, y, z):
@@ -107,6 +161,23 @@ def test_functional_variable_in_region(test_parameters: Tuple[Ferromagnet, np.nd
     initial_vector = np.array((1.0, 0.0, 0.0))
     magnet.magnetization = initial_vector
 
+    some_index = np.random.choice(np.unique(regions))
+    magnet.magnetization.set_in_region(some_index, func)
+
+    x, y, z = magnet.magnetization.meshgrid
+    mask = regions == some_index
+
+    assert np.allclose(magnet.magnetization()[:, mask], func(x[mask], y[mask], z[mask]))
+    assert np.all(magnet.magnetization()[:, ~mask] == initial_vector[:, None])
+
+
+def test_config_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
+    magnet, regions = test_parameters
+
+    initial_vector = np.array((1.0, 0.0, 0.0))
+    magnet.magnetization = initial_vector
+
+    func = vortex(magnet.center, 5e-9, 1, 1)
     some_index = np.random.choice(np.unique(regions))
     magnet.magnetization.set_in_region(some_index, func)
 
