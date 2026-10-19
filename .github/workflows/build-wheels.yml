@@ -67,7 +67,7 @@ jobs:
               source /venv/bin/activate
               python${{ matrix.python }} --version || true
               pip install --upgrade pip
-              pip install build wheel auditwheel
+              pip install build wheel auditwheel "patchelf>=0.14.5"
 
               echo "=== Starting wheel build ==="
               python${{ matrix.python }} -m build --wheel
