@@ -40,7 +40,7 @@ void wrap_altermagnet(py::module& m) {
       .def_readonly("dmi_tensor", &Altermagnet::dmiTensor)
       .def_readonly("dmi_vector", &Altermagnet::dmiVector)
 
-      .def("minimize", &Ferromagnet::minimize, py::arg("tol"), py::arg("nsamples"),
+      .def("minimize", &Altermagnet::minimize, py::arg("tol"), py::arg("nsamples"),
            py::arg("line_search_mode"), py::arg("max_step_angle"), py::arg("max_stall"))
       .def("relax", &Altermagnet::relax, py::arg("tol"));
 
