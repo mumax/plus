@@ -207,10 +207,8 @@ void MumaxWorld::minimize(real tol,
                           int nSamples,
                           int lineSearchMode,
                           double maxStepAngle,
-                          int maxStall,
-                          int verbose) {
-  Minimizer minimizer(this, tol, nSamples, lineSearchMode, maxStepAngle, maxStall,
-                      verbose);
+                          int maxStall) {
+  Minimizer minimizer(this, tol, nSamples, lineSearchMode, maxStepAngle, maxStall);
   minimizer.exec();
 }
 

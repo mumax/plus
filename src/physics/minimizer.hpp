@@ -27,22 +27,19 @@ class Minimizer {
             int nMagDiffSamples,
             int lineSearchMode = 0,
             double maxStepAngle = 0,
-            int maxStall = 3,
-            int verbose = 0);
+            int maxStall = 3);
   Minimizer(const HostMagnet*,
             real stopMaxMagDiff,
             int nMagDiffSamples,
             int lineSearchMode = 0,
             double maxStepAngle = 0,
-            int maxStall = 3,
-            int verbose = 0);
+            int maxStall = 3);
   Minimizer(const MumaxWorld*,
             real stopMaxMagDiff,
             int nMagDiffSamples,
             int lineSearchMode = 0,
             double maxStepAngle = 0,
-            int maxStall = 3,
-            int verbose = 0);
+            int maxStall = 3);
 
   void exec();
 
@@ -65,9 +62,6 @@ class Minimizer {
   int mode_;
   double maxStepAngle_;
   int maxStall_;
-  int verbose_;
-  int nLineSearches_;  // number of sdLineSearch calls (diagnostic)
-  int nGllRescues_;    // number of GLL-rejected BB steps (diagnostic)
   double hCheck_;  // |h| above which the BB step clamp must check max|t|(set in exec())
 
   std::vector<Field> tTrial_;      // torque at the most recent trial point
@@ -91,16 +85,6 @@ class Minimizer {
   real fRescue_;     // lowest energy seen at a convergence candidate or rescued point;
                      // a running minimum, never rises (modes 2, 3)
   bool haveRescue_;
-  int lsEvals_ = 0;
-  double energyNoise_ = 0;  // last measured noise std in E (0 = not measured yet)
-  int noiseAge_ = 0;        // line searches since the last measurement
-
-  // --- energy noise estimate (ECnoise-lite, diagnostic for now) ---
-  double estimateEnergyNoise(const std::vector<Field>& base,
-                             const std::vector<Field>& dir,
-                             double f0,
-                             double* rawSigma = nullptr,
-                             double* d4 = nullptr);
 
   real energyScale_;  // max(|E|, sum|E_i|) from the most recent energy evaluation
   real minimizerEnergy();

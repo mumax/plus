@@ -154,7 +154,6 @@ class Ferromagnet(Magnet):
         line_search_mode=0,
         max_step_angle=0,
         max_stall=3,
-        verbose=0,
     ):
         """Minimize the total energy.
 
@@ -194,20 +193,13 @@ class Ferromagnet(Magnet):
             level at the start of the streak). In mode 2 these are convergence
             rescues (the run then exits as converged).
 
-        verbose : int (default=0)
-            Line search output. 1 prints warnings, 2 also prints every trial
-            step with its finite-difference slope check (FD/slope should be
-            close to 1).
-
         See Also
         --------
         relax
         """
         if line_search_mode not in (0, 1, 2, 3):
             raise ValueError("'line_search_mode' should be 0, 1, 2 or 3.")
-        self._impl.minimize(
-            tol, nsamples, line_search_mode, max_step_angle, max_stall, verbose
-        )
+        self._impl.minimize(tol, nsamples, line_search_mode, max_step_angle, max_stall)
 
     def relax(self, tol=1e-9):
         """Relax the state to an energy minimum.

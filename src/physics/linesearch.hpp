@@ -53,5 +53,4 @@ LineSearchResult MTLineSearch(double f0,
                               double step0,
                               double maxStepAngle,
                               double eScale,
-                              const LineSearchEval& eval,
-                              int verbose = 0);
+                              const LineSearchEval& eval);
