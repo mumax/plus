@@ -17,6 +17,16 @@ def test_parameters() -> Tuple[Ferromagnet, np.ndarray]:
     return magnet, r
 
 
+@pytest.fixture
+def test_parameters_two_regions() -> Tuple[Ferromagnet, np.ndarray]:
+    nx, ny, nz = 18, 7, 2
+    w = World(cellsize=(1e-9, 1e-9, 1e-9))
+    g = Grid((nx, ny, nz))
+    r = np.random.randint(0, 2, size=g.shape)  # regions 0 and 1
+    magnet = Ferromagnet(w, g, regions=r)
+    return magnet, r
+
+
 def test_uniform_parameter_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
     magnet, regions = test_parameters
     ku1_value = 1e6
@@ -78,28 +88,27 @@ def test_vectorized_function_parameter_in_region(
 
 
 def test_non_vectorized_function_parameter_in_region(
-    test_parameters: Tuple[Ferromagnet, np.ndarray]
+    test_parameters_two_regions: Tuple[Ferromagnet, np.ndarray]
 ):
-    magnet, regions = test_parameters
+    magnet, regions = test_parameters_two_regions
 
     initial_value = 1e-12
     magnet.aex = initial_value
 
-    def values_function(x, y, z):
-        return x + y + z
-
-    def set_func(x, y, z):
-        return values_function(x, y, z)
+    def func(x, y, z):
+        # non-vectorized function
+        if x > 3.5e-9:
+            return x + y + z
+        return x - y * z
 
     x, y, z = magnet.aex.meshgrid
 
     some_index = np.random.choice(np.unique(regions))
-    magnet.aex.set_in_region(some_index, set_func)
+    magnet.aex.set_in_region(some_index, func)
     mask = regions == some_index
 
-    assert np.allclose(
-        magnet.aex()[0, mask], values_function(x[mask], y[mask], z[mask])
-    )
+    values = np.vectorize(func, otypes=[float])(x[mask], y[mask], z[mask])
+    assert np.allclose(magnet.aex()[0, mask], values)
     assert np.all(magnet.aex()[0, ~mask] == initial_value)
 
 
@@ -125,27 +134,26 @@ def test_vectorized_function_vectorparameter_in_region(
 
 
 def test_non_vectorized_function_vectorparameter_in_region(
-    test_parameters: Tuple[Ferromagnet, np.ndarray]
+    test_parameters_two_regions: Tuple[Ferromagnet, np.ndarray]
 ):
-    magnet, regions = test_parameters
+    magnet, regions = test_parameters_two_regions
 
     initial_vector = np.array((1.0, 0.0, 0.0))
     magnet.bias_magnetic_field = initial_vector
 
-    def values_func(x, y, z):
+    def func(x, y, z):
+        # non-vectorized function
+        if y > 3.2e-9:
+            return (z, 4 * y, x**2)
         return (x, y**2, 3 * x)
-
-    def set_func(x, y, z):
-        return values_func(x, y, z)
 
     x, y, z = magnet.magnetization.meshgrid
     some_index = np.random.choice(np.unique(regions))
-    magnet.bias_magnetic_field.set_in_region(some_index, set_func)
+    magnet.bias_magnetic_field.set_in_region(some_index, func)
     mask = regions == some_index
 
-    assert np.allclose(
-        magnet.bias_magnetic_field()[:, mask], values_func(x[mask], y[mask], z[mask])
-    )
+    values = np.vectorize(func, otypes=[float] * 3)(x[mask], y[mask], z[mask])
+    assert np.allclose(magnet.bias_magnetic_field()[:, mask], values)
     assert np.all(magnet.bias_magnetic_field()[:, ~mask] == initial_vector[:, None])
 
 
@@ -171,8 +179,10 @@ def test_vectorized_function_variable_in_region(
     assert np.all(magnet.magnetization()[:, ~mask] == initial_vector[:, None])
 
 
-def test_config_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarray]):
-    magnet, regions = test_parameters
+def test_config_variable_in_region(
+    test_parameters_two_regions: Tuple[Ferromagnet, np.ndarray]
+):
+    magnet, regions = test_parameters_two_regions
 
     initial_vector = np.array((1.0, 0.0, 0.0))
     magnet.magnetization = initial_vector
@@ -184,7 +194,8 @@ def test_config_variable_in_region(test_parameters: Tuple[Ferromagnet, np.ndarra
     x, y, z = magnet.magnetization.meshgrid
     mask = regions == some_index
 
-    assert np.allclose(magnet.magnetization()[:, mask], func(x[mask], y[mask], z[mask]))
+    values = np.vectorize(func, otypes=[float] * 3)(x[mask], y[mask], z[mask])
+    assert np.allclose(magnet.magnetization()[:, mask], values)
     assert np.all(magnet.magnetization()[:, ~mask] == initial_vector[:, None])
 
 
