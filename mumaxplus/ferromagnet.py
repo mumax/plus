@@ -148,12 +148,7 @@ class Ferromagnet(Magnet):
         self.bias_magnetic_field.set(value)
 
     def minimize(
-        self,
-        tol=1e-6,
-        nsamples=10,
-        line_search_mode=0,
-        max_step_angle=0,
-        max_stall=3,
+        self, tol=1e-6, nsamples=10, line_search_mode=0, max_step_angle=0, max_stall=3
     ):
         """Minimize the total energy.
 
@@ -175,23 +170,18 @@ class Ferromagnet(Magnet):
         line_search_mode : int (default=0)
             0: Barzilai-Borwein (BB) steps without line search.
             1: line search for the first step only.
-            2: as 1, and also recover from bad BB steps (NaN/Inf/0), and try a
-            line search when the magnetization difference criterion would
-            declare convergence, continuing if it finds real progress.
-            3: as 1, and also recover from bad BB steps, and apply the
-            non-monotone (GLL) energy test to every BB step (Exl et al. 2014).
+            2: as 1, and also recover from bad BB steps (NaN/Inf/0), and tries a
+            line search at convergence, continuing if it finds real progress.
+            3: as 2, and apply the non-monotone (GLL) energy test to every step.
             This costs one extra energy evaluation per step.
 
         max_step_angle : float (default=0)
             Maximum rotation angle (degrees) per line search trial step.
-            Values <= 0 disable the cap. Clamped to 89 degrees.
+            Values <= 0 disable the cap. Clamped to 179 degrees.
 
         max_stall : int (default=3)
             Number of consecutive no-progress rescues before further rescues
-            are disabled. In mode 3 these are GLL line search rescues (BB steps
-            are then accepted unconditionally until the energy drops below the
-            level at the start of the streak). In mode 2 these are convergence
-            rescues (the run then exits as converged).
+            are disabled.
 
         See Also
         --------
