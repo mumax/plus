@@ -1,10 +1,12 @@
 import numpy as np
 
-from mumaxplus import Antiferromagnet, NcAfm, Grid, World
+from mumaxplus import Antiferromagnet, Grid, NcAfm, World
+
 
 def max_absolute_error(result, wanted):
     """Maximum error for vector quantities."""
     return np.max(np.linalg.norm(result - wanted, axis=0))
+
 
 def max_semirelative_error(result, wanted):
     """Like relative error, but divides by the maximum of wanted.
@@ -12,10 +14,16 @@ def max_semirelative_error(result, wanted):
     """
     return max_absolute_error(result, wanted) / np.max(abs(wanted))
 
+
 def compute_local_dmi_field(magnet, sub, symmetry_factor):
     D = np.array(magnet.dmi_vector.average())
-    return symmetry_factor / sub.msat.average()[0] * np.cross(D[:, None, None, None],
-                                                              sub.magnetization(), axis=0)
+    return (
+        symmetry_factor
+        / sub.msat.average()[0]
+        * np.cross(D[:, None, None, None], sub.magnetization(), axis=0)
+    )
+
+
 class TestLocalDMI:
     def test_local_dmi_afm(self):
         world = World((1, 1, 1))
@@ -25,7 +33,9 @@ class TestLocalDMI:
 
         for i, sub in enumerate(magnet.sublattices):
             result = sub.homogeneous_dmi_field()
-            wanted = compute_local_dmi_field(magnet, magnet.other_sublattice(sub), (-1)**i)
+            wanted = compute_local_dmi_field(
+                magnet, magnet.other_sublattice(sub), (-1) ** i
+            )
             assert max_semirelative_error(result, wanted) < 1e-6
 
     def test_local_dmi_ncafm(self):
@@ -37,7 +47,8 @@ class TestLocalDMI:
         for i, sub in enumerate(magnet.sublattices):
             result = sub.homogeneous_dmi_field()
             sub2, sub3 = [s for j, s in enumerate(magnet.sublattices) if j != i]
-            
-            wanted = compute_local_dmi_field(magnet, sub2, (-1)**(i)) + \
-                     compute_local_dmi_field(magnet, sub3, (-1)**(i+1))
+
+            wanted = compute_local_dmi_field(
+                magnet, sub2, (-1) ** (i)
+            ) + compute_local_dmi_field(magnet, sub3, (-1) ** (i + 1))
             assert max_semirelative_error(result, wanted) < 1e-6

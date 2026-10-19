@@ -2,11 +2,12 @@
 
 from .parameter import Parameter
 
+
 class BoundaryTraction:
     """Contains the traction parameters of a Magnet's boundary at each of the 6
     sides of rectangular cells. The traction is applied as a boundary condition
     of the stress tensor σ during calculation of the internal force.
-    
+
     t = σ·n = n·σ
 
     Here t is the applied traction vector at the boundary with normal vector n,
@@ -37,12 +38,12 @@ class BoundaryTraction:
 
     def make_zero(self):
         """Set all traction parameters to zero."""
-        self.pos_x_side = (0., 0., 0.)
-        self.neg_x_side = (0., 0., 0.)
-        self.pos_y_side = (0., 0., 0.)
-        self.neg_y_side = (0., 0., 0.)
-        self.pos_z_side = (0., 0., 0.)
-        self.neg_z_side = (0., 0., 0.)
+        self.pos_x_side = (0.0, 0.0, 0.0)
+        self.neg_x_side = (0.0, 0.0, 0.0)
+        self.pos_y_side = (0.0, 0.0, 0.0)
+        self.neg_y_side = (0.0, 0.0, 0.0)
+        self.pos_z_side = (0.0, 0.0, 0.0)
+        self.neg_z_side = (0.0, 0.0, 0.0)
 
     @property
     def pos_x_side(self):
@@ -66,7 +67,6 @@ class BoundaryTraction:
     def neg_x_side(self, value):
         self.neg_x_side.set(value)
 
-
     @property
     def pos_y_side(self):
         """External traction vector (Pa)
@@ -88,7 +88,6 @@ class BoundaryTraction:
     @neg_y_side.setter
     def neg_y_side(self, value):
         self.neg_y_side.set(value)
-    
 
     @property
     def pos_z_side(self):

@@ -2,6 +2,7 @@
 
 from .parameter import Parameter
 
+
 class DmiTensorGroup:
     """Proxy class for managing multiple DmiTensor instances."""
 
@@ -11,10 +12,12 @@ class DmiTensorGroup:
     def __getattr__(self, name):
 
         if any(hasattr(tensor, name) for tensor in self.tensors):
+
             def method(*args, **kwargs):
                 for tensor in self.tensors:
                     if hasattr(tensor, name):
                         getattr(tensor, name)(*args, **kwargs)
+
             return method
 
         raise AttributeError(f"'DmiTensor' object has no attribute '{name}'")
@@ -28,6 +31,7 @@ class DmiTensorGroup:
         else:
             raise AttributeError(f"'DmiTensor' object has no attribute '{name}'")
 
+
 class DmiTensor:
     r"""Contains the DMI parameters of a ferromagnet.
 
@@ -36,28 +40,29 @@ class DmiTensor:
     .. math:: \varepsilon_{\text{DMI}} = \frac{1}{2} D_{ijk}
               \left[ m_j \partial_i m_k - m_k \partial_i m_j \right]
 
-    with summation indices running over :math:`x`, :math:`y`, and :math:`z`. The DMI strengths
-    and chiral properties are contained in the dmi tensor :math:`D_{ijk}`. This tensor is
-    antisymmetric in it's magnetic indices (:math:`D_{ijk} = - D_{ikj}`) and hence can be
-    fully described by only 9 elements.
+    with summation indices running over :math:`x`, :math:`y`, and :math:`z`. The DMI
+    strengths and chiral properties are contained in the dmi tensor :math:`D_{ijk}`.
+    This tensor is antisymmetric in it's magnetic indices (:math:`D_{ijk} = - D_{ikj}`)
+    and hence can be fully described by only 9 elements.
 
-    :func:`DmiTensor` has 9 Parameter properties: :attr:`xxy`, :attr:`xxz`, :attr:`xyz`, :attr:`yxy`,
-    :attr:`yxz`, :attr:`yyz`, :attr:`zxy`, :attr:`zxz`, and :attr:`zyz`. These 9 parameters fully define the
-    dmi tensor of a ferromagnet. The parameters can be set separately, or can be set
-    through one of the following methods:
+    :func:`DmiTensor` has 9 Parameter properties: :attr:`xxy`, :attr:`xxz`, :attr:`xyz`,
+    :attr:`yxy`, :attr:`yxz`, :attr:`yyz`, :attr:`zxy`, :attr:`zxz`, and :attr:`zyz`.
+    These 9 parameters fully define the dmi tensor of a ferromagnet. The parameters can
+    be set separately, or can be set through one of the following methods:
 
     - :func:`DmiTensor.set_interfacial_dmi`
     - :func:`DmiTensor.set_bulk_dmi`
-    
+
     Neumann boundary conditions are determined by
-    
+
     .. math:: 2 A \, n_i\partial_i\mathbf{m} = \mathbf{\Gamma} ,
-    
+
     where :math:`A` is the exchange constant and
 
     .. math:: \Gamma_k = m_j n_i D_{ijk}
 
-    with :math:`n_i` being the component of the surface normal in the :math:`i` th direction.
+    with :math:`n_i` being the component of the surface normal in the :math:`i` th
+    direction.
 
     Examples
     --------

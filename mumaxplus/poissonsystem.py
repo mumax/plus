@@ -3,6 +3,7 @@
 
 class PoissonSystem:
     """Poisson System which can be solver for the electrostatic potential."""
+
     def __init__(self, impl):
         self._impl = impl
 
@@ -19,7 +20,7 @@ class PoissonSystem:
         * conjugategradient
         * minimalresidual
         * steepestdescent
-        
+
         """
         return self._impl.solver.set_method(method_name)
 

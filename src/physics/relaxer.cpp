@@ -1,3 +1,7 @@
+#include "relaxer.hpp"
+
+#include <algorithm>
+
 #include "antiferromagnet.hpp"
 #include "butchertableau.hpp"
 #include "dynamicequation.hpp"
@@ -6,12 +10,9 @@
 #include "fieldops.hpp"
 #include "mumaxworld.hpp"
 #include "reduce.hpp"
-#include "relaxer.hpp"
 #include "thermalnoise.hpp"
 #include "timesolver.hpp"
 #include "torque.hpp"
-
-#include <algorithm>
 
 Relaxer::Relaxer(const Magnet* magnet, std::vector<real> RelaxTorqueThreshold, real tol)
     : magnets_({magnet}),
@@ -21,54 +22,53 @@ Relaxer::Relaxer(const Magnet* magnet, std::vector<real> RelaxTorqueThreshold, r
       threshold_(RelaxTorqueThreshold) {}
 
 Relaxer::Relaxer(const MumaxWorld* world, real RelaxTorqueThreshold, real tol)
-    : timesolver_(world->timesolver()),
-      world_(world),
-      tol_(tol) {
-        for (const auto& pair : world->magnets()) {
-          magnets_.push_back(pair.second);
-          threshold_.push_back(RelaxTorqueThreshold);
-        }
+    : timesolver_(world->timesolver()), world_(world), tol_(tol) {
+  for (const auto& pair : world->magnets()) {
+    magnets_.push_back(pair.second);
+    threshold_.push_back(RelaxTorqueThreshold);
+  }
 }
 
 std::vector<DynamicEquation> Relaxer::getEquation(const Magnet* magnet) {
   /////////
-  // TODO: this function looks too much like mumaxworld.resetTimeSolverEquations.
+  // TODO: this function looks too much like
+  // mumaxworld.resetTimeSolverEquations.
   /////////
-    std::vector<DynamicEquation> eqs;
-    if (const Ferromagnet* mag = magnet->asFM()) {
-      DynamicEquation eq(
-          mag->magnetization(),
-          std::shared_ptr<FieldQuantity>(relaxTorqueQuantity(mag).clone()),
-          std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(mag).clone()));
-      eqs.push_back(eq);
+  std::vector<DynamicEquation> eqs;
+  if (const Ferromagnet* mag = magnet->asFM()) {
+    DynamicEquation eq(
+        mag->magnetization(),
+        std::shared_ptr<FieldQuantity>(relaxTorqueQuantity(mag).clone()),
+        std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(mag).clone()));
+    eqs.push_back(eq);
+  } else if (auto host = magnet->asHost()) {
+    for (const Ferromagnet* sub : host->sublattices()) {
+      eqs.emplace_back(
+          sub->magnetization(),
+          std::shared_ptr<FieldQuantity>(relaxTorqueQuantity(sub).clone()),
+          std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()));
     }
-    else if (auto host = magnet->asHost()) {
-      for (const Ferromagnet* sub : host->sublattices()) {
-          eqs.emplace_back(
-              sub->magnetization(),
-              std::shared_ptr<FieldQuantity>(relaxTorqueQuantity(sub).clone()),
-              std::shared_ptr<FieldQuantity>(thermalNoiseQuantity(sub).clone()));
-      }
-    }
-    else
-      throw std::invalid_argument("Cannot relax quantity which is "
-                                  "no Ferromagnet or (non-collinear) Antiferromagnet");
-    return eqs;
+  } else {
+    throw std::invalid_argument(
+        "Cannot relax quantity which is "
+        "no Ferromagnet or (non-collinear) Antiferromagnet");
+  }
+  return eqs;
 }
 
 std::vector<FM_FieldQuantity> Relaxer::getTorque() {
   std::vector<FM_FieldQuantity> torque;
   for (auto magnet : magnets_) {
-    if (const Ferromagnet* mag = magnet->asFM())
-     torque.push_back(relaxTorqueQuantity(mag));
-
-    else if (auto host = magnet->asHost()) {
+    if (const Ferromagnet* mag = magnet->asFM()) {
+      torque.push_back(relaxTorqueQuantity(mag));
+    } else if (auto host = magnet->asHost()) {
       for (const Ferromagnet* sub : host->sublattices())
         torque.push_back(relaxTorqueQuantity(sub));
+    } else {
+      throw std::invalid_argument(
+          "Cannot relax quantity which is "
+          "no Ferromagnet or (non-collinear) Antiferromagnet");
     }
-    else
-      throw std::invalid_argument("Cannot relax quantity which is "
-                                  "no Ferromagnet or (non-collinear) Antiferromagnet");
   }
   return torque;
 }
@@ -76,7 +76,7 @@ std::vector<FM_FieldQuantity> Relaxer::getTorque() {
 real Relaxer::calcTorque(std::vector<FM_FieldQuantity> torque) {
   real t = 0;
   for (size_t i = 0; i < torque.size(); i++)
-      t += dotSum(torque[i].eval(), torque[i].eval());
+    t += dotSum(torque[i].eval(), torque[i].eval());
   return t;
 }
 
@@ -88,7 +88,6 @@ real Relaxer::calcEnergy() {
 }
 
 void Relaxer::exec() {
-  
   // Store current solver settings
   real time = timesolver_.time();
   real timestep = timesolver_.timestep();
@@ -100,11 +99,14 @@ void Relaxer::exec() {
   // Set solver settings for relax
   timesolver_.enableAdaptiveTimeStep();
   timesolver_.setRungeKuttaMethod("Fehlberg");
-  if (magnets_.size() == 1) { timesolver_.setEquations(getEquation(magnets_[0])); }
-  else {world_->resetTimeSolverEquations(relaxTorqueQuantity);}
+  if (magnets_.size() == 1) {
+    timesolver_.setEquations(getEquation(magnets_[0]));
+  } else {
+    world_->resetTimeSolverEquations(relaxTorqueQuantity);
+  }
 
   // Run while monitoring energy
-  const int N = 3; // evaluates energy every N steps (expenisve)  
+  const int N = 3;  // evaluates energy every N steps (expenisve)
 
   real E0 = calcEnergy();
   timesolver_.steps(N);
@@ -116,13 +118,14 @@ void Relaxer::exec() {
     E1 = calcEnergy();
   }
   // Run while monitoring torque
-  // If threshold < 0 (default = -1): relax until torque is steady or increasing.
-  if (std::all_of(threshold_.begin(), threshold_.end(), [](real t) { return t < 0; })) {
-
+  // If threshold < 0 (default = -1): relax until torque is steady or
+  // increasing.
+  auto all_negative = [](real t) { return t < 0; };
+  if (std::all_of(threshold_.begin(), threshold_.end(), all_negative)) {
     std::vector<FM_FieldQuantity> torque = getTorque();
     real t0 = 0;
     real t1 = calcTorque(torque);
-  
+
     real err = timesolver_.maxError();
 
     while (err > tol_) {
@@ -132,21 +135,18 @@ void Relaxer::exec() {
       timesolver_.steps(N);
       t0 = t1;
       t1 = calcTorque(torque);
-      
+
       while (t1 < t0) {
         timesolver_.steps(N);
         t0 = t1;
         t1 = calcTorque(torque);
-      }    
+      }
     }
-  }
-
-  else if (std::find(threshold_.begin(), threshold_.end(), 0) != threshold_.end())
+  } else if (std::find(threshold_.begin(), threshold_.end(), 0) != threshold_.end()) {
     throw std::invalid_argument("The relax threshold should not be zero.");
-
-  // If threshold is set by user: relax until torque is smaller than or equal to threshold.
-  else {
-
+  } else {
+    // If threshold is set by user: relax until torque is smaller than or equal
+    // to threshold.
     real err = timesolver_.maxError();
     std::vector<FM_FieldQuantity> torque = getTorque();
 
@@ -159,7 +159,7 @@ void Relaxer::exec() {
         }
       }
 
-      if (torqueConverged) {    
+      if (torqueConverged) {
         err /= std::sqrt(2);
         timesolver_.setMaxError(err);
       }
@@ -170,8 +170,10 @@ void Relaxer::exec() {
   // Restore solver settings after relaxing
   timesolver_.setRungeKuttaMethod(method);
   timesolver_.setMaxError(maxerr);
-  if (!adaptive) { timesolver_.disableAdaptiveTimeStep(); }
+  if (!adaptive) {
+    timesolver_.disableAdaptiveTimeStep();
+  }
   timesolver_.setTime(time);
-  timesolver_.setTimeStep(timestep); 
+  timesolver_.setTimeStep(timestep);
   timesolver_.setEquations(eqs);
 }

@@ -32,5 +32,6 @@ PYBIND11_MODULE(MUMAX_MODULE_NAME, m) {
   wrap_system(m);
   wrap_dmitensor(m);
   wrap_voronoi(m);
+  wrap_window(m);
   wrap_traction(m);
 }

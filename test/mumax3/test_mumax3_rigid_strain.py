@@ -1,15 +1,18 @@
+from mumax3 import Mumax3Simulation
 import numpy as np
 import pytest
-from mumax3 import Mumax3Simulation
+
 from mumaxplus import Ferromagnet, Grid, World
 
 RTOL = 3e-5
 strain = 1e-4
 
+
 def max_relative_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
     relerr = err / np.linalg.norm(wanted, axis=0)
     return np.max(relerr)
+
 
 def simulation(exx, eyy, ezz, exy, exz, eyz):
     # arbitrarily chosen parameters
@@ -57,6 +60,7 @@ def simulation(exx, eyy, ezz, exy, exz, eyz):
 @pytest.mark.mumax3
 class TestRigidStrain:
     """Test rigid strain against mumax³."""
+
     def test_exx(self):
         exx, eyy, ezz, exy, exz, eyz = strain, 0, 0, 0, 0, 0
         magnet, mumax3sim = simulation(exx, eyy, ezz, exy, exz, eyz)

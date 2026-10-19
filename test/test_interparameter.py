@@ -2,7 +2,8 @@
 
 import numpy as np
 import pytest
-from mumaxplus import World, Grid, Ferromagnet
+
+from mumaxplus import Ferromagnet, Grid, World
 
 
 def lut_index(i, j):
@@ -11,8 +12,10 @@ def lut_index(i, j):
         i, j = j, i
     return j * (j - 1) // 2 + i
 
+
 n_regions = 5
 nx, ny, nz = 32, 16, 1
+
 
 @pytest.fixture(scope="module")  # reuse across tests
 def magnet():
@@ -21,6 +24,7 @@ def magnet():
     regions = np.random.randint(0, n_regions, size=(nz, ny, nx))
     magnet = Ferromagnet(world, Grid((nx, ny, nz)), regions=regions)
     return magnet
+
 
 @pytest.fixture
 def interex(magnet):
@@ -31,7 +35,9 @@ def interex(magnet):
     magnet.inter_exchange.set(0.0)  # reset state before each test
     return magnet.inter_exchange
 
+
 # -------------------- Tests --------------------
+
 
 class TestRegions:
     def test_reported_number_of_regions(self, interex):
@@ -64,14 +70,14 @@ class TestUniformState:
         interex.set(val)
         matrix = interex.eval()
 
-        i_s, j_s = np.tril_indices(n_regions, k=-1)  # lower triangle, no diagonal
+        i_s, j_s = np.tril_indices(n_regions, k=0)  # lower triangle, with diagonal
         assert np.all(matrix[i_s, j_s] == val)
 
-    def test_diagonal_is_zero(self, interex):
-        """Diagonal has no physical meaning for inter-region parameters."""
-        interex.set(5.0)
+    def test_diagonal_is_intra_region_value(self, interex):
+        """Diagonal elements equal intra-region parameters."""
+        interex.intra_region_value = 5.0
         matrix = interex.eval()
-        assert np.all(np.diag(matrix) == 0.0)
+        assert np.all(np.diag(matrix) == 5.0)
 
 
 class TestSetGetBetween:
@@ -82,6 +88,14 @@ class TestSetGetBetween:
     def test_get_between_after_set_between(self, interex):
         interex.set_between(1, 3, 42.0)
         assert interex.get_between(1, 3) == 42.0
+
+    @pytest.mark.parametrize("first_non_uniform", [False, True])
+    def test_get_between_after_setting_uniform_value(self, interex, first_non_uniform):
+        if first_non_uniform:
+            interex.set_between(1, 2, 9.0)
+
+        interex.set(37.0)
+        assert interex.get_between(1, 2) == 37.0
 
     def test_get_between_is_symmetric(self, interex):
         interex.set_between(2, 4, 7.0)
@@ -107,10 +121,6 @@ class TestSetGetBetween:
         with pytest.raises(Exception):
             interex.set_between(2, 2, 1.0)
 
-    def test_get_between_same_index_exception(self, interex):
-        with pytest.raises(Exception):
-            interex.get_between(3, 3)
-
     def test_set_between_with_uniform_value(self, interex):
         """Setting a pair to the current uniform value should keep is_uniform True."""
         interex.set(5.0)
@@ -122,6 +132,59 @@ class TestSetGetBetween:
         assert interex.is_uniform is False
         with pytest.raises(Exception):
             _ = interex.uniform_value
+
+
+class TestIntraRegionValue:
+    def test_setting_intra_region_makes_non_uniform(self, interex):
+        interex.intra_region_value = 99.0
+        assert interex.is_uniform is False
+
+    def test_intra_region_value_get_after_set(self, interex):
+        interex.intra_region_value = 42.0
+        assert interex.intra_region_value == 42.0
+
+    def test_get_between_same_index(self, interex):
+        interex.intra_region_value = 27.0
+        for i in interex.region_indices:
+            assert interex.get_between(i, i) == 27.0
+
+    def test_setting_intra_region_value_with_uniform_value(self, interex):
+        """Setting intra_region_value to the current uniform value should keep
+        is_uniform True."""
+        interex.set(5.0)
+        interex.intra_region_value = 5.0
+        assert interex.is_uniform is True
+
+    @pytest.mark.parametrize("first_non_uniform", [False, True])
+    def test_intra_region_value_after_setting_uniform_value(
+        self, interex, first_non_uniform
+    ):
+        if first_non_uniform:
+            interex.set_between(1, 2, 9.0)
+
+        interex.set(37.0)
+        assert interex.intra_region_value == 37.0
+
+    def test_uniform_value_exception_when_not_uniform(self, interex):
+        interex.intra_region_value = 99.0
+        assert interex.is_uniform is False
+        with pytest.raises(Exception):
+            _ = interex.uniform_value
+
+    def test_intra_region_value_is_uniform_without_regions(self):
+        """When there is only region 0 (default), the only possible value is the intra
+        region value. Setting intra region value should thus be the same as setting a
+        uniform value.
+        """
+        world = World((1e-9, 1e-9, 1e-9))
+        magnet = Ferromagnet(world, Grid((nx, ny, nz)))  # magnet without regions
+
+        interex = magnet.inter_exchange
+        interex.set(0.0)  # set default
+        interex.intra_region_value = 36.0
+
+        assert interex.is_uniform
+        assert interex.uniform_value == 36.0
 
 
 class TestEval:

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.fft import rfft, rfftfreq
 from scipy.signal import find_peaks
+
 from mumaxplus import Antiferromagnet, Grid, World
 from mumaxplus.util.constants import GAMMALL_DEFAULT
 

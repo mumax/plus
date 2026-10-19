@@ -1,8 +1,9 @@
 #pragma once
 
-#include "quantityevaluator.hpp"
-#include "mumaxworld.hpp"
 #include <map>
+
+#include "mumaxworld.hpp"
+#include "quantityevaluator.hpp"
 
 class MFM : public FieldQuantity {
  public:
@@ -12,8 +13,8 @@ class MFM : public FieldQuantity {
   Field eval() const;
 
   int ncomp() const;
-  std::string name() const {return name_;};
-  std::string unit() const {return "J";};
+  std::string name() const { return name_; }
+  std::string unit() const { return "J"; }
 
   std::shared_ptr<const System> system() const;
 

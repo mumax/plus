@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,11 +59,11 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Domain wall motion with surface acoustic waves" href="DW_SAW.html" />
-    <link rel="prev" title="Standard Problem #2" href="stdp2.html" />
+    <link rel="prev" title="Standard Problem: Domain Wall Pinning" href="stdp_DW_pinning.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -245,10 +246,12 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -368,15 +371,15 @@ The magnet is minimized and the elastic parameters are assigned together
 with a circular area in which an external sinusoidal field is applied
 in the y-direction. This simulation runs for 0.5 ns and returns an animation
 of the y-magnetization and the amplified displacement.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">animation</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">World</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">Ferromagnet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ferromagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">mumaxplus.util.shape</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">shapes</span>
-
 
 <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">thickness</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="mf">20e-9</span>
 <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">1</span>
@@ -527,12 +530,12 @@ of the y-magnetization and the amplified displacement.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="stdp2.html"
+       href="stdp_DW_pinning.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Standard Problem #2</p>
+        <p class="prev-next-title">Standard Problem: Domain Wall Pinning</p>
       </div>
     </a>
     <a class="right-next"
@@ -572,7 +575,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

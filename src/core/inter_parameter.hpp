@@ -5,8 +5,6 @@
 #include "reduce.hpp"
 #include "system.hpp"
 
-
-
 class System;
 
 class CuInterParameter;
@@ -14,29 +12,33 @@ class CuInterParameter;
 class InterParameter {
  public:
   explicit InterParameter(std::shared_ptr<const System> system,
-                           real value,
-                           std::string name = "",
-                           std::string unit = "");
-  ~InterParameter() {};
+                          real value,
+                          std::string name = "",
+                          std::string unit = "");
+  ~InterParameter() {}
 
   std::string name() const { return name_; }
   std::string unit() const { return unit_; }
   int ncomp() const { return 1; }
   bool isUniform() const { return valuesBuffer_.size() == 0; }
-  bool assuredZero() const { return isUniform() && uniformValue_ == 0.0; };
+  bool assuredZero() const { return isUniform() && uniformValue_ == 0.0; }
 
   const std::vector<real> eval() const;
 
   // set to uniform value
   void set(real value);
+  void setIntraRegionValue(real value);
   void setBetween(unsigned int i, unsigned int j, real value);
   real getUniformValue() const;
+  real getIntraRegionValue() const;
   real getBetween(unsigned int i, unsigned int j) const;
 
   CuInterParameter cu() const;
 
   // TODO: these user-convenience functions should probably move
-  const std::vector<unsigned int> uniqueRegions() const { return system_->uniqueRegions; }
+  const std::vector<unsigned int> uniqueRegions() const {
+    return system_->uniqueRegions;
+  }
   int numberOfRegions() const { return system_->uniqueRegions.size(); }
 
  private:
@@ -48,6 +50,7 @@ class InterParameter {
 
   std::shared_ptr<const System> system_;
   real uniformValue_;
+  real intraRegionValue_;  // value of the diagonal
   GpuBuffer<real> valuesBuffer_;
   size_t valuesLimit_;  // N(N-1)/2 with N = maxRegionIdx+1
 
@@ -58,6 +61,7 @@ class CuInterParameter {
  private:
   real* valuesPtr_;
   real uniformValue_;
+  real intraRegionValue_;
 
  public:
   explicit CuInterParameter(const InterParameter* p);
@@ -67,6 +71,7 @@ class CuInterParameter {
 
 inline CuInterParameter::CuInterParameter(const InterParameter* p)
     : uniformValue_(p->uniformValue_),
+      intraRegionValue_(p->getIntraRegionValue()),
       valuesPtr_(nullptr) {
   if (!p->isUniform()) {
     valuesPtr_ = p->valuesBuffer_.get();
@@ -84,8 +89,11 @@ __device__ __host__ inline int getLutIndex(int i, int j) {
   return j * (j - 1) / 2 + i;
 }
 
-__device__ inline real CuInterParameter::valueBetween(unsigned int idx1, unsigned int idx2) const {
+__device__ inline real CuInterParameter::valueBetween(unsigned int idx1,
+                                                      unsigned int idx2) const {
   if (isUniform())
     return uniformValue_;
+  if (idx1 == idx2)
+    return intraRegionValue_;
   return valuesPtr_[getLutIndex(idx1, idx2)];
 }

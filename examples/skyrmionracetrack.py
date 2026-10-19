@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
+
 from mumaxplus import Ferromagnet, Grid, World
 from mumaxplus.util import neelskyrmion, plot_field
-import matplotlib.pyplot as plt
 
 # create the world
 cellsize = (1e-9, 1e-9, 0.4e-9)

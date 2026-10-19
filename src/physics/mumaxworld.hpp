@@ -7,10 +7,11 @@
 #include <string>
 
 #include "datatypes.hpp"
-#include "quantityevaluator.hpp"
 #include "gpubuffer.hpp"
 #include "grid.hpp"
+#include "quantityevaluator.hpp"
 #include "torque.hpp"
+#include "window.hpp"
 #include "world.hpp"
 
 class Altermagnet;
@@ -37,7 +38,9 @@ class MumaxWorld : public World {
   /** Uniform bias magnetic field which will affect all magnets in the world. */
   real3 biasMagneticField;
 
-  void checkAddibility(Grid grid, std::string name) const;
+  void checkAddibility(Grid grid,
+                       const GpuBuffer<bool>& geometry,
+                       std::string name) const;
 
   /** Add a ferromagnet to the world. */
   Ferromagnet* addFerromagnet(Grid grid,
@@ -50,7 +53,7 @@ class MumaxWorld : public World {
                                       GpuBuffer<bool> geometry,
                                       GpuBuffer<unsigned int> regions,
                                       std::string name = "");
-  
+
   /** Add an altermagnet to the world. */
   Altermagnet* addAltermagnet(Grid grid,
                               GpuBuffer<bool> geometry,
@@ -62,8 +65,9 @@ class MumaxWorld : public World {
                   GpuBuffer<bool> geometry,
                   GpuBuffer<unsigned int> regions,
                   std::string name = "");
-    
-  /**Add the magnetic field of the other magnets in the new magnet, and vice versa. */
+
+  /**Add the magnetic field of the other magnets in the new magnet, and vice
+   * versa. */
   void handleNewStrayfield(Magnet* newMagnet);
 
   /** Get a magnet by its name.
@@ -79,7 +83,8 @@ class MumaxWorld : public World {
    *  Return a nullptr if there is no altermagnet with specified name. */
   Altermagnet* getAltermagnet(std::string name) const;
   /** Get a non-collinear antiferromagnet by its name.
-   *  Return a nullptr if there is no non-collinear antiferromagnet with specified name. */
+   *  Return a nullptr if there is no non-collinear antiferromagnet with
+   * specified name. */
   NcAfm* getNcAfm(std::string name) const;
 
   /** Get map of all Magnets in this world. */
@@ -101,9 +106,9 @@ class MumaxWorld : public World {
 
   void resetTimeSolverEquations(FM_Field torque = torqueQuantity) const;
 
-  // ----------------------------------------------------------------------------------
-  // -------------------------------- Helper functions --------------------------------
-  // ----------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // ---------------------------- Helper functions ----------------------------
+  // --------------------------------------------------------------------------
 
   // * Helper function to add any magnet to the world
   template <class T>
@@ -118,7 +123,7 @@ class MumaxWorld : public World {
     if (name.empty())
       name = prefix + "_" + std::to_string(idxUnnamed++);
     // Check if magnet can be added to this world.
-    checkAddibility(grid, name);
+    checkAddibility(grid, geometry, name);
 
     // Create the magnet and add it to this world
     auto mag = std::make_unique<T>(this, grid, name, geometry, regions);
@@ -128,31 +133,33 @@ class MumaxWorld : public World {
     magnets_[name] = raw;
 
     handleNewStrayfield(raw);
+    window_->setOrigin(int3_to_real3(grid.origin()) * this->cellsize());
     return raw;
   }
 
   // * Helper function to get any magnet in the world
   template <class MapT>
   auto getMagnetTempl(const MapT& container, const std::string& name) const
-        -> decltype(container.begin()->second.get()) {
+      -> decltype(container.begin()->second.get()) {
     auto it = container.find(name);
-    if (it == container.end()) return nullptr;
+    if (it == container.end())
+      return nullptr;
     return it->second.get();
   }
 
   // * Helper function to get a map of any magnet type in the world
   template <class T, class MapT>
   std::map<std::string, T> getMagnetPointers(const MapT& container) const {
-      std::map<std::string, T> result;
-      for (const auto& pair : container) {
-          result[pair.first] = pair.second.get();
-      }
-      return result;
+    std::map<std::string, T> result;
+    for (const auto& pair : container) {
+      result[pair.first] = pair.second.get();
+    }
+    return result;
   }
 
-  // ----------------------------------------------------------------------------------
-  // -------------------------------------- PBC ---------------------------------------
-  // ----------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // ---------------------------------- PBC -----------------------------------
+  // --------------------------------------------------------------------------
 
   /** Check if all magnets fit inside the given grid.
    * @throws std:out_of_range Thrown not all magnets fit inside the given grid.
@@ -164,19 +171,19 @@ class MumaxWorld : public World {
 
   /** Returns Grid which is the minimum bounding box of all magnets currently
    * in the world.
-   * 
+   *
    * @throws std::out_of_range Thrown if there are no magnets in the world.
    */
   Grid boundingGrid() const;
 
   /** Set the periodic boundary conditions.
-   * 
+   *
    * This will recalculate all strayfield kernels of all magnets in the world.
-   * 
+   *
    * @param mastergrid Mastergrid defines a periodic simulation box. If it has
    * zero size in a direction, then it is considered to be infinitely large
    * (no periodicity) in that direction.
-   * 
+   *
    * @param pbcRepetitions The number of repetitions for everything inside
    * mastergrid in the x, y and z directions to create periodic boundary
    * conditions. The number of repetitions determines the cutoff range for the
@@ -185,7 +192,7 @@ class MumaxWorld : public World {
    * all magnets are essentially copied twice to the right, twice to the left,
    * but not in the y direction. That row is then copied once up and once down,
    * creating a 5x1x3 grid.
-   * 
+   *
    * @throws std::invalid_argument Thrown when given a negative number of
    * repetitions.
    * @throws std::invalid_argument Thrown when 0 in mastergrid size does not
@@ -195,20 +202,20 @@ class MumaxWorld : public World {
   void setPBC(const Grid mastergrid, const int3 pbcRepetitions);
 
   /** Set the periodic boundary conditions
-   * 
+   *
    * The mastergrid will be set to the minimum bounding box of the magnets
    * currently inside the world, but infinitely large (size 0, no periodicity)
    * for any direction set to 0 in `pbcRepetitions`.
-   * 
+   *
    * This will recalculate all strayfield kernels of all magnets in the world.
-   * 
+   *
    * This function reflects the behavior of the mumax³ SetPBC function.
-   * 
+   *
    * @param pbcRepetitions The number of repetitions for everything inside
    * mastergrid in the x, y and z directions to create periodic boundary
    * conditions. The number of repetitions determines the cutoff range for the
    * demagnetization.
-   * 
+   *
    * @throws std::invalid_argument Thrown when given a negative number of
    * repetitions.
    * @throws std::out_of_range Thrown if there are no magnets in the world.
@@ -217,19 +224,19 @@ class MumaxWorld : public World {
 
   /** Change pbcRepetitions of the world.
    * This does not change the `mastergrid`.
-   * 
+   *
    * @param pbcRepetitions The number of repetitions for everything inside
    * mastergrid in the x, y and z directions to create periodic boundary
    * conditions. The number of repetitions determines the cutoff range for the
    * demagnetization.
-   * 
+   *
    * For example {2,0,1} means that, for the strayFieldKernel computation,
    * all magnets are essentially copied twice to the right, twice to the left,
    * but not in the y direction. That row is then copied once up and once down,
    * creating a 5x1x3 grid.
    *
    * This will recalculate all strayfield kernels of all magnets in the world.
-   * 
+   *
    * @throws std::invalid_argument Thrown when given a negative number of
    * repetitions.
    * @throws std::invalid_argument Thrown when 0 in mastergrid size does not
@@ -239,13 +246,13 @@ class MumaxWorld : public World {
 
   /** Change the master grid of the world.
    * This does not change the `pbcRepetitions`.
-   * 
+   *
    * @param mastergrid defines a periodic simulation box. If it has zero size in
-   * a direction, then it is considered to be infinitely large (no periodicity) in
-   * that direction.
-   * 
+   * a direction, then it is considered to be infinitely large (no periodicity)
+   * in that direction.
+   *
    * This will recalculate all strayfield kernels of all magnets in the world.
-   * 
+   *
    * @throws std::invalid_argument Thrown when 0 in mastergrid size does not
    * correspond to a 0 in pbcRepetitions.
    * @throws std:out_of_range Thrown not all magnets fit inside the given grid.
@@ -259,6 +266,17 @@ class MumaxWorld : public World {
 
   // --------------------------------------------------
 
+  // Moving simulation window
+  Window& window() const { return *window_; }
+  void centerDomainWall(int comp, int axis);
+
+  // --------------------------------------------------
+
+  // Check overlapping magnets
+  static bool overlaps(Grid grid1,
+                       const GpuBuffer<bool>& geometry1,
+                       Grid grid2,
+                       const GpuBuffer<bool>& geometry2);
 
  private:
   std::map<std::string, Magnet*> magnets_;
@@ -267,4 +285,6 @@ class MumaxWorld : public World {
   std::map<std::string, std::unique_ptr<Antiferromagnet>> antiferromagnets_;
   std::map<std::string, std::unique_ptr<Altermagnet>> altermagnets_;
   std::map<std::string, std::unique_ptr<NcAfm>> ncafms_;
+
+  std::unique_ptr<Window> window_;
 };

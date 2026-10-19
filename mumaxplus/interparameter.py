@@ -1,9 +1,9 @@
 """InterParameter implementation."""
 
-from . import _cpp
 import numpy as _np
 
-class InterParameter():
+
+class InterParameter:
     """Represent a physical material parameter which acts between
     different regions, i.e. `inter_exchange`.
     """
@@ -39,6 +39,7 @@ class InterParameter():
         i_s, j_s = _np.tril_indices(N, k=-1)
         value_matrix[i_s, j_s] = values  # lower triangle
         value_matrix[j_s, i_s] = values  # upper triangle
+        value_matrix[_np.diag_indices(N)] = self.intra_region_value
         return value_matrix
 
     def __call__(self):
@@ -66,8 +67,7 @@ class InterParameter():
 
     @property
     def number_of_regions(self) -> int:
-        """Return the number of regions between which the quantity
-        is active."""
+        """Return the number of regions between which the quantity is active."""
         return self._impl.number_of_regions
 
     @property
@@ -78,7 +78,7 @@ class InterParameter():
     @property
     def is_uniform(self) -> bool:
         """Return True if an InterParameter instance is uniform, otherwise False.
-        
+
         See Also
         --------
         uniform_value
@@ -88,7 +88,7 @@ class InterParameter():
     @property
     def uniform_value(self) -> float:
         """Return the uniform value of the InterParameter instance if it exists.
-        
+
         See Also
         --------
         is_uniform
@@ -97,42 +97,70 @@ class InterParameter():
 
     @uniform_value.setter
     def uniform_value(self, value):
-        """Set the InterParameter value between every different region
-        to the same value. This functions the same as simply setting the
-        InterParameter with `= value` or `set(value)`.
+        """Set the InterParameter value between every region to the same value. This
+        functions the same as simply setting the InterParameter with `= value` or
+        `set(value)`.
 
         See Also
         --------
         set
         """
-        assert isinstance(value, (float, int)
-                          ), "The value should be uniform and static."
+        assert isinstance(
+            value, (float, int)
+        ), "The value should be uniform and static."
         self._impl.uniform_value = value
 
+    @property
+    def intra_region_value(self) -> float:
+        """Return the InterParameter value within a single region of any index.
+
+        This acts as a safe fall-back when evaluating two equal region indices.
+        By default, this has the same value as :attr:`uniform_value`.
+
+        See Also
+        --------
+        uniform_value
+        """
+        return self._impl.intra_region_value
+
+    @intra_region_value.setter
+    def intra_region_value(self, value):
+        """Set the InterParameter value within a single region of any index.
+
+        See Also
+        --------
+        set, set_between
+        """
+        assert isinstance(
+            value, (float, int)
+        ), "The value should be uniform and static."
+        self._impl.intra_region_value = value
+
     def set(self, value):
-        """Set the InterParameter value between every different region
-        to the same value.
+        """Set the InterParameter value between every region to the same value.
 
         See Also
         --------
         set_between
         """
-        assert isinstance(value, (float, int)
-                          ), "The value should be uniform and static."
+        assert isinstance(
+            value, (float, int)
+        ), "The value should be uniform and static."
         self._impl.set(value)
 
     def set_between(self, i, j, value):
-        """Set InterParameter value between regions i and j.
-        
+        """Set InterParameter value between different regions i and j.
+
         See Also
         --------
         get_between, set
+        intra_region_value
         """
         self._impl.set_between(i, j, value)
 
     def get_between(self, i, j) -> float:
         """Get the InterParameter value between regions i and j.
-        
+
         See Also
         --------
         set_between

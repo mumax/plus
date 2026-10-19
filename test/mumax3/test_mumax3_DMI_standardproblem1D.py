@@ -5,31 +5,35 @@
    the mumax³ github repository https://github.com/mumax/3/issues/352.
    """
 
-import pytest
-import numpy as np
-from mumaxplus import Ferromagnet, Grid, World
 from mumax3 import Mumax3Simulation
+import numpy as np
+import pytest
+
+from mumaxplus import Ferromagnet, Grid, World
 
 RTOL = 1e-5
+
+
 def max_relative_error(result, wanted):
     err = np.linalg.norm(result - wanted, axis=0)
     relerr = err / np.linalg.norm(wanted, axis=0)
     return np.max(relerr)
 
+
 def simulations(openbc, interfacial):
     """This simulates a 1D wire with bulk or interfacial DMI in both
-       mumax³ and mumax⁺."""
+    mumax³ and mumax⁺."""
 
     # constants
     A = 13e-12
     D = 3e-3
     Ku = 0.4e6
-    anisU = (1,0,0)
+    anisU = (1, 0, 0)
     Ms = 0.86e6
 
     cellsize = (1e-9, 1e-9, 1e-9)
     gridsize = (1, 1, 100)
-    magnetization = (1,0,0)
+    magnetization = (1, 0, 0)
 
     # mumax⁺ simulation
     world = World(cellsize=cellsize)
@@ -48,10 +52,10 @@ def simulations(openbc, interfacial):
     else:
         DMI = "Dbulk"
         magnet.dmi_tensor.set_bulk_dmi(D)
-    
+
     magnet.magnetization = magnetization
     magnet.minimize()
-    
+
     # mumax³ simulation
     mumax3sim = Mumax3Simulation(
         f"""
@@ -71,13 +75,12 @@ def simulations(openbc, interfacial):
         """
     )
 
-    return  magnet, mumax3sim
+    return magnet, mumax3sim
 
 
 @pytest.mark.mumax3
 class TestDMI1D:
-    """Compare the results of the simulations by comparing the magnetizations.
-    """
+    """Compare the results of the simulations by comparing the magnetizations."""
 
     def test_closed_inter(self):
         magnet, mumax3sim = simulations(False, True)

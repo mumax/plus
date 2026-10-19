@@ -1,9 +1,12 @@
 import numpy as np
-from mumaxplus import NcAfm, Grid, World
+
+from mumaxplus import Grid, NcAfm, World
+
 
 def max_absolute_error(result, wanted):
     """Maximum error for vector quantities."""
     return np.max(np.linalg.norm(result - wanted, axis=0))
+
 
 def max_semirelative_error(result, wanted):
     """Like relative error, but divides by the maximum of wanted.
@@ -11,19 +14,21 @@ def max_semirelative_error(result, wanted):
     """
     return max_absolute_error(result, wanted) / np.max(abs(wanted))
 
+
 def compute_octupole_vector(m1, m2, m3, ms1, ms2, ms3):
 
     def rotate_120(m, ref):
         k = np.cross(ref, m, axis=0)
         k /= np.linalg.norm(k, axis=0)
         s = np.sign(np.sum(ref * m, axis=0))
-        s[s == 0] = 1 # perpendicular vectors
+        s[s == 0] = 1  # perpendicular vectors
         return -0.5 * m + np.cross(k, m, axis=0) * (np.sqrt(3) / 2) * s
 
     m2r = rotate_120(m2, m1)
     m3r = rotate_120(m3, m1)
 
     return (m1 * ms1 + m2r * ms2 + m3r * ms3) / (ms1 + ms2 + ms3)
+
 
 class TestOctupoleVector:
     def test_octupole_vector(self):

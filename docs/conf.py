@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath("../mumaxplus"))
 project = "mumax⁺"
 # "Diego De Gusem, Oleh Kozynets, Ian Lateur, Lars Moreels, Jeroen Mulkers"
 author = "the DyNaMat group, Ghent University, Belgium."
-release = "1.2.1"
+release = "1.2.2"
 
 date = datetime.datetime.now()
 html_last_updated_fmt = f"{date.strftime("%Y")}-{date.strftime("%m")}-{date.strftime("%d")}, v{release}"
@@ -135,6 +135,14 @@ html_theme_options = {
 }
 
 def setup(app):
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    subprocess.run(
+        [sys.executable, str("plot_bench.py")],
+        check=True,
+        cwd=str(project_root+"/docs/bench"),  # run from docs/bench so relative paths inside the script work
+    )
+
     if shutil.which("clang-uml") is None:
         warnings.warn(
             "clang-uml not found. Skipping UML diagram generation. "
@@ -143,8 +151,6 @@ def setup(app):
         )
         return
     
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
     subprocess.run([
         "cmake",
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",

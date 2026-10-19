@@ -1,14 +1,12 @@
 #include "cudalaunch.hpp"
-#include "magnet.hpp"
 #include "field.hpp"
+#include "magnet.hpp"
 #include "parameter.hpp"
 #include "straintensor.hpp"
-
 
 bool strainTensorAssuredZero(const Magnet* magnet) {
   return !magnet->enableElastodynamics();
 }
-
 
 __global__ void k_strainTensor(CuField strain,
                                const CuField u,
@@ -28,18 +26,18 @@ __global__ void k_strainTensor(CuField strain,
   }
 
   const real ws[3] = {w.x, w.y, w.z};
-  const int3 im2_arr[3] = {int3{-2, 0, 0}, int3{0,-2, 0}, int3{0, 0,-2}};
-  const int3 im1_arr[3] = {int3{-1, 0, 0}, int3{0,-1, 0}, int3{0, 0,-1}};
-  const int3 ip1_arr[3] = {int3{ 1, 0, 0}, int3{0, 1, 0}, int3{0, 0, 1}};
-  const int3 ip2_arr[3] = {int3{ 2, 0, 0}, int3{0, 2, 0}, int3{0, 0, 2}};
+  const int3 im2_arr[3] = {int3{-2, 0, 0}, int3{0, -2, 0}, int3{0, 0, -2}};
+  const int3 im1_arr[3] = {int3{-1, 0, 0}, int3{0, -1, 0}, int3{0, 0, -1}};
+  const int3 ip1_arr[3] = {int3{1, 0, 0}, int3{0, 1, 0}, int3{0, 0, 1}};
+  const int3 ip2_arr[3] = {int3{2, 0, 0}, int3{0, 2, 0}, int3{0, 0, 2}};
   const int3 coo = grid.index2coord(idx);
 
-  real der[3][3] = {{0,0,0}, {0,0,0}, {0,0,0}};  // derivatives ∂i(mj)
+  real der[3][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};  // derivatives ∂i(mj)
   real3 u_0 = u.vectorAt(idx);
 #pragma unroll
   for (int i = 0; i < 3; i++) {  // i is a {x, y, z} direction
     // take translation in i direction
-    real wi = ws[i]; 
+    real wi = ws[i];
     int3 im2 = im2_arr[i], im1 = im1_arr[i];  // transl in direction -i
     int3 ip1 = ip1_arr[i], ip2 = ip2_arr[i];  // transl in direction +i
 
@@ -54,25 +52,25 @@ __global__ void k_strainTensor(CuField strain,
       // --1-- zero
       dudi = real3{0, 0, 0};
     } else if ((!system.inGeometry(coo_im2) || !system.inGeometry(coo_ip2)) &&
-                system.inGeometry(coo_im1) && system.inGeometry(coo_ip1)) {
+               system.inGeometry(coo_im1) && system.inGeometry(coo_ip1)) {
       // -111-, 1111-, -1111 central difference,  ε ~ h^2
       dudi = 0.5 * (u.vectorAt(coo_ip1) - u.vectorAt(coo_im1));
     } else if (!system.inGeometry(coo_im2) && !system.inGeometry(coo_ip1)) {
       // -11-- backward difference, ε ~ h^1
-      dudi =  (u_0 - u.vectorAt(coo_im1));
+      dudi = (u_0 - u.vectorAt(coo_im1));
     } else if (!system.inGeometry(coo_im1) && !system.inGeometry(coo_ip2)) {
       // --11- forward difference,  ε ~ h^1
       dudi = (-u_0 + u.vectorAt(coo_ip1));
     } else if (system.inGeometry(coo_im2) && !system.inGeometry(coo_ip1)) {
       // 111-- backward difference, ε ~ h^2
-      dudi =  (0.5 * u.vectorAt(coo_im2) - 2.0 * u.vectorAt(coo_im1) + 1.5 * u_0);
+      dudi = (0.5 * u.vectorAt(coo_im2) - 2.0 * u.vectorAt(coo_im1) + 1.5 * u_0);
     } else if (!system.inGeometry(coo_im1) && system.inGeometry(coo_ip1)) {
       // --111 forward difference,  ε ~ h^2
       dudi = (-0.5 * u.vectorAt(coo_ip2) + 2.0 * u.vectorAt(coo_ip1) - 1.5 * u_0);
     } else {
       // 11111 central difference,  ε ~ h^4
-      dudi = ((2.0/3.0)  * (u.vectorAt(coo_ip1) - u.vectorAt(coo_im1)) + 
-              (1.0/12.0) * (u.vectorAt(coo_im2) - u.vectorAt(coo_ip2)));
+      dudi = ((2.0 / 3.0) * (u.vectorAt(coo_ip1) - u.vectorAt(coo_im1)) +
+              (1.0 / 12.0) * (u.vectorAt(coo_im2) - u.vectorAt(coo_ip2)));
     }
     dudi *= wi;
 
@@ -82,19 +80,16 @@ __global__ void k_strainTensor(CuField strain,
   }
 
   // create the strain tensor
-  for (int i = 0; i < 3; i++){
-    for (int j = i; j < 3; j++){
+  for (int i = 0; i < 3; i++) {
+    for (int j = i; j < 3; j++) {
       if (i == j) {  // diagonals
         strain.setValueInCell(idx, i, der[i][j]);
-      }
-      else {  // off-diagonal
-        strain.setValueInCell(idx, i+j+2,
-                              0.5 * (der[i][j] + der[j][i]));
+      } else {  // off-diagonal
+        strain.setValueInCell(idx, i + j + 2, 0.5 * (der[i][j] + der[j][i]));
       }
     }
   }
 }
-
 
 Field evalStrainTensor(const Magnet* magnet) {
   Field strain(magnet->system(), 6);
@@ -112,7 +107,6 @@ Field evalStrainTensor(const Magnet* magnet) {
   return strain;
 }
 
-
 M_FieldQuantity strainTensorQuantity(const Magnet* magnet) {
   return M_FieldQuantity(magnet, evalStrainTensor, 6, "strain_tensor", "");
 }
@@ -129,7 +123,7 @@ Field evalStrainRate(const Magnet* magnet) {
 
   int ncells = strainRate.grid().ncells();
   CuField v = magnet->elasticVelocity()->field().cu();
-  real3 w = 1/ magnet->cellsize();
+  real3 w = 1 / magnet->cellsize();
   Grid mastergrid = magnet->world()->mastergrid();
 
   // The math for strain rate is exactly the same as for strain tensor,

@@ -9,34 +9,34 @@ The numerical material parameters used here can be found
 in the mentioned article.
 """
 
-
-import pytest
-
 import numpy as np
+import pytest
 from scipy.optimize import curve_fit
 
 from mumaxplus import Antiferromagnet, Grid, World
 from mumaxplus.util import *
-
 
 RTOL = 5e-3
 
 cx, cy, cz = 2e-9, 2e-9, 2e-9  # Cellsize
 nx, ny, nz = 1, 100, 200  # Number of cells
 dw = 4  # Width of the domain wall in number of cells
-z = np.linspace(-ny*cy, ny*cy, nz)  # Sample range when fitting
+z = np.linspace(-ny * cy, ny * cy, nz)  # Sample range when fitting
+
 
 def max_relative_error(result, wanted):
     err = np.abs(result - wanted)
     relerr = err / np.abs(wanted)
     return relerr
 
+
 def compute_domain_wall_width(magnet):
     """Computes the domain wall width"""
     ku = magnet.sub1.ku1.uniform_value
     aex = magnet.sub1.aex.uniform_value
     afmex_nn = magnet.afmex_nn.uniform_value
-    return np.sqrt((2*aex - afmex_nn) / (2*ku))
+    return np.sqrt((2 * aex - afmex_nn) / (2 * ku))
+
 
 def compute_domain_wall_speed(magnet):
     """Computes the domain wall speed"""
@@ -50,39 +50,44 @@ def compute_domain_wall_speed(magnet):
     L = Ms / GAMMALL_DEFAULT
     return np.pi * compute_domain_wall_width(magnet) * Hsh / (alpha * 2 * L)
 
+
 def DW_profile(x, position, width):
     """Walker ansatz to describe domain wall profile"""
     return np.cos(2 * np.arctan(np.exp(-(x - position) / width)))
 
+
 def fit_domain_wall(magnet):
     """Fit Walker ansatz to domain wall profile"""
     mz = magnet.sub1.magnetization()[0,]
-    profile = mz[:, int(ny/2), 0]  # middle row of the grid
+    profile = mz[:, int(ny / 2), 0]  # middle row of the grid
     popt, pcov = curve_fit(DW_profile, z, profile, p0=(1e-9, 5e-9))
     return popt
+
 
 def get_domain_wall_speed(world, magnet):
     """Find stationary value of the velocity"""
     t = 2e-11
-    world.timesolver.run(t/2)
+    world.timesolver.run(t / 2)
     q1 = fit_domain_wall(magnet)[0]
-    world.timesolver.run(t/2)
+    world.timesolver.run(t / 2)
     q2 = fit_domain_wall(magnet)[0]
-    return 2 * np.abs(q1-q2) / t
+    return 2 * np.abs(q1 - q2) / t
+
 
 def initialize(world, magnet):
     """Create a two-domain state"""
     nz2 = nz // 2
-    dw2 = dw//2
+    dw2 = dw // 2
 
     m = np.zeros(magnet.sub1.magnetization.shape)
-    m[0,         0:nz2 - dw2, :, :] = -1
-    m[2, nz2 - dw2:nz2 + dw2, :, :] = 1  # Domain wall has a width of 4 nm.
-    m[0, nz2 + dw2:         , :, :] = 1
-    
+    m[0, 0 : nz2 - dw2, :, :] = -1
+    m[2, nz2 - dw2 : nz2 + dw2, :, :] = 1  # Domain wall has a width of 4 nm.
+    m[0, nz2 + dw2 :, :, :] = 1
+
     magnet.sub1.magnetization = m
     magnet.sub2.magnetization = -m
     world.timesolver.run(1e-11)  # instead of minimize for better performance
+
 
 @pytest.mark.slow
 class TestStaticDomainWall:
