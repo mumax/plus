@@ -108,4 +108,4 @@ __all__ = [
     "util",
     "FP_PRECISION",
 ]
-__version__ = "1.2.1"
+__version__ = "1.2.2"
