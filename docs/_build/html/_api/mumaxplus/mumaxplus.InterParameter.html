@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -245,10 +246,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -369,6 +372,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.region_indices"><code class="docutils literal notranslate"><span class="pre">region_indices</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.is_uniform"><code class="docutils literal notranslate"><span class="pre">is_uniform</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.uniform_value"><code class="docutils literal notranslate"><span class="pre">uniform_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.intra_region_value"><code class="docutils literal notranslate"><span class="pre">intra_region_value</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.set"><code class="docutils literal notranslate"><span class="pre">set()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.set_between"><code class="docutils literal notranslate"><span class="pre">set_between()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.get_between"><code class="docutils literal notranslate"><span class="pre">get_between()</span></code></a></li>
@@ -431,8 +435,7 @@ matrix correspond to the values of self between the two regions.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.InterParameter.number_of_regions">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">number_of_regions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#mumaxplus.InterParameter.number_of_regions" title="Link to this definition">#</a></dt>
-<dd><p>Return the number of regions between which the quantity
-is active.</p>
+<dd><p>Return the number of regions between which the quantity is active.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -461,11 +464,22 @@ is active.</p>
 </div>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.InterParameter.intra_region_value">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">intra_region_value</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#mumaxplus.InterParameter.intra_region_value" title="Link to this definition">#</a></dt>
+<dd><p>Return the InterParameter value within a single region of any index.</p>
+<p>This acts as a safe fall-back when evaluating two equal region indices.
+By default, this has the same value as <a class="reference internal" href="#mumaxplus.InterParameter.uniform_value" title="mumaxplus.InterParameter.uniform_value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">uniform_value</span></code></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.InterParameter.uniform_value" title="mumaxplus.InterParameter.uniform_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_value</span></code></a></p>
+</div>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.InterParameter.set">
 <span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.InterParameter.set" title="Link to this definition">#</a></dt>
-<dd><p>Set the InterParameter value between every different region
-to the same value.</p>
+<dd><p>Set the InterParameter value between every region to the same value.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#mumaxplus.InterParameter.set_between" title="mumaxplus.InterParameter.set_between"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_between</span></code></a></p>
@@ -475,10 +489,10 @@ to the same value.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.InterParameter.set_between">
 <span class="sig-name descname"><span class="pre">set_between</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.InterParameter.set_between" title="Link to this definition">#</a></dt>
-<dd><p>Set InterParameter value between regions i and j.</p>
+<dd><p>Set InterParameter value between different regions i and j.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#mumaxplus.InterParameter.get_between" title="mumaxplus.InterParameter.get_between"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_between</span></code></a>, <a class="reference internal" href="#mumaxplus.InterParameter.set" title="mumaxplus.InterParameter.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a></p>
+<p><a class="reference internal" href="#mumaxplus.InterParameter.get_between" title="mumaxplus.InterParameter.get_between"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_between</span></code></a>, <a class="reference internal" href="#mumaxplus.InterParameter.set" title="mumaxplus.InterParameter.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>, <a class="reference internal" href="#mumaxplus.InterParameter.intra_region_value" title="mumaxplus.InterParameter.intra_region_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intra_region_value</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -558,6 +572,7 @@ to the same value.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.region_indices"><code class="docutils literal notranslate"><span class="pre">region_indices</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.is_uniform"><code class="docutils literal notranslate"><span class="pre">is_uniform</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.uniform_value"><code class="docutils literal notranslate"><span class="pre">uniform_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.intra_region_value"><code class="docutils literal notranslate"><span class="pre">intra_region_value</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.set"><code class="docutils literal notranslate"><span class="pre">set()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.set_between"><code class="docutils literal notranslate"><span class="pre">set_between()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.InterParameter.get_between"><code class="docutils literal notranslate"><span class="pre">get_between()</span></code></a></li>
@@ -589,7 +604,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

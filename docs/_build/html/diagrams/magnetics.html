@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -245,10 +246,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -365,7 +368,7 @@
 <h1>Magnetics<a class="headerlink" href="#magnetics" title="Link to this heading">#</a></h1>
 <p>UML diagram of <code class="docutils literal notranslate"><span class="pre">Altermagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">Antiferromagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">BoundaryTraction</span></code>, <code class="docutils literal notranslate"><span class="pre">CuBoundaryTraction</span></code>, <code class="docutils literal notranslate"><span class="pre">CuDmiTensor</span></code>, <code class="docutils literal notranslate"><span class="pre">DmiTensor</span></code>, <code class="docutils literal notranslate"><span class="pre">Ferromagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">HostMagnet</span></code>, <code class="docutils literal notranslate"><span class="pre">Magnet</span></code>, <code class="docutils literal notranslate"><span class="pre">Minimizer</span></code>, <code class="docutils literal notranslate"><span class="pre">MumaxWorld</span></code>, <code class="docutils literal notranslate"><span class="pre">NcAfm</span></code>.</p>
 <p class="plantuml">
-<img src="../_images/plantuml-b2e34a26735629e521bcfea50f45adf48a28f1c7.svg" alt="&#64;startuml
+<img src="../_images/plantuml-5662ed8ec5343f4534a923691381a8c0378916a9.svg" alt="&#64;startuml
 !theme vibrant
 package Legend {
   class Class
@@ -394,7 +397,7 @@ __
 -magnets_ : std::vector&lt;const Ferromagnet *&gt;
 -nMagDiffSamples_ : int
 -nsteps_ : int
--stepsizes_ : std::vector&lt;real&gt;
+-stepsize_ : real
 -stopMaxMagDiff_ : real
 -t0 : std::vector&lt;Field&gt;
 -t1 : std::vector&lt;Field&gt;
@@ -410,7 +413,8 @@ class C_0016179571750721185330 {
 +altermagnets() const : const std::map&lt;std::string,Altermagnet *&gt;
 +antiferromagnets() const : const std::map&lt;std::string,Antiferromagnet *&gt;
 +boundingGrid() const : Grid
-+checkAddibility(Grid grid, std::string name) const : void
++centerDomainWall(int comp, int axis) : void
++checkAddibility(Grid grid, const GpuBuffer&lt;bool&gt; &amp; geometry, std::string name) const : void
 +checkAllMagnetsInMastergrid() const : void
 +ferromagnets() const : const std::map&lt;std::string,Ferromagnet *&gt;
 +getAltermagnet(std::string name) const : Altermagnet *
@@ -424,6 +428,7 @@ class C_0016179571750721185330 {
 +magnets() const : const std::map&lt;std::string,Magnet *&gt;
 +minimize(real tol = 1e-6, int nSamples = 10) : void
 +ncafms() const : const std::map&lt;std::string,NcAfm *&gt;
+{static} +overlaps(Grid grid1, const GpuBuffer&lt;bool&gt; &amp; geometry1, Grid grid2, const GpuBuffer&lt;bool&gt; &amp; geometry2) : bool
 +recalculateStrayFields() : void
 +relax(real tol) : void
 +resetTimeSolverEquations(FM_Field torque = torqueQuantity) const : void
@@ -432,6 +437,7 @@ class C_0016179571750721185330 {
 +setPBC(const int3 pbcRepetitions) : void
 +setPbcRepetitions(const int3 pbcRepetitions) : void
 +unsetPBC() : void
++window() const : Window &amp;
 __
 +RelaxTorqueThreshold : real
 -altermagnets_ : std::map&lt;std::string,std::unique_ptr&lt;Altermagnet&gt;&gt;
@@ -441,6 +447,7 @@ __
 -hostmagnets_ : std::map&lt;std::string,HostMagnet *&gt;
 -magnets_ : std::map&lt;std::string,Magnet *&gt;
 -ncafms_ : std::map&lt;std::string,std::unique_ptr&lt;NcAfm&gt;&gt;
+-window_ : std::unique_ptr&lt;Window&gt;
 }
 class &quot;DmiTensor&quot; as C_0004656650194850054816
 class C_0004656650194850054816 {
@@ -554,6 +561,7 @@ class C_0014126231922832319520 {
 __
 +B1 : Parameter
 +B2 : Parameter
++BChiral : Parameter
 +Lambda : Parameter
 +RelaxTorqueThreshold : real
 +aex : Parameter
@@ -756,7 +764,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

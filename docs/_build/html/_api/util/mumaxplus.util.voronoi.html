@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../util.html">util</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.formulary.html">formulary</a></li>
@@ -245,10 +246,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -409,7 +412,8 @@ integer from a uniform distribution [0,1234567) is chosen as the seed.</p></li>
 <li><p><strong>max_idx</strong> (<em>int</em><em> (</em><em>default=255</em><em>)</em>) – The (inclusive) maximum region index within the tessellation. This value
 has no upper bound.</p></li>
 <li><p><strong>region_of_center</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function with signature tuple(float)-&gt;int which assigns region indices to
-generated Voronoi centers. If not specified, a random region index will be generated.</p></li>
+generated Voronoi centers. If not specified, a random region index will be
+generated.</p></li>
 </ul>
 </dd>
 </dl>
@@ -418,9 +422,10 @@ generated Voronoi centers. If not specified, a random region index will be gener
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.voronoi.VoronoiTessellator.generate">
 <span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">world</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_2d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.voronoi.VoronoiTessellator.generate" title="Link to this definition">#</a></dt>
-<dd><p>Generates a Voronoi tessellation.</p>
-<p>If make_2d is set to True (default: False) the VoronoiTesselator ignores the z-direction,
-resulting in a tessellation where a region index is uniform in the z-direction.</p>
+<dd><p>Generate a Voronoi tessellation.</p>
+<p>If make_2d is set to True (default: False) the VoronoiTesselator ignores the
+z-direction, resulting in a tessellation where a region index is uniform in
+the z-direction.</p>
 <p><strong>Important:</strong> 2D grids are assumed to lie in the xy-plane.</p>
 <p>Returns an ndarray of shape (nz, ny, nx) which is filled
 with region indices.</p>
@@ -429,7 +434,7 @@ with region indices.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.voronoi.VoronoiTessellator.coo_to_idx">
 <span class="sig-name descname"><span class="pre">coo_to_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.voronoi.VoronoiTessellator.coo_to_idx" title="Link to this definition">#</a></dt>
-<dd><p>Returns the region index (int) of the given coordinate within the
+<dd><p>Return the region index (int) of the given coordinate within the
 Voronoi tessellation.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -545,7 +550,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

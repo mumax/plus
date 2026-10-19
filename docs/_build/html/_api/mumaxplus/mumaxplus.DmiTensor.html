@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,7 +64,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -218,6 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -246,10 +247,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -398,14 +401,14 @@
 <div class="math notranslate nohighlight">
 \[\varepsilon_{\text{DMI}} = \frac{1}{2} D_{ijk}
 \left[ m_j \partial_i m_k - m_k \partial_i m_j \right]\]</div>
-<p>with summation indices running over <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>. The DMI strengths
-and chiral properties are contained in the dmi tensor <span class="math notranslate nohighlight">\(D_{ijk}\)</span>. This tensor is
-antisymmetric in it’s magnetic indices (<span class="math notranslate nohighlight">\(D_{ijk} = - D_{ikj}\)</span>) and hence can be
-fully described by only 9 elements.</p>
-<p><a class="reference internal" href="#mumaxplus.DmiTensor" title="mumaxplus.DmiTensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">DmiTensor()</span></code></a> has 9 Parameter properties: <a class="reference internal" href="#mumaxplus.DmiTensor.xxy" title="mumaxplus.DmiTensor.xxy"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xxy</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.xxz" title="mumaxplus.DmiTensor.xxz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xxz</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.xyz" title="mumaxplus.DmiTensor.xyz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xyz</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.yxy" title="mumaxplus.DmiTensor.yxy"><code class="xref py py-attr docutils literal notranslate"><span class="pre">yxy</span></code></a>,
-<a class="reference internal" href="#mumaxplus.DmiTensor.yxz" title="mumaxplus.DmiTensor.yxz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">yxz</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.yyz" title="mumaxplus.DmiTensor.yyz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">yyz</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.zxy" title="mumaxplus.DmiTensor.zxy"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zxy</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.zxz" title="mumaxplus.DmiTensor.zxz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zxz</span></code></a>, and <a class="reference internal" href="#mumaxplus.DmiTensor.zyz" title="mumaxplus.DmiTensor.zyz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zyz</span></code></a>. These 9 parameters fully define the
-dmi tensor of a ferromagnet. The parameters can be set separately, or can be set
-through one of the following methods:</p>
+<p>with summation indices running over <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>. The DMI
+strengths and chiral properties are contained in the dmi tensor <span class="math notranslate nohighlight">\(D_{ijk}\)</span>.
+This tensor is antisymmetric in it’s magnetic indices (<span class="math notranslate nohighlight">\(D_{ijk} = - D_{ikj}\)</span>)
+and hence can be fully described by only 9 elements.</p>
+<p><a class="reference internal" href="#mumaxplus.DmiTensor" title="mumaxplus.DmiTensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">DmiTensor()</span></code></a> has 9 Parameter properties: <a class="reference internal" href="#mumaxplus.DmiTensor.xxy" title="mumaxplus.DmiTensor.xxy"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xxy</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.xxz" title="mumaxplus.DmiTensor.xxz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xxz</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.xyz" title="mumaxplus.DmiTensor.xyz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xyz</span></code></a>,
+<a class="reference internal" href="#mumaxplus.DmiTensor.yxy" title="mumaxplus.DmiTensor.yxy"><code class="xref py py-attr docutils literal notranslate"><span class="pre">yxy</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.yxz" title="mumaxplus.DmiTensor.yxz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">yxz</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.yyz" title="mumaxplus.DmiTensor.yyz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">yyz</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.zxy" title="mumaxplus.DmiTensor.zxy"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zxy</span></code></a>, <a class="reference internal" href="#mumaxplus.DmiTensor.zxz" title="mumaxplus.DmiTensor.zxz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zxz</span></code></a>, and <a class="reference internal" href="#mumaxplus.DmiTensor.zyz" title="mumaxplus.DmiTensor.zyz"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zyz</span></code></a>.
+These 9 parameters fully define the dmi tensor of a ferromagnet. The parameters can
+be set separately, or can be set through one of the following methods:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#mumaxplus.DmiTensor.set_interfacial_dmi" title="mumaxplus.DmiTensor.set_interfacial_dmi"><code class="xref py py-func docutils literal notranslate"><span class="pre">DmiTensor.set_interfacial_dmi()</span></code></a></p></li>
 <li><p><a class="reference internal" href="#mumaxplus.DmiTensor.set_bulk_dmi" title="mumaxplus.DmiTensor.set_bulk_dmi"><code class="xref py py-func docutils literal notranslate"><span class="pre">DmiTensor.set_bulk_dmi()</span></code></a></p></li>
@@ -416,7 +419,8 @@ through one of the following methods:</p>
 <p>where <span class="math notranslate nohighlight">\(A\)</span> is the exchange constant and</p>
 <div class="math notranslate nohighlight">
 \[\Gamma_k = m_j n_i D_{ijk}\]</div>
-<p>with <span class="math notranslate nohighlight">\(n_i\)</span> being the component of the surface normal in the <span class="math notranslate nohighlight">\(i\)</span> th direction.</p>
+<p>with <span class="math notranslate nohighlight">\(n_i\)</span> being the component of the surface normal in the <span class="math notranslate nohighlight">\(i\)</span> th
+direction.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span><span class="mf">1e-9</span><span class="p">,</span><span class="mf">1e-9</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">magnet</span> <span class="o">=</span> <span class="n">Ferromagnet</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">Grid</span><span class="p">((</span><span class="mi">64</span><span class="p">,</span><span class="mi">64</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
@@ -693,7 +697,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,7 +64,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -218,6 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -246,10 +247,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -404,6 +407,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.frozen_spins"><code class="docutils literal notranslate"><span class="pre">frozen_spins</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.B1"><code class="docutils literal notranslate"><span class="pre">B1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.B2"><code class="docutils literal notranslate"><span class="pre">B2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.B_chiral"><code class="docutils literal notranslate"><span class="pre">B_chiral</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.poisson_system"><code class="docutils literal notranslate"><span class="pre">poisson_system</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.torque"><code class="docutils literal notranslate"><span class="pre">torque</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.llg_torque"><code class="docutils literal notranslate"><span class="pre">llg_torque</span></code></a></li>
@@ -475,14 +479,15 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>world</strong> (<a class="reference internal" href="mumaxplus.World.html#mumaxplus.World" title="mumaxplus.World"><em>World</em></a>) – World in which the ferromagnet lives.</p></li>
-<li><p><strong>grid</strong> (<a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.Grid"><em>Grid</em></a>) – The number of cells in x, y, z the ferromagnet should be divided into.</p></li>
+<li><p><strong>grid</strong> (<a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.Grid"><em>Grid</em></a><em> or </em><em>tuple</em><em>[</em><em>int</em><em>] of </em><em>size 3</em>) – The number of cells in x, y, z the ferromagnet should be divided into.</p></li>
 <li><p><strong>geometry</strong> (<em>None</em><em>, </em><em>ndarray</em><em>, or </em><em>callable</em><em> (</em><em>default=None</em><em>)</em>) – <p>The geometry of the ferromagnet can be set in three ways.</p>
 <ol class="arabic simple">
-<li><p>If the geometry contains all cells in the grid, then use None (the default)</p></li>
+<li><p>If the geometry contains all cells in the grid, then use None
+(the default)</p></li>
 <li><p>Use an ndarray which specifies for each cell wheter or not it is in the
 geometry.</p></li>
-<li><p>Use a function which takes x, y, and z coordinates as arguments and returns
-true if this position is inside the geometry and false otherwise.</p></li>
+<li><p>Use a function which takes x, y, and z coordinates as arguments and
+returns true if this position is inside the geometry and false otherwise.</p></li>
 </ol>
 </p></li>
 <li><p><strong>regions</strong> (<em>None</em><em>, </em><em>ndarray</em><em>, or </em><em>callable</em><em> (</em><em>default=None</em><em>)</em>) – <p>The regional structure of a ferromagnet can be set in the same three ways
@@ -490,15 +495,16 @@ as the geometry. This parameter indexes each grid cell to a certain region.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The values of <cite>InterParameters</cite> which act between
-different regions are stored in an array with a size that scales with the
-square of the maximal index value. Therefore, if possible, it’s good
+different regions are stored in an array with a size that scales with
+the square of the maximal index value. Therefore, if possible, it’s good
 practice to keep each region index as close to zero as possible.
-E.g. defining two regions with indices 1 and 500 will work, but occupies more
-memory and will pay in performance than giving them the values 0 and 1.</p>
+E.g. defining two regions with indices 1 and 500 will work, but occupies
+more memory and will pay in performance than giving them the values 0
+and 1.</p>
 </div>
 </p></li>
-<li><p><strong>name</strong> (<em>str</em><em> (</em><em>default=&quot;&quot;</em><em>)</em>) – The ferromagnet’s identifier. If the name is empty (the default), a name for the
-ferromagnet will be created.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em> (</em><em>default=&quot;&quot;</em><em>)</em>) – The ferromagnet’s identifier. If the name is empty (the default), a name for
+the ferromagnet will be created.</p></li>
 </ul>
 </dd>
 </dl>
@@ -857,7 +863,8 @@ then the layer will be at the top. Otherwise it will be at the bottom.</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">thermal_seed</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#mumaxplus.Ferromagnet.thermal_seed" title="Link to this definition">#</a></dt>
 <dd><p>Return seed of the thermal noise generator.</p>
 <p>If not set, a random seed is generated based on the current time.
-Resetting the seed does not reset the generator. Use <a class="reference internal" href="#mumaxplus.Ferromagnet.reset_noise_generator" title="mumaxplus.Ferromagnet.reset_noise_generator"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset_noise_generator()</span></code></a> instead.</p>
+Resetting the seed does not reset the generator. Use
+<a class="reference internal" href="#mumaxplus.Ferromagnet.reset_noise_generator" title="mumaxplus.Ferromagnet.reset_noise_generator"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset_noise_generator()</span></code></a> instead.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#mumaxplus.Ferromagnet.reset_noise_generator" title="mumaxplus.Ferromagnet.reset_noise_generator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_noise_generator</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.temperature" title="mumaxplus.Ferromagnet.temperature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">temperature</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.thermal_noise" title="mumaxplus.Ferromagnet.thermal_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thermal_noise</span></code></a></p>
@@ -932,7 +939,7 @@ wherever frozen_spins is not 0.</p>
 <dd><p>First magnetoelastic coupling constant (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B2" title="mumaxplus.Ferromagnet.B2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B2</span></code></a></p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B2" title="mumaxplus.Ferromagnet.B2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B2</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B_chiral" title="mumaxplus.Ferromagnet.B_chiral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B_chiral</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -942,7 +949,30 @@ wherever frozen_spins is not 0.</p>
 <dd><p>Second magnetoelastic coupling constant (J/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B1" title="mumaxplus.Ferromagnet.B1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B1</span></code></a></p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B1" title="mumaxplus.Ferromagnet.B1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B1</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B_chiral" title="mumaxplus.Ferromagnet.B_chiral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B_chiral</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.Ferromagnet.B_chiral">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">B_chiral</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Ferromagnet.B_chiral" title="Link to this definition">#</a></dt>
+<dd><p>Chiral magnetoelastic coupling constant (J/m³).</p>
+<p class="rubric">Notes</p>
+<p>Materials of the cubic point group 23 (or B20 compounds) can have a
+chiral magnetoelastic coupling, with the following energy density.</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{E} = B_\text{chiral} \sum_{i, j, k} \epsilon_{ijk}
+\varepsilon_{ii} m_j^2\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\epsilon_{ijk}\)</span> is the Levi-Civita symbol and
+<span class="math notranslate nohighlight">\(\varepsilon_{ii}\)</span> denotes the normal strain components.
+This energy density comes from equations (8.12) and (8.16) in
+<a class="reference external" href="https://doi.org/10.5445/IR/1000184834">Franke (2025)</a>, where B_chiral
+corresponds to <span class="math notranslate nohighlight">\(\lambda_{12}\)</span>. Magnetoelastic coupling constants
+B1 and B2 correspond to <span class="math notranslate nohighlight">\(\lambda_{11}\)</span> and <span class="math notranslate nohighlight">\(2 \lambda_{44}\)</span>
+respectively. These lambdas are not the usual magnetostrictive coefficients.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B1" title="mumaxplus.Ferromagnet.B1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B1</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B2" title="mumaxplus.Ferromagnet.B2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B2</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1377,7 +1407,7 @@ between neighbouring cells.</p>
 magnetostriction (T).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B1" title="mumaxplus.Ferromagnet.B1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B1</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B2" title="mumaxplus.Ferromagnet.B2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B2</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.strain_tensor</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.rigid_norm_strain" title="mumaxplus.Magnet.rigid_norm_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.rigid_norm_strain</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.rigid_shear_strain" title="mumaxplus.Magnet.rigid_shear_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.rigid_shear_strain</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.magnetoelastic_force" title="mumaxplus.Ferromagnet.magnetoelastic_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">magnetoelastic_force</span></code></a></p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B1" title="mumaxplus.Ferromagnet.B1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B1</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B2" title="mumaxplus.Ferromagnet.B2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B2</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B_chiral" title="mumaxplus.Ferromagnet.B_chiral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B_chiral</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.strain_tensor" title="mumaxplus.Magnet.strain_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.strain_tensor</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.rigid_norm_strain" title="mumaxplus.Magnet.rigid_norm_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.rigid_norm_strain</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.rigid_shear_strain" title="mumaxplus.Magnet.rigid_shear_strain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.rigid_shear_strain</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.magnetoelastic_force" title="mumaxplus.Ferromagnet.magnetoelastic_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">magnetoelastic_force</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1407,7 +1437,7 @@ magnetostriction (T).</p>
 <dd><p>Magnetoelastic body force density due to magnetostriction effect (N/m³).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B1" title="mumaxplus.Ferromagnet.B1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B1</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B2" title="mumaxplus.Ferromagnet.B2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B2</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.effective_body_force" title="mumaxplus.Magnet.effective_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.effective_body_force</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.magnetoelastic_field" title="mumaxplus.Ferromagnet.magnetoelastic_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">magnetoelastic_field</span></code></a></p>
+<p><a class="reference internal" href="#mumaxplus.Ferromagnet.B1" title="mumaxplus.Ferromagnet.B1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B1</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B2" title="mumaxplus.Ferromagnet.B2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B2</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.B_chiral" title="mumaxplus.Ferromagnet.B_chiral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B_chiral</span></code></a>, <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet.effective_body_force" title="mumaxplus.Magnet.effective_body_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Magnet.effective_body_force</span></code></a>, <a class="reference internal" href="#mumaxplus.Ferromagnet.magnetoelastic_field" title="mumaxplus.Ferromagnet.magnetoelastic_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">magnetoelastic_field</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1506,6 +1536,7 @@ magnetostriction (T).</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.frozen_spins"><code class="docutils literal notranslate"><span class="pre">frozen_spins</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.B1"><code class="docutils literal notranslate"><span class="pre">B1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.B2"><code class="docutils literal notranslate"><span class="pre">B2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.B_chiral"><code class="docutils literal notranslate"><span class="pre">B_chiral</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.poisson_system"><code class="docutils literal notranslate"><span class="pre">poisson_system</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.torque"><code class="docutils literal notranslate"><span class="pre">torque</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.Ferromagnet.llg_torque"><code class="docutils literal notranslate"><span class="pre">llg_torque</span></code></a></li>
@@ -1578,7 +1609,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>
