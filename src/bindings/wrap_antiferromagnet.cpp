@@ -37,15 +37,22 @@ void wrap_antiferromagnet(py::module& m) {
       .def("minimize", &Antiferromagnet::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &Antiferromagnet::relax, py::arg("tol"));
 
-  m.def("neel_vector", py::overload_cast<const Antiferromagnet*>(&neelVectorQuantity));
+  m.def("neel_vector", py::overload_cast<const Antiferromagnet*>(&neelVectorQuantity),
+        py::keep_alive<0, 1>());
   m.def("full_magnetization",
-        py::overload_cast<const Antiferromagnet*>(&fullMagnetizationQuantity));
+        py::overload_cast<const Antiferromagnet*>(&fullMagnetizationQuantity),
+        py::keep_alive<0, 1>());
 
-  m.def("angle_field", py::overload_cast<const Antiferromagnet*>(&angleFieldQuantity));
-  m.def("max_intracell_angle", py::overload_cast<const Antiferromagnet*>(&maxAngle));
+  m.def("angle_field", py::overload_cast<const Antiferromagnet*>(&angleFieldQuantity),
+        py::keep_alive<0, 1>());
+  m.def("max_intracell_angle", py::overload_cast<const Antiferromagnet*>(&maxAngle),
+        py::keep_alive<0, 1>());
 
-  m.def("total_energy_density",
-        [](const Antiferromagnet* m) { return totalEnergyDensityQuantity(m); });
-  m.def("total_energy",
-        [](const Antiferromagnet* m) { return totalEnergyQuantity(m); });
+  m.def(
+      "total_energy_density",
+      [](const Antiferromagnet* m) { return totalEnergyDensityQuantity(m); },
+      py::keep_alive<0, 1>());
+  m.def(
+      "total_energy", [](const Antiferromagnet* m) { return totalEnergyQuantity(m); },
+      py::keep_alive<0, 1>());
 }
