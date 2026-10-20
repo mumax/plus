@@ -21,7 +21,7 @@ jobs:
           - {name: "ubuntu", version: "22.04"}
           - {name: "windows", version: "2022"}
         cuda: ["12.4.1"]
-        python: ["3.11", "3.12", "3.13", "3.14"]
+        python: ["3.11", "3.12", "3.13", "3.14", "3.15"]
 
     steps:
       - name: Check out source
@@ -85,7 +85,7 @@ jobs:
           EOF
       
       - name: Build source distribution tar.gz
-        if: runner.os == 'Linux' && matrix.python == '3.14'
+        if: runner.os == 'Linux' && matrix.python == '3.15'
         run: |
           echo "=== Creating clean build directory for .tar.gz --sdist ==="
           mkdir clean_src
