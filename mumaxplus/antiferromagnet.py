@@ -123,7 +123,9 @@ class Antiferromagnet(Magnet):
         self.sub1.enable_demag = value
         self.sub2.enable_demag = value
 
-    def minimize(self, tol=1e-6, nsamples=10):
+    def minimize(
+        self, tol=1e-6, nsamples=10, line_search_mode=0, max_step_angle=0, max_stall=3
+    ):
         """Minimize the total energy.
 
         Fast energy minimization, but less robust than :func:`relax`
@@ -139,11 +141,27 @@ class Antiferromagnet(Magnet):
             The number of consecutive magnetization evaluations that must not
             differ by more than the tolerance "tol".
 
+                line_search_mode : int (default=0)
+            0: Barzilai-Borwein (BB) steps without line search.
+            1: line search for the first step only.
+            2: as 1, and also recover from bad BB steps (NaN/Inf/0), and tries a
+            line search at convergence, continuing if it finds real progress.
+            3: as 2, and apply the non-monotone (GLL) energy test to every step.
+            This costs one extra energy evaluation per step.
+
+        max_step_angle : float (default=0)
+            Maximum rotation angle (degrees) per line search trial step.
+            Values <= 0 disable the cap. Clamped to 179 degrees.
+
+        max_stall : int (default=3)
+            Number of consecutive no-progress rescues before further rescues
+            are disabled.
+
         See Also
         --------
         relax
         """
-        self._impl.minimize(tol, nsamples)
+        self._impl.minimize(tol, nsamples, line_search_mode, max_step_angle, max_stall)
 
     def relax(self, tol=1e-9):
         """Relax the state to an energy minimum.

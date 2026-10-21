@@ -32,7 +32,8 @@ void wrap_ncafm(py::module& m) {
       .def_readonly("dmi_tensor", &NcAfm::dmiTensor)
       .def_readonly("dmi_vector", &NcAfm::dmiVector)
 
-      .def("minimize", &NcAfm::minimize, py::arg("tol"), py::arg("nsamples"))
+      .def("minimize", &NcAfm::minimize, py::arg("tol"), py::arg("nsamples"),
+           py::arg("line_search_mode"), py::arg("max_step_angle"), py::arg("max_stall"))
       .def("relax", &NcAfm::relax, py::arg("tol"));
 
   m.def("octupole_vector", &octupoleVectorQuantity);
