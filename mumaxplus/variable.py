@@ -88,8 +88,11 @@ class Variable(FieldQuantity):
             raise TypeError("Value must be uniform or returned by a function.")
 
     def _set_func(self, func):
-        X, Y, Z = self.meshgrid
-        self._impl.set(_np.vectorize(func, otypes=[float] * self.shape[0])(X, Y, Z))
+        try:
+            values = func(*self.meshgrid)
+        except Exception:
+            values = _np.vectorize(func, otypes=[float] * self.ncomp)(*self.meshgrid)
+        self._impl.set(values)
 
     def get(self):
         """Get the variable value."""
