@@ -24,11 +24,11 @@ class World:
         """
         Parameters
         ----------
-        cellsize : tuple[float] of size 3
+        cellsize : tuple[float, float, float]
             A tuple of three floating pointing numbers which represent the dimensions
             of the cells in the x, y, and z direction.
 
-        pbc_repetitions : tuple[int] of size 3, default=(0,0,0)
+        pbc_repetitions : tuple[int, int, int], default=(0,0,0)
             The number of repetitions for everything inside mastergrid in the
             x, y and z directions to create periodic boundary conditions.
             The number of repetitions determines the cutoff range for the
@@ -218,19 +218,19 @@ class World:
         self._impl.RelaxTorqueThreshold = value
 
     @property
-    def cellsize(self) -> tuple[float]:
+    def cellsize(self) -> tuple[float, float, float]:
         """Return the cell size of the world.
 
         Returns
         -------
-        tuple[float] of size 3
+        tuple[float, float, float]
             A tuple of three floating pointing numbers which represent the dimensions
             of the cells in the x, y, and z direction.
         """
         return self._impl.cellsize
 
     @property
-    def bias_magnetic_field(self) -> tuple[float]:
+    def bias_magnetic_field(self) -> tuple[float, float, float]:
         """Return a uniform magnetic field which extends over the whole world."""
         return self._impl.bias_magnetic_field
 
@@ -271,7 +271,7 @@ class World:
         self._impl.mastergrid = mastergrid._impl
 
     @property
-    def pbc_repetitions(self) -> tuple[int]:
+    def pbc_repetitions(self) -> tuple[int, int, int]:
         """The number of repetitions for everything inside mastergrid in the
         x, y and z directions to create periodic boundary conditions. The number of
         repetitions determines the cutoff range for the demagnetization.
@@ -299,7 +299,7 @@ class World:
 
         Parameters
         ----------
-        value : tuple[int] of size 3
+        value : tuple[int, int, int]
             The number of repetitions to set in each direction.
         """
         if len(value) != 3:
@@ -322,7 +322,7 @@ class World:
 
         Parameters
         ----------
-        pbc_repetitions : tuple[int] of size 3
+        pbc_repetitions : tuple[int, int, int]
             The number of repetitions for everything inside mastergrid in the
             x, y and z directions to create periodic boundary conditions.
             The number of repetitions determines the cutoff range for the

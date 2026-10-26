@@ -33,7 +33,7 @@ class Shape:
 
         Parameters
         ----------
-        coord : tuple[float] of size 3
+        coord : tuple[float, float, float]
             The coordinates to check.
         """
         return self.shape_func(*coord)
@@ -180,9 +180,9 @@ class Shape:
 
         Parameters
         ----------
-        min_point : tuple[float] of size 3
+        min_point : tuple[float, float, float]
             Smallest x, y and z coordinates of the bounding box (inclusive).
-        max_point : tuple[float] of size 3
+        max_point : tuple[float, float, float]
             Largest x, y and z coordinates of the bounding box (exclusive).
 
         Notes
@@ -535,7 +535,7 @@ class Line2D(Shape):
 
         Parameters
         ----------
-        p1, p2 : tuple[float] of size 2 or 3
+        p1, p2 : tuple[float, float] or tuple[float, float, float]
             The two endpoints of the line segment, `(x1, y1)` and `(x2, y2)`.
             If the size is 3, the z-values are simply ignored.
         diam : float
@@ -616,7 +616,7 @@ class Line(Shape):
 
         Parameters
         ----------
-        p1, p2 : tuple[float] of size 3
+        p1, p2 : tuple[float, float, float]
             The two endpoints of the line segment, `(x1, y1, z1)` and `(x2, y2, z2)`.
         diam : float
             Inclusive diameter of the line, with `diam > 0.0`.
@@ -948,15 +948,15 @@ class ObjShape(Shape):
         ----------
         fname : string
             Filename of the 3D object to use.
-        min_point : tuple[float] of size 3
+        min_point : tuple[float, float, float]
             Smallest x, y and z coordinates of the object's bounding box.
-        max_point : tuple[float] of size 3
+        max_point : tuple[float, float, float]
             Largest x, y and z coordinates of the object's bounding box.
-        center : tuple[float] of size 3
+        center : tuple[float, float, float]
             Center of the object's bounding box.
-        scale : float or tuple[float] of size 3
+        scale : float or tuple[float, float, float]
             Scaling factor to apply. If a tuple, scaling for each axis.
-        size : float or tuple[float] of size 3
+        size : float or tuple[float, float, float]
             Size of the object's bounding box, in meters. Overrides scale.
         keep_aspect : bool (default=False)
             If True, the object will fit tightly inside the bounding box
