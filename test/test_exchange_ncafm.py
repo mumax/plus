@@ -37,11 +37,11 @@ def compute_fm_exchange_numpy(magnet):
 
 
 def compute_homo_exchange_numpy(magnet, sub2, sub3):
-    l = magnet.latcon.average()[0]
+    lc = magnet.latcon.average()[0]
     a = magnet.ncafmex_cell.average()[0]
     m2 = sub2.magnetization.get()
     m3 = sub3.magnetization.get()
-    return np.full(m2.shape, 4 * a * (m2 + m3) / (l * l * sub2.msat.average()[0]))
+    return np.full(m2.shape, 4 * a * (m2 + m3) / (lc * lc * sub2.msat.average()[0]))
 
 
 def compute_inhomo_exchange_numpy(magnet, sub2, sub3):
@@ -53,32 +53,32 @@ def compute_inhomo_exchange_numpy(magnet, sub2, sub3):
     m2_ = np.roll(m2, 1, axis=1)
     m3_ = np.roll(m3, 1, axis=1)
     h_exch[:, 1:, :, :] += ((m2_ - m2)[:, 1:, :, :] + (m3_ - m3)[:, 1:, :, :]) \
-                         / (cellsize[2] ** 2)  # fmt: skip
+                         / (cellsize[2] ** 2)  # fmt: skip  # noqa
 
     m2_ = np.roll(m2, -1, axis=1)
     m3_ = np.roll(m3, -1, axis=1)
     h_exch[:, :-1, :, :] += ((m2_ - m2)[:, :-1, :, :] + (m3_ - m3)[:, :-1, :, :]) \
-                          / (cellsize[2] ** 2)  # fmt: skip
+                          / (cellsize[2] ** 2)  # fmt: skip  # noqa
 
     m2_ = np.roll(m2, 1, axis=2)
     m3_ = np.roll(m3, 1, axis=2)
     h_exch[:, :, 1:, :] += ((m2_ - m2)[:, :, 1:, :] + (m3_ - m3)[:, :, 1:, :]) \
-                         / (cellsize[1] ** 2)  # fmt: skip
+                         / (cellsize[1] ** 2)  # fmt: skip  # noqa
 
     m2_ = np.roll(m2, -1, axis=2)
     m3_ = np.roll(m3, -1, axis=2)
     h_exch[:, :, 0:-1, :] += ((m2_ - m2)[:, :, 0:-1, :] + (m3_ - m3)[:, :, 0:-1, :]) \
-                           / (cellsize[1] ** 2)  # fmt: skip
+                           / (cellsize[1] ** 2)  # fmt: skip  # noqa
 
     m2_ = np.roll(m2, 1, axis=3)
     m3_ = np.roll(m3, 1, axis=3)
     h_exch[:, :, :, 1:] += ((m2_ - m2)[:, :, :, 1:] + (m3_ - m3)[:, :, :, 1:]) \
-                         / (cellsize[0] ** 2)  # fmt: skip
+                         / (cellsize[0] ** 2)  # fmt: skip  # noqa
 
     m2_ = np.roll(m2, -1, axis=3)
     m3_ = np.roll(m3, -1, axis=3)
     h_exch[:, :, :, 0:-1] += ((m2_ - m2)[:, :, :, 0:-1] + (m3_ - m3)[:, :, :, 0:-1]) \
-                           / (cellsize[0] ** 2)  # fmt: skip
+                           / (cellsize[0] ** 2)  # fmt: skip  # noqa
 
     return magnet.ncafmex_nn.average()[0] * h_exch / sub2.msat.average()[0]
 
@@ -188,7 +188,7 @@ class TestNcAfmExchange:
         ]
         assert max(error) < 1e-2
 
-    def test_exchange_spiral(self):
+    def test_exchange_spiral2(self):
         """This test compares numerical and analytical exchange energy for
         magnetizations as a function of the angle between spins at a
         single simulation cell.
@@ -200,7 +200,7 @@ class TestNcAfmExchange:
         msat = 800e3
         ncafmex_nn = -15e-12
         ncafmex_cell = -100e-12
-        l = 0.35e-9  # Default lattice constant
+        lc = 0.35e-9  # Default lattice constant
 
         length, width, thickness = 100e-6, 1e-9, 1e-9
         nx, ny, nz = int(length / 1e-9), 1, 1
@@ -230,7 +230,7 @@ class TestNcAfmExchange:
             E_inhomo_mumax.append(
                 magnet.sub1.inhomogeneous_exchange_energy() / (Km(msat) * V)
             )
-            E_homo_theory.append(2 * ncafmex_cell * np.cos(phi) / (l * l * Km(msat)))
+            E_homo_theory.append(2 * ncafmex_cell * np.cos(phi) / (lc * lc * Km(msat)))
             E_inhomo_theory.append(-0.5 * ncafmex_nn * kx * kx * np.cos(phi) / Km(msat))
 
             phi += np.pi / 180

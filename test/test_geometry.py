@@ -30,7 +30,7 @@ class TestGeometry:
         geometry = np.ones((nz, ny, nx + 1), dtype=bool)  # wooops, wrong nx
 
         with pytest.raises(ValueError):
-            magnet = Ferromagnet(world=world, grid=grid, geometry=geometry)
+            _ = Ferromagnet(world=world, grid=grid, geometry=geometry)
 
     def test_function_geometry(self):
         """Test if a geometry is correctly set when using a function."""
@@ -52,7 +52,7 @@ class TestGeometry:
         grid = Grid((128, 64, 4))
         geomfunc = lambda x, y: True
         with pytest.raises(TypeError):
-            magnet = Ferromagnet(world=world, grid=grid, geometry=geomfunc)
+            _ = Ferromagnet(world=world, grid=grid, geometry=geomfunc)
 
     def test_overlap_success(self):
         cs = 1e-9
@@ -70,7 +70,7 @@ class TestGeometry:
         world = World(cellsize=(cs, cs, cs))
         grid = Grid((20, 20, 1))
 
-        magnet = Ferromagnet(world, grid)
+        _ = Ferromagnet(world, grid)
 
         with pytest.raises(Exception):
             Ferromagnet(world, grid, geometry=np.ones(grid.shape))
@@ -80,7 +80,7 @@ class TestGeometry:
         world = World(cellsize=(cs, cs, cs))
         grid1 = Grid((20, 20, 1))
 
-        magnet = Ferromagnet(world, grid1)
+        _ = Ferromagnet(world, grid1)
 
         with pytest.raises(Exception):
             grid2 = Grid((20, 20, 1), origin=(19, 19, 0))

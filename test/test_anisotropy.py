@@ -91,15 +91,17 @@ def compute_cubic_anisotropy_field(magnet):
         np.sum(c3 * m, axis=0),
     )
 
-    return -2/msat * (kc1 * ((c2m**2 + c3m**2)*c1m*c1 + \
-                             (c1m**2 + c3m**2)*c2m*c2 + \
-                             (c1m**2 + c2m**2)*c3m*c3) + \
-                      kc2 * (c2m**2*c3m**2*c1m*c1 + \
-                             c1m**2*c3m**2*c2m*c2 + \
-                             c1m**2*c2m**2*c3m*c3) + \
-                      2*kc3 * ((c2m**4 + c3m**4)*c1m**3*c1 + \
-                               (c1m**4 + c3m**4)*c2m**3*c2 + \
-                               (c1m**4 + c2m**4)*c3m**3*c3))  # fmt: skip
+    # fmt: off
+    return -2/msat * (kc1 * ((c2m**2 + c3m**2)*c1m*c1 +       # noqa
+                             (c1m**2 + c3m**2)*c2m*c2 +       # noqa
+                             (c1m**2 + c2m**2)*c3m*c3) +      # noqa
+                      kc2 * (c2m**2*c3m**2*c1m*c1 +           # noqa
+                             c1m**2*c3m**2*c2m*c2 +           # noqa
+                             c1m**2*c2m**2*c3m*c3) +          # noqa
+                      2*kc3 * ((c2m**4 + c3m**4)*c1m**3*c1 +  # noqa
+                               (c1m**4 + c3m**4)*c2m**3*c2 +  # noqa
+                               (c1m**4 + c2m**4)*c3m**3*c3))  # noqa 
+    # fmt: on
 
 
 def compute_cubic_anisotropy_energy_density(magnet):

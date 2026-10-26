@@ -21,25 +21,25 @@ class TestMaxAngleNcAfm:
     def test_same_sublattices(self):
         magnet = NcAfm(World((1, 1, 1)), Grid((1, 1, 1)))
         with pytest.raises((ValueError)):
-            angle = magnet.max_intracell_angle_between(magnet.sub1, magnet.sub1)
+            _ = magnet.max_intracell_angle_between(magnet.sub1, magnet.sub1)
 
     def test_different_host(self):
         magnet1 = NcAfm(World((1, 1, 1)), Grid((1, 1, 1)))
         magnet2 = NcAfm(World((1, 1, 1)), Grid((1, 1, 1)))
         with pytest.raises((ValueError)):
-            angle = magnet1.max_intracell_angle_between(magnet1.sub1, magnet2.sub2)
+            _ = magnet1.max_intracell_angle_between(magnet1.sub1, magnet2.sub2)
 
     def test_afm_sublattice(self):
         magnet1 = NcAfm(World((1, 1, 1)), Grid((1, 1, 1)))
         magnet2 = Antiferromagnet(World((1, 1, 1)), Grid((1, 1, 1)))
         with pytest.raises((ValueError)):
-            angle = magnet1.max_intracell_angle_between(magnet1.sub1, magnet2.sub1)
+            _ = magnet1.max_intracell_angle_between(magnet1.sub1, magnet2.sub1)
 
     def test_fm(self):
         magnet1 = NcAfm(World((1, 1, 1)), Grid((1, 1, 1)))
         magnet2 = Ferromagnet(World((1, 1, 1)), Grid((1, 1, 1)))
         with pytest.raises((ValueError)):
-            angle = magnet1.max_intracell_angle_between(magnet1.sub1, magnet2)
+            _ = magnet1.max_intracell_angle_between(magnet1.sub1, magnet2)
 
     def test_90(self):
         magnet = NcAfm(World((1, 1, 1)), Grid((1, 1, 1)))

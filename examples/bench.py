@@ -1,4 +1,5 @@
 import os
+
 os.environ["GPU_ABORT"] = "OFF"  # make GPU out-of-memory a catchable RuntimeError instead of aborting
 
 import argparse
@@ -75,7 +76,10 @@ def read_runs(path):
 def simple_bench(grid, nsteps=100):
     """Returns the walltime of a simple simulation using the specified grid
     and number of steps"""
-    from mumaxplus import Ferromagnet, World  # imported lazily so the parent never initializes CUDA
+    from mumaxplus import (  # imported lazily so the parent never initializes CUDA
+        Ferromagnet,
+        World,
+    )
 
     world = World((4e-9, 4e-9, 4e-9))
 

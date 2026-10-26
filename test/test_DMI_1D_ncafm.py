@@ -5,7 +5,6 @@
    are set to 0 for this test."""
 
 import numpy as np
-import pytest
 
 from mumaxplus import Ferromagnet, Grid, NcAfm, World
 

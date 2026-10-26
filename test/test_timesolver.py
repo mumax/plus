@@ -63,7 +63,7 @@ def test_set_timestep(test_world, timestep):
 
 
 def test_adaptive_timestep_default_is_true(test_world):
-    assert test_world.timesolver.adaptive_timestep == True
+    assert test_world.timesolver.adaptive_timestep is True
 
 
 @pytest.mark.parametrize("adaptive", [True, False])

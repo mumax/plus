@@ -3,7 +3,7 @@ problem 2 to the analytical value. This mostly tests the minimize function.
 TODO: try with relax function as well
 Standard problems: https://www.ctcms.nist.gov/~rdm/mumag.org.html
 Analytical value:
-https://pubs.aip.org/aip/jap/article-abstract/87/9/5520/530184/Behavior-of-MAG-standard-problem-No-2-in-the-small
+https://pubs.aip.org/aip/jap/article-abstract/87/9/5520/530184/Behavior-of-MAG-standard-problem-No-2-in-the-small  # noqa
 """
 
 import numpy as np

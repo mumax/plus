@@ -47,7 +47,7 @@ def test_magnet_bias_field(test_parameters):
 def test_invalid_grid_size(size):
     world = World((1, 1, 1))
     with pytest.raises(ValueError):
-        magnet = Ferromagnet(world, Grid(size))
+        _ = Ferromagnet(world, Grid(size))
 
 
 def test_max_torque(test_parameters):

@@ -75,7 +75,8 @@ class TestForces:
         )
 
     def test_damping_add(self):
-        """Check if damping is correctly added to the forces. This also checks the division by rho."""
+        """Check if damping is correctly added to the forces. This also checks the
+        division by rho."""
         damping = self.magnet.elastic_damping.eval()
         forces = self.magnet.effective_body_force.eval()
         rho = self.magnet.rho.eval()
@@ -87,5 +88,6 @@ class TestForces:
         )
 
     def test_default_damping(self):
-        """Check that there is viscous damping, even if viscosity tensor has not been set."""
+        """Check that there is viscous damping, even if viscosity tensor has not been
+        set."""
         assert np.any(self.magnet.elastic_damping.eval() != 0)
