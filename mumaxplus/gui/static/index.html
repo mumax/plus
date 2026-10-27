@@ -89,7 +89,9 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .using { font-weight: 700; gap: 4px 8px; }
 .using span { white-space: nowrap; }
 .plotErr { color: var(--err); font-weight: 600; }
-.plotcv { display: block; width: 100%; height: 340px; border-radius: 8px; border: 1px solid var(--line); margin-top: 8px; cursor: crosshair; touch-action: none; }
+.overlay { position: absolute; pointer-events: none; }
+.plotcv, .profcv { display: block; width: 100%; height: 340px; border-radius: 8px; border: 1px solid var(--line); margin-top: 8px; cursor: crosshair; touch-action: none; }
+.profcv { height: 220px; }
 
 /* parameters */
 #ptable td.n, #stable td.n, #wtable td.n { padding-right: 14px; font: 13px var(--mono); }
@@ -129,8 +131,15 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   </table>
   <div class="row">Save: <button class="savePng" title="Download the image as shown here, with its arrows">PNG</button><button class="saveOvf" title="Save the quantity of the selected magnet as an OVF file, in the folder the script runs in (save_ovf)">OVF</button>
     <span title="Save the quantity as OVF now and every this many seconds of simulation time while running (mumax3: AutoSave). 0 = off">AutoSave: <input type="text" class="autosave" size="7"> s</span></div>
-  <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
+  <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
+  <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="overlay" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
   <div class="hover">&nbsp;</div>
+  <div class="profile" hidden>
+    <div class="row"><b class="gray" style="font-size:.92em">Line profile</b> <button class="profReset" hidden title="Show the whole profile again (or double-click it)">Reset zoom</button>
+      <button class="profCsv" title="Download the values along the line as text">Save values</button><button class="profPng" title="Download the profile as shown">PNG</button></div>
+    <canvas class="profcv"></canvas>
+    <div class="hover profHover">&nbsp;</div>
+  </div>
 </div></template>
 
 <section id="s-plot"><h2 title="Click to show/hide">Plot</h2><div class="body">
@@ -458,9 +467,28 @@ function makeView(id) {
   };
   q("saveOvf").onclick = () => send({ cmd: "save_ovf", view: id }); // the console says where
   bindText(q("autosave"), (v) => send({ cmd: "view_autosave", view: id, text: v }));
+  V.chart = makeChart(q("profcv"), q("profHover"), q("profReset"));
+  V.chart.onHover = (k) => { if (k !== V.profK) { V.profK = k; drawOverlay(V); } };
+  q("profOn").onchange = (e) => profileOn(V, e.target.checked);
+  q("profCsv").onclick = () => profileCsv(V);
+  q("profPng").onclick = () => q("profcv").toBlob((b) => b && download(`${stem()}_${V.frame ? V.frame.meta.quant : "profile"}_profile.png`, b), "image/png");
   const disp = q("disp");
-  disp.onmousemove = (e) => { const r = disp.getBoundingClientRect(); V.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }; updateLoupe(V); };
+  // line profile: drag on the image draws the line (a click still selects a magnet in "show all")
+  disp.onpointerdown = (e) => {
+    if (!V.profOn || !V.frame || e.button !== 0) return;
+    V.pdrag = { a: cellAt(V, e), x: e.clientX, y: e.clientY, moved: false }; disp.setPointerCapture(e.pointerId);
+  };
+  disp.onpointerup = () => { if (V.pdrag) setTimeout(() => (V.pdrag = null)); }; // after the click event
+  disp.onmousemove = (e) => {
+    const pd = V.pdrag;
+    if (pd && (pd.moved || Math.hypot(e.clientX - pd.x, e.clientY - pd.y) > 4)) {
+      pd.moved = true; V.prof = { a: pd.a, b: cellAt(V, e) }; V.mouse = null; q("loupe").style.display = "none";
+      drawOverlay(V); updateProfile(V); return;
+    }
+    const r = disp.getBoundingClientRect(); V.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }; updateLoupe(V);
+  };
   disp.onclick = (e) => {
+    if (V.pdrag && V.pdrag.moved) return;
     if (!V.frame || !V.frame.meta.boxes) return;
     const { meta } = V.frame, r = disp.getBoundingClientRect();
     const b = boxAt(meta, Math.floor((e.clientX - r.left) / r.width * meta.w), Math.floor((1 - (e.clientY - r.top) / r.height) * meta.h));
@@ -519,7 +547,8 @@ async function fetchFrame(V) {
   V.frameId = cfgOf(V).frame_id;
   const r = await GET("/api/frame?view=" + V.id); if (r.status === 204 || !views.has(V.id)) return;
   const meta = JSON.parse(r.headers.get("X-Frame-Meta")), buf = await r.arrayBuffer();
-  const n = meta.ncomp * meta.w * meta.h;
+  const n = meta.ncomp * meta.w * meta.h, old = V.frame && V.frame.meta;
+  if (old && (old.w !== meta.w || old.h !== meta.h)) V.prof = null; // another image: the line means nothing there
   V.frame = { meta, data: new Float32Array(buf, 0, n), rgba: meta.vector ? new Uint8ClampedArray(buf, n * 4, meta.w * meta.h * 4) : null };
   V.q("renderLayer").max = meta.nz - 1;
   V.q("renderLayerLabel").textContent = (meta.layer + 1) + "/" + meta.nz;
@@ -551,7 +580,7 @@ function drawFrame(V) {
   V.q("arrowSizeRow").style.display = meta.vector ? "" : "none";
   if (meta.vector) drawArrows(V, ctx, cv.width / w, w, h);
   if (meta.boxes) drawBoxes(ctx, cv.width / w, meta);
-  updateLoupe(V);
+  updateLoupe(V); drawOverlay(V); updateProfile(V);
 }
 
 /* "show all magnets": outline and name every magnet, the selected one in the accent colour */
@@ -608,6 +637,71 @@ function drawArrows(V, ctx, f, w, h) {
   ctx.fill(); // one fill for all arrows
 }
 
+/* ---------- line profiles: the shown quantity along a line dragged across a display ----------
+   V.prof = the line's ends, in cells of the shown image (x right, y up, floats) */
+function profileOn(V, on) {
+  V.profOn = on; V.prof = null; V.profK = -1;
+  V.q("profile").hidden = !on; V.q("profOn").checked = on;
+  drawOverlay(V); updateProfile(V);
+}
+function cellAt(V, e) { // mouse -> position in cells of the shown image
+  const { meta } = V.frame, r = V.q("disp").getBoundingClientRect();
+  return { x: Math.max(0, Math.min(meta.w, ((e.clientX - r.left) / r.width) * meta.w)), y: Math.max(0, Math.min(meta.h, (1 - (e.clientY - r.top) / r.height) * meta.h)) };
+}
+function profileData(V) {
+  // one sample per cell length along the line, from the cell each sample falls in (no interpolation)
+  const { meta, data } = V.frame, { a, b } = V.prof, w = meta.w, h = meta.h, N = w * h;
+  const t = cur(), c = (t && t.mesh && t.mesh.c) || [1, 1, 1];
+  const len = Math.hypot((b.x - a.x) * c[0], (b.y - a.y) * c[1]), n = Math.max(2, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y)) + 1);
+  const P = { X: [], Y: Array.from({ length: meta.ncomp }, () => []), cells: [], pts: [] };
+  for (let k = 0; k < n; k++) {
+    const f = k / (n - 1), x = a.x + f * (b.x - a.x), y = a.y + f * (b.y - a.y);
+    const ix = Math.min(w - 1, Math.floor(x)), iy = Math.min(h - 1, Math.floor(y)), i = iy * w + ix;
+    const vals = P.Y.map((_, j) => data[j * N + i]);
+    const outside = vals.some(isNaN) || (meta.vector && vals.every((v) => v === 0)); // between magnets / outside the geometry
+    P.X.push(f * len * 1e9); vals.forEach((v, j) => P.Y[j].push(outside ? null : v));
+    P.cells.push([ix, iy]); P.pts.push({ x, y });
+  }
+  return P;
+}
+function updateProfile(V) {
+  if (!V.profOn || !V.chart) return;
+  if (!V.frame || !V.prof) return drawChart(V.chart, { message: "drag a line across the image" });
+  const { meta } = V.frame, P = V.profData = profileData(V), unit = meta.unit ? ` (${meta.unit})` : "";
+  const names = meta.vector ? ["x", "y", "z"] : [meta.comp !== "" ? meta.comp : meta.quant];
+  const o = meta.boxes ? meta.origin : [0, 0, 0], u = meta.unit ? " " + esc(meta.unit) : "";
+  drawChart(V.chart, {
+    X: P.X, Y: P.Y, names,
+    xlabel: "distance (nm)", ylabel: meta.quant + (meta.vector || meta.comp === "" ? "" : " " + meta.comp) + unit,
+    readout: (k, colors) => `d = ${g(P.X[k])} nm&ensp;cell ${P.cells[k][0] + o[0]}, ${P.cells[k][1] + o[1]}, ${meta.layer + o[2]}` +
+      P.Y.map((S, j) => `&ensp;<b style="color:${colors[j % colors.length]}">${esc(names[j])}</b> = ${S[k] === null ? "–" : g(S[k])}${u}`).join(""),
+  });
+}
+/* the line on top of the image (a canvas of its own, so hovering the profile does not redraw the image) */
+function drawOverlay(V) {
+  const ov = V.q("overlay"), cv = V.q("disp");
+  Object.assign(ov.style, { left: cv.offsetLeft + "px", top: cv.offsetTop + "px", width: cv.style.width, height: cv.style.height });
+  ov.width = cv.width; ov.height = cv.height;
+  const ctx = ov.getContext("2d"); ctx.clearRect(0, 0, ov.width, ov.height);
+  if (!V.prof || !V.frame) return;
+  const { meta } = V.frame, sx = ov.width / meta.w, sy = ov.height / meta.h, dpr = window.devicePixelRatio || 1;
+  const P = (p) => [p.x * sx, (meta.h - p.y) * sy], [ax, ay] = P(V.prof.a), [bx, by] = P(V.prof.b);
+  ctx.lineCap = "round";
+  for (const [color, wd] of [["rgba(0,0,0,0.6)", 4], ["#fff", 2]]) { ctx.strokeStyle = color; ctx.lineWidth = wd * dpr; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); }
+  const dot = (x, y, r, fill) => { ctx.beginPath(); ctx.arc(x, y, r * dpr, 0, 2 * Math.PI); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = "rgba(0,0,0,0.7)"; ctx.stroke(); };
+  dot(ax, ay, 4, "#fff"); dot(bx, by, 4, css("--accent")); // start (distance 0) white, end in the accent colour
+  const pts = V.profData && V.profData.pts;
+  if (V.profK >= 0 && pts && pts[V.profK]) { const [x, y] = P(pts[V.profK]); dot(x, y, 5, "#ffd43b"); }
+}
+function profileCsv(V) {
+  const P = V.profData, { meta } = V.frame; if (!P) return;
+  const names = meta.vector ? ["x", "y", "z"] : [meta.comp !== "" ? meta.comp : meta.quant];
+  const head = [`# ${meta.quant} along a line, layer ${meta.layer}, t = ${meta.time} s` + (meta.unit ? `, unit ${meta.unit}` : ""),
+                ["distance (nm)", "ix", "iy", ...names].join("\t")];
+  const lines = P.X.map((d, k) => [g(d), P.cells[k][0], P.cells[k][1], ...P.Y.map((S) => (S[k] === null ? "nan" : S[k]))].join("\t"));
+  download(`${stem()}_${meta.quant}_profile.txt`, new Blob([[...head, ...lines].join("\n") + "\n"], { type: "text/plain" }));
+}
+
 /* loupe (5× magnifier, as in mumax3) + value under the cursor */
 function updateLoupe(V) {
   const lp = V.q("loupe"), cv = V.q("disp"), mouse = V.mouse;
@@ -643,6 +737,157 @@ const panelObserver = new ResizeObserver((entries) => {
   }
 });
 
+/* ---------- charts: drawn in the page, for the plots of the table and the line profiles ----------
+   C = a chart's state (zoom, mouse, ...); C.data = what it shows:
+   { X, Y: [series], names, xlabel, ylabel, logx, logy, empty, readout(k, colors) } or { message } */
+function makeChart(cv, hoverEl, resetBtn) {
+  const C = { cv, hoverEl, resetBtn, data: null, zoom: null, drag: null, mouse: null, geom: null, raf: 0, onHover: null };
+  // hover: values at the nearest point; drag: zoom to a box (or a range of x or y); double-click: zoom out
+  const at = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const redraw = () => { cancelAnimationFrame(C.raf); C.raf = requestAnimationFrame(() => drawChart(C)); };
+  cv.onpointerdown = (e) => { if (e.button !== 0 || !C.geom) return; C.drag = { a: at(e), b: at(e) }; cv.setPointerCapture(e.pointerId); };
+  cv.onpointermove = (e) => { C.mouse = at(e); if (C.drag) C.drag.b = C.mouse; redraw(); };
+  cv.onpointerup = () => {
+    const d = C.drag, g = C.geom; C.drag = null; if (!d || !g) return;
+    const dx = Math.abs(d.b.x - d.a.x) > 5, dy = Math.abs(d.b.y - d.a.y) > 5;
+    if (dx || dy) {
+      const z = C.zoom || {}, sort = (a, b) => [Math.min(a, b), Math.max(a, b)];
+      C.zoom = { x: dx ? sort(g.ix(d.a.x), g.ix(d.b.x)) : z.x || null, y: dy ? sort(g.iy(d.a.y), g.iy(d.b.y)) : z.y || null };
+    }
+    redraw();
+  };
+  cv.onpointerleave = () => { if (!C.drag) { C.mouse = null; redraw(); } };
+  cv.ondblclick = () => { C.zoom = null; redraw(); };
+  resetBtn.onclick = () => { C.zoom = null; drawChart(C); };
+  return C;
+}
+
+/* tick positions in axis coordinates (log10 of the value on a log axis), about n of them */
+function plotTicks(a, b, log, n) {
+  if (log) {
+    const step = Math.max(1, Math.ceil((b - a) / n)), out = [];
+    for (let e = Math.ceil(a); e <= b; e += step) out.push(e);
+    if (out.length >= 3) return out;
+    for (let e = Math.floor(a); e <= b; e++) for (const m of [2, 5]) { const v = e + Math.log10(m); if (v >= a && v <= b) out.push(v); }
+    if (out.length >= 2) return out.sort((u, v) => u - v);
+    return plotTicks(10 ** a, 10 ** b, false, n).filter((v) => v > 0).map(Math.log10); // less than a factor 2
+  }
+  const raw = (b - a) / n, mag = 10 ** Math.floor(Math.log10(raw)), f = raw / mag;
+  const step = (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * mag, out = [];
+  for (let v = Math.ceil(a / step) * step; v <= b + step * 1e-9; v += step) out.push(Math.abs(v) < step * 1e-9 ? 0 : v);
+  return out;
+}
+function g(v) { // gnuplot's "%g"
+  if (v === 0) return "0";
+  const s = Number(v.toPrecision(6)), a = Math.abs(s);
+  return a >= 1e-4 && a < 1e6 ? String(s) : s.toExponential().replace("e+", "e");
+}
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const seriesColors = () => theme() === "dark"
+  ? ["#7aa2ff", "#ff8a4c", "#5fd39a", "#da77f2", "#ffd43b", "#3bc9db"]
+  : ["#2f5fd0", "#d9480f", "#2b8a3e", "#ae3ec9", "#b08800", "#0b7285"];
+
+function drawChart(C, data) {
+  if (data) C.data = data;
+  const d = C.data, cv = C.cv, W = cv.clientWidth, H = cv.clientHeight;
+  if (!d || !W) return;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const ink = css("--ink"), mute = css("--mute"), line = css("--line"), card = css("--card"), font = getComputedStyle(document.body).fontFamily;
+  ctx.fillStyle = card; ctx.fillRect(0, 0, W, H); // also the background of a saved PNG
+  ctx.font = `11px ${font}`;
+  C.resetBtn.hidden = !C.zoom;
+  const message = (text) => {
+    C.geom = null; ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, W / 2, H / 2);
+    C.hoverEl.innerHTML = "&nbsp;"; if (C.onHover) C.onHover(-1);
+  };
+  if (d.message !== undefined) return message(d.message);
+
+  // the data in axis coordinates (log10 on a log axis); points that a log axis cannot show are gaps
+  const lx = !!d.logx, ly = !!d.logy;
+  const tf = (log) => (v) => (v === null || !Number.isFinite(v) || (log && v <= 0) ? NaN : log ? Math.log10(v) : v);
+  const X = d.X.map(tf(lx)), Y = d.Y.map((S) => S.map(tf(ly)));
+  const z = C.zoom || {};
+  let [x0, x1] = z.x || [Infinity, -Infinity], [y0, y1] = z.y || [Infinity, -Infinity];
+  if (!z.x) for (const x of X) if (!isNaN(x)) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
+  if (!z.y) for (const S of Y) S.forEach((y, k) => { if (!isNaN(y) && X[k] >= x0 && X[k] <= x1) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); } });
+  if (!(x1 >= x0) || !(y1 >= y0)) return message(d.empty || "nothing to show" + (lx || ly ? " on a log axis" : ""));
+  const pad = (a, b, log) => (a === b ? (log ? [a - 0.5, b + 0.5] : [a - (Math.abs(a) || 1) * 0.1, b + (Math.abs(b) || 1) * 0.1]) : [a, b]);
+  [x0, x1] = pad(x0, x1, lx); [y0, y1] = pad(y0, y1, ly);
+  if (!z.y) { const m = 0.04 * (y1 - y0); y0 -= m; y1 += m; } // room above and below the lines
+
+  // layout: room for the tick labels and the axis titles
+  const ytk = plotTicks(y0, y1, ly, Math.max(2, Math.round(H / 60))), ylab = ytk.map((v) => g(ly ? 10 ** v : v));
+  const L = 24 + Math.max(...ylab.map((s) => ctx.measureText(s).width), 10), R = W - 14, Tp = 10, B = H - 40;
+  const xtk = plotTicks(x0, x1, lx, Math.max(2, Math.round((R - L) / 90)));
+  const px = (x) => L + ((x - x0) / (x1 - x0)) * (R - L), py = (y) => B - ((y - y0) / (y1 - y0)) * (B - Tp);
+  C.geom = { ix: (p) => x0 + ((p - L) / (R - L)) * (x1 - x0), iy: (p) => y0 + ((B - p) / (B - Tp)) * (y1 - y0) };
+
+  // grid, ticks and axis titles
+  ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.beginPath();
+  for (const v of xtk) { const p = Math.round(px(v)) + 0.5; ctx.moveTo(p, Tp); ctx.lineTo(p, B); }
+  for (const v of ytk) { const p = Math.round(py(v)) + 0.5; ctx.moveTo(L, p); ctx.lineTo(R, p); }
+  ctx.stroke(); ctx.strokeRect(L + 0.5, Tp + 0.5, R - L - 1, B - Tp - 1);
+  ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "top";
+  xtk.forEach((v) => ctx.fillText(g(lx ? 10 ** v : v), px(v), B + 5));
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  ytk.forEach((v, k) => ctx.fillText(ylab[k], L - 5, py(v)));
+  ctx.font = `12px ${font}`; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+  ctx.fillText(d.xlabel, (L + R) / 2, H - 4);
+  ctx.save(); ctx.translate(12, (Tp + B) / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = "middle"; ctx.fillText(d.ylabel, 0, 0); ctx.restore();
+
+  // the lines (with lines)
+  const colors = seriesColors();
+  ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, R - L, B - Tp); ctx.clip();
+  ctx.lineWidth = 1.5; ctx.lineJoin = "round";
+  Y.forEach((S, s) => {
+    ctx.strokeStyle = colors[s % colors.length]; ctx.beginPath(); let pen = false;
+    for (let k = 0; k < S.length; k++) {
+      if (isNaN(X[k]) || isNaN(S[k])) { pen = false; continue; }
+      const a = px(X[k]), b = py(S[k]); pen ? ctx.lineTo(a, b) : ctx.moveTo(a, b); pen = true;
+    }
+    ctx.stroke();
+  });
+
+  // hover: the point nearest to the mouse (on any line), its values below the chart
+  const m = C.mouse;
+  let best = -1;
+  if (m && !C.drag && m.x >= L && m.x <= R && m.y >= Tp && m.y <= B) {
+    let bd = Infinity;
+    Y.forEach((S) => S.forEach((y, k) => { if (isNaN(X[k]) || isNaN(y)) return; const e = (px(X[k]) - m.x) ** 2 + (py(y) - m.y) ** 2; if (e < bd) { bd = e; best = k; } }));
+  }
+  if (best >= 0) {
+    ctx.strokeStyle = mute; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px(X[best]), Tp); ctx.lineTo(px(X[best]), B); ctx.stroke(); ctx.setLineDash([]);
+    Y.forEach((S, s) => { if (isNaN(S[best])) return; ctx.fillStyle = colors[s % colors.length]; ctx.beginPath(); ctx.arc(px(X[best]), py(S[best]), 3.5, 0, 2 * Math.PI); ctx.fill(); });
+    C.hoverEl.innerHTML = d.readout(best, colors);
+  } else C.hoverEl.innerHTML = C.mouse ? "&nbsp;" : "drag to zoom, double-click to zoom out";
+  if (C.onHover) C.onHover(best);
+
+  // zoom box while dragging
+  const dr = C.drag;
+  if (dr) {
+    const a = { x: Math.max(L, Math.min(R, dr.a.x)), y: Math.max(Tp, Math.min(B, dr.a.y)) }, b = { x: Math.max(L, Math.min(R, dr.b.x)), y: Math.max(Tp, Math.min(B, dr.b.y)) };
+    const wx = Math.abs(b.x - a.x) > 5, wy = Math.abs(b.y - a.y) > 5; // a range of x only / y only spans the chart
+    const rx = wx ? Math.min(a.x, b.x) : L, ry = wy ? Math.min(a.y, b.y) : Tp, rw = wx ? Math.abs(b.x - a.x) : R - L, rh = wy ? Math.abs(b.y - a.y) : B - Tp;
+    if (wx || wy) { ctx.fillStyle = "rgba(128,128,128,0.15)"; ctx.fillRect(rx, ry, rw, rh); ctx.strokeStyle = mute; ctx.strokeRect(rx + 0.5, ry + 0.5, rw, rh); }
+  }
+  ctx.restore();
+
+  // legend, for more than one line
+  if (Y.length > 1) {
+    ctx.font = `11px ${font}`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    const w = 30 + Math.max(...d.names.map((n) => ctx.measureText(n).width)), h = 8 + 16 * Y.length, x = R - w - 8, y = Tp + 8;
+    ctx.globalAlpha = 0.85; ctx.fillStyle = card; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
+    ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, w, h);
+    d.names.forEach((n, s) => {
+      const yy = y + 12 + 16 * s; ctx.strokeStyle = colors[s % colors.length]; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x + 6, yy); ctx.lineTo(x + 20, yy); ctx.stroke(); ctx.fillStyle = ink; ctx.fillText(n, x + 25, yy);
+    });
+  }
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { plots.forEach(drawPlot); views.forEach(updateProfile); });
+
 /* ---------- plot ---------- */
 $("saveTable").onclick = async () => download(stem() + "_table.txt", await (await GET("/api/table.txt")).blob());
 bindText($("tableAutoSave"), (v) => send({ cmd: "table_autosave", text: v }));
@@ -671,43 +916,22 @@ function column(spec) { // 1-based number or name -> index into a row
   throw new Error(`unknown column "${spec}"; columns are: ` + TB.names.map((n, i) => `${i + 1}=${n}`).join(", "));
 }
 const colLabel = (i) => (TB.units[i] ? `${TB.names[i]} (${TB.units[i]})` : TB.names[i]);
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-const seriesColors = () => theme() === "dark"
-  ? ["#7aa2ff", "#ff8a4c", "#5fd39a", "#da77f2", "#ffd43b", "#3bc9db"]
-  : ["#2f5fd0", "#d9480f", "#2b8a3e", "#ae3ec9", "#b08800", "#0b7285"];
 
 function makePlot(id) {
   const el = $("plotTpl").content.firstElementChild.cloneNode(true);
-  const Pl = { id, el, q: (c) => el.querySelector("." + c), key: "", zoom: null, drag: null, mouse: null, geom: null, raf: 0 };
-  const { q } = Pl, cfg = () => T.plots.find((p) => p.id === id);
+  const q = (c) => el.querySelector("." + c), cfg = () => T.plots.find((p) => p.id === id);
+  const Pl = { id, el, q, key: "", chart: makeChart(q("plotcv"), q("plotHover"), q("zoomReset")) };
   const sendUsing = () => send({ cmd: "table_using", plot: id, x: q("usingx").value, y: q("usingy").value });
   bindText(q("usingx"), sendUsing); bindText(q("usingy"), sendUsing);
   for (const k of ["logx", "logy"]) q(k).onchange = (e) => {
     const c = cfg(); if (c) c[k] = e.target.checked; // show it now, the tick confirms
-    Pl.zoom = null; send({ cmd: "table_using", plot: id, [k]: e.target.checked }); drawPlot(Pl);
+    Pl.chart.zoom = null; send({ cmd: "table_using", plot: id, [k]: e.target.checked }); drawPlot(Pl);
   };
   q("vremove").onclick = () => send({ cmd: "plot_remove", plot: id }); // syncPlots drops the panel
-  q("zoomReset").onclick = () => { Pl.zoom = null; drawPlot(Pl); };
   q("savePlot").onclick = () => {
     const c = cfg(), name = c ? `${c.y}_vs_${c.x}`.replace(/[^\w.,-]+/g, "_") : "plot";
     q("plotcv").toBlob((b) => b && download(`${stem()}_${name}.png`, b), "image/png");
   };
-  // hover: values at the nearest row; drag: zoom to a box (or a range of x or y); double-click: zoom out
-  const cv = q("plotcv"), at = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-  const redraw = () => { cancelAnimationFrame(Pl.raf); Pl.raf = requestAnimationFrame(() => drawPlot(Pl)); };
-  cv.onpointerdown = (e) => { if (e.button !== 0 || !Pl.geom) return; Pl.drag = { a: at(e), b: at(e) }; cv.setPointerCapture(e.pointerId); };
-  cv.onpointermove = (e) => { Pl.mouse = at(e); if (Pl.drag) Pl.drag.b = Pl.mouse; redraw(); };
-  cv.onpointerup = () => {
-    const d = Pl.drag, g = Pl.geom; Pl.drag = null; if (!d || !g) return;
-    const dx = Math.abs(d.b.x - d.a.x) > 5, dy = Math.abs(d.b.y - d.a.y) > 5;
-    if (dx || dy) {
-      const z = Pl.zoom || {}, sort = (a, b) => [Math.min(a, b), Math.max(a, b)];
-      Pl.zoom = { x: dx ? sort(g.ix(d.a.x), g.ix(d.b.x)) : z.x || null, y: dy ? sort(g.iy(d.a.y), g.iy(d.b.y)) : z.y || null };
-    }
-    redraw();
-  };
-  cv.onpointerleave = () => { if (!Pl.drag) { Pl.mouse = null; redraw(); } };
-  cv.ondblclick = () => { Pl.zoom = null; redraw(); };
   $("plots").appendChild(el); plots.set(id, Pl); panelObserver.observe(el);
   return Pl;
 }
@@ -721,137 +945,29 @@ function syncPlots() { // add/remove panels to match the simulation, and show th
     setText(q("usingx"), c.x); setText(q("usingy"), c.y);
     q("logx").checked = !!c.logx; q("logy").checked = !!c.logy;
     const key = [c.x, c.y, c.logx, c.logy].join("|");
-    if (key !== Pl.key) { if (Pl.key) Pl.zoom = null; Pl.key = key; drawPlot(Pl); }
+    if (key !== Pl.key) { if (Pl.key) Pl.chart.zoom = null; Pl.key = key; drawPlot(Pl); }
   });
 }
-
-/* tick positions in axis coordinates (log10 of the value on a log axis), about n of them */
-function plotTicks(a, b, log, n) {
-  if (log) {
-    const step = Math.max(1, Math.ceil((b - a) / n)), out = [];
-    for (let e = Math.ceil(a); e <= b; e += step) out.push(e);
-    if (out.length >= 3) return out;
-    for (let e = Math.floor(a); e <= b; e++) for (const m of [2, 5]) { const v = e + Math.log10(m); if (v >= a && v <= b) out.push(v); }
-    if (out.length >= 2) return out.sort((u, v) => u - v);
-    return plotTicks(10 ** a, 10 ** b, false, n).filter((v) => v > 0).map(Math.log10); // less than a factor 2
-  }
-  const raw = (b - a) / n, mag = 10 ** Math.floor(Math.log10(raw)), f = raw / mag;
-  const step = (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * mag, out = [];
-  for (let v = Math.ceil(a / step) * step; v <= b + step * 1e-9; v += step) out.push(Math.abs(v) < step * 1e-9 ? 0 : v);
-  return out;
-}
-function g(v) { // gnuplot's "%g"
-  if (v === 0) return "0";
-  const s = Number(v.toPrecision(6)), a = Math.abs(s);
-  return a >= 1e-4 && a < 1e6 ? String(s) : s.toExponential().replace("e+", "e");
-}
-
 function drawPlot(Pl) {
-  const c = T && T.plots.find((p) => p.id === Pl.id), cv = Pl.q("plotcv"), W = cv.clientWidth, H = cv.clientHeight;
-  if (!c || !W) return;
-  const dpr = window.devicePixelRatio || 1;
-  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const ink = css("--ink"), mute = css("--mute"), line = css("--line"), card = css("--card"), font = getComputedStyle(document.body).fontFamily;
-  ctx.fillStyle = card; ctx.fillRect(0, 0, W, H); // also the background of a saved PNG
-  ctx.font = `11px ${font}`;
-  const message = (text) => { Pl.geom = null; ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, W / 2, H / 2); Pl.q("plotHover").innerHTML = "&nbsp;"; Pl.q("zoomReset").hidden = !Pl.zoom; };
+  const c = T && T.plots.find((p) => p.id === Pl.id); if (!c) return;
+  if (!TB.names.length) return drawChart(Pl.chart, { message: "no data yet: run the simulation" });
   let xi, ys;
   try {
-    if (!TB.names.length) return message("no data yet: run the simulation");
     xi = column(c.x || "1"); ys = String(c.y || "2").split(",").filter((s) => s.trim()).map(column);
     Pl.q("plotErr").textContent = "";
-  } catch (e) { Pl.q("plotErr").textContent = e.message; return message(""); }
-  if (!ys.length) return message("no y column");
-
-  // the data in axis coordinates (log10 on a log axis); points that a log axis cannot show are gaps
-  const lx = !!c.logx, ly = !!c.logy, rows = TB.rows;
-  const tx = (v) => (v === null || !Number.isFinite(v) || (lx && v <= 0) ? NaN : lx ? Math.log10(v) : v);
-  const ty = (v) => (v === null || !Number.isFinite(v) || (ly && v <= 0) ? NaN : ly ? Math.log10(v) : v);
-  const X = rows.map((r) => tx(r[xi])), Y = ys.map((j) => rows.map((r) => ty(r[j])));
-  const z = Pl.zoom || {};
-  let [x0, x1] = z.x || [Infinity, -Infinity], [y0, y1] = z.y || [Infinity, -Infinity];
-  if (!z.x) for (const x of X) if (!isNaN(x)) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
-  if (!z.y) for (const S of Y) S.forEach((y, k) => { if (!isNaN(y) && X[k] >= x0 && X[k] <= x1) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); } });
-  if (!(x1 >= x0) || !(y1 >= y0)) return message(rows.length < 2 ? "no data yet: run the simulation" : "nothing to show" + (lx || ly ? " on a log axis" : ""));
-  const pad = (a, b, log) => (a === b ? (log ? [a - 0.5, b + 0.5] : [a - (Math.abs(a) || 1) * 0.1, b + (Math.abs(b) || 1) * 0.1]) : [a, b]);
-  [x0, x1] = pad(x0, x1, lx); [y0, y1] = pad(y0, y1, ly);
-  if (!z.y) { const m = 0.04 * (y1 - y0); y0 -= m; y1 += m; } // room above and below the lines
-
-  // layout: room for the tick labels and the axis titles
-  const ytk = plotTicks(y0, y1, ly, Math.max(2, Math.round(H / 60))), ylab = ytk.map((v) => g(ly ? 10 ** v : v));
-  const L = 24 + Math.max(...ylab.map((s) => ctx.measureText(s).width), 10), R = W - 14, Tp = 10, B = H - 40;
-  const xtk = plotTicks(x0, x1, lx, Math.max(2, Math.round((R - L) / 90)));
-  const px = (x) => L + ((x - x0) / (x1 - x0)) * (R - L), py = (y) => B - ((y - y0) / (y1 - y0)) * (B - Tp);
-  Pl.geom = { ix: (p) => x0 + ((p - L) / (R - L)) * (x1 - x0), iy: (p) => y0 + ((B - p) / (B - Tp)) * (y1 - y0) };
-
-  // grid, ticks and axis titles
-  ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.beginPath();
-  for (const v of xtk) { const p = Math.round(px(v)) + 0.5; ctx.moveTo(p, Tp); ctx.lineTo(p, B); }
-  for (const v of ytk) { const p = Math.round(py(v)) + 0.5; ctx.moveTo(L, p); ctx.lineTo(R, p); }
-  ctx.stroke(); ctx.strokeRect(L + 0.5, Tp + 0.5, R - L - 1, B - Tp - 1);
-  ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "top";
-  xtk.forEach((v) => ctx.fillText(g(lx ? 10 ** v : v), px(v), B + 5));
-  ctx.textAlign = "right"; ctx.textBaseline = "middle";
-  ytk.forEach((v, k) => ctx.fillText(ylab[k], L - 5, py(v)));
-  ctx.font = `12px ${font}`; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
-  ctx.fillText(colLabel(xi), (L + R) / 2, H - 4);
+  } catch (e) { Pl.q("plotErr").textContent = e.message; return drawChart(Pl.chart, { message: "" }); }
+  if (!ys.length) return drawChart(Pl.chart, { message: "no y column" });
+  const rows = TB.rows, unit = (j) => (TB.units[j] ? " " + esc(TB.units[j]) : "");
   const units = new Set(ys.map((j) => TB.units[j]));
-  const ytitle = ys.length === 1 ? colLabel(ys[0]) : ys.map((j) => TB.names[j]).join(", ") + (units.size === 1 && TB.units[ys[0]] ? ` (${TB.units[ys[0]]})` : "");
-  ctx.save(); ctx.translate(12, (Tp + B) / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = "middle"; ctx.fillText(ytitle, 0, 0); ctx.restore();
-
-  // the lines (with lines)
-  const colors = seriesColors();
-  ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, R - L, B - Tp); ctx.clip();
-  ctx.lineWidth = 1.5; ctx.lineJoin = "round";
-  Y.forEach((S, s) => {
-    ctx.strokeStyle = colors[s % colors.length]; ctx.beginPath(); let pen = false;
-    for (let k = 0; k < S.length; k++) {
-      if (isNaN(X[k]) || isNaN(S[k])) { pen = false; continue; }
-      const a = px(X[k]), b = py(S[k]); pen ? ctx.lineTo(a, b) : ctx.moveTo(a, b); pen = true;
-    }
-    ctx.stroke();
+  drawChart(Pl.chart, {
+    X: rows.map((r) => r[xi]), Y: ys.map((j) => rows.map((r) => r[j])), names: ys.map((j) => TB.names[j]),
+    xlabel: colLabel(xi),
+    ylabel: ys.length === 1 ? colLabel(ys[0]) : ys.map((j) => TB.names[j]).join(", ") + (units.size === 1 && TB.units[ys[0]] ? ` (${TB.units[ys[0]]})` : ""),
+    logx: c.logx, logy: c.logy, empty: rows.length < 2 ? "no data yet: run the simulation" : undefined,
+    readout: (k, colors) => `${esc(TB.names[xi])} = ${g(rows[k][xi])}${unit(xi)}` + ys.map((j, s) =>
+      `&ensp;<b style="color:${colors[s % colors.length]}">${esc(TB.names[j])}</b> = ${rows[k][j] === null ? "NaN" : g(rows[k][j])}${unit(j)}`).join(""),
   });
-
-  // hover: the row nearest to the mouse (on any line), its values below the plot
-  const m = Pl.mouse, hover = Pl.q("plotHover");
-  let best = -1;
-  if (m && !Pl.drag && m.x >= L && m.x <= R && m.y >= Tp && m.y <= B) {
-    let bd = Infinity;
-    Y.forEach((S) => S.forEach((y, k) => { if (isNaN(X[k]) || isNaN(y)) return; const d = (px(X[k]) - m.x) ** 2 + (py(y) - m.y) ** 2; if (d < bd) { bd = d; best = k; } }));
-  }
-  if (best >= 0) {
-    ctx.strokeStyle = mute; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px(X[best]), Tp); ctx.lineTo(px(X[best]), B); ctx.stroke(); ctx.setLineDash([]);
-    Y.forEach((S, s) => { if (isNaN(S[best])) return; ctx.fillStyle = colors[s % colors.length]; ctx.beginPath(); ctx.arc(px(X[best]), py(S[best]), 3.5, 0, 2 * Math.PI); ctx.fill(); });
-    const r = rows[best], unit = (j) => (TB.units[j] ? " " + esc(TB.units[j]) : "");
-    hover.innerHTML = `${esc(TB.names[xi])} = ${g(r[xi])}${unit(xi)}` + ys.map((j, s) =>
-      `&ensp;<b style="color:${colors[s % colors.length]}">${esc(TB.names[j])}</b> = ${r[j] === null ? "NaN" : g(r[j])}${unit(j)}`).join("");
-  } else hover.innerHTML = Pl.mouse ? "&nbsp;" : "drag to zoom, double-click to zoom out";
-
-  // zoom box while dragging
-  const d = Pl.drag;
-  if (d) {
-    const a = { x: Math.max(L, Math.min(R, d.a.x)), y: Math.max(Tp, Math.min(B, d.a.y)) }, b = { x: Math.max(L, Math.min(R, d.b.x)), y: Math.max(Tp, Math.min(B, d.b.y)) };
-    const wx = Math.abs(b.x - a.x) > 5, wy = Math.abs(b.y - a.y) > 5; // a range of x only / y only spans the plot
-    const rx = wx ? Math.min(a.x, b.x) : L, ry = wy ? Math.min(a.y, b.y) : Tp, rw = wx ? Math.abs(b.x - a.x) : R - L, rh = wy ? Math.abs(b.y - a.y) : B - Tp;
-    if (wx || wy) { ctx.fillStyle = "rgba(128,128,128,0.15)"; ctx.fillRect(rx, ry, rw, rh); ctx.strokeStyle = mute; ctx.strokeRect(rx + 0.5, ry + 0.5, rw, rh); }
-  }
-  ctx.restore();
-
-  // legend, for more than one line
-  if (ys.length > 1) {
-    ctx.font = `11px ${font}`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
-    const w = 30 + Math.max(...ys.map((j) => ctx.measureText(TB.names[j]).width)), h = 8 + 16 * ys.length, x = R - w - 8, y = Tp + 8;
-    ctx.globalAlpha = 0.85; ctx.fillStyle = card; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
-    ctx.strokeStyle = line; ctx.strokeRect(x + 0.5, y + 0.5, w, h);
-    ys.forEach((j, s) => {
-      const yy = y + 12 + 16 * s; ctx.strokeStyle = colors[s % colors.length]; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x + 6, yy); ctx.lineTo(x + 20, yy); ctx.stroke(); ctx.fillStyle = ink; ctx.fillText(TB.names[j], x + 25, yy);
-    });
-  }
-  Pl.q("zoomReset").hidden = !Pl.zoom;
 }
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => plots.forEach(drawPlot));
 
 /* ---------- parameters ---------- */
 bindText($("region"), (v) => send({ cmd: "region", value: v }));
