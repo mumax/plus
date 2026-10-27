@@ -10,9 +10,9 @@ class Grid:
         """
         Parameters
         ----------
-        size : tuple[int] of size 3
+        size : tuple[int, int, int]
             The grid size.
-        origin : tuple[int] of size 3, optional
+        origin : tuple[int, int, int], optional
             The origin of the grid. The default value is (0, 0, 0).
         """
         if len(size) != 3:
@@ -40,17 +40,17 @@ class Grid:
         return grid
 
     @property
-    def size(self) -> tuple[int]:
+    def size(self) -> tuple[int, int, int]:
         """Return the number of cells in the x, y, and z direction."""
         return self._impl.size
 
     @property
-    def origin(self) -> tuple[float]:
+    def origin(self) -> tuple[float, float, float]:
         """Return the origin the grid."""
         return self._impl.origin
 
     @property
-    def shape(self) -> tuple[int]:
+    def shape(self) -> tuple[int, int, int]:
         """Return the number of cells in the x, y, and z direction.
 
         The shape property is similar to the size property, but with the order of

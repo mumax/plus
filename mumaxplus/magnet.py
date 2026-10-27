@@ -24,7 +24,7 @@ class Magnet(ABC):
         self,
         _impl_function,
         world,
-        grid: Grid | tuple[int],
+        grid: Grid | tuple[int, int, int],
         name="",
         geometry=None,
         regions=None,
@@ -37,7 +37,7 @@ class Magnet(ABC):
             `world._impl.add_ferromagnet` or `world._impl.add_antiferromagnet`.
         world : World
             World in which the magnet lives.
-        grid : Grid or tuple[int] of size 3
+        grid : Grid or tuple[int, int, int]
             The number of cells in x, y, z the magnet should be divided into.
         geometry : None, ndarray, or callable (default=None)
             The geometry of the magnet can be set in three ways.
@@ -62,7 +62,7 @@ class Magnet(ABC):
         self._impl = _impl_function(grid._impl, geometry_array, regions_array, name)
 
     @staticmethod
-    def _get_grid(grid: Grid | tuple[int]) -> Grid:
+    def _get_grid(grid: Grid | tuple[int, int, int]) -> Grid:
         """Check grid input and convert to Grid type if needed."""
         if isinstance(grid, Grid):
             return grid
@@ -70,7 +70,7 @@ class Magnet(ABC):
         if isinstance(grid, tuple):
             return Grid(size=grid)  # Grid class handles size and type
 
-        raise ValueError("'grid' has to be a Grid instance or a tuple[int] of size 3.")
+        raise ValueError("'grid' has to be a Grid instance or a tuple[int, int, int].")
 
     @staticmethod
     def _get_mask_array(input, grid, world, input_name):
@@ -123,7 +123,7 @@ class Magnet(ABC):
         return Grid._from_impl(self._impl.system.grid)
 
     @property
-    def cellsize(self) -> tuple[float]:
+    def cellsize(self) -> tuple[float, float, float]:
         """Dimensions of the cell."""
         return self._impl.system.cellsize
 
@@ -138,34 +138,34 @@ class Magnet(ABC):
         return self._impl.system.regions
 
     @property
-    def origin(self) -> tuple[float]:
+    def origin(self) -> tuple[float, float, float]:
         """Origin of the magnet.
 
         Returns
         -------
-        origin: tuple[float] of size 3
+        origin: tuple[float, float, float]
             xyz coordinate of the origin of the magnet.
         """
         return self._impl.system.origin
 
     @property
-    def center(self) -> tuple[float]:
+    def center(self) -> tuple[float, float, float]:
         """Center of the magnet.
 
         Returns
         -------
-        center: tuple[float] of size 3
+        center: tuple[float, float, float]
             xyz coordinate of the center of the magnet.
         """
         return self._impl.system.center
 
     @property
-    def extent(self) -> tuple[float]:
+    def extent(self) -> tuple[float, float, float, float, float, float]:
         """Extent of the magnet.
 
         Returns
         -------
-        extent: tuple[float] of size 6
+        extent: tuple[float, float, float, float, float, float]
            Positions of the edges of the magnet: (xmin, xmax, ymin, ymax, zmin, zmax).
         """
         return self._impl.system.extent
