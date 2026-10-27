@@ -1,3 +1,6 @@
+import gc
+import weakref
+
 import numpy as np
 from numpy.testing import assert_almost_equal
 import pytest
@@ -57,3 +60,27 @@ def test_max_torque(test_parameters):
     result = magnet.max_torque.eval()
     relerr = abs(wanted - result) / wanted
     assert relerr < 1e-5
+
+
+def test_quantity_lifetime():
+    for name in ("exchange_energy", "exchange_field"):
+        world = World((1e-9, 1e-9, 1e-9))
+        magnet = Ferromagnet(world, Grid((2, 2, 2)))
+        magnet.msat = 1
+        magnet.aex = 1
+        magnet.magnetization = lambda x, y, z: (x < 0.5e-9, x >= 0.5e-9, 0)
+        quantity = getattr(magnet, name)
+        expected = quantity()
+        world_ref = weakref.ref(world._impl)
+        magnet_ref = weakref.ref(magnet._impl)
+
+        del magnet, world
+        gc.collect()
+        assert magnet_ref() is not None
+        assert world_ref() is not None
+        np.testing.assert_allclose(quantity(), expected)
+
+        del quantity
+        gc.collect()
+        assert magnet_ref() is None
+        assert world_ref() is None

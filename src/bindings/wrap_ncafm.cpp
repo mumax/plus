@@ -35,17 +35,22 @@ void wrap_ncafm(py::module& m) {
       .def("minimize", &NcAfm::minimize, py::arg("tol"), py::arg("nsamples"))
       .def("relax", &NcAfm::relax, py::arg("tol"));
 
-  m.def("octupole_vector", &octupoleVectorQuantity);
+  m.def("octupole_vector", &octupoleVectorQuantity, py::keep_alive<0, 1>());
   m.def("full_magnetization",
-        py::overload_cast<const NcAfm*>(&fullMagnetizationQuantity));
+        py::overload_cast<const NcAfm*>(&fullMagnetizationQuantity),
+        py::keep_alive<0, 1>());
 
-  m.def("angle_field", &angleFieldQuantity);
+  m.def("angle_field", &angleFieldQuantity, py::keep_alive<0, 1>());
   m.def(
       "max_intracell_angle_between",
       [](const Ferromagnet* i, const Ferromagnet* j) { return evalMaxAngle(i, j); },
       py::arg("sub1"), py::arg("sub2"));
 
-  m.def("total_energy_density",
-        [](const NcAfm* m) { return totalEnergyDensityQuantity(m); });
-  m.def("total_energy", [](const NcAfm* m) { return totalEnergyQuantity(m); });
+  m.def(
+      "total_energy_density",
+      [](const NcAfm* m) { return totalEnergyDensityQuantity(m); },
+      py::keep_alive<0, 1>());
+  m.def(
+      "total_energy", [](const NcAfm* m) { return totalEnergyQuantity(m); },
+      py::keep_alive<0, 1>());
 }
