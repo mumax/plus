@@ -98,6 +98,19 @@ NO_RESET = {
 
 
 # ----------------------------------------------------------------- small helpers
+# a display's plane: the world axes (0 = x, 1 = y, 2 = z) of the image's horizontal and
+# vertical, and of the slice (the axis normal to it)
+PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}
+
+
+def _check_plane(cfg):
+    """Check a display's plane; a layer of None is its middle slice, xy's bottom one."""
+    if cfg.get("plane", "xy") not in PLANES:
+        raise ValueError(f"plane must be xy, xz or yz, not {cfg['plane']!r}")
+    if cfg.get("layer") is None and cfg.get("plane", "xy") == "xy":
+        cfg["layer"] = 0
+
+
 def _mro(obj):
     return {c.__name__ for c in type(obj).__mro__}
 
@@ -359,7 +372,7 @@ class Controller:
         self.region = -1
         self.views = (
             []
-        )  # one dict per display panel: {"id", "quant", "comp", "layer", "all"}
+        )  # one dict per display panel: {"id", "quant", "comp", "plane", "layer", ...}
         self._next_view = 0
         self.table = Table(table_file)
         # one dict per plot panel: table columns x against y1,y2,... (names)
@@ -513,18 +526,20 @@ class Controller:
 
         It starts as a copy of the last one (or the default quantity).
         """
-        keys = ("quant", "comp", "layer", "all")
+        keys = ("quant", "comp", "plane", "layer", "all")
         base = (
             {k: self.views[-1][k] for k in keys}
             if self.views
             else {
                 "quant": self._default_quantity(),
                 "comp": "",
+                "plane": "xy",
                 "layer": 0,
                 "all": False,
             }
         )
         base.update({k: v for k, v in cfg.items() if k in keys})
+        _check_plane(base)
         base["autosave"] = 0.0  # mumax3 AutoSave period of the shown quantity (OVF)
         base["_next_save"] = None
         base["id"] = self._next_view
@@ -940,8 +955,22 @@ class Controller:
             return
         cfg.pop("_err", None)
         ncomp, nz, ny, nx = arr.shape
-        layer = min(max(int(cfg["layer"]), 0), nz - 1)
-        sl = arr[:, layer]  # (ncomp, ny, nx)
+        axes = PLANES[cfg.get("plane", "xy")]
+        n = arr.shape[3 - axes[2]]  # slices; world axis a is array axis 3 - a
+        if cfg["layer"] is None:
+            cfg["layer"] = n // 2
+        layer = min(max(int(cfg["layer"]), 0), n - 1)
+        # (ncomp, vertical, horizontal): the vertical axis comes first in (z, y, x)
+        sl = np.take(arr, layer, axis=3 - axes[2])
+        if boxes:  # in the image's cells: x right, y up, z through the slices
+            k = "xyz"
+            boxes = [
+                {"name": b["name"]}
+                | {f"{d}0": b[f"{k[a]}0"] for d, a in zip(k, axes)}
+                | {f"n{d}": b[f"n{k[a]}"] for d, a in zip(k, axes)}
+                for b in boxes
+            ]
+        cell = self._cell_size()
         comp = cfg["comp"]
         vector = ncomp == 3 and comp == ""
         rgba = b""
@@ -967,7 +996,9 @@ class Controller:
             "w": int(data.shape[2]),
             "h": int(data.shape[1]),
             "layer": layer,
-            "nz": nz,
+            "nslices": n,
+            "axes": axes,
+            "cell": [cell[axes[0]], cell[axes[1]]],  # m, of the image's cells
             "quant": cfg["quant"],
             "comp": comp,
             "vmin": float(finite.min()) if finite.size else 0.0,
@@ -977,7 +1008,7 @@ class Controller:
             "fullny": ny,
             "time": float(self._ts().time),
             "boxes": boxes,
-            "origin": lo,  # boxes: one per magnet in "show all" mode, in cells
+            "origin": lo,  # "show all": world cell (x, y, z) of the composed cell 0
         }
         with self.lock:
             self.frame_id += 1
@@ -1283,9 +1314,12 @@ class Controller:
             cfg = self._view(c.get("view", self.views[0]["id"] if self.views else None))
             if cfg is None:
                 raise ValueError(f"no display {c.get('view')!r}")
-            for k in ("quant", "comp", "layer", "all"):
+            for k in ("quant", "comp", "plane", "layer", "all"):
                 if k in c:
                     cfg[k] = c[k]
+            if "plane" in c and "layer" not in c:
+                cfg["layer"] = None  # another plane: start in its middle
+            _check_plane(cfg)
             self._dirty = True
         elif name == "view_add":
             return {"ok": True, "view": self.add_view()}
@@ -1697,7 +1731,7 @@ class Controller:
         """Paint on a field of the magnet under a display's image.
 
         ``c["points"]`` are positions in cells of the display's image (x right, y
-        up; cell i spans [i, i + 1)). The "brush" tool sets the quantity
+        up, in its plane; cell i spans [i, i + 1)). The "brush" tool sets the quantity
         ``c["quant"]`` (m, or any parameter or variable) to ``c["value"]`` within
         ``c["radius"]`` cells of the points; "place" puts the m configuration
         ``c["config"]`` (vortex, skyrmion, ...) centred on the point, within the
@@ -1737,18 +1771,17 @@ class Controller:
         name = self.sel
         boxes = meta.get("boxes")
         if boxes:  # "show all magnets": the magnet the stroke starts on
-            x, y = first
-            b = next(
-                (
-                    b
-                    for b in boxes
-                    if b["x0"] <= x < b["x0"] + b["nx"]
-                    and b["y0"] <= y < b["y0"] + b["ny"]
-                ),
-                None,
-            )
-            if b is None:
+            x, y, z = *first, int(c.get("layer", 0))
+            under = [
+                b
+                for b in boxes
+                if b["x0"] <= x < b["x0"] + b["nx"] and b["y0"] <= y < b["y0"] + b["ny"]
+            ]
+            # the one the shown slice goes through, if any (magnets overlap in a cut)
+            under.sort(key=lambda b: not b["z0"] <= z < b["z0"] + b["nz"])
+            if not under:
                 return None
+            b = under[0]
             name, dx, dy, dz = b["name"], b["x0"], b["y0"], b["z0"]
         obj = self.targets.get(name)
         tool = c.get("tool", "brush")
@@ -1773,9 +1806,11 @@ class Controller:
                 f"{quant} of {name} has time terms, which painting would remove;"
                 " remove them first, or paint before adding them"
             )
-        nz = int(obj.grid.size[2])
-        layer = None if c.get("all") else int(c.get("layer", 0)) - dz
-        if layer is not None and not 0 <= layer < nz:
+        axes = tuple(meta.get("axes", PLANES["xy"]))
+        n = int(obj.grid.size[axes[2]])
+        shown = int(c.get("layer", 0)) - dz  # the shown slice, in the magnet
+        layer = None if c.get("all") else shown
+        if layer is not None and not 0 <= layer < n:
             return None
         st = {
             "id": c["stroke"],
@@ -1785,7 +1820,9 @@ class Controller:
             "ncomp": int(field.ncomp),
             "dx": dx,
             "dy": dy,
+            "axes": axes,
             "layer": layer,
+            "shown": shown,
             "radius": max(float(self._eval(c.get("radius", 1))), 0.5),
             "tool": tool,
             "points": [],
@@ -1818,37 +1855,48 @@ class Controller:
 
     def _paint_code(self, st, pts):
         """Python that paints ``pts`` of stroke ``st``, and the imports it needs."""
-        ref, r2 = st["ref"], st["radius"] ** 2
+        ref, r2, (ah, av, an) = st["ref"], st["radius"] ** 2, st["axes"]
         z = ":" if st["layer"] is None else f"{st['layer']}:{st['layer'] + 1}"
         field = f"{ref}.{st['quant']}"
+        # an xz or yz cut: paint a view of the array with the slices first, (c, n, v, h)
+        cut = "" if an == 2 else f"np.moveaxis(_m, {3 - an}, 1)"
         lines = [f"_m = {field}.eval()"]
         imports = ["import numpy as np"]
         if st["tool"] == "place":  # the configuration centred on the point
             (x, y), o, c = pts[-1], st["origin"], st["cell"]
-            pos = (o[0] + (x - 0.5) * c[0], o[1] + (y - 0.5) * c[1], o[2])
+            pos = list(o)
+            pos[ah], pos[av] = o[ah] + (x - 0.5) * c[ah], o[av] + (y - 0.5) * c[av]
+            if an != 2:  # in the shown slice (xy: at the bottom layer's z, as before)
+                pos[an] = o[an] + st["shown"] * c[an]
             args = ", ".join(f"{v:.6g}" for v in pos) + ")"
             args = f"({args}" + (f", {st['args']}" if st["args"] else "")
             lines.append(f"{ref}.magnetization = {st['config']}({args})")
             lines.append(f"_new = {ref}.magnetization.eval()")
+            if cut:
+                lines.append(f"_new = np.moveaxis(_new, {3 - an}, 1)")
             if self.ns.get(st["config"]) is not st["env"][st["config"]]:
                 imports.append(f"from mumaxplus.util import {st['config']}")
             centres, value = [pts[-1]], f"_new[:, {z}, _on]"
         else:
             centres, value = pts, f"np.reshape({st['value']!r}, ({st['ncomp']}, 1, 1))"
+        h, v = "xyz"[ah], "xyz"[av]
         lines += [
-            "_y, _x = np.mgrid[: _m.shape[2], : _m.shape[3]] + 0.5  # cell centres",
-            "_on = np.zeros(_m.shape[2:], bool)",
+            f"_{v}, _{h} = np.mgrid[: _m.shape[{3 - av}], : _m.shape[{3 - ah}]] + 0.5"
+            "  # cell centres",
+            f"_on = np.zeros(_{h}.shape, bool)",
         ]
         if len(centres) == 1:
             ((x, y),) = centres
             lines.append(
-                f"_on |= (_x - {x:.4g}) ** 2 + (_y - {y:.4g}) ** 2 <= {r2:.4g}"
+                f"_on |= (_{h} - {x:.4g}) ** 2 + (_{v} - {y:.4g}) ** 2 <= {r2:.4g}"
             )
         else:
             cs = ", ".join(f"({x:.4g}, {y:.4g})" for x, y in centres)
-            lines.append(f"for _cx, _cy in [{cs}]:")
-            lines.append(f"    _on |= (_x - _cx) ** 2 + (_y - _cy) ** 2 <= {r2:.4g}")
-        lines += [f"_m[:, {z}, _on] = {value}", f"{field} = _m"]
+            lines.append(f"for _c{h}, _c{v} in [{cs}]:")
+            lines.append(
+                f"    _on |= (_{h} - _c{h}) ** 2 + (_{v} - _c{v}) ** 2 <= {r2:.4g}"
+            )
+        lines += [f"{cut or '_m'}[:, {z}, _on] = {value}", f"{field} = _m"]
         return "\n".join(lines), imports
 
     def _undo_paint(self):

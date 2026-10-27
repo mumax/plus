@@ -46,7 +46,8 @@ def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
 
     ``meta``, ``data`` and ``rgba`` are a display frame as sent to the page; the
     image is drawn like the page draws it (vector colours, or gray from the
-    minimum to the maximum), scaled up by a whole factor to about ``size`` pixels.
+    minimum to the maximum), scaled up by a whole factor to about ``size`` pixels,
+    and with pixels the shape of the cells.
     """
     from PIL import Image, ImageDraw, ImageFont
 
@@ -64,11 +65,12 @@ def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
         img[..., 3] = np.where(np.isnan(v), 0, 255)
     img = img[::-1]  # y up
     rgb = np.where(img[..., 3:] > 0, img[..., :3], np.array(MOVIE_BG, np.uint8))
-    k = max(1, min(16, round(size / max(w, h))))
-    im = Image.fromarray(rgb.astype(np.uint8)).resize((w * k, h * k), Image.NEAREST)
+    kx, ky = pixel_scale(meta, size, size)
+    im = Image.fromarray(rgb.astype(np.uint8)).resize((w * kx, h * ky), Image.NEAREST)
     im = im.convert("RGBA")
     if meta["vector"] and arrow_cells:
-        im = Image.alpha_composite(im, _arrows(data, w, h, k, arrow_cells))
+        arrows = _arrows(data, meta["axes"][:2], w, h, kx, ky, arrow_cells)
+        im = Image.alpha_composite(im, arrows)
     d = ImageDraw.Draw(im)
     try:
         font = ImageFont.load_default(size=max(12, im.width // 32))
@@ -81,12 +83,27 @@ def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
     return im.convert("RGB")
 
 
-def _arrows(d, w, h, f, cells):
-    """Draw the page's arrows (drawArrows: plot_field's quiver) on an RGBA layer."""
+def pixel_scale(meta, max_w, max_h):
+    """Whole scale factors (kx, ky) of an image's cells, as the page's drawFrame.
+
+    The pixels get the shape of the cells (e.g. thin layers in an xz cut), and the
+    image fits in about max_w × max_h.
+    """
+    w, h, (cx, cy) = meta["w"], meta["h"], meta["cell"]
+    aspect = cy / cx if cx > 0 and cy > 0 else 1.0
+    k = max(1, min(16, round(min(max_w / w, max_h / (h * aspect)))))
+    return k, max(1, round(k * aspect))
+
+
+def _arrows(d, comps, w, h, fx, fy, cells):
+    """Draw the page's arrows (drawArrows: plot_field's quiver) on an RGBA layer.
+
+    ``comps`` are the components of ``d`` along the image's horizontal and vertical.
+    """
     from PIL import Image, ImageDraw
 
-    layer = Image.new("RGBA", (w * f, h * f), (0, 0, 0, 0))
-    S = max(cells, 6 / f)
+    layer = Image.new("RGBA", (w * fx, h * fy), (0, 0, 0, 0))
+    S = max(cells, 6 / fx)
     nax, nay = max(int(w // S), 1), max(int(h // S), 1)
     sx, sy = w / nax, h / nay
     inside = ~np.isnan(d[0]) & np.any(np.nan_to_num(d) != 0, axis=0)
@@ -102,14 +119,15 @@ def _arrows(d, w, h, f, cells):
             on = inside[ys, xs]
             if not on.any():
                 continue
-            mx, my = d[0][ys, xs][on].mean(), d[1][ys, xs][on].mean()
+            mx, my = (d[i][ys, xs][on].mean() for i in comps)
             ip = float(np.hypot(mx, my))
             maxip = max(maxip, ip)
-            arrows.append(((ix + 0.5) * sx * f, (h - (iy + 0.5) * sy) * f, mx, my, ip))
+            X, Y = (ix + 0.5) * sx * fx, (h - (iy + 0.5) * sy) * fy
+            arrows.append((X, Y, mx, my, ip))
     if maxip == 0:
         return layer
     draw = ImageDraw.Draw(layer)
-    sw, lmax = 0.005 * w * f, 0.75 * min(sx, sy) * f
+    sw, lmax = 0.005 * w * fx, 0.75 * min(sx * fx, sy * fy)
     for X, Y, mx, my, ip in arrows:
         L = ip / maxip * lmax
         if L == 0:

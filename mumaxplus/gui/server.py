@@ -11,7 +11,7 @@ import threading
 from urllib.parse import parse_qs, urlparse
 import webbrowser
 
-from .core import Controller, _clean
+from .core import Controller, _check_plane, _clean
 
 
 def _make_handler(ctrl: Controller, token: str):
@@ -187,15 +187,19 @@ class GUI:
 
         self._do(add)
 
-    def add_display(self, quantity, comp="", layer=0, all=False):
+    def add_display(self, quantity, comp="", layer=None, all=False, plane="xy"):
         """Show a display of ``quantity``.
 
         ``quantity`` is a quantity name of the selected magnet, e.g.
         ``"effective_field"``; ``comp`` is "" (vector), "x", "y", "z" or a component
-        number. The first call replaces the default display (magnetization); later
-        calls add displays.
+        number. ``plane`` is "xy", or "xz" or "yz" for a cross-section; ``layer`` is
+        the slice along the axis normal to it (default: the bottom layer of "xy", the
+        middle of the others). The first call replaces the default display
+        (magnetization); later calls add displays.
         """
-        cfg = {"quant": quantity, "comp": comp, "layer": layer, "all": all}
+        cfg = {"quant": quantity, "comp": comp, "plane": plane, "layer": layer}
+        cfg["all"] = all
+        _check_plane(cfg)
 
         def add():
             if not self._script_views:

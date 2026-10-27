@@ -160,7 +160,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <div class="row">Quantity: <button class="quantBtn mono" title="Pick the quantity to show (type to search by name or description)"></button> <select class="renderComp"></select> <span class="renderDoc gray"></span></div>
   <div class="row renderAllRow" title="Draw every magnet at its place in the world (the selected one is outlined). Click a magnet to select it"><label><input type="checkbox" class="renderAll"> show all magnets</label></div>
   <table>
-    <tr title="Slice through z layers"><td>Slice: <input type="range" class="renderLayer" min="0" max="0" value="0"></td><td class="renderLayerLabel">1/1</td></tr>
+    <tr title="The plane of the image (xz and yz: cross-sections), and which slice of the magnet along the axis normal to it"><td>Slice: <select class="renderPlane"><option>xy</option><option>xz</option><option>yz</option></select> <input type="range" class="renderLayer" min="0" max="0" value="0"></td><td class="renderLayerLabel">1/1</td></tr>
     <tr class="arrowSizeRow" title="Arrow spacing in cells"><td>Arrows: <input type="range" class="arrowSize" min="2" max="64" value="8"></td><td class="arrowSizeLabel">8</td></tr>
   </table>
   <div class="row" title="Paint the magnet: drag with the brush to set a parameter, or click to place a vortex, skyrmion, ...">Paint:
@@ -168,7 +168,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
     <span class="brushOpts" hidden><select class="paintQuant" title="what to paint"></select> = <input type="text" class="paintValue" size="9" title="the value to paint"> <span class="paintUnit gray"></span></span>
     <span class="placeOpts" hidden><select class="placeConfig"></select> <input type="text" class="placeArgs" size="12" title="its arguments after the position (which is where you click)"></span>
     <span class="paintOpts" hidden>radius <input type="text" class="paintRadius" value="3" size="3"> cells
-      <label title="Paint through all layers, or only the shown one"><input type="checkbox" class="paintAll" checked> all layers</label>
+      <label title="Paint through all slices (along the axis normal to the image), or only the shown one"><input type="checkbox" class="paintAll" checked> all slices</label>
       <button class="paintUndo" title="Undo the last stroke (possible until something else changes the state)">Undo</button></span></div>
   <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
   <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="overlay" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
@@ -593,6 +593,7 @@ function makeView(id) {
     })));
   };
   q("renderComp").onchange = (e) => render({ comp: e.target.value });
+  q("renderPlane").onchange = (e) => render({ plane: e.target.value }); // starts at its middle slice
   q("renderLayer").oninput = (e) => render({ layer: +e.target.value });
   q("renderAll").onchange = (e) => render({ all: e.target.checked });
   q("arrowSize").oninput = (e) => { V.arrowCells = +e.target.value; q("arrowSizeLabel").textContent = V.arrowCells; drawFrame(V); }; // client-side only
@@ -687,7 +688,8 @@ function syncViews() { // add/remove panels to match the simulation, and show th
       V.qkey = qkey; fillQuantities(V); if (V.paintTool === "brush") fillPaintQuants(V, true);
     }
     if (document.activeElement !== q("renderComp") && [...q("renderComp").options].some((o) => o.value === c.comp)) q("renderComp").value = c.comp;
-    if (document.activeElement !== q("renderLayer")) q("renderLayer").value = c.layer;
+    if (document.activeElement !== q("renderPlane")) q("renderPlane").value = c.plane;
+    if (document.activeElement !== q("renderLayer") && c.layer !== null) q("renderLayer").value = c.layer;
     q("renderAllRow").style.display = many ? "" : "none";
     q("renderAll").checked = !!c.all;
     setText(q("autosave"), num(c.autosave));
@@ -720,8 +722,8 @@ async function fetchFrame(V) {
   const n = meta.ncomp * meta.w * meta.h, old = V.frame && V.frame.meta;
   if (old && (old.w !== meta.w || old.h !== meta.h)) V.prof = null; // another image: the line means nothing there
   V.frame = { meta, data: new Float32Array(buf, 0, n), rgba: meta.vector ? new Uint8ClampedArray(buf, n * 4, meta.w * meta.h * 4) : null };
-  V.q("renderLayer").max = meta.nz - 1;
-  V.q("renderLayerLabel").textContent = (meta.layer + 1) + "/" + meta.nz;
+  V.q("renderLayer").max = meta.nslices - 1;
+  V.q("renderLayerLabel").textContent = `${"xyz"[meta.axes[2]]} ${meta.layer + 1}/${meta.nslices}`;
   drawFrame(V);
 }
 
@@ -739,26 +741,27 @@ function drawFrame(V) {
   }
   octx.putImageData(img, 0, 0);
 
-  // show small images enlarged by a whole factor so they are not tiny
+  // show small images enlarged by a whole factor so they are not tiny, with pixels the shape of the cells
+  // (e.g. the thin layers of a film in an xz cut); plots.pixel_scale does the same for movies
   const cv = V.q("disp"), dpr = window.devicePixelRatio || 1;
-  const maxW = Math.max(200, V.el.clientWidth - 20);
-  const k = Math.max(1, Math.floor(Math.min(maxW / w, 560 / h)));
-  cv.style.width = w * k + "px"; cv.style.height = h * k + "px";
-  cv.width = Math.round(w * k * dpr); cv.height = Math.round(h * k * dpr);
+  const maxW = Math.max(200, V.el.clientWidth - 20), asp = meta.cell[1] / meta.cell[0] || 1;
+  const kx = Math.max(1, Math.floor(Math.min(maxW / w, 560 / (h * asp)))), ky = Math.max(1, Math.round(kx * asp));
+  cv.style.width = w * kx + "px"; cv.style.height = h * ky + "px";
+  cv.width = Math.round(w * kx * dpr); cv.height = Math.round(h * ky * dpr);
   const ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false;
   ctx.drawImage(off, 0, 0, cv.width, cv.height);
   V.q("arrowSizeRow").style.display = meta.vector ? "" : "none";
-  if (meta.vector) drawArrows(V, ctx, cv.width / w, w, h);
-  if (meta.boxes) drawBoxes(ctx, cv.width / w, meta);
+  if (meta.vector) drawArrows(V, ctx, cv.width / w, cv.height / h, w, h);
+  if (meta.boxes) drawBoxes(ctx, cv.width / w, cv.height / h, meta);
   updateLoupe(V); drawOverlay(V); updateProfile(V);
 }
 
 /* "show all magnets": outline and name every magnet, the selected one in the accent colour */
-function drawBoxes(ctx, f, meta) {
+function drawBoxes(ctx, fx, fy, meta) {
   const dpr = window.devicePixelRatio || 1, css = getComputedStyle(document.body);
   ctx.font = `${11 * dpr}px ${css.fontFamily}`; ctx.textBaseline = "top";
   for (const b of meta.boxes) {
-    const x = b.x0 * f, y = (meta.h - b.y0 - b.ny) * f, w = b.nx * f, h = b.ny * f;
+    const x = b.x0 * fx, y = (meta.h - b.y0 - b.ny) * fy, w = b.nx * fx, h = b.ny * fy;
     const on = b.name === T.sel, inLayer = meta.layer >= b.z0 && meta.layer < b.z0 + b.nz;
     ctx.strokeStyle = on ? css.getPropertyValue("--accent") : "rgba(128,128,128,0.8)";
     ctx.lineWidth = (on ? 2 : 1) * dpr; ctx.setLineDash(inLayer ? [] : [4 * dpr, 3 * dpr]);
@@ -767,18 +770,21 @@ function drawBoxes(ctx, f, meta) {
   }
   ctx.setLineDash([]);
 }
-function boxAt(meta, cx, cy) { // cell (in the composed image) -> magnet box under it
-  return (meta.boxes || []).find((b) => cx >= b.x0 && cx < b.x0 + b.nx && cy >= b.y0 && cy < b.y0 + b.ny) || null;
+function boxAt(meta, cx, cy) { // cell (in the composed image) -> magnet box under it (boxes are in the image's cells)
+  const under = (meta.boxes || []).filter((b) => cx >= b.x0 && cx < b.x0 + b.nx && cy >= b.y0 && cy < b.y0 + b.ny);
+  return under.find((b) => meta.layer >= b.z0 && meta.layer < b.z0 + b.nz) || under[0] || null; // magnets overlap in a cut: the one in the slice
 }
 
 /* arrows on top of vector images, as in mumaxplus.util.plot_field (matplotlib quiver, pivot="middle"):
    one arrow per arrowCells × arrowCells cells, length ∝ in-plane norm, longest one 3/4 of the spacing.
    Cells outside the geometry (zero vector, or NaN between magnets) are left out of the average,
-   and a block gets no arrow when its centre cell is outside the geometry. */
-function drawArrows(V, ctx, f, w, h) {
+   and a block gets no arrow when its centre cell is outside the geometry. The arrows show the components
+   in the image's plane (x and z in an xz cut). */
+function drawArrows(V, ctx, fx, fy, w, h) {
   const dpr = window.devicePixelRatio || 1;
-  const S = Math.max(V.arrowCells, (6 * dpr) / f); // spacing in image pixels, at least 6 css px on screen
+  const S = Math.max(V.arrowCells, (6 * dpr) / fx); // spacing in image pixels, at least 6 css px on screen
   const nax = Math.max(Math.floor(w / S), 1), nay = Math.max(Math.floor(h / S), 1), N = w * h, d = V.frame.data;
+  const [ah, av] = V.frame.meta.axes;
   const sx = w / nax, sy = h / nay, A = [];
   let maxip = 0;
   const inside = (i) => !isNaN(d[i]) && (d[i] !== 0 || d[N + i] !== 0 || d[2 * N + i] !== 0);
@@ -786,15 +792,15 @@ function drawArrows(V, ctx, f, w, h) {
     if (!inside(Math.floor((iy + 0.5) * sy) * w + Math.floor((ix + 0.5) * sx))) continue;
     let mx = 0, my = 0, c = 0;
     for (let y = Math.floor(iy * sy); y < Math.floor((iy + 1) * sy); y++) for (let x = Math.floor(ix * sx); x < Math.floor((ix + 1) * sx); x++) {
-      const i = y * w + x; if (!inside(i)) continue; mx += d[i]; my += d[N + i]; c++;
+      const i = y * w + x; if (!inside(i)) continue; mx += d[ah * N + i]; my += d[av * N + i]; c++;
     }
     if (!c) continue; mx /= c; my /= c;
     const ip = Math.hypot(mx, my); if (ip > maxip) maxip = ip;
-    A.push([(ix + 0.5) * sx * f, (h - (iy + 0.5) * sy) * f, mx, my, ip]); // canvas coordinates (y down)
+    A.push([(ix + 0.5) * sx * fx, (h - (iy + 0.5) * sy) * fy, mx, my, ip]); // canvas coordinates (y down)
   }
   if (maxip === 0) return;
   // matplotlib quiver defaults: shaft width 0.005 × plot width, head width 3, head length 5, head axis length 4.5 (in shaft widths)
-  const sw = 0.005 * w * f, Lmax = 0.75 * Math.min(sx, sy) * f;
+  const sw = 0.005 * w * fx, Lmax = 0.75 * Math.min(sx * fx, sy * fy);
   ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.beginPath();
   for (const [X, Y, mx, my, ip] of A) {
     const L = (ip / maxip) * Lmax; if (L === 0) continue;
@@ -884,8 +890,7 @@ function cellAt(V, e) { // mouse -> position in cells of the shown image
 }
 function profileData(V) {
   // one sample per cell length along the line, from the cell each sample falls in (no interpolation)
-  const { meta, data } = V.frame, { a, b } = V.prof, w = meta.w, h = meta.h, N = w * h;
-  const t = cur(), c = (t && t.mesh && t.mesh.c) || [1, 1, 1];
+  const { meta, data } = V.frame, { a, b } = V.prof, w = meta.w, h = meta.h, N = w * h, c = meta.cell;
   const len = Math.hypot((b.x - a.x) * c[0], (b.y - a.y) * c[1]), n = Math.max(2, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y)) + 1);
   const P = { X: [], Y: Array.from({ length: meta.ncomp }, () => []), cells: [], pts: [] };
   for (let k = 0; k < n; k++) {
@@ -903,11 +908,11 @@ function updateProfile(V) {
   if (!V.frame || !V.prof) return drawChart(V.chart, { message: "drag a line across the image" });
   const { meta } = V.frame, P = V.profData = profileData(V), unit = meta.unit ? ` (${meta.unit})` : "";
   const names = meta.vector ? ["x", "y", "z"] : [meta.comp !== "" ? meta.comp : meta.quant];
-  const o = meta.boxes ? meta.origin : [0, 0, 0], u = meta.unit ? " " + esc(meta.unit) : "";
+  const u = meta.unit ? " " + esc(meta.unit) : "";
   drawChart(V.chart, {
     X: P.X, Y: P.Y, names,
     xlabel: "distance (nm)", ylabel: meta.quant + (meta.vector || meta.comp === "" ? "" : " " + meta.comp) + unit,
-    readout: (k, colors) => `d = ${g(P.X[k])} nm&ensp;cell ${P.cells[k][0] + o[0]}, ${P.cells[k][1] + o[1]}, ${meta.layer + o[2]}` +
+    readout: (k, colors) => `d = ${g(P.X[k])} nm&ensp;cell ${cell3(meta, ...P.cells[k])}` +
       P.Y.map((S, j) => `&ensp;<b style="color:${colors[j % colors.length]}">${esc(names[j])}</b> = ${S[k] === null ? "–" : g(S[k])}${u}`).join(""),
   });
 }
@@ -941,8 +946,9 @@ function drawOverlay(V) {
 function profileCsv(V) {
   const P = V.profData, { meta } = V.frame; if (!P) return;
   const names = meta.vector ? ["x", "y", "z"] : [meta.comp !== "" ? meta.comp : meta.quant];
-  const head = [`# ${meta.quant} along a line, layer ${meta.layer}, t = ${meta.time} s` + (meta.unit ? `, unit ${meta.unit}` : ""),
-                ["distance (nm)", "ix", "iy", ...names].join("\t")];
+  const [h, v, n] = meta.axes.map((a) => "xyz"[a]);
+  const head = [`# ${meta.quant} along a line in the ${h}${v} plane, slice i${n} = ${meta.layer}, t = ${meta.time} s` + (meta.unit ? `, unit ${meta.unit}` : ""),
+                ["distance (nm)", "i" + h, "i" + v, ...names].join("\t")];
   const lines = P.X.map((d, k) => [g(d), P.cells[k][0], P.cells[k][1], ...P.Y.map((S) => (S[k] === null ? "nan" : S[k]))].join("\t"));
   download(`${stem()}_${meta.quant}_profile.txt`, new Blob([[...head, ...lines].join("\n") + "\n"], { type: "text/plain" }));
 }
@@ -962,9 +968,14 @@ function updateLoupe(V) {
   const vals = Array.from({ length: meta.ncomp }, (_, c2) => data[c2 * N + iy * meta.w + ix]);
   const label = `${meta.quant}${meta.comp ? "." + meta.comp : ""} = ${vals.map(num).join(", ")}${meta.unit ? " " + meta.unit : ""}`;
   if (meta.boxes) { // world cell indices, and which magnet is under the cursor
-    const b = boxAt(meta, ix, iy), o = meta.origin;
-    V.q("hover").textContent = `world cell ${ix + o[0]}, ${iy + o[1]}, ${meta.layer + o[2]}   ` + (b && !isNaN(vals[0]) ? `${b.name}: ${label}` : "(no magnet)");
-  } else V.q("hover").textContent = `cell ${ix}, ${iy}, ${meta.layer}   ${label}`;
+    const b = boxAt(meta, ix, iy);
+    V.q("hover").textContent = `world cell ${cell3(meta, ix, iy)}   ` + (b && !isNaN(vals[0]) ? `${b.name}: ${label}` : "(no magnet)");
+  } else V.q("hover").textContent = `cell ${cell3(meta, ix, iy)}   ${label}`;
+}
+function cell3(meta, ix, iy) { // a cell of the shown image -> "ix, iy, iz" (of the world in "show all magnets")
+  const c = [0, 0, 0], o = meta.boxes ? meta.origin : [0, 0, 0];
+  [c[meta.axes[0]], c[meta.axes[1]], c[meta.axes[2]]] = [ix, iy, meta.layer];
+  return c.map((v, i) => v + o[i]).join(", ");
 }
 let resizeTimer = null;
 window.addEventListener("resize", () => { views.forEach(drawFrame); clearTimeout(resizeTimer); resizeTimer = setTimeout(() => plots.forEach(drawPlot), 100); });
