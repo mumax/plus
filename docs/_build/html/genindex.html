@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=60f8217a"></script>
+    <script src="_static/documentation_options.js?v=778ca11c"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -60,7 +60,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -216,6 +216,7 @@
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_api/mumaxplus/mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_api/util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_api/util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -244,10 +245,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -488,6 +491,8 @@
 </li>
         <li><a href="_api/util/mumaxplus.util.voronoi.html#mumaxplus.util.voronoi.VoronoiTessellator.__init__">(VoronoiTessellator method)</a>
 </li>
+        <li><a href="_api/mumaxplus/mumaxplus.Window.html#mumaxplus.Window.__init__">(Window method)</a>
+</li>
         <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.__init__">(World method)</a>
 </li>
         <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.XRange.__init__">(XRange method)</a>
@@ -532,6 +537,8 @@
       <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.alterex_angle">alterex_angle (Altermagnet property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet">Altermagnet (class in mumaxplus)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.altermagnets">altermagnets (World property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.amr_ratio">amr_ratio (Ferromagnet property)</a>
 </li>
@@ -585,6 +592,8 @@
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.B2">B2 (Ferromagnet property)</a>
 </li>
+      <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.B_chiral">B_chiral (Ferromagnet property)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.bias_magnetic_field">bias_magnetic_field (Altermagnet property)</a>
 
       <ul>
@@ -629,6 +638,8 @@
       </ul></li>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.center">center (Magnet property)</a>
 </li>
+      <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.center_domain_wall">center_domain_wall() (World method)</a>
+</li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Circle">Circle (class in mumaxplus.util.shape)</a>
 </li>
   </ul></td>
@@ -664,6 +675,8 @@
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.demag_energy_density">demag_energy_density (Ferromagnet property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.demag_field">demag_field (Magnet property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Window.html#mumaxplus.Window.disable_motion">disable_motion() (Window method)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.dmi_energy">dmi_energy (Ferromagnet property)</a>
 </li>
@@ -925,6 +938,8 @@
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.inhomogeneous_exchange_field">inhomogeneous_exchange_field (Ferromagnet property)</a>
 </li>
+      <li><a href="_api/mumaxplus/mumaxplus.Window.html#mumaxplus.Window.insert_magnetization">insert_magnetization() (Window method)</a>
+</li>
       <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.inspect_field">inspect_field() (in module mumaxplus.util.show)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Altermagnet.html#mumaxplus.Altermagnet.inter_afmex_nn">inter_afmex_nn (Altermagnet property)</a>
@@ -948,6 +963,8 @@
       <li><a href="_api/mumaxplus/mumaxplus.InterParameter.html#mumaxplus.InterParameter">InterParameter (class in mumaxplus)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.intersect">intersect() (Shape method)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.InterParameter.html#mumaxplus.InterParameter.intra_region_value">intra_region_value (InterParameter property)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.invert">invert() (Shape method)</a>
 </li>
@@ -1048,6 +1065,8 @@
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.magnetoelastic_force">magnetoelastic_force (Ferromagnet property)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.formulary.html#mumaxplus.util.formulary.magnetostatic_energy_density">magnetostatic_energy_density() (in module mumaxplus.util.formulary)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.magnets">magnets (World property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.BoundaryTraction.html#mumaxplus.BoundaryTraction.make_zero">make_zero() (BoundaryTraction method)</a>
 
@@ -1266,10 +1285,10 @@
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.PoissonSystem.html#mumaxplus.PoissonSystem">PoissonSystem (class in mumaxplus)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.pol">pol (Ferromagnet property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Polygon">Polygon (class in mumaxplus.util.shape)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.BoundaryTraction.html#mumaxplus.BoundaryTraction.pos_x_side">pos_x_side (BoundaryTraction property)</a>
@@ -1277,6 +1296,8 @@
       <li><a href="_api/mumaxplus/mumaxplus.BoundaryTraction.html#mumaxplus.BoundaryTraction.pos_y_side">pos_y_side (BoundaryTraction property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.BoundaryTraction.html#mumaxplus.BoundaryTraction.pos_z_side">pos_z_side (BoundaryTraction property)</a>
+</li>
+      <li><a href="_api/mumaxplus/mumaxplus.Window.html#mumaxplus.Window.position">position (Window property)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.poynting_vector">poynting_vector (Magnet property)</a>
 </li>
@@ -1536,6 +1557,8 @@
         <li><a href="_api/mumaxplus/mumaxplus.NcAfm.html#mumaxplus.NcAfm.total_energy_density">(NcAfm property)</a>
 </li>
       </ul></li>
+      <li><a href="_api/mumaxplus/mumaxplus.Window.html#mumaxplus.Window.total_shift">total_shift (Window property)</a>
+</li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.transform">transform() (Shape method)</a>
 </li>
       <li><a href="_api/util/mumaxplus.util.shape.html#mumaxplus.util.shape.Shape.transform3">transform3() (Shape method)</a>
@@ -1594,6 +1617,8 @@
 </li>
       <li><a href="_api/util/mumaxplus.util.show.html#mumaxplus.util.show.vector_to_rgb">vector_to_rgb() (in module mumaxplus.util.show)</a>
 </li>
+      <li><a href="_api/mumaxplus/mumaxplus.Window.html#mumaxplus.Window.velocity">velocity (Window property)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.viscous_stress">viscous_stress (Magnet property)</a>
@@ -1612,8 +1637,12 @@
 </li>
       <li><a href="_api/util/mumaxplus.util.formulary.html#mumaxplus.util.formulary.wall_width">wall_width() (in module mumaxplus.util.formulary)</a>
 </li>
+      <li><a href="_api/mumaxplus/mumaxplus.Window.html#mumaxplus.Window">Window (class in mumaxplus)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World.window">window (World property)</a>
+</li>
       <li><a href="_api/mumaxplus/mumaxplus.World.html#mumaxplus.World">World (class in mumaxplus)</a>
 </li>
       <li><a href="_api/mumaxplus/mumaxplus.Magnet.html#mumaxplus.Magnet.world">world (Magnet property)</a>
@@ -1717,7 +1746,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

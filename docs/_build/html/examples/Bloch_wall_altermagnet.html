@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,12 +58,12 @@
     <link rel="icon" href="../_static/nimble-plus.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Class Diagrams" href="../class_diagrams.html" />
+    <link rel="next" title="Moving simulation window" href="moving_window.html" />
     <link rel="prev" title="Voronoi" href="voronoi.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_api/mumaxplus/mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_api/util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -245,10 +246,12 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="voronoi.html">Voronoi</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -364,13 +367,12 @@
   <section id="altermagnetic-domain-wall">
 <h1>Altermagnetic domain wall<a class="headerlink" href="#altermagnetic-domain-wall" title="Link to this heading">#</a></h1>
 <p>In this example, we compute the Néel and net magnetization profiles of a Bloch
-wall as described in <a class="reference external" href="https://arxiv.org/abs/2604.15454">Moreels et al. (2026)</a>.
+wall as described in <a class="reference external" href="https://doi.org/10.1063/5.0341263">Moreels et al. (2026)</a>.
 The theoretical model is based on <a class="reference external" href="https://www.nature.com/articles/s44306-024-00042-3">Gomonay et al. (2024)</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">World</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">Altermagnet</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">mumaxplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">Altermagnet</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">World</span>
 
 <span class="c1"># ----------- Material and simulation parameters -----------</span>
 
@@ -385,13 +387,10 @@ The theoretical model is based on <a class="reference external" href="https://ww
 <span class="n">A12</span> <span class="o">=</span> <span class="n">A0</span><span class="o">/</span><span class="mi">2</span>
 
 <span class="n">length</span> <span class="o">=</span> <span class="mf">256e-9</span>
-<span class="n">width</span> <span class="o">=</span> <span class="mf">64e-9</span>
 
 <span class="c1"># ----------- Create altermagnet -----------</span>
 
 <span class="n">Nx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="n">cs</span><span class="p">)</span>
-<span class="n">Ny</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">cs</span><span class="p">)</span>
-
 <span class="n">world</span>  <span class="o">=</span> <span class="n">World</span><span class="p">((</span><span class="n">cs</span><span class="p">,</span> <span class="n">cs</span><span class="p">,</span> <span class="n">cs</span><span class="p">))</span>
 <span class="n">grid</span>   <span class="o">=</span> <span class="n">Grid</span><span class="p">((</span><span class="n">Nx</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="n">magnet</span> <span class="o">=</span> <span class="n">Altermagnet</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
@@ -430,7 +429,7 @@ The theoretical model is based on <a class="reference external" href="https://ww
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">scale_net</span> <span class="o">=</span> <span class="mf">1e4</span>
 <span class="c1"># Theoretical profiles</span>
-<span class="n">dw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">A1</span><span class="o">+</span><span class="n">A2</span><span class="p">)</span> <span class="o">-</span> <span class="n">A12</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">))</span> <span class="c1"># Theoretical DW width</span>
+<span class="n">dw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(((</span><span class="n">A1</span><span class="o">+</span><span class="n">A2</span><span class="p">)</span> <span class="o">-</span> <span class="n">A12</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">))</span> <span class="c1"># Theoretical DW width</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">Nx</span><span class="o">*</span><span class="n">cs</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">Nx</span><span class="o">*</span><span class="n">cs</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">Nx</span><span class="p">)</span> <span class="o">/</span> <span class="n">dw</span>
 
 <span class="c1"># --- NEEL ---</span>
@@ -441,7 +440,7 @@ The theoretical model is based on <a class="reference external" href="https://ww
 <span class="c1"># --- NET ---</span>
 <span class="n">Han</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">K</span> <span class="o">/</span> <span class="n">Ms</span>
 <span class="n">Hex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">8</span> <span class="o">*</span> <span class="n">A0</span> <span class="o">/</span> <span class="p">(</span> <span class="n">Ms</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-<span class="n">prefactor</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">Han</span><span class="o">/</span><span class="n">Hex</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">A1</span><span class="o">-</span><span class="n">A2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">A1</span><span class="o">+</span><span class="n">A2</span><span class="p">)</span> <span class="o">-</span> <span class="n">A12</span><span class="p">)</span>
+<span class="n">prefactor</span> <span class="o">=</span> <span class="p">(</span><span class="n">Han</span><span class="o">/</span><span class="n">Hex</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">A1</span><span class="o">-</span><span class="n">A2</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">A1</span><span class="o">+</span><span class="n">A2</span><span class="p">)</span> <span class="o">-</span> <span class="n">A12</span><span class="p">)</span>
 
 <span class="n">theory_y</span> <span class="o">=</span> <span class="o">-</span><span class="n">prefactor</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span>
 <span class="n">theory_z</span> <span class="o">=</span>  <span class="n">prefactor</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>   <span class="o">/</span>  <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span>
@@ -497,11 +496,11 @@ The theoretical model is based on <a class="reference external" href="https://ww
       </div>
     </a>
     <a class="right-next"
-       href="../class_diagrams.html"
+       href="moving_window.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Class Diagrams</p>
+        <p class="prev-next-title">Moving simulation window</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -533,7 +532,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

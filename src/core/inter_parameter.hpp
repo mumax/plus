@@ -27,8 +27,10 @@ class InterParameter {
 
   // set to uniform value
   void set(real value);
+  void setIntraRegionValue(real value);
   void setBetween(unsigned int i, unsigned int j, real value);
   real getUniformValue() const;
+  real getIntraRegionValue() const;
   real getBetween(unsigned int i, unsigned int j) const;
 
   CuInterParameter cu() const;
@@ -48,6 +50,7 @@ class InterParameter {
 
   std::shared_ptr<const System> system_;
   real uniformValue_;
+  real intraRegionValue_;  // value of the diagonal
   GpuBuffer<real> valuesBuffer_;
   size_t valuesLimit_;  // N(N-1)/2 with N = maxRegionIdx+1
 
@@ -58,6 +61,7 @@ class CuInterParameter {
  private:
   real* valuesPtr_;
   real uniformValue_;
+  real intraRegionValue_;
 
  public:
   explicit CuInterParameter(const InterParameter* p);
@@ -66,7 +70,9 @@ class CuInterParameter {
 };
 
 inline CuInterParameter::CuInterParameter(const InterParameter* p)
-    : uniformValue_(p->uniformValue_), valuesPtr_(nullptr) {
+    : uniformValue_(p->uniformValue_),
+      intraRegionValue_(p->getIntraRegionValue()),
+      valuesPtr_(nullptr) {
   if (!p->isUniform()) {
     valuesPtr_ = p->valuesBuffer_.get();
   }
@@ -87,5 +93,7 @@ __device__ inline real CuInterParameter::valueBetween(unsigned int idx1,
                                                       unsigned int idx2) const {
   if (isUniform())
     return uniformValue_;
+  if (idx1 == idx2)
+    return intraRegionValue_;
   return valuesPtr_[getLutIndex(idx1, idx2)];
 }

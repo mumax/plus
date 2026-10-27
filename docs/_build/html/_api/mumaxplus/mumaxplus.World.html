@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -245,10 +246,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -365,8 +368,10 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.get_ferromagnet"><code class="docutils literal notranslate"><span class="pre">get_ferromagnet()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.get_antiferromagnet"><code class="docutils literal notranslate"><span class="pre">get_antiferromagnet()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.get_ncafm"><code class="docutils literal notranslate"><span class="pre">get_ncafm()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.magnets"><code class="docutils literal notranslate"><span class="pre">magnets</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.ferromagnets"><code class="docutils literal notranslate"><span class="pre">ferromagnets</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.antiferromagnets"><code class="docutils literal notranslate"><span class="pre">antiferromagnets</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.altermagnets"><code class="docutils literal notranslate"><span class="pre">altermagnets</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.ncafms"><code class="docutils literal notranslate"><span class="pre">ncafms</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.minimize"><code class="docutils literal notranslate"><span class="pre">minimize()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.relax"><code class="docutils literal notranslate"><span class="pre">relax()</span></code></a></li>
@@ -378,6 +383,8 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.bounding_grid"><code class="docutils literal notranslate"><span class="pre">bounding_grid</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.set_pbc"><code class="docutils literal notranslate"><span class="pre">set_pbc()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.unset_pbc"><code class="docutils literal notranslate"><span class="pre">unset_pbc()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.window"><code class="docutils literal notranslate"><span class="pre">window</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.center_domain_wall"><code class="docutils literal notranslate"><span class="pre">center_domain_wall()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -420,7 +427,8 @@ All subsequently added magnets need to fit inside this mastergrid.</p></li>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">pbc_repetitions</span></code> and <code class="docutils literal notranslate"><span class="pre">mastergrid</span></code> can be changed later using <a class="reference internal" href="#mumaxplus.World.set_pbc" title="mumaxplus.World.set_pbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_pbc()</span></code></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pbc_repetitions</span></code> and <code class="docutils literal notranslate"><span class="pre">mastergrid</span></code> can be changed later using
+<a class="reference internal" href="#mumaxplus.World.set_pbc" title="mumaxplus.World.set_pbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_pbc()</span></code></a>.</p>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -466,21 +474,33 @@ Raises KeyError if there is no magnet with the given name.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.World.magnets">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnets</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet" title="mumaxplus.magnet.Magnet"><span class="pre">Magnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.magnets" title="Link to this definition">#</a></dt>
+<dd><p>Get a dictionary of all magnet names.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.ferromagnets">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ferromagnets</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.ferromagnets" title="Link to this definition">#</a></dt>
-<dd><p>Get a dictionairy of <a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.Ferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ferromagnet</span></code></a> names.</p>
+<dd><p>Get a dictionary of <a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.Ferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ferromagnet</span></code></a> names.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.antiferromagnets">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">antiferromagnets</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet" title="mumaxplus.antiferromagnet.Antiferromagnet"><span class="pre">Antiferromagnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.antiferromagnets" title="Link to this definition">#</a></dt>
-<dd><p>Get a dictionairy of <a class="reference internal" href="mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet" title="mumaxplus.Antiferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Antiferromagnet</span></code></a> names.</p>
+<dd><p>Get a dictionary of <a class="reference internal" href="mumaxplus.Antiferromagnet.html#mumaxplus.Antiferromagnet" title="mumaxplus.Antiferromagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Antiferromagnet</span></code></a> names.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.World.altermagnets">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">altermagnets</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Altermagnet.html#mumaxplus.Altermagnet" title="mumaxplus.altermagnet.Altermagnet"><span class="pre">Altermagnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.World.altermagnets" title="Link to this definition">#</a></dt>
+<dd><p>Get a dictionary of <a class="reference internal" href="mumaxplus.Altermagnet.html#mumaxplus.Altermagnet" title="mumaxplus.Altermagnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Altermagnet</span></code></a> names.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.World.ncafms">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ncafms</span></span><a class="headerlink" href="#mumaxplus.World.ncafms" title="Link to this definition">#</a></dt>
-<dd><p>Get a dictionairy of non-collinear antiferromagnets by name.</p>
+<dd><p>Get a dictionary of non-collinear antiferromagnets by name.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -643,6 +663,44 @@ This will throw an error if there are no magnets in the world.</p>
 </div>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="mumaxplus.World.window">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">window</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Window.html#mumaxplus.Window" title="mumaxplus.window.Window"><span class="pre">Window</span></a></span><a class="headerlink" href="#mumaxplus.World.window" title="Link to this definition">#</a></dt>
+<dd><p>Simulation window for this world.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mumaxplus.World.center_domain_wall">
+<span class="sig-name descname"><span class="pre">center_domain_wall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.World.center_domain_wall" title="Link to this definition">#</a></dt>
+<dd><p>Move the simulation window along with the domain wall. This function
+should be called before the <cite>TimeSolver</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The domain wall should be centered already for this function to work properly.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comp</strong> (<em>int</em>) – The magnetization direction of the domains. The average of this
+magnetization component will be kept close to zero. Possible values
+are 0 (x-component), 1 (y-component) and 2 (z-component).</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis along which the domain wall moves (i.e. the wall normal).
+Possible values are 0 (x-direction), 1 (y-direction) and 2 (z-direction).
+If axis is <cite>None</cite> (default), then the first axis with the most number of
+grid cells is chosen.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><cite>center_domain_wall</cite> will not work properly with non-uniform parameters.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="mumaxplus.Window.html#mumaxplus.Window.disable_motion" title="mumaxplus.Window.disable_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Window.disable_motion</span></code></a></p>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -700,8 +758,10 @@ This will throw an error if there are no magnets in the world.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.get_ferromagnet"><code class="docutils literal notranslate"><span class="pre">get_ferromagnet()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.get_antiferromagnet"><code class="docutils literal notranslate"><span class="pre">get_antiferromagnet()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.get_ncafm"><code class="docutils literal notranslate"><span class="pre">get_ncafm()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.magnets"><code class="docutils literal notranslate"><span class="pre">magnets</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.ferromagnets"><code class="docutils literal notranslate"><span class="pre">ferromagnets</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.antiferromagnets"><code class="docutils literal notranslate"><span class="pre">antiferromagnets</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.altermagnets"><code class="docutils literal notranslate"><span class="pre">altermagnets</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.ncafms"><code class="docutils literal notranslate"><span class="pre">ncafms</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.minimize"><code class="docutils literal notranslate"><span class="pre">minimize()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.relax"><code class="docutils literal notranslate"><span class="pre">relax()</span></code></a></li>
@@ -713,6 +773,8 @@ This will throw an error if there are no magnets in the world.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.bounding_grid"><code class="docutils literal notranslate"><span class="pre">bounding_grid</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.set_pbc"><code class="docutils literal notranslate"><span class="pre">set_pbc()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.unset_pbc"><code class="docutils literal notranslate"><span class="pre">unset_pbc()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.window"><code class="docutils literal notranslate"><span class="pre">window</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mumaxplus.World.center_domain_wall"><code class="docutils literal notranslate"><span class="pre">center_domain_wall()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -741,7 +803,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

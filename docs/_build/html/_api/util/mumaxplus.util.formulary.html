@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,7 +64,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -218,6 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../util.html">util</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">formulary</a></li>
@@ -246,10 +247,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -428,7 +431,8 @@
 <dd><p>Ferromagnetic exchange length (m). Beware that different definitions exist
 without the √2 prefactor, but this one seems to be used most often.</p>
 <div class="math notranslate nohighlight">
-\[l_{ex} = \sqrt{a_\text{ex}/K_\text{m}} = \sqrt{2a_\text{ex}/(\mu_0 m_\text{sat}^2)}\]</div>
+\[l_{ex} = \sqrt{a_\text{ex}/K_\text{m}} =
+\sqrt{2a_\text{ex}/(\mu_0 m_\text{sat}^2)}\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -451,7 +455,8 @@ without the √2 prefactor, but this one seems to be used most often.</p>
 <dd><p>Ferromagnetic exchange length (m). Beware that different definitions exist
 without the √2 prefactor, but this one seems to be used most often.</p>
 <div class="math notranslate nohighlight">
-\[l_{ex} = \sqrt{a_\text{ex}/K_\text{m}} = \sqrt{2a_\text{ex}/(\mu_0 m_\text{sat}^2)}\]</div>
+\[l_{ex} = \sqrt{a_\text{ex}/K_\text{m}} =
+\sqrt{2a_\text{ex}/(\mu_0 m_\text{sat}^2)}\]</div>
 <p>This is a short alias for <cite>exchange_length(aex, msat)</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -592,7 +597,7 @@ calculated by providing damping ratios ζ₁,₂ at specified frequencies f₁,�
 <p>α = 4π f₁ f₂ * (ζ₁f₂ - ζ₂f₁) / (f₂² - f₁²)</p>
 <p>β = 1/π * (ζ₂f₂ - ζ₁f₁) / (f₂² - f₁²)</p>
 <p>with f₁/f₂ &lt;= ζ₂/ζ₁ &lt;= f₂/f₁</p>
-<p>Based on <a class="reference external" href="https://www.comsol.com/blogs/how-to-model-different-types-of-damping-in-comsol-multiphysics">https://www.comsol.com/blogs/how-to-model-different-types-of-damping-in-comsol-multiphysics</a>
+<p>Based on <a class="reference external" href="https://www.comsol.com/blogs/how-to-model-different-types-of-damping-in-comsol-multiphysics">https://www.comsol.com/blogs/how-to-model-different-types-of-damping-in-comsol-multiphysics</a> # noqa: E501
 and <a class="reference external" href="https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html">https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -627,7 +632,7 @@ zero, calculated by providing a damping ratio ζ at a specified frequency f.</p>
 <p>This is useful to obtain a damping that increases linearly with frequency,
 by only setting the viscosity tensor, but not the phenomenological elastic
 damping constant.</p>
-<p>Based on <a class="reference external" href="https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html">https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html</a>.</p>
+<p>Based on <a class="reference external" href="https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html">https://doc.comsol.com/6.3/doc/com.comsol.help.sme/sme_ug_modeling.05.126.html</a>. # noqa: E501</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -734,7 +739,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

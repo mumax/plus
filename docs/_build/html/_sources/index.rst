@@ -24,6 +24,23 @@ mumax\ :sup:`+` is described in the following paper:
 Please cite this paper if you would like to cite mumax\ :sup:`+`.
 All demonstrations in the paper were simulated using version `v1.1.0 <https://github.com/mumax/plus/tree/v1.1.0>`_ of the code. The scripts used to generate the data can be found in the `paper2025 directory <https://github.com/mumax/plus/tree/paper2025/paper2025>`_ under the `paper2025 tag <https://github.com/mumax/plus/tree/paper2025>`_.
 
+GPU Performance
+---------------
+
+mumax\ :sup:`+` is cross-platform and runs on Linux and Windows platforms. All installation
+instructions can be found on the :doc:`installation page <install>`. You will
+need an NVIDIA GPU and the benchmark below may guide your GPU choice.
+
+  .. raw:: html
+     :file: _static/bench.html
+
+If you would like to contribute your GPU benchmark to this figure, run
+:file:`examples/bench.py` and share the contents of the resulting
+:file:`bench.txt` file `here <https://github.com/mumax/plus/discussions/categories/benchmarks>`_.
+If you have multiple different GPUs in your system, you can use the optional flag ``--all``
+to benchmark them all. Even if your GPU is already included in the list, we appreciate additional
+benchmarks, as they allow us to estimate and display error bars in the figure.
+
 Contents
 --------
 

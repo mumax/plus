@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag (e.g., v1.2.1)"
+        description: "Release tag (e.g., v1.2.2)"
         required: true
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           - {name: "ubuntu", version: "22.04"}
           - {name: "windows", version: "2022"}
         cuda: ["12.4.1"]
-        python: ["3.11", "3.12", "3.13", "3.14"]
+        python: ["3.11", "3.12", "3.13", "3.14", "3.15"]
 
     steps:
       - name: Check out source
@@ -67,7 +67,7 @@ jobs:
               source /venv/bin/activate
               python${{ matrix.python }} --version || true
               pip install --upgrade pip
-              pip install build wheel auditwheel
+              pip install build wheel auditwheel "patchelf>=0.14.5"
 
               echo "=== Starting wheel build ==="
               python${{ matrix.python }} -m build --wheel
@@ -85,7 +85,7 @@ jobs:
           EOF
       
       - name: Build source distribution tar.gz
-        if: runner.os == 'Linux' && matrix.python == '3.14'
+        if: runner.os == 'Linux' && matrix.python == '3.15'
         run: |
           echo "=== Creating clean build directory for .tar.gz --sdist ==="
           mkdir clean_src

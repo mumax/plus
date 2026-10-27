@@ -9,7 +9,7 @@ dependencies = [
   "numpy>=2",
   "scipy",
   "matplotlib",
-  "pyovf",
+  "pyovf>=0.2.15",
   "tqdm"
 ]
 requires-python = ">=3.11"

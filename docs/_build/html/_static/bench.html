@@ -1,0 +1,170 @@
+<div id="gpubench" style="position:relative;max-width:800px;margin:auto;font-family:sans-serif">
+<style>
+#gpubench .bar{fill:#1f77b4}
+#gpubench .bar:hover{fill:#ff7f0e}
+#gpubench .tip{position:absolute;pointer-events:none;display:none;padding:4px 8px;
+  background:rgba(30,30,30,.9);color:#fff;border-radius:4px;font-size:12px;white-space:nowrap}
+#gpubench .ctl{display:flex;align-items:center;gap:12px;justify-content:center;font-size:14px;margin-top:4px}
+#gpubench input[type=range]{flex:1;max-width:400px}
+</style>
+<svg id="gpubench-svg" viewBox="0 0 800 400" width="100%" role="img"></svg>
+<div class="ctl">
+  <span>Number of cells:</span>
+  <input id="gpubench-slider" type="range" min="0" max="11" step="1" value="9">
+  <span id="gpubench-size" style="min-width:9em"></span>
+</div>
+<div class="ctl">
+  <label><input id="gpubench-keep" type="checkbox">
+  keep current (GPU) order</label>
+</div>
+<div class="tip"></div>
+<script>
+(function(){
+  var D={"sizes": [16, 64, 256, 1024, 4096, 16384, 65536, 262144, 1048576, 4194304, 16777216, 67108864], "vals": {"16": {"OOMMF Core Ultra 7 155H": [0.02161392641929344, 0.0, 1], "RTX 4060 (mobile)": [0.014800400506367082, 0.0, 1], "GTX 1080": [0.011938909270141431, 5.146555153910128e-05, 4], "RTX 3080 (mobile)": [0.005043, 0.0, 1], "TITAN RTX": [0.01421, 0.0, 1], "A100 (80GB)": [0.01086, 0.0, 1], "TITAN Xp": [0.01199, 0.0, 1], "H100 NVL": [0.01427990969309697, 0.0, 1], "H200": [0.014586124798136004, 0.0, 1], "Tesla T4": [0.009857722752526535, 0.0021636894365803495, 2]}, "64": {"OOMMF Core Ultra 7 155H": [0.10833708238826692, 0.0, 1], "RTX 4060 (mobile)": [0.058717283437525976, 0.0, 1], "GTX 1080": [0.04913926296099239, 0.0003319036357767654, 4], "RTX 3080 (mobile)": [0.01984, 0.0, 1], "TITAN RTX": [0.05686, 0.0, 1], "A100 (80GB)": [0.046, 0.0, 1], "TITAN Xp": [0.0505, 0.0, 1], "H100 NVL": [0.05701954126998288, 0.0, 1], "H200": [0.058223013271965766, 0.0, 1], "Tesla T4": [0.040839607390269844, 0.0011660801786139228, 2]}, "256": {"OOMMF Core Ultra 7 155H": [0.36043821026589545, 0.0, 1], "RTX 4060 (mobile)": [0.2442665065130648, 0.0, 1], "GTX 1080": [0.20008084459257736, 0.0015172018551010407, 4], "RTX 3080 (mobile)": [0.0837, 0.0, 1], "TITAN RTX": [0.2161, 0.0, 1], "A100 (80GB)": [0.1733, 0.0, 1], "TITAN Xp": [0.2084, 0.0, 1], "H100 NVL": [0.2133517641518619, 0.0, 1], "H200": [0.21945882910797354, 0.0, 1], "Tesla T4": [0.13436564173146887, 0.019361905171723173, 2]}, "1024": {"OOMMF Core Ultra 7 155H": [1.390186501979291, 0.0, 1], "RTX 4060 (mobile)": [1.0054492006676514, 0.0, 1], "GTX 1080": [0.8058687568391698, 0.004199712808714567, 4], "RTX 3080 (mobile)": [0.3272, 0.0, 1], "TITAN RTX": [0.8596, 0.0, 1], "A100 (80GB)": [0.7046, 0.0, 1], "TITAN Xp": [0.8268, 0.0, 1], "H100 NVL": [0.8629890987271065, 0.0, 1], "H200": [0.8969543616956848, 0.0, 1], "Tesla T4": [0.6561070705793105, 0.012520798856691535, 2]}, "4096": {"OOMMF Core Ultra 7 155H": [4.338011212253586, 0.0, 1], "RTX 4060 (mobile)": [3.79331972850399, 0.0, 1], "GTX 1080": [3.1957123245723666, 0.02322429081916429, 4], "RTX 3080 (mobile)": [1.368, 0.0, 1], "TITAN RTX": [3.212, 0.0, 1], "A100 (80GB)": [2.677, 0.0, 1], "TITAN Xp": [3.2, 0.0, 1], "H100 NVL": [3.341580860648404, 0.0, 1], "H200": [3.444930656506918, 0.0, 1], "Tesla T4": [2.5482593277029446, 0.15509042663041275, 2]}, "16384": {"OOMMF Core Ultra 7 155H": [6.358475354798594, 0.0, 1], "RTX 4060 (mobile)": [14.720260805936132, 0.0, 1], "GTX 1080": [10.353684417407067, 0.03738071308556285, 4], "RTX 3080 (mobile)": [5.143, 0.0, 1], "TITAN RTX": [12.86, 0.0, 1], "A100 (80GB)": [10.66, 0.0, 1], "TITAN Xp": [10.06, 0.0, 1], "H100 NVL": [13.336129841176197, 0.0, 1], "H200": [13.64226050642712, 0.0, 1], "Tesla T4": [10.376976299844255, 0.04129550313256117, 2]}, "65536": {"OOMMF Core Ultra 7 155H": [7.410178584938417, 0.0, 1], "RTX 4060 (mobile)": [40.79366407360962, 0.0, 1], "GTX 1080": [21.97622655601202, 0.02084974287876213, 4], "RTX 3080 (mobile)": [19.5, 0.0, 1], "TITAN RTX": [34.39, 0.0, 1], "A100 (80GB)": [37.59, 0.0, 1], "TITAN Xp": [25.29, 0.0, 1], "H100 NVL": [48.59290351244089, 0.0, 1], "H200": [50.72718005886967, 0.0, 1], "Tesla T4": [24.7524659829237, 0.526044393563289, 2]}, "262144": {"OOMMF Core Ultra 7 155H": [7.3646659174769615, 0.0, 1], "RTX 4060 (mobile)": [44.69812025053448, 0.0, 1], "GTX 1080": [22.619252012639567, 0.03820708829904708, 4], "RTX 3080 (mobile)": [39.81, 0.0, 1], "TITAN RTX": [63.1, 0.0, 1], "A100 (80GB)": [99.28, 0.0, 1], "TITAN Xp": [33.75, 0.0, 1], "H100 NVL": [140.95309020210115, 0.0, 1], "H200": [149.28226170431154, 0.0, 1], "Tesla T4": [29.009600693305224, 0.3509404946593445, 2]}, "1048576": {"OOMMF Core Ultra 7 155H": [6.573375115778659, 0.0, 1], "RTX 4060 (mobile)": [35.682728493444564, 0.0, 1], "GTX 1080": [23.08436399727625, 0.027531469644694138, 4], "RTX 3080 (mobile)": [49.04, 0.0, 1], "TITAN RTX": [62.03, 0.0, 1], "A100 (80GB)": [159.8, 0.0, 1], "TITAN Xp": [36.2, 0.0, 1], "H100 NVL": [260.3645367539907, 0.0, 1], "H200": [284.9915443750081, 0.0, 1], "Tesla T4": [25.096714481116884, 3.1323669216413643, 2]}, "4194304": {"OOMMF Core Ultra 7 155H": [6.76722432209176, 0.0, 1], "RTX 4060 (mobile)": [24.19703446198679, 0.0, 1], "GTX 1080": [23.682815549731682, 0.03937327230382061, 4], "RTX 3080 (mobile)": [46.73, 0.0, 1], "TITAN RTX": [64.38, 0.0, 1], "A100 (80GB)": [167.1, 0.0, 1], "TITAN Xp": [37.87, 0.0, 1], "H100 NVL": [286.31544858975025, 0.0, 1], "H200": [340.5769583000139, 0.0, 1], "Tesla T4": [27.4092162459901, 0.05819208977479626, 2]}, "16777216": {"OOMMF Core Ultra 7 155H": [6.16251683396031, 0.0, 1], "RTX 3080 (mobile)": [2.652, 0.0, 1], "A100 (80GB)": [182.2, 0.0, 1], "TITAN Xp": [38.16, 0.0, 1], "H100 NVL": [286.80279755980547, 0.0, 1], "H200": [389.98367591120893, 0.0, 1], "Tesla T4": [27.502745127781566, 0.004057668208289359, 2]}, "67108864": {"A100 (80GB)": [182.9, 0.0, 1], "H100 NVL": [281.89640902318155, 0.0, 1], "H200": [395.0894406359184, 0.0, 1]}}};
+  var W=800, H=400, L=70, R=20, T=45, B=164;
+  var PW=W-L-R, PH=H-T-B;
+  var sizes=D.sizes, vals=D.vals;      // vals[size][gpu] = [mean, std, runs]
+
+  var box=document.getElementById("gpubench"), tip=box.querySelector(".tip");
+  var svg=document.getElementById("gpubench-svg");
+  var slider=document.getElementById("gpubench-slider");
+  var label=document.getElementById("gpubench-size");
+  var keep=document.getElementById("gpubench-keep");
+  var frozen=null;
+
+  var SUP={"0":"\u2070","1":"\u00b9","2":"\u00b2","3":"\u00b3","4":"\u2074",
+           "5":"\u2075","6":"\u2076","7":"\u2077","8":"\u2078","9":"\u2079"};
+
+  function sup(e){
+    var s="", d=String(e);
+    for(var k=0; k<d.length; k++) s+=SUP[d.charAt(k)];
+    return s;
+  }
+
+  // n = 2^e. For even e the grid is square: 2^(e/2) x 2^(e/2) x 1.
+  // Odd e shows as 2^e; other numbers as 1,234,567.
+  function cells(n){
+    var e=Math.round(Math.log(n)/Math.LN2);
+    if(!(n>=1) || Math.pow(2,e)!==n) return n.toLocaleString("en-US");
+    if(e%2===0){
+      var p="2"+sup(e/2);
+      return p+" \u00d7 "+p+" \u00d7 1";
+    }
+    return "2"+sup(e);
+  }
+
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+                    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function group(i){ return vals[String(sizes[i])]; }
+
+  // labels of one group, sorted low to high by mean
+  function sortedLabels(i){
+    var g=group(i);
+    return Object.keys(g).sort(function(a,b){return g[a][0]-g[b][0];});
+  }
+
+  // order of group i, followed by every other GPU (sorted by its mean in
+  // the largest group where it appears) so that missing GPUs keep a slot
+  function buildFrozen(i){
+    var cur=sortedLabels(i), seen={}, ref={};
+    cur.forEach(function(l){seen[l]=true;});
+    sizes.forEach(function(s){
+      var g=vals[String(s)];
+      for(var l in g){ ref[l]=g[l][0]; }
+    });
+    var rest=Object.keys(ref).filter(function(l){return !seen[l];})
+                   .sort(function(a,b){return ref[a]-ref[b];});
+    return cur.concat(rest);
+  }
+
+  function niceMax(m){
+    var raw=m/5, mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)), step=mag;
+    [1,2,5,10].some(function(k){ step=k*mag; return step>=raw; });
+    return {ymax:Math.ceil(m/step)*step, step:step};
+  }
+
+  function draw(){
+    var i=+slider.value, g=group(i);
+    var labels=frozen?frozen:sortedLabels(i);
+    var n=labels.length;
+    // axis maximum includes the top of the error bars
+    var m=0; labels.forEach(function(l){
+      if(g[l]!==undefined) m=Math.max(m,g[l][0]+g[l][1]);
+    });
+    var a=niceMax(m), ymax=a.ymax, step=a.step;
+    function ypix(v){ return T+PH-v/ymax*PH; }
+
+    var o=[];
+    for(var k=0; k*step<=ymax*(1+1e-9); k++){
+      var v=k*step, y=ypix(v);
+      o.push('<line x1="'+L+'" x2="'+(L+PW)+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+
+             '" stroke="currentColor" stroke-opacity="0.15"/>');
+      o.push('<text x="'+(L-8)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="12" '+
+             'fill="currentColor">'+(+v.toFixed(6))+'</text>');
+    }
+    o.push('<line x1="'+L+'" x2="'+L+'" y1="'+T+'" y2="'+(T+PH)+'" stroke="currentColor"/>');
+    o.push('<line x1="'+L+'" x2="'+(L+PW)+'" y1="'+(T+PH)+'" y2="'+(T+PH)+'" stroke="currentColor"/>');
+
+    var slot=PW/n, bw=0.6*slot;
+    labels.forEach(function(lab,j){
+      var cx=L+(j+0.5)*slot, e=g[lab], has=(e!==undefined);
+      if(has){
+        var v=e[0], sd=e[1], cnt=e[2];
+        var html=esc(lab)+"<br><b>"+v.toFixed(2)+"</b>"+
+                 (cnt>1?" \u00b1 "+sd.toFixed(2):"")+" M cells/s<br>"+
+                 cnt+(cnt===1?" run":" runs");
+        o.push('<rect class="bar" x="'+(cx-bw/2).toFixed(1)+'" y="'+ypix(v).toFixed(1)+
+               '" width="'+bw.toFixed(1)+'" height="'+(T+PH-ypix(v)).toFixed(1)+
+               '" data-tip="'+esc(html)+'"/>');
+        if(cnt>1 && sd>0){
+          var yt=ypix(v+sd).toFixed(1), yb=ypix(Math.max(v-sd,0)).toFixed(1);
+          var c=(bw*0.25).toFixed(1), x0=(cx-c).toFixed(1), x1=(+cx+ +c).toFixed(1);
+          o.push('<path d="M'+cx.toFixed(1)+' '+yt+'V'+yb+
+                 'M'+x0+' '+yt+'H'+x1+'M'+x0+' '+yb+'H'+x1+
+                 '" stroke="currentColor" stroke-width="1.5" fill="none" pointer-events="none"/>');
+        }
+      }
+      var ty=T+PH+8;
+      o.push('<text x="'+cx.toFixed(1)+'" y="'+ty+'" font-size="11" fill="currentColor" '+
+             'fill-opacity="'+(has?1:0.35)+'" text-anchor="end" '+
+             'transform="rotate(-90 '+cx.toFixed(1)+' '+ty+')" dy="4">'+esc(lab)+'</text>');
+    });
+
+    o.push('<text x="'+(L+PW/2)+'" y="24" text-anchor="middle" font-size="14" fill="currentColor">'+
+           'mumax\u207a GPU performance for 2D simulations containing '+
+           sizes[i].toLocaleString("en-US")+' cells.</text>');
+    o.push('<text transform="translate(16 '+(T+PH/2)+') rotate(-90)" text-anchor="middle" '+
+           'font-size="12" fill="currentColor">throughput (M cells/s)</text>');
+
+    svg.innerHTML=o.join("\n");
+    label.textContent=cells(sizes[i]);
+    tip.style.display="none";
+  }
+
+  slider.addEventListener("input",draw);
+  keep.addEventListener("change",function(){
+    frozen=keep.checked?buildFrozen(+slider.value):null;
+    draw();
+  });
+
+  // tooltip via event delegation, since the bars are redrawn
+  svg.addEventListener("mousemove",function(e){
+    var t=e.target;
+    if(t.classList && t.classList.contains("bar")){
+      var r=box.getBoundingClientRect();
+      tip.innerHTML=t.getAttribute("data-tip");
+      tip.style.display="block";
+      tip.style.left=(e.clientX-r.left+12)+"px";
+      tip.style.top=(e.clientY-r.top-30)+"px";
+    } else {
+      tip.style.display="none";
+    }
+  });
+  svg.addEventListener("mouseleave",function(){tip.style.display="none";});
+
+  draw();
+})();
+</script>
+</div>

@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../util.html">util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../util/mumaxplus.util.formulary.html">formulary</a></li>
@@ -245,10 +246,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -402,30 +405,32 @@
 <dt class="sig sig-object py" id="mumaxplus.Antiferromagnet">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Antiferromagnet</span></span><a class="headerlink" href="#mumaxplus.Antiferromagnet" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="mumaxplus.Magnet.html#mumaxplus.Magnet" title="mumaxplus.magnet.Magnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Magnet</span></code></a></p>
-<p>Create an antiferromagnet instance.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.Antiferromagnet.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">world</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.Antiferromagnet.__init__" title="Link to this definition">#</a></dt>
-<dd><p>This class can also be used to create a Ferrimagnet instance since
+<dd><p>Create an antiferromagnet instance.</p>
+<p>This class can also be used to create a Ferrimagnet instance since
 both sublattices are independently modifiable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>world</strong> (<a class="reference internal" href="mumaxplus.World.html#mumaxplus.World" title="mumaxplus.World"><em>World</em></a>) – World in which the antiferromagnet lives.</p></li>
-<li><p><strong>grid</strong> (<a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.Grid"><em>Grid</em></a>) – The number of cells in x, y, z the antiferromagnet should be divided into.</p></li>
+<li><p><strong>grid</strong> (<a class="reference internal" href="mumaxplus.Grid.html#mumaxplus.Grid" title="mumaxplus.Grid"><em>Grid</em></a><em> or </em><em>tuple</em><em>[</em><em>int</em><em>] of </em><em>size 3</em>) – The number of cells in x, y, z the antiferromagnet should be divided into.</p></li>
 <li><p><strong>geometry</strong> (<em>None</em><em>, </em><em>ndarray</em><em>, or </em><em>callable</em><em> (</em><em>default=None</em><em>)</em>) – <p>The geometry of the antiferromagnet can be set in three ways.</p>
 <ol class="arabic simple">
-<li><p>If the geometry contains all cells in the grid, then use None (the default)</p></li>
+<li><p>If the geometry contains all cells in the grid, then use None
+(the default)</p></li>
 <li><p>Use an ndarray which specifies for each cell whether or not it is in the
 geometry.</p></li>
-<li><p>Use a function which takes x, y, and z coordinates as arguments and returns
-true if this position is inside the geometry and false otherwise.</p></li>
+<li><p>Use a function which takes x, y, and z coordinates as arguments and
+returns true if this position is inside the geometry and false otherwise.</p></li>
 </ol>
 </p></li>
-<li><p><strong>regions</strong> (<em>None</em><em>, </em><em>ndarray</em><em>, or </em><em>callable</em><em> (</em><em>default=None</em><em>)</em>) – The regional structure of an antiferromagnet can be set in the same three ways
-as the geometry. This parameter indexes each grid cell to a certain region.</p></li>
-<li><p><strong>name</strong> (<em>str</em><em> (</em><em>default=&quot;&quot;</em><em>)</em>) – The antiferromagnet’s identifier. If the name is empty (the default), a name for the
-antiferromagnet will be created.</p></li>
+<li><p><strong>regions</strong> (<em>None</em><em>, </em><em>ndarray</em><em>, or </em><em>callable</em><em> (</em><em>default=None</em><em>)</em>) – The regional structure of an antiferromagnet can be set in the same three
+ways as the geometry. This parameter indexes each grid cell to a certain
+region.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em> (</em><em>default=&quot;&quot;</em><em>)</em>) – The antiferromagnet’s identifier. If the name is empty (the default), a name
+for the antiferromagnet will be created.</p></li>
 </ul>
 </dd>
 </dl>
@@ -446,13 +451,13 @@ antiferromagnet will be created.</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Antiferromagnet.sublattices">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sublattices</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><span class="pre">Ferromagnet</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mumaxplus.Antiferromagnet.sublattices" title="Link to this definition">#</a></dt>
-<dd><p>Both sublattice instances</p>
+<dd><p>Return both sublattice instances</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.Antiferromagnet.other_sublattice">
 <span class="sig-name descname"><span class="pre">other_sublattice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.Antiferromagnet.other_sublattice" title="Link to this definition">#</a></dt>
-<dd><p>Returns sister sublattice of given sublattice.</p>
+<dd><p>Return sister sublattice of given sublattice.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sub</strong> (<a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet" title="mumaxplus.ferromagnet.Ferromagnet"><em>Ferromagnet</em></a>)</p>
@@ -479,7 +484,7 @@ antiferromagnet will be created.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.Antiferromagnet.minimize">
-<span class="sig-name descname"><span class="pre">minimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.Antiferromagnet.minimize" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">minimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.Antiferromagnet.minimize" title="Link to this definition">#</a></dt>
 <dd><p>Minimize the total energy.</p>
 <p>Fast energy minimization, but less robust than <a class="reference internal" href="#mumaxplus.Antiferromagnet.relax" title="mumaxplus.Antiferromagnet.relax"><code class="xref py py-func docutils literal notranslate"><span class="pre">relax()</span></code></a>
 when starting from a high energy state.</p>
@@ -488,7 +493,7 @@ when starting from a high energy state.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tol</strong> (<em>int / float</em><em> (</em><em>default=1e-6</em><em>)</em>) – The maximum allowed difference between consecutive magnetization
 evaluations when advancing toward an energy minimum.</p></li>
-<li><p><strong>nsamples</strong> (<em>int</em><em> (</em><em>default=20</em><em>)</em>) – The number of consecutive magnetization evaluations that must not
+<li><p><strong>nsamples</strong> (<em>int</em><em> (</em><em>default=10</em><em>)</em>) – The number of consecutive magnetization evaluations that must not
 differ by more than the tolerance “tol”.</p></li>
 </ul>
 </dd>
@@ -537,9 +542,12 @@ in a single simulation cell.</p>
 <dt class="sig sig-object py" id="mumaxplus.Antiferromagnet.afmex_nn">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">afmex_nn</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="mumaxplus.Parameter.html#mumaxplus.Parameter" title="mumaxplus.parameter.Parameter"><span class="pre">Parameter</span></a></span><a class="headerlink" href="#mumaxplus.Antiferromagnet.afmex_nn" title="Link to this definition">#</a></dt>
 <dd><p>Intercell antiferromagnetic exchange constant (J/m).
-This parameter plays the role of exchange constant of
-the antiferromagnetic inhomogeneous exchange interaction
-between neighbouring simulation cells.</p>
+This parameter plays the role of exchange constant of the antiferromagnetic
+inhomogeneous exchange interaction between neighboring simulation cells.</p>
+<p>For a cell adjacent to a boundary, Neumann boundary conditions cannot be
+properly applied if <a class="reference internal" href="mumaxplus.Ferromagnet.html#mumaxplus.Ferromagnet.msat" title="mumaxplus.Ferromagnet.msat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Ferromagnet.msat</span></code></a> of either sublattice is 0 in
+that cell, or the next cell inward. In this case, open boundary conditions are
+applied instead.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#mumaxplus.Antiferromagnet.afmex_cell" title="mumaxplus.Antiferromagnet.afmex_cell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">afmex_cell</span></code></a></p>
@@ -644,11 +652,9 @@ one could use</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="mumaxplus.Antiferromagnet.dmi_vector">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dmi_vector</span></span><a class="headerlink" href="#mumaxplus.Antiferromagnet.dmi_vector" title="Link to this definition">#</a></dt>
-<dd><dl class="simple">
-<dt>DMI vector D (J/m³) associated with the homogeneous DMI (in a single simulation cell),</dt><dd><p>defined by the energy density ε = D . (m1 x m2) with m1 and m2 being the sublattice
-magnetizations.</p>
-</dd>
-</dl>
+<dd><p>DMI vector D (J/m³) associated with the homogeneous DMI (in a single
+simulation cell), defined by the energy density ε = D . (m1 x m2) with m1 and m2
+being the sublattice magnetizations.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="mumaxplus.DmiTensor.html#mumaxplus.DmiTensor" title="mumaxplus.DmiTensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DmiTensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Antiferromagnet.dmi_tensor" title="mumaxplus.Antiferromagnet.dmi_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dmi_tensor</span></code></a>, <a class="reference internal" href="#mumaxplus.Antiferromagnet.dmi_tensors" title="mumaxplus.Antiferromagnet.dmi_tensors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dmi_tensors</span></code></a></p>
@@ -822,7 +828,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>

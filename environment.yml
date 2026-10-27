@@ -47,5 +47,5 @@ dependencies:
   # pip blocks
   - pip:
       - clang-format            # code checks
-      - pyovf                   # optional
+      - pyovf>=0.2.15           # optional
       - sphinxcontrib.plantuml  # documentation generation

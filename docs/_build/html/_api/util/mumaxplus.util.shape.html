@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/logo.css?v=81431fe9" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=4b5c67ef" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d6fc788c" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../../_static/documentation_options.js?v=778ca11c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,7 +64,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="2026-06-08, v1.2.1"/>
+    <meta name="docbuild:last-update" content="2026-10-19, v1.2.2"/>
   </head>
   
   
@@ -218,6 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.PoissonSystem.html">PoissonSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.DmiTensor.html">DmiTensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.BoundaryTraction.html">BoundaryTraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mumaxplus/mumaxplus.Window.html">Window</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../util.html">util</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.config.html">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mumaxplus.util.formulary.html">formulary</a></li>
@@ -246,10 +247,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/stdp2.html">Standard Problem #2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/stdp_DW_pinning.html">Standard Problem: Domain Wall Pinning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/magnetoelastics.html">Magnetoelastics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/DW_SAW.html">Domain wall motion with surface acoustic waves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/voronoi.html">Voronoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/Bloch_wall_altermagnet.html">Altermagnetic domain wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/moving_window.html">Moving simulation window</a></li>
 </ul>
 </details></li>
 </ul>
@@ -522,7 +525,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">Shape.&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.__init__" title="Link to this definition">#</a></dt>
-<dd><p>Base class for all shapes using constructive solid geometry (CSG).
+<dd><p>Provide a base class for all shapes using constructive solid geometry (CSG).
 This mutable class holds and manipulates a given shape function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -538,7 +541,7 @@ This mutable class holds and manipulates a given shape function.</p>
 which can represent any affine transformation (rotate, scale, shear,
 translate). It is usually of the form [[R, T], [0, 1]], with R a
 3x3 rotation matrix and T a 3x1 translation vector.
-Returns transformed self.</p>
+Return transformed self.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -546,7 +549,7 @@ Returns transformed self.</p>
 <span class="sig-name descname"><span class="pre">transform3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.transform3" title="Link to this definition">#</a></dt>
 <dd><p>Transform this shape according to a given 3x3 matrix (rotate, scale,
 shear).
-Returns transformed self.</p>
+Return transformed self.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -556,7 +559,7 @@ Returns transformed self.</p>
 shear) or 4x4 matrix (like 3x3 plus translations). It is usually of the
 form [[R, T], [0, 1]], with R a 3x3 rotation matrix and T a 3x1
 translation vector.
-Returns transformed self.</p>
+Return transformed self.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -659,7 +662,7 @@ outside this box is ignored.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Shape.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Shape.copy" title="Link to this definition">#</a></dt>
-<dd><p>Returns a new shape which is a copy of this shape.</p>
+<dd><p>Return a new shape which is a copy of this shape.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -816,7 +819,8 @@ Calling <code class="docutils literal notranslate"><span class="pre">a.xor(b)</s
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Cuboid.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sidex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sidey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sidez</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Cuboid.__init__" title="Link to this definition">#</a></dt>
-<dd><p>3D rectangular slab with given sides, including minimum, excluding maximum.</p>
+<dd><p>3D rectangular slab with given sides, including minimum, excluding
+maximum.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1015,8 +1019,8 @@ If the size is 3, the z-values are simply ignored.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.DelaunayHull.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.DelaunayHull.__init__" title="Link to this definition">#</a></dt>
-<dd><p>The Delaunay hull of a list of 3D points. These points can serve as the
-vertices of a convex polyhedron.</p>
+<dd><p>Compute the Delaunay hull of a list of 3D points. These points can serve as
+the vertices of a convex polyhedron.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>points</strong> (ndarray of double, <code class="docutils literal notranslate"><span class="pre">shape</span> <span class="pre">(npoints,</span> <span class="pre">3)</span></code>)</p>
@@ -1098,7 +1102,7 @@ diameter.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.Polygon.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.Polygon.__init__" title="Link to this definition">#</a></dt>
-<dd><p>A polygon in the xy-plane, with a given list of vertices.</p>
+<dd><p>Create a polygon in the xy-plane, with a given list of vertices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>vertices</strong> (<em>float ndarray</em><em> of </em><a class="reference internal" href="../mumaxplus/mumaxplus.Grid.html#mumaxplus.Grid.size" title="mumaxplus.Grid.size"><em>size</em></a><em> (</em><em>N</em><em>, </em><em>2</em><em>) or </em><em>(</em><em>N</em><em>, </em><em>3</em><em>)</em>) – If the size is (N, 3), the z-values are simply ignored.</p>
@@ -1115,8 +1119,8 @@ diameter.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mumaxplus.util.shape.RegularPolygon.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mumaxplus.util.shape.RegularPolygon.__init__" title="Link to this definition">#</a></dt>
-<dd><p>A regular polygon in the xy-plane with N vertices which lie on a circle
-with given diameter. One point is located at (diam/2, 0).</p>
+<dd><p>Create a regular polygon in the xy-plane with N vertices which lie on a
+circle with given diameter. One point is located at (diam/2, 0).</p>
 </dd></dl>
 
 </dd></dl>
@@ -1401,7 +1405,7 @@ By the DyNaMat group, Ghent University, Belgium.
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-06-08, v1.2.1.
+  Last updated on 2026-10-19, v1.2.2.
   <br/>
 </p>
   </div>
