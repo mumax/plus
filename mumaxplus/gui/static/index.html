@@ -379,7 +379,7 @@ function makeView(id) {
     if (b && b.name !== T.sel) send({ cmd: "select", target: b.name });
   };
   disp.onmouseleave = () => { V.mouse = null; q("loupe").style.display = "none"; q("hover").innerHTML = "&nbsp;"; };
-  $("views").appendChild(el); views.set(id, V);
+  $("views").appendChild(el); views.set(id, V); panelObserver.observe(el);
   return V;
 }
 function dropView(V) { V.el.remove(); views.delete(V.id); }
@@ -540,6 +540,19 @@ function updateLoupe(V) {
 }
 let resizeTimer = null;
 window.addEventListener("resize", () => { views.forEach(drawFrame); clearTimeout(resizeTimer); resizeTimer = setTimeout(() => P && refreshPlots(true), 250); });
+/* a panel also changes width when another one is added or closed: redraw it to fit */
+const panelWidth = new WeakMap(), plotTimers = new WeakMap();
+const panelObserver = new ResizeObserver((entries) => {
+  for (const e of entries) {
+    const w = Math.round(e.contentRect.width), el = e.target;
+    if (panelWidth.get(el) === w) continue; // height changes come from our own redraws
+    panelWidth.set(el, w);
+    const V = [...views.values()].find((V) => V.el === el);
+    if (V) { drawFrame(V); continue; }
+    const Pl = [...plots.values()].find((Pl) => Pl.el === el);
+    if (Pl) { clearTimeout(plotTimers.get(el)); plotTimers.set(el, setTimeout(() => P && plots.has(Pl.id) && refreshPlot(Pl, true), 150)); }
+  }
+});
 
 /* ---------- plot ---------- */
 bindText($("tableAutoSave"), (v) => send({ cmd: "table_autosave", text: v }));
@@ -553,7 +566,7 @@ function makePlot(id) {
   const sendUsing = () => send({ cmd: "table_using", plot: id, x: Pl.q("usingx").value, y: Pl.q("usingy").value });
   bindText(Pl.q("usingx"), sendUsing); bindText(Pl.q("usingy"), sendUsing);
   Pl.q("vremove").onclick = () => send({ cmd: "plot_remove", plot: id }); // syncPlots drops the panel
-  $("plots").appendChild(el); plots.set(id, Pl);
+  $("plots").appendChild(el); plots.set(id, Pl); panelObserver.observe(el);
   return Pl;
 }
 function syncPlots() { // add/remove panels to match the simulation, and show their columns

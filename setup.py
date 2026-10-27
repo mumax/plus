@@ -143,6 +143,7 @@ class InstallWithPreCommit(install):
 setup(
     long_description="",
     packages=find_packages(include=["mumaxplus", "mumaxplus.*"]),
+    package_data={"mumaxplus.gui": ["static/*"]},  # the GUI's web page
     ext_modules=[
         CMakeExtension("_mumaxpluscpp_single"),
         CMakeExtension("_mumaxpluscpp_double"),
