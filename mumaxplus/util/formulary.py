@@ -226,7 +226,7 @@ def Rayleigh_damping_coefficients(
 
     Returns
     -------
-    tuple[float] of size 2
+    tuple[float, float]
         Rayleigh damping mass coefficient α (1/s) and stiffness coefficient β (s).
 
     See Also
