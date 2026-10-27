@@ -1,13 +1,15 @@
 """Images made on the server.
 
 The display image's vector colours come from ``mumaxplus.util.get_rgb`` (reused, not
-re-implemented), so they match ``mumaxplus.util.plot_field`` and the rest of mumax+.
+re-implemented), so they match ``mumaxplus.util.plot_field`` and the rest of mumax+;
+a map of the regions gets a colour per region (region_rgba).
 The table plots are drawn in the page. Movie frames are drawn here, like the page draws
 a display, so a recording does not need the page to be open.
 """
 
 from __future__ import annotations
 
+import colorsys
 from pathlib import Path
 
 import numpy as np
@@ -29,6 +31,19 @@ def vector_rgba(sl):
     return out
 
 
+def region_rgba(regions):
+    """(h, w) region indices -> (h, w, 4) uint8, a colour per region.
+
+    The hues of successive indices are a golden angle apart, so neighbouring regions
+    get clearly different colours. NaN (no cell there) is transparent.
+    """
+    out = np.zeros((*regions.shape, 4), dtype=np.uint8)
+    for r in np.unique(regions[~np.isnan(regions)]):
+        rgb = colorsys.hsv_to_rgb((r * 0.618034) % 1.0, 0.55, 0.9)
+        out[regions == r] = [*(round(255 * c) for c in rgb), 255]
+    return out
+
+
 # ------------------------------------------------------------------------- movies
 MOVIE_BG = (232, 234, 239)  # outside the magnets, as the page's light theme
 
@@ -45,14 +60,14 @@ def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
     """One movie frame as a PIL image: the display's image, arrows, and the time.
 
     ``meta``, ``data`` and ``rgba`` are a display frame as sent to the page; the
-    image is drawn like the page draws it (vector colours, or gray from the
-    minimum to the maximum), scaled up by a whole factor to about ``size`` pixels,
-    and with pixels the shape of the cells.
+    image is drawn like the page draws it (the colours in ``rgba``: vectors or
+    regions, or else gray from the minimum to the maximum), scaled up by a whole
+    factor to about ``size`` pixels, and with pixels the shape of the cells.
     """
     from PIL import Image, ImageDraw, ImageFont
 
     w, h = meta["w"], meta["h"]
-    if meta["vector"]:
+    if meta["rgba"]:
         img = np.array(rgba, dtype=np.uint8).reshape(h, w, 4)
     else:
         lo, hi = meta["vmin"], meta["vmax"]

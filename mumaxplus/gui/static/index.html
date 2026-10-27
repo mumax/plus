@@ -82,6 +82,8 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .loupe { position: absolute; display: none; pointer-events: none; width: 150px; height: 150px; border: 1px solid #000;
          border-radius: 2% 50% 50%; box-shadow: 3px 3px 8px rgba(0,0,0,.4); image-rendering: pixelated; }
 .hover { font: 12px var(--mono); color: var(--mute); min-height: 18px; }
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 2px 0 6px; font-size: 12px; }
+.legend .chip { padding-right: 10px; }
 .plotErr { color: var(--err); font-weight: 600; }
 .overlay { position: absolute; pointer-events: none; }
 .plotcv, .profcv { display: block; width: 100%; height: 300px; border-radius: 8px; cursor: crosshair; touch-action: none; }
@@ -176,6 +178,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
   <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="overlay" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
   <div class="hover">&nbsp;</div>
+  <div class="legend" hidden></div>
   <div class="profile" hidden>
     <div class="row"><b class="gray" style="font-size:.92em">Line profile</b> <button class="profReset" hidden title="Show the whole profile again (or double-click it)">Reset zoom</button>
       <button class="profCsv" title="Download the values along the line as text">Save values</button><button class="profPng" title="Download the profile as shown">PNG</button></div>
@@ -718,7 +721,7 @@ async function fetchFrame(V) {
   const meta = JSON.parse(r.headers.get("X-Frame-Meta")), buf = await r.arrayBuffer();
   const n = meta.ncomp * meta.w * meta.h, old = V.frame && V.frame.meta;
   if (old && (old.w !== meta.w || old.h !== meta.h)) V.prof = null; // another image: the line means nothing there
-  V.frame = { meta, data: new Float32Array(buf, 0, n), rgba: meta.vector ? new Uint8ClampedArray(buf, n * 4, meta.w * meta.h * 4) : null };
+  V.frame = { meta, data: new Float32Array(buf, 0, n), rgba: meta.rgba ? new Uint8ClampedArray(buf, n * 4, meta.w * meta.h * 4) : null };
   V.q("renderLayer").max = meta.nslices - 1;
   V.q("renderLayerLabel").textContent = `${"xyz"[meta.axes[2]]} ${meta.layer + 1}/${meta.nslices}`;
   drawFrame(V);
@@ -733,7 +736,7 @@ function drawFrame(V) {
   if (vmin === vmax) { vmin -= 1; vmax += 1; }                // mumax3: make it gray instead of black
   for (let iy = 0; iy < h; iy++) for (let ix = 0; ix < w; ix++) {
     const i = iy * w + ix, o = 4 * ((h - 1 - iy) * w + ix); // y axis points up
-    if (meta.vector) { px[o] = rgba[4 * i]; px[o + 1] = rgba[4 * i + 1]; px[o + 2] = rgba[4 * i + 2]; px[o + 3] = rgba[4 * i + 3]; }
+    if (rgba) { px[o] = rgba[4 * i]; px[o + 1] = rgba[4 * i + 1]; px[o + 2] = rgba[4 * i + 2]; px[o + 3] = rgba[4 * i + 3]; }
     else { const g = 255 * Math.min(1, Math.max(0, (data[i] - vmin) / (vmax - vmin))); px[o] = px[o + 1] = px[o + 2] = g; px[o + 3] = isNaN(data[i]) ? 0 : 255; }
   }
   octx.putImageData(img, 0, 0);
@@ -750,7 +753,19 @@ function drawFrame(V) {
   V.q("arrowSizeRow").style.display = meta.vector ? "" : "none";
   if (meta.vector) drawArrows(V, ctx, cv.width / w, cv.height / h, w, h);
   if (meta.boxes) drawBoxes(ctx, cv.width / w, cv.height / h, meta);
-  updateLoupe(V); drawOverlay(V); updateProfile(V);
+  updateLoupe(V); drawOverlay(V); updateProfile(V); showLegend(V);
+}
+
+/* a map of the regions: which colour is which region (those in the shown slice) */
+function showLegend(V) {
+  const { meta, data, rgba } = V.frame, el = V.q("legend"), first = new Map(); // region -> its first cell
+  if (meta.quant === "regions" && rgba) for (let i = 0; i < data.length; i++) if (!isNaN(data[i]) && !first.has(data[i])) first.set(data[i], i);
+  const regions = [...first.keys()].sort((a, b) => a - b), key = regions.join(",");
+  if (el.dataset.key === key) return; // the same as shown (frames come often while running)
+  el.dataset.key = key; el.hidden = !regions.length;
+  const MAX = 64, color = (i) => `rgb(${rgba[4 * i]},${rgba[4 * i + 1]},${rgba[4 * i + 2]})`;
+  el.innerHTML = regions.slice(0, MAX).map((r) => `<span class="chip"><i style="background:${color(first.get(r))}"></i><span>region ${r}</span></span>`).join("")
+    + (regions.length > MAX ? `<span class="gray">… ${regions.length - MAX} more</span>` : "");
 }
 
 /* "show all magnets": outline and name every magnet, the selected one in the accent colour */
@@ -1341,7 +1356,7 @@ function openPlotPicker(anchor, pid, axis) {
   for (const tn of T.targets) {
     const t = P.targets[tn]; if (!t) continue;
     const grp = T.targets.length > 1 ? tn : "Quantities", qs = [];
-    for (const x of t.quantities) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc,
+    for (const x of t.quantities.filter((x) => !x.noplot)) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc,
       pick: () => pickQuantity(tn, x.name, axis === "x" || x.ncomp < 2 ? [0] : [...Array(x.ncomp).keys()]),
       comps: x.ncomp < 2 ? [] : [...Array(x.ncomp).keys()].map((k) => ({ label: compLabel(x.ncomp, k), title: `the ${compLabel(x.ncomp, k)} component of its average`, pick: () => pickQuantity(tn, x.name, [k]) })) });
     for (const x of t.scalars || []) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc, pick: () => pickQuantity(tn, x.name, [0]) });

@@ -34,7 +34,7 @@ import numpy as np
 import mumaxplus
 import mumaxplus.util as U
 
-from .plots import movie_frame, vector_rgba, write_movie
+from .plots import movie_frame, region_rgba, vector_rgba, write_movie
 
 SOLVER_METHODS = ["Heun", "BogackiShampine", "CashKarp", "Fehlberg", "DormandPrince"]
 DEFAULT_METHOD = "Fehlberg"  # documented default; mumax+ cannot report the current one
@@ -707,6 +707,9 @@ class Controller:
                         info["paintable"].append(item)
                 elif "ScalarQuantity" in m:
                     info["scalars"].append(item)
+                elif pname == "regions":  # an array: it can be shown, not plotted
+                    item["doc"] = "The region index of every cell (a colour each)."
+                    info["quantities"].append({**item, "ncomp": 1, "noplot": True})
                 elif isinstance(val, (bool, int, float)) and settable:
                     kind = "bool" if isinstance(val, bool) else "num"
                     info["switches"].append({**item, "kind": kind, "value": val})
@@ -836,7 +839,12 @@ class Controller:
 
     # --------------------------------------------------------------------- display
     def _eval_quant(self, name, quant):
-        arr = np.asarray(getattr(self.targets[name], quant).eval())
+        obj = self.targets[name]
+        if quant == "regions":  # an array, not a quantity; NaN outside the geometry
+            inside = np.asarray(obj.geometry, dtype=bool)
+            arr = np.where(inside, np.asarray(obj.regions, dtype=float), np.nan)
+        else:
+            arr = np.asarray(getattr(obj, quant).eval())
         return arr[None] if arr.ndim == 3 else arr
 
     def _compose_all(self, quant, ncomp):
@@ -925,10 +933,13 @@ class Controller:
             )
             c = min(c, ncomp - 1)
             data = sl[c : c + 1]
+            if cfg["quant"] == "regions":  # a colour per region, not gray
+                rgba = region_rgba(data[0]).tobytes()
         data = np.ascontiguousarray(data, dtype="<f4")
         finite = data[np.isfinite(data)]
         meta = {
             "vector": vector,
+            "rgba": bool(rgba),  # the colours come with the data (else: gray)
             "ncomp": int(data.shape[0]),
             "w": int(data.shape[2]),
             "h": int(data.shape[1]),
@@ -1879,7 +1890,7 @@ class Controller:
         data = np.frombuffer(buf[: 4 * n], "<f4").reshape(
             meta["ncomp"], meta["h"], meta["w"]
         )
-        rgba = np.frombuffer(buf[4 * n :], np.uint8) if meta["vector"] else None
+        rgba = np.frombuffer(buf[4 * n :], np.uint8) if meta["rgba"] else None
         img = movie_frame(meta, data, rgba, mv["arrows"])
         img.save(mv["folder"] / f"{mv['n']:06d}.png")
         mv["n"] += 1
