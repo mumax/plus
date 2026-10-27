@@ -76,6 +76,10 @@ def _make_handler(ctrl: Controller, token: str):
                 since = int(arg("since", "0"))
                 with ctrl.lock:
                     return self._json([m for m in ctrl.log if m["id"] > since])
+            if url.path == "/api/table.txt":  # the table rows in memory
+                with ctrl.lock:
+                    text = ctrl.table.text()
+                return self._send(200, text.encode(), "text/plain; charset=utf-8")
             if url.path == "/api/plot.png":  # plot "table.txt" using x:y with lines
                 dpr = max(1.0, min(3.0, float(arg("dpr", "1"))))
                 w, h = (

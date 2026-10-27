@@ -107,6 +107,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <button id="hdrRun" class="primary" title="Run for the time in the Solver panel / Break">▶ Run</button>
   <span id="busy">Paused</span>
   <span class="mono gray" style="font-size:12px">t = <b id="hdrTime" style="color:var(--ink)">0</b> s</span>
+  <span id="hdrPerf" class="mono gray" style="font-size:12px" title="Speed over the last 2 s of wall time, and the time left in the current Run / Steps"></span>
   <span id="errbox"></span>
   <label id="magnetPick">magnet <select id="selMagnet"></select></label>
 </div></header>
@@ -126,6 +127,8 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
     <tr title="Slice through z layers"><td>Slice: <input type="range" class="renderLayer" min="0" max="0" value="0"></td><td class="renderLayerLabel">1/1</td></tr>
     <tr class="arrowSizeRow" title="Arrow spacing in cells, as arrow_size in mumaxplus.util.plot_field"><td>Arrows: <input type="range" class="arrowSize" min="2" max="64" value="8"></td><td class="arrowSizeLabel">8</td></tr>
   </table>
+  <div class="row">Save: <button class="savePng" title="Download the image as shown here, with its arrows">PNG</button><button class="saveOvf" title="Save the quantity of the selected magnet as an OVF file, in the folder the script runs in (save_ovf)">OVF</button>
+    <span title="Save the quantity as OVF now and every this many seconds of simulation time while running (mumax3: AutoSave). 0 = off">AutoSave: <input type="text" class="autosave" size="7"> s</span></div>
   <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
   <div class="hover">&nbsp;</div>
 </div></template>
@@ -134,7 +137,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <div class="row" title="Save a row of the table every this many seconds of simulation time into table.txt. 0 = only keep a live preview, nothing is saved"><span>TableAutosave:</span> <input type="text" id="tableAutoSave" size="8"> s <span class="gray" style="font-size:12px">(0: live preview only, not saved)</span></div>
   <div id="cols" class="gray" style="font-size:12px"></div>
   <div id="plots"></div>
-  <div class="row"><button id="addPlot" title="Add another plot, to follow more table columns at the same time">+ Add plot</button></div>
+  <div class="row"><button id="addPlot" title="Add another plot, to follow more table columns at the same time">+ Add plot</button><button id="saveTable" title="Download the table rows shown in the plots (with TableAutosave 0 these are live samples that table.txt does not have)">Save table</button></div>
 </div></section>
 <template id="plotTpl"><div class="plot">
   <div class="vhead"><span class="vname"></span><button class="vremove" title="Remove this plot">×</button></div>
@@ -146,6 +149,10 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
 <section id="s-console"><h2 title="Click to show/hide">Console</h2><div class="body">
   <div id="console"></div>
   <input id="cli" type="text" placeholder="type commands here (python), or up/down" autocomplete="off" spellcheck="false">
+  <div class="row" id="pyrow" title="Everything done in this page that changes the simulation (parameters, initial m, solver, runs, console lines), as Python lines to add to the end of your script">
+    <button id="pyCopy">Copy as Python</button><button id="pySave">Save .py</button><button id="pyClear" title="Forget what was recorded so far">Clear</button>
+    <span id="pyNote" class="gray" style="font-size:12px"></span>
+  </div>
 </div></section>
 
 <section id="s-geom"><h2 title="Click to show/hide">Geometry</h2><div class="body">
@@ -168,6 +175,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
       <tr title="Simulation time"><td>time:</td><td><span id="time">0</span> s</td></tr>
       <tr title="Current time step"><td>dt:</td><td><span id="dt">0</span> s</td></tr>
       <tr title="Maximum absolute torque"><td>MaxTorque:</td><td id="maxtorque">--</td></tr>
+      <tr title="Time steps and simulated time per second of wall time, over the last 2 s of the (last) run. Includes the time spent on displays and plots"><td>speed:</td><td id="speed">--</td></tr>
     </table>
     <table>
       <tr title="Fixed time step. 0 = adaptive time step (adaptive_timestep)"><td>fixdt:</td><td><input type="text" id="fixdt" size="8"> s</td></tr>
@@ -176,6 +184,12 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   </div>
   <details style="margin-top:8px"><summary class="gray" style="cursor:pointer">more solver settings (mumax⁺)</summary>
     <table id="moresolver" style="margin-top:6px"></table></details>
+</div></section>
+
+<section id="s-ckpt"><h2 title="Click to show/hide">Checkpoints</h2><div class="body">
+  <div class="row"><button id="ckptSave" title="Keep a copy of the magnetization (and elastic fields) of every magnet, the time and the step count in memory">Save checkpoint</button>
+    <span class="gray" style="font-size:12px">to go back to later; parameters are not part of it</span></div>
+  <table id="ckpts" class="mono" style="font-size:12px"></table>
 </div></section>
 
 <section id="s-m"><h2 title="Click to show/hide">Initial m</h2><div class="body">
@@ -225,6 +239,14 @@ async function send(c) {
     return await r.json();
   } catch (e) { return { ok: false, error: String(e) }; }
 }
+
+/* let the browser save a file */
+function download(name, blob) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const stem = () => (P ? P.title : "mumaxplus");
 
 /* number formatting */
 function num(v) { // like mumax3's float32(v)
@@ -276,6 +298,62 @@ async function fetchLog() {
   }
   while (box.childNodes.length > 500) box.removeChild(box.firstChild);
   if (!consoleHover) box.scrollTop = box.scrollHeight;
+}
+
+/* ---------- Copy as Python: what was done in the page, as lines for the script ---------- */
+let pyFlash = "";
+async function pyScript() {
+  const r = await send({ cmd: "script" });
+  if (r.ok === false || r.script === undefined) { pyFlash = r.pending ? "busy, try again when it finishes" : "failed: " + r.error; return null; }
+  return r.script;
+}
+function pyNote(text) { pyFlash = text; clearTimeout(pyNote.t); pyNote.t = setTimeout(() => (pyFlash = ""), 2500); }
+$("pyCopy").onclick = async () => {
+  const text = await pyScript(); if (text === null) return;
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) { // no clipboard API (e.g. not opened as localhost): copy through a selection
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); ta.remove();
+  }
+  pyNote("copied");
+};
+$("pySave").onclick = async () => {
+  const text = await pyScript(); if (text === null) return;
+  download(stem() + "_gui.py", new Blob([text], { type: "text/x-python" }));
+  pyNote("saved");
+};
+$("pyClear").onclick = () => { send({ cmd: "script_clear" }); pyNote("cleared"); };
+function showPyNote() {
+  const n = T.script_lines || 0;
+  $("pyNote").textContent = pyFlash || (n ? `${n} line${n === 1 ? "" : "s"} recorded` + (T.running ? " + the run so far" : "") : T.running ? "the run so far is recorded" : "nothing recorded yet");
+}
+
+/* ---------- checkpoints ---------- */
+$("ckptSave").onclick = () => send({ cmd: "checkpoint" });
+let ckptKey = "";
+function showCheckpoints() {
+  const key = T.checkpoints.map((c) => c.id).join(","); if (key === ckptKey) return; ckptKey = key;
+  $("ckpts").innerHTML = T.checkpoints.map((c) => `<tr><td>#${c.id}</td><td>t = ${sci(c.time, 4)} s</td><td>step ${c.steps}</td><td class="gray">${num(+c.mb.toPrecision(2))} MB</td>
+    <td><button data-restore="${c.id}" title="Go back to this checkpoint (stops a run)">Restore</button> <button data-remove="${c.id}" title="Forget this checkpoint">×</button></td></tr>`).join("");
+}
+$("ckpts").onclick = (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.restore) send({ cmd: "checkpoint_restore", id: +b.dataset.restore });
+  else send({ cmd: "checkpoint_remove", id: +b.dataset.remove });
+};
+
+/* ---------- performance ---------- */
+function si(v, unit) { // 8.5e-10 -> "850 p" + unit
+  if (!v) return "0 " + unit;
+  const e = Math.max(-5, Math.min(4, Math.floor(Math.log10(Math.abs(v)) / 3)));
+  return `${+(v / 10 ** (3 * e)).toPrecision(3)} ${["f", "p", "n", "µ", "m", "", "k", "M", "G", "T"][e + 5]}${unit}`;
+}
+function duration(s) { return s < 90 ? `${Math.ceil(s)} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`; }
+function showPerf() {
+  const p = T.perf || {};
+  const speed = p.steps_s === null || p.steps_s === undefined ? "" : `${si(p.steps_s, "steps/s")}, ${si(p.sim_s, "s/s")}`;
+  $("speed").textContent = speed || "--";
+  $("hdrPerf").textContent = T.running && speed ? speed + (p.eta !== null && p.eta !== undefined ? ` · ${duration(p.eta)} left` : "") : "";
 }
 
 /* ---------- magnet selection ---------- */
@@ -370,6 +448,13 @@ function makeView(id) {
   q("renderLayer").oninput = (e) => render({ layer: +e.target.value });
   q("renderAll").onchange = (e) => render({ all: e.target.checked });
   q("arrowSize").oninput = (e) => { V.arrowCells = +e.target.value; q("arrowSizeLabel").textContent = V.arrowCells; drawFrame(V); }; // client-side only
+  q("savePng").onclick = () => {
+    if (!V.frame) return;
+    const m = V.frame.meta, name = `${stem()}_${m.quant}${m.comp === "" ? "" : "_" + m.comp}_t${sci(m.time, 4)}.png`;
+    q("disp").toBlob((b) => b && download(name, b), "image/png");
+  };
+  q("saveOvf").onclick = () => send({ cmd: "save_ovf", view: id }); // the console says where
+  bindText(q("autosave"), (v) => send({ cmd: "view_autosave", view: id, text: v }));
   const disp = q("disp");
   disp.onmousemove = (e) => { const r = disp.getBoundingClientRect(); V.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }; updateLoupe(V); };
   disp.onclick = (e) => {
@@ -400,6 +485,7 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     if (document.activeElement !== q("renderLayer")) q("renderLayer").value = c.layer;
     q("renderAllRow").style.display = many ? "" : "none";
     q("renderAll").checked = !!c.all;
+    setText(q("autosave"), num(c.autosave));
   });
 }
 
@@ -555,6 +641,7 @@ const panelObserver = new ResizeObserver((entries) => {
 });
 
 /* ---------- plot ---------- */
+$("saveTable").onclick = async () => download(stem() + "_table.txt", await (await GET("/api/table.txt")).blob());
 bindText($("tableAutoSave"), (v) => send({ cmd: "table_autosave", text: v }));
 /* One or more plot panels, like the display panels: each plots its own x:y columns of the one table.
    Pl = the panel's page state, cfg = its columns as the simulation reports them in /api/tick. */
@@ -650,6 +737,7 @@ function showTick() {
   $("maxtorque").textContent = T.maxtorque === null ? "--" : sci(T.maxtorque, 3) + " T";
   setText($("fixdt"), num(T.fixdt)); setText($("maxerr"), num(T.maxerr));
   setText($("tableAutoSave"), num(T.autosave));
+  showPyNote(); showCheckpoints(); showPerf();
   syncPlots();
   if (document.activeElement !== $("solvertype")) $("solvertype").value = T.method;
   $("methodnote").textContent = T.method_known ? "" : "(mumax⁺ cannot report the current method; showing its default)";

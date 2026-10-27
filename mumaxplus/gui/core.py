@@ -12,10 +12,13 @@ server.)
 
 from __future__ import annotations
 
+import ast
+import collections
 import contextlib
 import inspect
 import io
 import math
+import os
 from pathlib import Path
 import queue
 import re
@@ -44,6 +47,7 @@ RENDER_INTERVAL = 0.10  # minimum wall time between two display frames while run
 TORQUE_INTERVAL = 0.5
 LIVE_SAMPLE_INTERVAL = 0.15  # live table sampling (wall time) when TableAutosave is 0
 TABLE_MAX_ROWS = 20000
+PERF_WINDOW = 2.0  # wall time over which steps/s and simulated time/s are measured
 NO_RESET = {
     "break",
     "render",
@@ -56,6 +60,11 @@ NO_RESET = {
     "plot_add",
     "plot_remove",
     "call",
+    "script",
+    "script_clear",
+    "save_ovf",
+    "view_autosave",
+    "checkpoint_remove",
 }
 
 
@@ -137,10 +146,33 @@ class Table:
         if to_file:
             with open(self.path, "a") as f:
                 if not self._header_written:
-                    head = ["t (s)"] + [f"{n} ({u})" for n, u, _ in self.cols]
-                    f.write("# " + "\t".join(head) + "\n")
+                    f.write(self._header())
                     self._header_written = True
-                f.write("\t".join(f"{v:.8g}" for v in row) + "\n")
+                f.write(self._line(row))
+
+    def _header(self):
+        head = ["t (s)"] + [f"{n} ({u})" for n, u, _ in self.cols]
+        return "# " + "\t".join(head) + "\n"
+
+    @staticmethod
+    def _line(row):
+        return "\t".join(f"{v:.8g}" for v in row) + "\n"
+
+    def rewind(self, t):
+        """Go back to time t (a checkpoint was restored).
+
+        Rows after t are dropped from memory; the table file only gets a comment,
+        as its rows were saved already.
+        """
+        self.rows[:] = [r for r in self.rows if r[0] <= t * (1 + 1e-12)]
+        self.next_save = None
+        if self._header_written:
+            with open(self.path, "a") as f:
+                f.write(f"# checkpoint restored: back to t = {t:.8g} s\n")
+
+    def text(self):
+        """Return the rows in memory, in the format of the table file."""
+        return self._header() + "".join(map(self._line, list(self.rows)))
 
     def column(self, spec):
         """1-based index or name -> index into a row."""
@@ -211,6 +243,19 @@ class Controller:
         self._dirty = True
         self._last_render = self._last_live = 0.0
 
+        # "Copy as Python": what was done in the page, as lines to add to the script
+        self.script = []
+        self._script_imports = []
+        self._rec_t = self._rec_n = None  # time / step of the unrecorded part of a run
+
+        # checkpoints: copies of the state (m, elastic fields, time) in host memory
+        self.checkpoints = []
+        self._next_checkpoint = 1
+
+        # performance: (wall time, simulation time, step) at the end of recent chunks
+        self._perf = collections.deque()
+        self.perf = {"steps_s": None, "sim_s": None}
+
         self._install_helpers()
         self.refresh_targets()
         self._default_table()
@@ -229,6 +274,48 @@ class Controller:
 
     def _ts(self):
         return self.world.timesolver
+
+    # ------------------------------------------------------------- Copy as Python
+    def record(self, code, imports=()):
+        """Add ``code`` to the recorded script, after the run done so far."""
+        self._record_run()
+        self.script.append(code)
+        self._script_imports += [i for i in imports if i not in self._script_imports]
+
+    def _did(self, code, imports=()):
+        """Echo ``code`` in the console and record it."""
+        self.say(code, "in")
+        self.record(code, imports)
+
+    def _record_run(self):
+        """Record the part of the current run that was not recorded yet."""
+        if not self.running or self._rec_t is None:
+            return
+        ts = self._ts()
+        if self.steps_left is not None:
+            n = self.steps_done - self._rec_n
+            if n > 0:
+                self.script.append(f"world.timesolver.steps({n})")
+        else:
+            # a finished Run(t) records t, not t plus the overshoot of the last step
+            end = self.run_until
+            if end is None or ts.time < end * (1 - 1e-12):
+                end = float(ts.time)
+            if end > self._rec_t:
+                self.script.append(f"world.timesolver.run({end - self._rec_t:.10g})")
+        self._rec_t, self._rec_n = float(ts.time), self.steps_done
+
+    def script_text(self):
+        """Return the recorded script, including the run so far."""
+        self._record_run()
+        head = [
+            f"# What was done in the mumax+ GUI of {self.title}, as Python. Add these",
+            "# lines to the end of the script, in place of gui.run(), to repeat it.",
+        ]
+        if not self.script:
+            return "\n".join(head + ["# (nothing recorded yet)"]) + "\n"
+        imports = self._script_imports and ["", *self._script_imports]
+        return "\n".join(head + imports + [""] + self.script) + "\n"
 
     # -------------------------------------------------------------------- targets
     def refresh_targets(self):
@@ -255,8 +342,11 @@ class Controller:
             parent, sub = name.split(":sub")
             return f"{self._ref(parent)}.sub{sub}"
         obj = self.targets[name]
+        impl = getattr(obj, "_impl", None)  # world.magnets makes new Python objects
         for k, v in self.ns.items():
-            if v is obj and not k.startswith("_"):
+            if k.startswith("_"):
+                continue
+            if v is obj or (impl is not None and getattr(v, "_impl", None) is impl):
                 return k
         return f"world.magnets[{name!r}]"
 
@@ -293,6 +383,8 @@ class Controller:
             }
         )
         base.update({k: v for k, v in cfg.items() if k in keys})
+        base["autosave"] = 0.0  # mumax3 AutoSave period of the shown quantity (OVF)
+        base["_next_save"] = None
         base["id"] = self._next_view
         self._next_view += 1
         self.views.append(base)
@@ -766,6 +858,12 @@ class Controller:
                     "frame_id": self.frame_id,
                     "desc_version": self.desc_version,
                     "log_id": self.log_id,
+                    "script_lines": len(self.script),
+                    "perf": dict(self.perf, eta=self._eta()),
+                    "checkpoints": [
+                        {k: v for k, v in cp.items() if k != "state"}
+                        for cp in self.checkpoints
+                    ],
                     "error": self.last_error,
                     "targets": list(self.targets),
                 }
@@ -834,8 +932,12 @@ class Controller:
         self.steps_left = int(n) if n is not None else None
         self.progress = 0
         self._fresh = True
+        self._rec_t, self._rec_n = float(ts.time), self.steps_done
+        self._perf.clear()
+        self._perf.append((time.perf_counter(), float(ts.time), self.steps_done))
 
     def _break(self):
+        self._record_run()
         self.running = False
         self.run_until = self.steps_left = None
         self._live_sample()
@@ -870,12 +972,11 @@ class Controller:
             self._break()
         elif name in ("relax", "minimize"):
             self._break()
-            self.say(f"world.{name}()", "in")
             self._blocking(name, lambda: getattr(self.world, name)())
         elif name == "solver_type":
             ts.set_method(c["value"])
             self.method, self.method_known = c["value"], True
-            self.say(f"world.timesolver.set_method({c['value']!r})", "in")
+            self._did(f"world.timesolver.set_method({c['value']!r})")
         elif name == "solver_set":
             self._solver_set(c["name"], c["text"])
         elif name == "param":
@@ -884,7 +985,7 @@ class Controller:
             obj = self.targets[c["target"]]
             value = c["value"] if c.get("kind") == "bool" else self._eval(c["value"])
             setattr(obj, c["name"], value)
-            self.say(f"{self._ref(c['target'])}.{c['name']} = {value}", "in")
+            self._did(f"{self._ref(c['target'])}.{c['name']} = {value!r}")
             self.describe()
         elif name == "world_set":
             cur = getattr(self.world, c["name"])
@@ -894,16 +995,16 @@ class Controller:
                 else self._eval(c["text"])
             )
             setattr(self.world, c["name"], value)
-            self.say(f"world.{c['name']} = {value}", "in")
+            self._did(f"world.{c['name']} = {value!r}")
             self.describe()
         elif name == "set_pbc":
             value = tuple(int(self._eval(v)) for v in c["value"])
             if any(value):
                 self.world.set_pbc(value)  # also fits mastergrid to the magnets
-                self.say(f"world.set_pbc({value})", "in")
+                self._did(f"world.set_pbc({value})")
             else:
                 self.world.unset_pbc()
-                self.say("world.unset_pbc()", "in")
+                self._did("world.unset_pbc()")
             self.refresh_targets()
             self.describe()
         elif name == "setm":
@@ -937,6 +1038,19 @@ class Controller:
                 self.views = [v for v in self.views if v["id"] != c["view"]]
                 with self.lock:
                     self.frames.pop(c["view"], None)
+        elif name in ("save_ovf", "view_autosave"):
+            cfg = self._view(c["view"])
+            if cfg is None:
+                raise ValueError(f"no display {c['view']!r}")
+            if name == "save_ovf":
+                return {"ok": True, "file": self._save_ovf(cfg)}
+            self._view_autosave(cfg, self._eval(c["text"]))
+        elif name == "checkpoint":
+            self._checkpoint()
+        elif name == "checkpoint_restore":
+            self._restore(c["id"])
+        elif name == "checkpoint_remove":
+            self.checkpoints = [cp for cp in self.checkpoints if cp["id"] != c["id"]]
         elif name == "table_autosave":
             self._table_autosave(self._eval(c["text"]))
         elif name == "table_using":
@@ -956,6 +1070,11 @@ class Controller:
                 self.plots = [p for p in self.plots if p["id"] != c["plot"]]
         elif name == "cli":
             return self._cli(c["code"])
+        elif name == "script":
+            return {"ok": True, "script": self.script_text()}
+        elif name == "script_clear":
+            self._record_run()  # forget the run so far too
+            self.script, self._script_imports = [], []
         elif name == "refresh":
             self.refresh_targets()
             self.describe()
@@ -964,6 +1083,7 @@ class Controller:
         return {"ok": True}
 
     def _blocking(self, label, fn):
+        self._did(f"world.{label}()")
         self.busy = f"{label}: busy, the page updates when finished"
         self._publish()
         t0 = time.perf_counter()
@@ -983,17 +1103,17 @@ class Controller:
             if v > 0:
                 ts.adaptive_timestep = False
                 ts.timestep = v
+                self._did(
+                    "world.timesolver.adaptive_timestep = False; "
+                    f"world.timesolver.timestep = {v!r}"
+                )
             else:
                 ts.adaptive_timestep = True
-            self.say(
-                f"world.timesolver.adaptive_timestep = {v == 0}"
-                + (f"; timestep = {v}" if v else ""),
-                "in",
-            )
+                self._did("world.timesolver.adaptive_timestep = True")
         else:
             attr = {"maxerr": "max_error"}.get(key, key)
             setattr(ts, attr, v)
-            self.say(f"world.timesolver.{attr} = {v}", "in")
+            self._did(f"world.timesolver.{attr} = {v!r}")
         self.describe()
 
     def _set_param(self, target, pname, text):
@@ -1007,15 +1127,16 @@ class Controller:
                 setattr(obj, pname, value)
             else:
                 q.set(value)
-            self.say(f"{ref} = {value}", "in")
+            self._did(f"{ref} = {value!r}")
         else:
             q.set_in_region(self.region, value)
-            self.say(f"{ref}.set_in_region({self.region}, {value})", "in")
+            self._did(f"{ref}.set_in_region({self.region}, {value!r})")
         self.describe()
         self._dirty = True
 
     def _set_m(self, target, config, args):
         obj = self.targets[target]
+        imports = []
         if config == "Uniform":
             value = tuple(float(x) for x in self._eval(args))
             code = f"{self._ref(target)}.magnetization = {value}"
@@ -1032,10 +1153,110 @@ class Controller:
                 },
             )
             code = f"{self._ref(target)}.magnetization = {config}{args}"
+            if self.ns.get(config) is not fn:  # the script did not import it
+                imports.append(f"from mumaxplus.util import {config}")
         obj.magnetization = value
-        self.say(code, "in")
+        self._did(code, imports)
         self._dirty = True
         self._live_sample()
+
+    def _save_ovf(self, cfg, record=True):
+        """Save the quantity of a display as an OVF file (mumax3: Save)."""
+        if self.sel not in self.targets or not cfg["quant"]:
+            raise ValueError("nothing to save")
+        fq = getattr(self.targets[self.sel], cfg["quant"])
+        if not hasattr(fq, "save_ovf"):
+            raise ValueError(f"{cfg['quant']} cannot be saved as OVF")
+        # the name save_ovf() picks
+        count = fq._ovf_counts.get(fq.name, 0)
+        file = os.path.abspath(fq.name.replace(":", "_") + f"_{count:06d}.ovf")
+        fq.save_ovf()
+        if record:
+            self._did(f"{self._ref(self.sel)}.{cfg['quant']}.save_ovf()")
+        self.say(f"saved {file}")
+        return file
+
+    def _view_autosave(self, cfg, period):
+        """Save the display's quantity now and every ``period`` s (mumax3: AutoSave)."""
+        cfg["autosave"] = max(float(period), 0.0)
+        cfg["_next_save"] = None
+        if cfg["autosave"] == 0:
+            self.say(f"autosave of {cfg['quant']} off")
+            return
+        self.say(f"saving {cfg['quant']} every {cfg['autosave']:g} s")
+        self._autosave_tick()
+
+    def _autosave_tick(self):
+        t = float(self._ts().time)
+        for cfg in self.views:
+            period, due = cfg["autosave"], cfg["_next_save"]
+            if period <= 0 or (due is not None and t < due * (1 - 1e-12)):
+                continue
+            try:
+                self._save_ovf(cfg, record=False)
+            except Exception as e:  # e.g. the quantity has gone: stop, do not repeat
+                cfg["autosave"] = 0.0
+                self.say(f"autosave of {cfg['quant']} stopped: {e}", "err")
+                continue
+            due = t if due is None else due
+            while due <= t * (1 + 1e-12):
+                due += period
+            cfg["_next_save"] = due
+
+    def _state_vars(self):
+        """(target, attribute) of every field that evolves in time."""
+        out = []
+        for name, obj in self.targets.items():
+            if isinstance(getattr(type(obj), "magnetization", None), property):
+                out.append((name, "magnetization"))
+            if ":sub" not in name and getattr(obj, "enable_elastodynamics", False):
+                out += [(name, "elastic_displacement"), (name, "elastic_velocity")]
+        return out
+
+    def _checkpoint(self):
+        """Keep a copy of the state in memory, to go back to it with _restore."""
+        ts = self._ts()
+        state = [
+            (n, a, np.array(getattr(self.targets[n], a).eval()))
+            for n, a in self._state_vars()
+        ]
+        cp = {
+            "id": self._next_checkpoint,
+            "time": float(ts.time),
+            "steps": self.steps_done,
+            "mb": sum(arr.nbytes for _, _, arr in state) / 1e6,
+            "state": state,
+        }
+        self._next_checkpoint += 1
+        self.checkpoints.append(cp)
+        refs = ", ".join(f"{self._ref(n)}.{a}.eval()" for n, a, _ in state)
+        self._did(f"checkpoint_{cp['id']} = (world.timesolver.time, {refs})")
+        self.say(f"checkpoint {cp['id']} at t = {cp['time']:.6g} s ({cp['mb']:.3g} MB)")
+
+    def _restore(self, cid):
+        """Go back to a checkpoint: its fields, time and step count."""
+        cp = next((cp for cp in self.checkpoints if cp["id"] == cid), None)
+        if cp is None:
+            raise ValueError(f"no checkpoint {cid!r}")
+        missing = [n for n, _, _ in cp["state"] if n not in self.targets]
+        if missing:
+            raise ValueError(f"checkpoint {cid}: magnet(s) gone: {', '.join(missing)}")
+        self._break()
+        ts = self._ts()
+        for n, a, arr in cp["state"]:
+            setattr(self.targets[n], a, arr)
+        ts.time = cp["time"]
+        self.steps_done = cp["steps"]
+        self._fresh = True
+        refs = ", ".join(f"{self._ref(n)}.{a}" for n, a, _ in cp["state"])
+        self._did(f"world.timesolver.time, {refs} = checkpoint_{cid}")
+        self.table.rewind(cp["time"])
+        self._live_sample()
+        for cfg in self.views:  # AutoSave: save now and every period from here
+            cfg["_next_save"] = None
+        self._autosave_tick()
+        self._update_torque()
+        self._dirty = True
 
     def _table_autosave(self, period):
         period = float(period)
@@ -1078,6 +1299,7 @@ class Controller:
         def SetSolver(method):
             self._ts().set_method(method)
             self.method, self.method_known = method, True
+            self.record(f"world.timesolver.set_method({method!r})")
 
         for fn in (
             Run,
@@ -1091,6 +1313,14 @@ class Controller:
             SetSolver,
         ):
             self.ns.setdefault(fn.__name__, fn)
+        # the console lines that use them are not recorded as typed (Run, Relax, ...
+        # record what they do themselves)
+        self._helpers = {
+            k
+            for k, v in self.ns.items()
+            if inspect.isfunction(v)
+            and v.__qualname__.startswith("Controller._install_helpers")
+        }
 
     def _cli(self, code):
         out = io.StringIO()
@@ -1099,11 +1329,15 @@ class Controller:
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
             try:
                 try:
-                    result = eval(compile(code, "<gui>", "eval"), self.ns)
-                    if result is not None:
-                        print(repr(result))
+                    mode, tree = "eval", ast.parse(code, "<gui>", "eval")
                 except SyntaxError:
-                    exec(compile(code, "<gui>", "exec"), self.ns)
+                    mode, tree = "exec", ast.parse(code, "<gui>", "exec")
+                self._record_run()
+                at = len(self.script)  # before what Run, Relax, ... in it record
+                result = eval(compile(tree, "<gui>", mode), self.ns)
+                if result is not None:
+                    print(repr(result))
+                self._record_cli(code, tree, result, at)
             except Exception as e:
                 tb = [
                     f
@@ -1122,6 +1356,21 @@ class Controller:
         self.describe()
         self._dirty = True
         return {"ok": not failed, "output": text}
+
+    def _record_cli(self, code, tree, result, at):
+        """Record a console line that worked, unless it only asked for a value."""
+        names = {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)}
+        if names & self._helpers:  # Run, Relax, ... record what they do themselves
+            call = tree.body if isinstance(tree, ast.Expression) else None
+            lone = (  # just one call of a GUI command, like Run(1e-9)
+                isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Name)
+                and call.func.id in self._helpers
+            )
+            if not lone:
+                self.script.insert(at, f"# console, uses GUI-only commands: {code}")
+        elif isinstance(tree, ast.Module) or result is None:
+            self.record(code)
 
     # --------------------------------------------------------------------- the loop
     def _call(self, name, arg):
@@ -1146,6 +1395,7 @@ class Controller:
             for x in (
                 self.run_until,
                 self.table.next_save if self.table.period > 0 else None,
+                *(v["_next_save"] for v in self.views if v["autosave"] > 0),
             )
             if x is not None
         ]
@@ -1158,6 +1408,7 @@ class Controller:
                 n = max(1, min(n, int(0.5 * remaining / dt)))
         self._call("steps", n)
         self.steps_done += n
+        self._measure()
         wall = max(time.perf_counter() - t0, 1e-4)
         self._nchunk = max(
             1,
@@ -1169,6 +1420,7 @@ class Controller:
         if self.steps_left is not None:
             self.steps_left -= n
         self._table_tick()
+        self._autosave_tick()
         # progress and end of run, like mumax3's Run/Steps
         if self.run_until is not None:
             total = self.run_until - self._run_t0
@@ -1188,6 +1440,33 @@ class Controller:
             self.progress = 100
             self._break()
             self._dirty = True
+
+    def _measure(self):
+        """Measure steps and simulated time per second of wall time, over PERF_WINDOW.
+
+        The wall time includes everything the loop does (displays, table, commands),
+        so this is the speed you get, not only that of the solver.
+        """
+        now, perf = time.perf_counter(), self._perf
+        perf.append((now, float(self._ts().time), self.steps_done))
+        while len(perf) > 2 and now - perf[1][0] > PERF_WINDOW:
+            perf.popleft()
+        (w0, t0, n0), (w1, t1, n1) = perf[0], perf[-1]
+        if w1 - w0 > 0.2:  # too short a time says little
+            self.perf = {
+                "steps_s": (n1 - n0) / (w1 - w0),
+                "sim_s": (t1 - t0) / (w1 - w0),
+            }
+
+    def _eta(self):
+        """Wall time (s) left in the current Run / Steps, or None."""
+        if not self.running:
+            return None
+        if self.run_until is not None and self.perf["sim_s"]:
+            return max(self.run_until - float(self._ts().time), 0) / self.perf["sim_s"]
+        if self.steps_left is not None and self.perf["steps_s"]:
+            return self.steps_left / self.perf["steps_s"]
+        return None
 
     def loop(self):
         """Drive the simulation on the calling thread until stop()."""
@@ -1210,6 +1489,8 @@ class Controller:
                     self._publish()
                     last_pub = now
             except Exception as e:
+                with contextlib.suppress(Exception):
+                    self._record_run()
                 self.running = False
                 self.say(f"simulation stopped: {type(e).__name__}: {e}", "err")
                 self.say(traceback.format_exc(limit=4).rstrip(), "err")
