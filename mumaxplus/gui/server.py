@@ -10,7 +10,6 @@ import threading
 from urllib.parse import parse_qs, urlparse
 import webbrowser
 
-from . import plots
 from .core import Controller, _clean
 
 
@@ -80,29 +79,9 @@ def _make_handler(ctrl: Controller, token: str):
                 with ctrl.lock:
                     text = ctrl.table.text()
                 return self._send(200, text.encode(), "text/plain; charset=utf-8")
-            if url.path == "/api/plot.png":  # plot "table.txt" using x:y with lines
-                dpr = max(1.0, min(3.0, float(arg("dpr", "1"))))
-                w, h = (
-                    int(float(arg("w", "480"))) / dpr,
-                    int(float(arg("h", "320"))) / dpr,
-                )
-                theme = "dark" if arg("theme") == "dark" else "light"
-                with ctrl.lock:
-                    tb = ctrl.table
-                    names, rows = tb.names(), [r[:] for r in tb.rows]
-                    units = ["s"] + [c[1] for c in tb.cols]
-                    try:
-                        xi, yi = tb.column(arg("x", "1")), tb.column(arg("y", "2"))
-                        err = ""
-                    except ValueError as e:
-                        err = str(e)
-                if err:  # also in a header, so the page can show it next to the plot
-                    png = plots.message_png(err, w, h, dpr, theme)
-                    return self._send(
-                        200, png, "image/png", {"X-Plot-Error": json.dumps(err)}
-                    )
-                png = plots.table_png(names, units, rows, xi, yi, w, h, dpr, theme)
-                return self._send(200, png, "image/png")
+            if url.path == "/api/table":  # new rows for the plots (drawn in the page)
+                ver, since = int(arg("version", "-1")), int(arg("since", "0"))
+                return self._json(ctrl.table.since(ver, since))
             self._send(404, b"not found", "text/plain")
 
         def do_POST(self):
@@ -178,21 +157,20 @@ class GUI:
         """
         self._do(lambda: self.ctrl._table_autosave(period))
 
-    def add_plot(self, x="t", y=None):
-        """Show a plot of table column ``y`` against column ``x``.
+    def add_plot(self, x="t", y=None, logx=False, logy=False):
+        """Show a plot of table column(s) ``y`` against column ``x``.
 
-        Columns are names or 1-based numbers. The first call replaces the default plot
-        (mx against t); later calls add plots.
+        Columns are names or 1-based numbers; ``y`` can be several, as a list or
+        comma-separated (``"mx,my,mz"``). ``logx`` / ``logy`` use logarithmic axes.
+        The first call replaces the default plot (mx against t); later calls add plots.
         """
 
         def add():
             if not self._script_plots:
-                self.ctrl.plots[0].update(
-                    x=str(x), y=str(y if y is not None else self.ctrl.plots[0]["y"])
-                )
+                self.ctrl._plot_set(self.ctrl.plots[0], x, y, logx, logy)
                 self._script_plots = True
             else:
-                self.ctrl.add_plot(x, y)
+                self.ctrl.add_plot(x, y, logx, logy)
 
         self._do(add)
 

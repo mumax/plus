@@ -114,6 +114,10 @@ class Table:
         self.period = 0.0  # TableAutosave: 0 = live preview only (not saved)
         self.next_save = None
         self._header_written = False
+        # the page fetches new rows only; rows that change otherwise (clear, thinning,
+        # rewind) make a new version, which it fetches whole
+        self.version = 0
+        self.lock = threading.Lock()
 
     def names(self):
         """Return the column names, starting with t."""
@@ -121,7 +125,9 @@ class Table:
 
     def clear(self):
         """Remove all rows; the header is written again on the next save."""
-        self.rows.clear()
+        with self.lock:
+            self.rows.clear()
+            self.version += 1
         self._header_written = False
 
     def add(self, name, unit, fn):
@@ -140,9 +146,11 @@ class Table:
                 row.append(float(fn()))
             except Exception:
                 row.append(float("nan"))
-        self.rows.append(row)
-        if len(self.rows) > TABLE_MAX_ROWS:
-            self.rows[:] = self.rows[::2]
+        with self.lock:
+            self.rows.append(row)
+            if len(self.rows) > TABLE_MAX_ROWS:
+                self.rows[:] = self.rows[::2]
+                self.version += 1
         if to_file:
             with open(self.path, "a") as f:
                 if not self._header_written:
@@ -164,7 +172,9 @@ class Table:
         Rows after t are dropped from memory; the table file only gets a comment,
         as its rows were saved already.
         """
-        self.rows[:] = [r for r in self.rows if r[0] <= t * (1 + 1e-12)]
+        with self.lock:
+            self.rows[:] = [r for r in self.rows if r[0] <= t * (1 + 1e-12)]
+            self.version += 1
         self.next_save = None
         if self._header_written:
             with open(self.path, "a") as f:
@@ -172,7 +182,26 @@ class Table:
 
     def text(self):
         """Return the rows in memory, in the format of the table file."""
-        return self._header() + "".join(map(self._line, list(self.rows)))
+        with self.lock:
+            rows = list(self.rows)
+        return self._header() + "".join(map(self._line, rows))
+
+    def since(self, version, start):
+        """Return the rows the page does not have yet.
+
+        The page has rows [0, start) of ``version``; when the version changed, it gets
+        all rows again.
+        """
+        with self.lock:
+            if version != self.version or not 0 <= start <= len(self.rows):
+                start = 0
+            return {
+                "version": self.version,
+                "start": start,
+                "names": self.names(),
+                "units": ["s"] + [c[1] for c in self.cols],
+                "rows": [r[:] for r in self.rows[start:]],
+            }
 
     def column(self, spec):
         """1-based index or name -> index into a row."""
@@ -229,9 +258,8 @@ class Controller:
         )  # one dict per display panel: {"id", "quant", "comp", "layer", "all"}
         self._next_view = 0
         self.table = Table(table_file)
-        self.plots = [
-            {"id": 0, "x": "1", "y": "2"}
-        ]  # one dict per plot panel: plot "table.txt" using x:y
+        # one dict per plot panel: plot "table.txt" using x:y1,y2,...
+        self.plots = [{"id": 0, "x": "1", "y": "2", "logx": False, "logy": False}]
         self._next_plot = 1
         self.desc = {}
         self.desc_version = 0
@@ -391,19 +419,27 @@ class Controller:
         self._dirty = True
         return base["id"]
 
-    def add_plot(self, x=None, y=None):
+    def add_plot(self, x=None, y=None, logx=None, logy=None):
         """Add a plot panel of table columns x:y (numbers or names).
 
-        It starts as a copy of the last one.
+        It starts as a copy of the last one. ``y`` may name several columns.
         """
         p = dict(self.plots[-1], id=self._next_plot)
         self._next_plot += 1
+        self._plot_set(p, x, y, logx, logy)
+        self.plots.append(p)
+        return p["id"]
+
+    @staticmethod
+    def _plot_set(p, x=None, y=None, logx=None, logy=None):
         if x is not None:
             p["x"] = str(x)
         if y is not None:
-            p["y"] = str(y)
-        self.plots.append(p)
-        return p["id"]
+            p["y"] = ",".join(map(str, y)) if isinstance(y, (list, tuple)) else str(y)
+        if logx is not None:
+            p["logx"] = bool(logx)
+        if logy is not None:
+            p["logy"] = bool(logy)
 
     def _view(self, vid):
         return next((v for v in self.views if v["id"] == vid), None)
@@ -1058,7 +1094,7 @@ class Controller:
             p = next((p for p in self.plots if p["id"] == pid), None)
             if p is None:
                 raise ValueError(f"no plot {pid!r}")
-            p["x"], p["y"] = str(c["x"]), str(c["y"])
+            self._plot_set(p, c.get("x"), c.get("y"), c.get("logx"), c.get("logy"))
         elif name == "plot_add":
             return {"ok": True, "plot": self.add_plot()}
         elif (

@@ -89,7 +89,7 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .using { font-weight: 700; gap: 4px 8px; }
 .using span { white-space: nowrap; }
 .plotErr { color: var(--err); font-weight: 600; }
-.plotimg { display: block; width: 100%; height: 340px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); margin-top: 8px; }
+.plotcv { display: block; width: 100%; height: 340px; border-radius: 8px; border: 1px solid var(--line); margin-top: 8px; cursor: crosshair; touch-action: none; }
 
 /* parameters */
 #ptable td.n, #stable td.n, #wtable td.n { padding-right: 14px; font: 13px var(--mono); }
@@ -141,9 +141,12 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
 </div></section>
 <template id="plotTpl"><div class="plot">
   <div class="vhead"><span class="vname"></span><button class="vremove" title="Remove this plot">×</button></div>
-  <div class="row using mono"><span>plot "table.txt" using</span> <span><input type="text" class="usingx" size="6" value="1"> : <input type="text" class="usingy" size="6" value="2"></span> <span>with lines</span></div>
+  <div class="row using mono"><span>plot "table.txt" using</span> <span><input type="text" class="usingx" size="6" value="1" title="x column: a name or number"> : <input type="text" class="usingy" size="12" value="2" title="y column(s): names or numbers, separated by commas, e.g. mx,my,mz or 2,3,4"></span> <span>with lines</span></div>
+  <div class="row"><label><input type="checkbox" class="logx"> log x</label><label><input type="checkbox" class="logy"> log y</label>
+    <button class="zoomReset" hidden title="Show all data again (or double-click the plot)">Reset zoom</button><button class="savePlot" title="Download the plot as shown">PNG</button></div>
   <div class="plotErr"></div>
-  <img class="plotimg" alt="plot">
+  <canvas class="plotcv"></canvas>
+  <div class="hover plotHover">&nbsp;</div>
 </div></template>
 
 <section id="s-console"><h2 title="Click to show/hide">Console</h2><div class="body">
@@ -625,9 +628,9 @@ function updateLoupe(V) {
   } else V.q("hover").textContent = `cell ${ix}, ${iy}, ${meta.layer}   ${label}`;
 }
 let resizeTimer = null;
-window.addEventListener("resize", () => { views.forEach(drawFrame); clearTimeout(resizeTimer); resizeTimer = setTimeout(() => P && refreshPlots(true), 250); });
+window.addEventListener("resize", () => { views.forEach(drawFrame); clearTimeout(resizeTimer); resizeTimer = setTimeout(() => plots.forEach(drawPlot), 100); });
 /* a panel also changes width when another one is added or closed: redraw it to fit */
-const panelWidth = new WeakMap(), plotTimers = new WeakMap();
+const panelWidth = new WeakMap();
 const panelObserver = new ResizeObserver((entries) => {
   for (const e of entries) {
     const w = Math.round(e.contentRect.width), el = e.target;
@@ -636,53 +639,219 @@ const panelObserver = new ResizeObserver((entries) => {
     const V = [...views.values()].find((V) => V.el === el);
     if (V) { drawFrame(V); continue; }
     const Pl = [...plots.values()].find((Pl) => Pl.el === el);
-    if (Pl) { clearTimeout(plotTimers.get(el)); plotTimers.set(el, setTimeout(() => P && plots.has(Pl.id) && refreshPlot(Pl, true), 150)); }
+    if (Pl) drawPlot(Pl);
   }
 });
 
 /* ---------- plot ---------- */
 $("saveTable").onclick = async () => download(stem() + "_table.txt", await (await GET("/api/table.txt")).blob());
 bindText($("tableAutoSave"), (v) => send({ cmd: "table_autosave", text: v }));
-/* One or more plot panels, like the display panels: each plots its own x:y columns of the one table.
+/* One or more plot panels, like the display panels: each draws its own x:y1,y2,... columns of the one table
+   (gnuplot: plot "table.txt" using x:y with lines). The page keeps a copy of the table and only fetches new rows.
    Pl = the panel's page state, cfg = its columns as the simulation reports them in /api/tick. */
 const plots = new Map(); // plot id -> Pl
+const TB = { version: -1, names: [], units: [], rows: [], busy: false };
 $("addPlot").onclick = () => send({ cmd: "plot_add" });
+
+async function fetchTable() {
+  if (TB.busy) return; TB.busy = true;
+  try {
+    const d = await (await GET(`/api/table?version=${TB.version}&since=${TB.rows.length}`)).json();
+    const changed = d.rows.length > 0 || d.version !== TB.version || d.names.join("\n") !== TB.names.join("\n");
+    if (d.start === 0) TB.rows = d.rows; else for (const r of d.rows) TB.rows.push(r);
+    Object.assign(TB, { version: d.version, names: d.names, units: d.units });
+    if (changed) plots.forEach(drawPlot);
+  } catch (e) { /* next tick */ }
+  TB.busy = false;
+}
+function column(spec) { // 1-based number or name -> index into a row
+  spec = String(spec).trim();
+  if (/^\d+$/.test(spec) && +spec >= 1 && +spec <= TB.names.length) return +spec - 1;
+  const i = TB.names.indexOf(spec); if (i >= 0) return i;
+  throw new Error(`unknown column "${spec}"; columns are: ` + TB.names.map((n, i) => `${i + 1}=${n}`).join(", "));
+}
+const colLabel = (i) => (TB.units[i] ? `${TB.names[i]} (${TB.units[i]})` : TB.names[i]);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const seriesColors = () => theme() === "dark"
+  ? ["#7aa2ff", "#ff8a4c", "#5fd39a", "#da77f2", "#ffd43b", "#3bc9db"]
+  : ["#2f5fd0", "#d9480f", "#2b8a3e", "#ae3ec9", "#b08800", "#0b7285"];
+
 function makePlot(id) {
   const el = $("plotTpl").content.firstElementChild.cloneNode(true);
-  const Pl = { id, el, q: (c) => el.querySelector("." + c), busy: false, url: null, key: "", at: 0 };
-  const sendUsing = () => send({ cmd: "table_using", plot: id, x: Pl.q("usingx").value, y: Pl.q("usingy").value });
-  bindText(Pl.q("usingx"), sendUsing); bindText(Pl.q("usingy"), sendUsing);
-  Pl.q("vremove").onclick = () => send({ cmd: "plot_remove", plot: id }); // syncPlots drops the panel
+  const Pl = { id, el, q: (c) => el.querySelector("." + c), key: "", zoom: null, drag: null, mouse: null, geom: null, raf: 0 };
+  const { q } = Pl, cfg = () => T.plots.find((p) => p.id === id);
+  const sendUsing = () => send({ cmd: "table_using", plot: id, x: q("usingx").value, y: q("usingy").value });
+  bindText(q("usingx"), sendUsing); bindText(q("usingy"), sendUsing);
+  for (const k of ["logx", "logy"]) q(k).onchange = (e) => {
+    const c = cfg(); if (c) c[k] = e.target.checked; // show it now, the tick confirms
+    Pl.zoom = null; send({ cmd: "table_using", plot: id, [k]: e.target.checked }); drawPlot(Pl);
+  };
+  q("vremove").onclick = () => send({ cmd: "plot_remove", plot: id }); // syncPlots drops the panel
+  q("zoomReset").onclick = () => { Pl.zoom = null; drawPlot(Pl); };
+  q("savePlot").onclick = () => {
+    const c = cfg(), name = c ? `${c.y}_vs_${c.x}`.replace(/[^\w.,-]+/g, "_") : "plot";
+    q("plotcv").toBlob((b) => b && download(`${stem()}_${name}.png`, b), "image/png");
+  };
+  // hover: values at the nearest row; drag: zoom to a box (or a range of x or y); double-click: zoom out
+  const cv = q("plotcv"), at = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const redraw = () => { cancelAnimationFrame(Pl.raf); Pl.raf = requestAnimationFrame(() => drawPlot(Pl)); };
+  cv.onpointerdown = (e) => { if (e.button !== 0 || !Pl.geom) return; Pl.drag = { a: at(e), b: at(e) }; cv.setPointerCapture(e.pointerId); };
+  cv.onpointermove = (e) => { Pl.mouse = at(e); if (Pl.drag) Pl.drag.b = Pl.mouse; redraw(); };
+  cv.onpointerup = () => {
+    const d = Pl.drag, g = Pl.geom; Pl.drag = null; if (!d || !g) return;
+    const dx = Math.abs(d.b.x - d.a.x) > 5, dy = Math.abs(d.b.y - d.a.y) > 5;
+    if (dx || dy) {
+      const z = Pl.zoom || {}, sort = (a, b) => [Math.min(a, b), Math.max(a, b)];
+      Pl.zoom = { x: dx ? sort(g.ix(d.a.x), g.ix(d.b.x)) : z.x || null, y: dy ? sort(g.iy(d.a.y), g.iy(d.b.y)) : z.y || null };
+    }
+    redraw();
+  };
+  cv.onpointerleave = () => { if (!Pl.drag) { Pl.mouse = null; redraw(); } };
+  cv.ondblclick = () => { Pl.zoom = null; redraw(); };
   $("plots").appendChild(el); plots.set(id, Pl); panelObserver.observe(el);
   return Pl;
 }
 function syncPlots() { // add/remove panels to match the simulation, and show their columns
   const ids = T.plots.map((p) => p.id);
-  for (const Pl of [...plots.values()]) if (!ids.includes(Pl.id)) { Pl.el.remove(); if (Pl.url) URL.revokeObjectURL(Pl.url); plots.delete(Pl.id); }
+  for (const Pl of [...plots.values()]) if (!ids.includes(Pl.id)) { Pl.el.remove(); plots.delete(Pl.id); }
   T.plots.forEach((c, i) => {
-    const Pl = plots.get(c.id) || makePlot(c.id), box = $("plots");
+    const Pl = plots.get(c.id) || makePlot(c.id), box = $("plots"), { q } = Pl;
     if (box.children[i] !== Pl.el) box.insertBefore(Pl.el, box.children[i] || null); // keep the simulation's order
-    Pl.q("vname").textContent = "Plot " + (i + 1);
-    setText(Pl.q("usingx"), c.x); setText(Pl.q("usingy"), c.y);
+    q("vname").textContent = "Plot " + (i + 1);
+    setText(q("usingx"), c.x); setText(q("usingy"), c.y);
+    q("logx").checked = !!c.logx; q("logy").checked = !!c.logy;
+    const key = [c.x, c.y, c.logx, c.logy].join("|");
+    if (key !== Pl.key) { if (Pl.key) Pl.zoom = null; Pl.key = key; drawPlot(Pl); }
   });
 }
-function refreshPlots(force) { plots.forEach((Pl) => refreshPlot(Pl, force)); }
-async function refreshPlot(Pl, force) {
-  const img = Pl.q("plotimg"), c = T.plots.find((p) => p.id === Pl.id); if (!c) return;
-  const key = [T.nsteps, T.time, c.x, c.y, T.autosave, P.table_columns.length].join("|");
-  if (Pl.busy || (!force && key === Pl.key) || (!force && Date.now() - Pl.at < 500)) return;
-  Pl.busy = true; Pl.key = key; Pl.at = Date.now();
-  try {
-    const dpr = window.devicePixelRatio || 1;
-    const q = new URLSearchParams({ x: Pl.q("usingx").value || "1", y: Pl.q("usingy").value || "2", w: Math.round(img.clientWidth * dpr), h: Math.round(img.clientHeight * dpr), dpr, theme: theme() });
-    const r = await GET("/api/plot.png?" + q);
-    if (r.status === 200) {
-      const err = r.headers.get("X-Plot-Error"); Pl.q("plotErr").textContent = err ? JSON.parse(err) : "";
-      const u = URL.createObjectURL(await r.blob()); img.src = u; if (Pl.url) URL.revokeObjectURL(Pl.url); Pl.url = u;
-    }
-  } catch (e) { /* next tick */ }
-  Pl.busy = false;
+
+/* tick positions in axis coordinates (log10 of the value on a log axis), about n of them */
+function plotTicks(a, b, log, n) {
+  if (log) {
+    const step = Math.max(1, Math.ceil((b - a) / n)), out = [];
+    for (let e = Math.ceil(a); e <= b; e += step) out.push(e);
+    if (out.length >= 3) return out;
+    for (let e = Math.floor(a); e <= b; e++) for (const m of [2, 5]) { const v = e + Math.log10(m); if (v >= a && v <= b) out.push(v); }
+    if (out.length >= 2) return out.sort((u, v) => u - v);
+    return plotTicks(10 ** a, 10 ** b, false, n).filter((v) => v > 0).map(Math.log10); // less than a factor 2
+  }
+  const raw = (b - a) / n, mag = 10 ** Math.floor(Math.log10(raw)), f = raw / mag;
+  const step = (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * mag, out = [];
+  for (let v = Math.ceil(a / step) * step; v <= b + step * 1e-9; v += step) out.push(Math.abs(v) < step * 1e-9 ? 0 : v);
+  return out;
 }
+function g(v) { // gnuplot's "%g"
+  if (v === 0) return "0";
+  const s = Number(v.toPrecision(6)), a = Math.abs(s);
+  return a >= 1e-4 && a < 1e6 ? String(s) : s.toExponential().replace("e+", "e");
+}
+
+function drawPlot(Pl) {
+  const c = T && T.plots.find((p) => p.id === Pl.id), cv = Pl.q("plotcv"), W = cv.clientWidth, H = cv.clientHeight;
+  if (!c || !W) return;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const ink = css("--ink"), mute = css("--mute"), line = css("--line"), card = css("--card"), font = getComputedStyle(document.body).fontFamily;
+  ctx.fillStyle = card; ctx.fillRect(0, 0, W, H); // also the background of a saved PNG
+  ctx.font = `11px ${font}`;
+  const message = (text) => { Pl.geom = null; ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, W / 2, H / 2); Pl.q("plotHover").innerHTML = "&nbsp;"; Pl.q("zoomReset").hidden = !Pl.zoom; };
+  let xi, ys;
+  try {
+    if (!TB.names.length) return message("no data yet: run the simulation");
+    xi = column(c.x || "1"); ys = String(c.y || "2").split(",").filter((s) => s.trim()).map(column);
+    Pl.q("plotErr").textContent = "";
+  } catch (e) { Pl.q("plotErr").textContent = e.message; return message(""); }
+  if (!ys.length) return message("no y column");
+
+  // the data in axis coordinates (log10 on a log axis); points that a log axis cannot show are gaps
+  const lx = !!c.logx, ly = !!c.logy, rows = TB.rows;
+  const tx = (v) => (v === null || !Number.isFinite(v) || (lx && v <= 0) ? NaN : lx ? Math.log10(v) : v);
+  const ty = (v) => (v === null || !Number.isFinite(v) || (ly && v <= 0) ? NaN : ly ? Math.log10(v) : v);
+  const X = rows.map((r) => tx(r[xi])), Y = ys.map((j) => rows.map((r) => ty(r[j])));
+  const z = Pl.zoom || {};
+  let [x0, x1] = z.x || [Infinity, -Infinity], [y0, y1] = z.y || [Infinity, -Infinity];
+  if (!z.x) for (const x of X) if (!isNaN(x)) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
+  if (!z.y) for (const S of Y) S.forEach((y, k) => { if (!isNaN(y) && X[k] >= x0 && X[k] <= x1) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); } });
+  if (!(x1 >= x0) || !(y1 >= y0)) return message(rows.length < 2 ? "no data yet: run the simulation" : "nothing to show" + (lx || ly ? " on a log axis" : ""));
+  const pad = (a, b, log) => (a === b ? (log ? [a - 0.5, b + 0.5] : [a - (Math.abs(a) || 1) * 0.1, b + (Math.abs(b) || 1) * 0.1]) : [a, b]);
+  [x0, x1] = pad(x0, x1, lx); [y0, y1] = pad(y0, y1, ly);
+  if (!z.y) { const m = 0.04 * (y1 - y0); y0 -= m; y1 += m; } // room above and below the lines
+
+  // layout: room for the tick labels and the axis titles
+  const ytk = plotTicks(y0, y1, ly, Math.max(2, Math.round(H / 60))), ylab = ytk.map((v) => g(ly ? 10 ** v : v));
+  const L = 24 + Math.max(...ylab.map((s) => ctx.measureText(s).width), 10), R = W - 14, Tp = 10, B = H - 40;
+  const xtk = plotTicks(x0, x1, lx, Math.max(2, Math.round((R - L) / 90)));
+  const px = (x) => L + ((x - x0) / (x1 - x0)) * (R - L), py = (y) => B - ((y - y0) / (y1 - y0)) * (B - Tp);
+  Pl.geom = { ix: (p) => x0 + ((p - L) / (R - L)) * (x1 - x0), iy: (p) => y0 + ((B - p) / (B - Tp)) * (y1 - y0) };
+
+  // grid, ticks and axis titles
+  ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.beginPath();
+  for (const v of xtk) { const p = Math.round(px(v)) + 0.5; ctx.moveTo(p, Tp); ctx.lineTo(p, B); }
+  for (const v of ytk) { const p = Math.round(py(v)) + 0.5; ctx.moveTo(L, p); ctx.lineTo(R, p); }
+  ctx.stroke(); ctx.strokeRect(L + 0.5, Tp + 0.5, R - L - 1, B - Tp - 1);
+  ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "top";
+  xtk.forEach((v) => ctx.fillText(g(lx ? 10 ** v : v), px(v), B + 5));
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  ytk.forEach((v, k) => ctx.fillText(ylab[k], L - 5, py(v)));
+  ctx.font = `12px ${font}`; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+  ctx.fillText(colLabel(xi), (L + R) / 2, H - 4);
+  const units = new Set(ys.map((j) => TB.units[j]));
+  const ytitle = ys.length === 1 ? colLabel(ys[0]) : ys.map((j) => TB.names[j]).join(", ") + (units.size === 1 && TB.units[ys[0]] ? ` (${TB.units[ys[0]]})` : "");
+  ctx.save(); ctx.translate(12, (Tp + B) / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = "middle"; ctx.fillText(ytitle, 0, 0); ctx.restore();
+
+  // the lines (with lines)
+  const colors = seriesColors();
+  ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, R - L, B - Tp); ctx.clip();
+  ctx.lineWidth = 1.5; ctx.lineJoin = "round";
+  Y.forEach((S, s) => {
+    ctx.strokeStyle = colors[s % colors.length]; ctx.beginPath(); let pen = false;
+    for (let k = 0; k < S.length; k++) {
+      if (isNaN(X[k]) || isNaN(S[k])) { pen = false; continue; }
+      const a = px(X[k]), b = py(S[k]); pen ? ctx.lineTo(a, b) : ctx.moveTo(a, b); pen = true;
+    }
+    ctx.stroke();
+  });
+
+  // hover: the row nearest to the mouse (on any line), its values below the plot
+  const m = Pl.mouse, hover = Pl.q("plotHover");
+  let best = -1;
+  if (m && !Pl.drag && m.x >= L && m.x <= R && m.y >= Tp && m.y <= B) {
+    let bd = Infinity;
+    Y.forEach((S) => S.forEach((y, k) => { if (isNaN(X[k]) || isNaN(y)) return; const d = (px(X[k]) - m.x) ** 2 + (py(y) - m.y) ** 2; if (d < bd) { bd = d; best = k; } }));
+  }
+  if (best >= 0) {
+    ctx.strokeStyle = mute; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px(X[best]), Tp); ctx.lineTo(px(X[best]), B); ctx.stroke(); ctx.setLineDash([]);
+    Y.forEach((S, s) => { if (isNaN(S[best])) return; ctx.fillStyle = colors[s % colors.length]; ctx.beginPath(); ctx.arc(px(X[best]), py(S[best]), 3.5, 0, 2 * Math.PI); ctx.fill(); });
+    const r = rows[best], unit = (j) => (TB.units[j] ? " " + esc(TB.units[j]) : "");
+    hover.innerHTML = `${esc(TB.names[xi])} = ${g(r[xi])}${unit(xi)}` + ys.map((j, s) =>
+      `&ensp;<b style="color:${colors[s % colors.length]}">${esc(TB.names[j])}</b> = ${r[j] === null ? "NaN" : g(r[j])}${unit(j)}`).join("");
+  } else hover.innerHTML = Pl.mouse ? "&nbsp;" : "drag to zoom, double-click to zoom out";
+
+  // zoom box while dragging
+  const d = Pl.drag;
+  if (d) {
+    const a = { x: Math.max(L, Math.min(R, d.a.x)), y: Math.max(Tp, Math.min(B, d.a.y)) }, b = { x: Math.max(L, Math.min(R, d.b.x)), y: Math.max(Tp, Math.min(B, d.b.y)) };
+    const wx = Math.abs(b.x - a.x) > 5, wy = Math.abs(b.y - a.y) > 5; // a range of x only / y only spans the plot
+    const rx = wx ? Math.min(a.x, b.x) : L, ry = wy ? Math.min(a.y, b.y) : Tp, rw = wx ? Math.abs(b.x - a.x) : R - L, rh = wy ? Math.abs(b.y - a.y) : B - Tp;
+    if (wx || wy) { ctx.fillStyle = "rgba(128,128,128,0.15)"; ctx.fillRect(rx, ry, rw, rh); ctx.strokeStyle = mute; ctx.strokeRect(rx + 0.5, ry + 0.5, rw, rh); }
+  }
+  ctx.restore();
+
+  // legend, for more than one line
+  if (ys.length > 1) {
+    ctx.font = `11px ${font}`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    const w = 30 + Math.max(...ys.map((j) => ctx.measureText(TB.names[j]).width)), h = 8 + 16 * ys.length, x = R - w - 8, y = Tp + 8;
+    ctx.globalAlpha = 0.85; ctx.fillStyle = card; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
+    ctx.strokeStyle = line; ctx.strokeRect(x + 0.5, y + 0.5, w, h);
+    ys.forEach((j, s) => {
+      const yy = y + 12 + 16 * s; ctx.strokeStyle = colors[s % colors.length]; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x + 6, yy); ctx.lineTo(x + 20, yy); ctx.stroke(); ctx.fillStyle = ink; ctx.fillText(TB.names[j], x + 25, yy);
+    });
+  }
+  Pl.q("zoomReset").hidden = !Pl.zoom;
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => plots.forEach(drawPlot));
 
 /* ---------- parameters ---------- */
 bindText($("region"), (v) => send({ cmd: "region", value: v }));
@@ -772,7 +941,7 @@ async function poll() {
     showTick();
     await Promise.all([...views.values()].filter((V) => cfgOf(V) && cfgOf(V).frame_id !== V.frameId).map(fetchFrame));
     if (T.log_id !== lastLog) await fetchLog();
-    refreshPlots(false);
+    fetchTable();
     delay = T.running ? 150 : 300;
   } catch (e) { $("banner").style.display = "block"; delay = 1000; }
   setTimeout(poll, delay);
