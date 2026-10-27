@@ -8,12 +8,15 @@ import json
 import os
 import secrets
 import threading
+import time
 from urllib.parse import parse_qs, urlparse
 import webbrowser
 
 from .core import Controller, _check_plane, _clean
 
 FORBIDDEN = b"forbidden: missing or wrong token"
+EVENT_GAP = 0.15  # minimum time (s) between two pushed updates of the page
+KEEPALIVE = 15.0  # time (s) without updates after which a keepalive is sent
 
 
 def _make_handler(ctrl: Controller, token: str):
@@ -52,6 +55,8 @@ def _make_handler(ctrl: Controller, token: str):
                 return self._send(200, page, "text/html; charset=utf-8")
             if url.path == "/api/tick":  # what mumax3 refreshes on every update
                 return self._json(ctrl.snapshot())
+            if url.path == "/api/events":  # the same, pushed whenever it changes
+                return self._events()
             if url.path == "/api/page":  # parameters, mesh, solver settings, ...
                 with ctrl.lock:
                     return self._json(ctrl.desc)
@@ -96,6 +101,32 @@ def _make_handler(ctrl: Controller, token: str):
                 ver, since = int(arg("version", "-1")), int(arg("since", "0"))
                 return self._json(ctrl.table.since(ver, since))
             self._send(404, b"not found", "text/plain")
+
+        def _events(self):
+            """Server-sent events: the snapshot whenever it changes.
+
+            At most one event per EVENT_GAP (a run changes it all the time), always
+            the newest snapshot, and a comment now and then to keep the connection.
+            """
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Connection", "close")  # the stream ends with it
+            self.end_headers()
+            sid = 0  # the snapshot the page has: none yet
+            try:
+                while (new := ctrl.wait_snapshot(sid, KEEPALIVE)) is not None:
+                    if new[0] == sid:
+                        self.wfile.write(b": keepalive\n\n")
+                        self.wfile.flush()
+                        continue
+                    sid, snap = new
+                    data = json.dumps(snap, allow_nan=False).encode()
+                    self.wfile.write(b"data: " + data + b"\n\n")
+                    self.wfile.flush()
+                    time.sleep(EVENT_GAP)
+            except OSError:  # the page went away
+                pass
 
         def do_POST(self):
             url = urlparse(self.path)

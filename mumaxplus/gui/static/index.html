@@ -348,7 +348,7 @@ document.querySelectorAll("section > h2").forEach((h) => h.onclick = () => h.par
 function bindText(el, onCommit) {
   el.addEventListener("input", () => el.classList.add("dirty"));
   el.addEventListener("change", () => { el.classList.remove("dirty"); onCommit(el.value); });
-  el.addEventListener("keydown", (e) => { if (e.key === "Escape") { el.classList.remove("dirty"); el.blur(); lastDesc = -1; } });
+  el.addEventListener("keydown", (e) => { if (e.key === "Escape") { el.classList.remove("dirty"); el.blur(); lastDesc = -1; update(); } }); // show the value again
 }
 function setText(el, value) {
   if (document.activeElement === el || el.classList.contains("dirty")) return;
@@ -387,10 +387,13 @@ async function fetchLog() {
 let pyFlash = "";
 async function pyScript() {
   const r = await send({ cmd: "script" });
-  if (r.ok === false || r.script === undefined) { pyFlash = r.pending ? "busy, try again when it finishes" : "failed: " + r.error; return null; }
+  if (r.ok === false || r.script === undefined) { pyNote(r.pending ? "busy, try again when it finishes" : "failed: " + r.error); return null; }
   return r.script;
 }
-function pyNote(text) { pyFlash = text; clearTimeout(pyNote.t); pyNote.t = setTimeout(() => (pyFlash = ""), 2500); }
+function pyNote(text) { // for a while
+  pyFlash = text; showPyNote();
+  clearTimeout(pyNote.t); pyNote.t = setTimeout(() => { pyFlash = ""; showPyNote(); }, 2500);
+}
 $("pyCopy").onclick = async () => {
   const text = await pyScript(); if (text === null) return;
   try { await navigator.clipboard.writeText(text); }
@@ -407,6 +410,7 @@ $("pySave").onclick = async () => {
 };
 $("pyClear").onclick = () => { send({ cmd: "script_clear" }); pyNote("cleared"); };
 function showPyNote() {
+  if (!T) return;
   const n = T.script_lines || 0;
   $("pyNote").textContent = pyFlash || (n ? `${n} line${n === 1 ? "" : "s"} recorded` + (T.running ? " + the run so far" : "") : T.running ? "the run so far is recorded" : "nothing recorded yet");
 }
@@ -1150,6 +1154,7 @@ const plots = new Map(); // plot id -> Pl
 const TB = { version: -1, names: [], units: [], saved: [], rows: [], busy: false };
 $("addPlot").onclick = () => send({ cmd: "plot_add" });
 
+const tableBehind = () => T && (T.table[0] !== TB.version || T.table[1] !== TB.rows.length); // T.table: [version, rows]
 async function fetchTable() {
   if (TB.busy) return; TB.busy = true;
   try {
@@ -1158,8 +1163,9 @@ async function fetchTable() {
     if (d.start === 0) TB.rows = d.rows; else for (const r of d.rows) TB.rows.push(r);
     Object.assign(TB, { version: d.version, names: d.names, units: d.units, saved: d.saved || [] });
     if (changed && T) plots.forEach((Pl) => { showSeries(Pl); drawPlot(Pl); });
-  } catch (e) { /* next tick */ }
-  TB.busy = false;
+    TB.busy = false;
+    if (tableBehind()) fetchTable(); // it changed while fetching
+  } catch (e) { TB.busy = false; /* the next update tries again */ }
 }
 function column(spec) { // 1-based number or name -> index into a row
   spec = String(spec).trim();
@@ -1406,12 +1412,15 @@ function rebuildPage() {
 }
 function showPage() { showMesh(); showSolver(); showParams(); }
 
-async function poll() {
-  let delay = 300;
+/* The simulation pushes the snapshot (/api/tick) whenever it changes (/api/events, at most every 0.15 s);
+   the page then fetches what it says changed. One update at a time: a snapshot that comes meanwhile waits
+   (only the newest). update() without one redoes the current snapshot. */
+let updating = false, nextT = null;
+async function update(t = T) {
+  if (t) nextT = t;
+  if (updating || !nextT) return;
+  updating = true; T = nextT; nextT = null;
   try {
-    T = await (await GET("/api/tick")).json();
-    $("banner").style.display = "none";
-    if (!T || T.desc_version === undefined) { setTimeout(poll, 200); return; }
     if (T.desc_version !== lastDesc) {
       P = await (await GET("/api/page")).json(); lastDesc = T.desc_version;
       rebuildPage(); showPage();
@@ -1419,12 +1428,15 @@ async function poll() {
     showTick();
     await Promise.all([...views.values()].filter((V) => cfgOf(V) && cfgOf(V).frame_id !== V.frameId).map(fetchFrame));
     if (T.log_id !== lastLog) await fetchLog();
-    fetchTable();
-    delay = T.running ? 150 : 300;
-  } catch (e) { $("banner").style.display = "block"; delay = 1000; }
-  setTimeout(poll, delay);
+    if (tableBehind()) fetchTable();
+    $("banner").style.display = "none";
+  } catch (e) { $("banner").style.display = "block"; }
+  updating = false; update(null);
 }
-poll();
+const events = new EventSource("/api/events?token=" + encodeURIComponent(token));
+events.onmessage = (e) => update(JSON.parse(e.data));
+events.onopen = () => ($("banner").style.display = "none");
+events.onerror = () => ($("banner").style.display = "block"); // the browser connects again by itself
 </script>
 </body>
 </html>

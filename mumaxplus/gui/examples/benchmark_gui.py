@@ -10,8 +10,9 @@ minimizes it (not timed) and then times only the time evolution:
   * GUI:   the same run, started with the GUI's Run button command and driven by the
            GUI loop (chunked steps, display rendering, torque updates, publishing)
 
-With --client a background thread polls the HTTP server like an open browser tab
-(/api/tick, /api/frame, /api/log), so serving the page is included in the cost.
+With --client a background thread follows the HTTP server like an open browser tab
+(the updates of /api/events, and the /api/frame, /api/log and /api/table requests they
+call for), so serving the page is included in the cost.
 """
 
 import argparse
@@ -65,31 +66,46 @@ def time_plain(duration):
 
 
 def browser_client(gui, stop):
-    """Poll the server the way index.html does (150 ms while running)."""
+    """Follow the server the way index.html does: fetch what each update announces."""
+
+    def request(path):
+        url = f"http://{gui.host}:{gui.port}{path}"
+        return urllib.request.Request(url, headers={"X-Token": gui.token})
+
     def get(path):
-        req = urllib.request.Request(
-            f"http://{gui.host}:{gui.port}{path}", headers={"X-Token": gui.token}
-        )
-        with urllib.request.urlopen(req, timeout=5) as r:
+        with urllib.request.urlopen(request(path), timeout=5) as r:
             return r.read()
 
     get("/")
     get("/api/page")
-    last_frames, last_log = {}, None
-    while not stop.is_set():
-        tick = json.loads(get("/api/tick"))
-        for v in tick.get("views", []):  # one image per display panel
-            if last_frames.get(v["id"]) != v["frame_id"]:
-                last_frames[v["id"]] = v["frame_id"]
-                get(f"/api/frame?view={v['id']}")
-        if tick.get("log_id") != last_log:
-            last_log = tick.get("log_id")
-            get("/api/log?since=0")
-        stop.wait(0.15 if tick.get("running") else 0.3)
+    last_frames, last_log, last_table = {}, None, None
+    # the updates come at least every 15 s (a keepalive), and end with gui.stop()
+    events = urllib.request.urlopen(request("/api/events"), timeout=30)
+    try:
+        for line in events:
+            if stop.is_set():
+                break
+            if not line.startswith(b"data: "):
+                continue
+            tick = json.loads(line[len(b"data: ") :])
+            for v in tick["views"]:  # one image per display panel
+                if last_frames.get(v["id"]) != v["frame_id"]:
+                    last_frames[v["id"]] = v["frame_id"]
+                    get(f"/api/frame?view={v['id']}")
+            if tick["log_id"] != last_log:
+                last_log = tick["log_id"]
+                get("/api/log?since=0")
+            if tick["table"] != last_table:
+                last_table = tick["table"]
+                get("/api/table?version=-1&since=0")
+    except OSError:  # gui.stop() closed the server during a request
+        pass
+    finally:
+        events.close()
 
 
 def time_gui(duration, client):
-    """Time the same run driven by the GUI, optionally with a polling client."""
+    """Time the same run driven by the GUI, optionally with a browser-like client."""
     world, magnet = make_racetrack()
     gui = GUI(world, namespace={"world": world, "magnet": magnet})
     gui.start_server()
@@ -132,7 +148,7 @@ def main():
     p.add_argument(
         "--client",
         action="store_true",
-        help="also poll the server like an open browser tab",
+        help="also follow the server like an open browser tab",
     )
     args = p.parse_args()
 

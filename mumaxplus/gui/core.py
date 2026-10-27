@@ -394,6 +394,8 @@ class Controller:
         self.frame_id = 0
         self.frames = {}  # view id -> (meta, bytes)
         self.snap = {}
+        self.snap_id = 0  # goes up when the snapshot changes
+        self.changed = threading.Condition(self.lock)  # notified then
         self.log = []
         self.log_id = 0
         self._dirty = True
@@ -1035,45 +1037,61 @@ class Controller:
         with self.lock:
             return dict(self.snap)
 
+    def wait_snapshot(self, last, timeout):
+        """Wait up to ``timeout`` s for a snapshot newer than the one with id ``last``.
+
+        Return (id, snapshot), the same id when there is none yet, or None once the
+        loop stopped.
+        """
+        with self.changed:
+            self.changed.wait_for(lambda: self.snap_id != last or self._stop, timeout)
+            return None if self._stop else (self.snap_id, dict(self.snap))
+
     def _publish(self):
         ts = self._ts()
-        with self.lock:
-            self.snap = _clean(
-                {
-                    "nsteps": self.steps_done,
-                    "time": ts.time,
-                    "dt": ts.timestep,
-                    "busy": self.busy or ("Running" if self.running else "Paused"),
-                    "running": self.running,
-                    "progress": self.progress,
-                    "maxtorque": self.maxtorque,
-                    "fixdt": 0.0 if ts.adaptive_timestep else ts.timestep,
-                    "maxerr": ts.max_error,
-                    "method": self.method,
-                    "method_known": self.method_known,
-                    "autosave": self.table.period,
-                    "plots": [dict(p) for p in self.plots],
-                    "sel": self.sel,
-                    "region": self.region,
-                    "views": [self._view_state(cfg) for cfg in self.views],
-                    "frame_id": self.frame_id,
-                    "desc_version": self.desc_version,
-                    "log_id": self.log_id,
-                    "script_lines": len(self.script),
-                    "paint_undo": self._paint_undo is not None,
-                    "excitations": [
-                        {k: v for k, v in e.items() if k in ("id", "target", "label")}
-                        for e in self.excitations
-                    ],
-                    "perf": dict(self.perf, eta=self._eta()),
-                    "checkpoints": [
-                        {k: v for k, v in cp.items() if k != "state"}
-                        for cp in self.checkpoints
-                    ],
-                    "error": self.last_error,
-                    "targets": list(self.targets),
-                }
-            )
+        snap = _clean(
+            {
+                "nsteps": self.steps_done,
+                "time": ts.time,
+                "dt": ts.timestep,
+                "busy": self.busy or ("Running" if self.running else "Paused"),
+                "running": self.running,
+                "progress": self.progress,
+                "maxtorque": self.maxtorque,
+                "fixdt": 0.0 if ts.adaptive_timestep else ts.timestep,
+                "maxerr": ts.max_error,
+                "method": self.method,
+                "method_known": self.method_known,
+                "autosave": self.table.period,
+                "plots": [dict(p) for p in self.plots],
+                "sel": self.sel,
+                "region": self.region,
+                "views": [self._view_state(cfg) for cfg in self.views],
+                "frame_id": self.frame_id,
+                "desc_version": self.desc_version,
+                "log_id": self.log_id,
+                "script_lines": len(self.script),
+                "paint_undo": self._paint_undo is not None,
+                "excitations": [
+                    {k: v for k, v in e.items() if k in ("id", "target", "label")}
+                    for e in self.excitations
+                ],
+                "perf": dict(self.perf, eta=self._eta()),
+                "checkpoints": [
+                    {k: v for k, v in cp.items() if k != "state"}
+                    for cp in self.checkpoints
+                ],
+                "error": self.last_error,
+                "targets": list(self.targets),
+                # the page fetches the table when this changes
+                "table": [self.table.version, len(self.table.rows)],
+            }
+        )
+        with self.changed:
+            if snap != self.snap:  # wake the pages waiting for it (/api/events)
+                self.snap = snap
+                self.snap_id += 1
+                self.changed.notify_all()
 
     def _update_torque(self):
         best = None
@@ -2099,5 +2117,7 @@ class Controller:
                 self._publish()
 
     def stop(self):
-        """Ask the simulation loop to stop."""
-        self._stop = True
+        """Ask the simulation loop to stop (and end the pushed updates)."""
+        with self.changed:
+            self._stop = True
+            self.changed.notify_all()
