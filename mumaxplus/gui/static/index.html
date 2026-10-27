@@ -216,6 +216,25 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <span id="mdoc" class="gray"></span>
 </div></section>
 
+<section id="s-excite"><h2 title="Click to show/hide">Excitation</h2><div class="body">
+  <div class="row" title="A time-dependent term added to a parameter of the selected magnet (Parameter.add_time_term); t is the simulation time">add to <select id="exParam"></select> <span id="exUnit" class="gray"></span></div>
+  <div class="row">waveform <select id="exWave"><option value="sine">sine</option><option value="gauss">Gaussian pulse</option><option value="rect">rectangular pulse</option>
+    <option value="sinc">sinc pulse (broadband)</option><option value="expr">expression of t</option></select></div>
+  <table id="exFields"></table>
+  <div class="row" title="Where it acts: the whole magnet, one region, or where a mask expression of the cell position x, y, z (m) is non-zero, e.g. abs(x - 200e-9) &lt; 20e-9">where
+    <select id="exWhere"><option value="all">whole magnet</option><option value="region">region</option><option value="mask">mask(x, y, z) =</option></select>
+    <input type="text" id="exWhereValue" size="18" hidden spellcheck="false"></div>
+  <div class="row"><button id="exAdd" class="primary">Add</button>
+    <span class="gray" style="font-size:12px" title="Time window of the preview; empty: a few periods, or the pulse">preview over <input type="text" id="exWindow" size="7" placeholder="auto"> s</span>
+    <button id="exReset" hidden title="Show the whole preview again (or double-click it)">Reset zoom</button></div>
+  <div id="exErr" class="plotErr"></div>
+  <canvas id="exCv" class="profcv"></canvas>
+  <div id="exHover" class="hover">&nbsp;</div>
+  <div class="sub">Active excitations</div>
+  <table id="exList" class="mono" style="font-size:12px"></table>
+  <div id="exNone" class="gray" style="font-size:12px">none (time terms the script added itself are not listed)</div>
+</div></section>
+
 <section id="s-params"><h2 title="Click to show/hide">Parameters</h2><div class="body">
   <div class="row" title="-1 = the whole magnet; 0…255 = set/show the value in this region only">Region: <input type="text" id="region" size="4" value="-1"></div>
   <div id="pwrap"><table id="ptable"></table></div>
@@ -373,6 +392,75 @@ function showPerf() {
   const speed = p.steps_s === null || p.steps_s === undefined ? "" : `${si(p.steps_s, "steps/s")}, ${si(p.sim_s, "s/s")}`;
   $("speed").textContent = speed || "--";
   $("hdrPerf").textContent = T.running && speed ? speed + (p.eta !== null && p.eta !== undefined ? ` · ${duration(p.eta)} left` : "") : "";
+}
+
+/* ---------- excitation: a time term added to a parameter (Parameter.add_time_term) ----------
+   The simulation makes the term from these fields; the preview samples that same term */
+const EX_FIELDS = { // key, label, unit ("" = the parameter's), default
+  sine: [["A", "amplitude"], ["f", "frequency", "Hz", "5e9"], ["phi", "phase", "rad", "0"], ["t0", "start", "s", ""]],
+  gauss: [["A", "amplitude"], ["t0", "centre", "s", ""], ["sigma", "width σ", "s", "5e-11"]],
+  rect: [["A", "amplitude"], ["t0", "start", "s", ""], ["tau", "duration", "s", "1e-10"]],
+  sinc: [["A", "amplitude"], ["fc", "cutoff frequency", "Hz", "2e10"], ["t0", "centre", "s", ""]],
+  expr: [["expr", "value(t) ="]],
+};
+const exVals = {}; // what was typed, per parameter shape and field, kept when the waveform changes
+let exChart = null, exTimer = 0, exKey = "";
+const exParam = () => { const t = cur(); return t && t.params.find((x) => x.name === $("exParam").value); };
+function exDefault(k, p) {
+  const vec = p && p.ncomp > 1;
+  if (k === "A") return vec ? "(0, 0, 1e-3)" : "1e-3";
+  if (k === "expr") return vec ? "(0, 0, 1e-3 * sin(2 * pi * 5e9 * t))" : "1e-3 * sin(2 * pi * 5e9 * t)";
+  return null;
+}
+let exBuilt = "";
+function buildExcite() {
+  const t = cur(); if (!t) return;
+  const key = T.sel + "|" + t.params.map((x) => x.name + x.ncomp).join(",");
+  if (key === exBuilt) return; exBuilt = key; // the page is rebuilt on any change: keep what is being typed
+  const sel = $("exParam"), keep = sel.value || "bias_magnetic_field";
+  sel.innerHTML = t.params.map((x) => `<option value="${esc(x.name)}">${esc(x.name)}</option>`).join("");
+  sel.value = t.params.some((x) => x.name === keep) ? keep : (t.params[0] || {}).name;
+  if (!exChart) exChart = makeChart($("exCv"), $("exHover"), $("exReset"));
+  exBuildFields();
+}
+function exBuildFields() {
+  const p = exParam(), wave = $("exWave").value, shape = p && p.ncomp > 1 ? "v" : "s";
+  $("exUnit").textContent = p ? (p.ncomp > 1 ? "vector" : "scalar") + (p.unit ? `, ${p.unit}` : "") : "";
+  $("exFields").innerHTML = EX_FIELDS[wave].map(([k, label, unit, def]) => {
+    const v = exVals[shape + k] ?? exDefault(k, p) ?? def, u = unit === undefined ? (p && p.unit) || "" : unit;
+    return `<tr><td>${label}</td><td><input type="text" data-k="${k}" value="${esc(v)}" size="${k === "expr" || k === "A" ? 26 : 10}" spellcheck="false"
+      ${k === "t0" ? 'placeholder="now"' : ""}> ${esc(u)}</td></tr>`;
+  }).join("");
+  $("exFields").querySelectorAll("input").forEach((el) => (el.oninput = () => { exVals[shape + el.dataset.k] = el.value; exSoon(); }));
+  exSoon();
+}
+function exPayload() {
+  const c = { target: T.sel, param: $("exParam").value, wave: $("exWave").value, where: $("exWhere").value, whereValue: $("exWhereValue").value, window: $("exWindow").value };
+  $("exFields").querySelectorAll("input").forEach((el) => (c[el.dataset.k] = el.value));
+  return c;
+}
+function exSoon() { clearTimeout(exTimer); exTimer = setTimeout(exPreview, 250); } // preview while typing
+async function exPreview() {
+  const p = exParam(); if (!p || !exChart) return;
+  const r = await send({ cmd: "excite_preview", ...exPayload() });
+  if (r.ok === false || !r.t) { $("exErr").textContent = r.pending ? "" : r.error || ""; return drawChart(exChart, { message: "" }); }
+  $("exErr").textContent = "";
+  const names = p.ncomp > 1 ? ["x", "y", "z"].slice(0, p.ncomp) : [p.name], u = p.unit ? " " + esc(p.unit) : "";
+  drawChart(exChart, {
+    X: r.t, Y: r.values, names, xlabel: "t (s)", ylabel: p.name + (p.unit ? ` (${p.unit})` : ""),
+    readout: (k, colors) => `t = ${g(r.t[k])} s` + r.values.map((S, j) => `&ensp;<b style="color:${colors[j % colors.length]}">${esc(names[j])}</b> = ${g(S[k])}${u}`).join(""),
+  });
+}
+$("exParam").onchange = exBuildFields; $("exWave").onchange = exBuildFields;
+$("exWhere").onchange = () => { $("exWhereValue").hidden = $("exWhere").value === "all"; $("exWhereValue").placeholder = $("exWhere").value === "region" ? "region number" : "e.g. x < 50e-9"; exSoon(); };
+$("exWhereValue").oninput = exSoon; $("exWindow").oninput = exSoon;
+$("exAdd").onclick = async () => { const r = await send({ cmd: "excite", ...exPayload() }); $("exErr").textContent = r.ok === false ? r.error : ""; };
+$("exList").onclick = (e) => { const b = e.target.closest("button"); if (b) send({ cmd: "excite_remove", id: +b.dataset.rm }); };
+function showExcitations() {
+  const key = T.excitations.map((x) => x.id).join(","); if (key === exKey) return; exKey = key;
+  $("exNone").hidden = T.excitations.length > 0;
+  $("exList").innerHTML = T.excitations.map((x) => `<tr><td class="gray">${esc(x.target)}</td><td style="word-break:break-all">${esc(x.label)}</td>
+    <td><button data-rm="${x.id}" title="Remove it. mumax⁺ can only remove all time terms of a parameter: the other ones added here are added again">×</button></td></tr>`).join("");
 }
 
 /* ---------- magnet selection ---------- */
@@ -1094,7 +1182,7 @@ function showTick() {
   $("maxtorque").textContent = T.maxtorque === null ? "--" : sci(T.maxtorque, 3) + " T";
   setText($("fixdt"), num(T.fixdt)); setText($("maxerr"), num(T.maxerr));
   setText($("tableAutoSave"), num(T.autosave));
-  showPyNote(); showCheckpoints(); showPerf();
+  showPyNote(); showCheckpoints(); showPerf(); showExcitations();
   syncPlots();
   if (document.activeElement !== $("solvertype")) $("solvertype").value = T.method;
   $("methodnote").textContent = T.method_known ? "" : "(mumax⁺ cannot report the current method; showing its default)";
@@ -1110,7 +1198,7 @@ function rebuildPage() {
   if (!built.solver) { buildSolver(); built.solver = true; }
   const ck = P.configs.map((c) => c.name).join("|");
   if (ck !== built.cfg) { built.cfg = ck; buildConfigs(); }
-  buildParams();
+  buildParams(); buildExcite();
   $("version").textContent = P.version;
   $("cols").textContent = "columns: " + P.table_columns.map((n, i) => `${i + 1} = ${n}`).join(",  ");
 }

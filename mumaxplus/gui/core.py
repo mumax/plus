@@ -47,6 +47,26 @@ RENDER_INTERVAL = 0.10  # minimum wall time between two display frames while run
 TORQUE_INTERVAL = 0.5
 LIVE_SAMPLE_INTERVAL = 0.15  # live table sampling (wall time) when TableAutosave is 0
 TABLE_MAX_ROWS = 20000
+# excitation waveforms: factor(t) multiplying the amplitude, from the panel's fields
+WAVEFORMS = {
+    "sine": "np.sin(2 * np.pi * {f} * (t - {t0}) + {phi}) * (t >= {t0})",
+    "gauss": "np.exp(-0.5 * ((t - {t0}) / {sigma}) ** 2)",
+    "rect": "((t >= {t0}) & (t < {t0} + {tau}))",
+    "sinc": "np.sinc(2 * {fc} * (t - {t0}))",
+}
+# numpy functions an expression may use without "np."
+NP_NAMES = (
+    "sin",
+    "cos",
+    "tan",
+    "exp",
+    "sqrt",
+    "tanh",
+    "sinc",
+    "pi",
+    "abs",
+    "heaviside",
+)
 PERF_WINDOW = 2.0  # wall time over which steps/s and simulated time/s are measured
 NO_RESET = {
     "break",
@@ -56,6 +76,7 @@ NO_RESET = {
     "region",
     "log_only",
     "paint",
+    "excite_preview",
     "view_add",
     "view_remove",
     "plot_add",
@@ -96,6 +117,16 @@ def _doc(obj):
     """First paragraph of a docstring on one line (mumax3 shows these as tooltips)."""
     text = inspect.getdoc(obj) or ""
     return re.sub(r"\s+", " ", text.split("\n\n")[0]).strip()
+
+
+def _num(v):
+    """Shortest text that reads back as the float v (5e+09, not 5000000000.0)."""
+    v = float(v)
+    return min(
+        (f"{v:.{p}g}" for p in range(1, 18) if float(f"{v:.{p}g}") == v),
+        key=len,
+        default=repr(v),
+    )
 
 
 def _fmt(v):
@@ -276,6 +307,10 @@ class Controller:
         self.script = []
         self._script_imports = []
         self._rec_t = self._rec_n = None  # time / step of the unrecorded part of a run
+
+        # excitations added in the page (time terms of parameters), see _excite
+        self.excitations = []
+        self._next_excitation = 1
 
         # painting on a display: the stroke being painted, and how to undo the last one
         self._stroke = None
@@ -907,6 +942,10 @@ class Controller:
                     "log_id": self.log_id,
                     "script_lines": len(self.script),
                     "paint_undo": self._paint_undo is not None,
+                    "excitations": [
+                        {k: v for k, v in e.items() if k in ("id", "target", "label")}
+                        for e in self.excitations
+                    ],
                     "perf": dict(self.perf, eta=self._eta()),
                     "checkpoints": [
                         {k: v for k, v in cp.items() if k != "state"}
@@ -1116,6 +1155,12 @@ class Controller:
         elif name == "plot_remove":
             if len(self.plots) > 1:
                 self.plots = [p for p in self.plots if p["id"] != c["plot"]]
+        elif name == "excite_preview":
+            return {"ok": True, **self._excite_preview(c)}
+        elif name == "excite":
+            self._excite(c)
+        elif name == "excite_remove":
+            self._excite_remove(c.get("id"))
         elif name == "paint":
             self._paint(c)
         elif name == "paint_undo":
@@ -1308,6 +1353,150 @@ class Controller:
             cfg["_next_save"] = None
         self._autosave_tick()
         self._update_torque()
+        self._dirty = True
+
+    # ---------------------------------------------------------------- excitations
+    def _term(self, c):
+        """Python source of an excitation's time term and mask, from the panel.
+
+        ``c``: target, param, wave (sine, gauss, rect, sinc or expr), the wave's
+        fields (A, f, phi, t0, sigma, tau, fc, or expr), and where (all, region,
+        mask) with its value. An empty t0 is now. Returns a dict with the term's and
+        the mask's source, the functions made from that same source, and the imports
+        the recorded script needs.
+        """
+        obj = self.targets[c["target"]]
+        param = getattr(obj, c["param"])
+        ncomp = int(param.ncomp)
+        ref = f"{self._ref(c['target'])}.{c['param']}"
+        imports = ["import numpy as np"]
+        env = {**self.ns, "np": np, **{n: getattr(np, n) for n in NP_NAMES}}
+        if c["wave"] == "expr":
+            body = str(c["expr"]).strip()
+            used = {n.id for n in ast.walk(ast.parse(body)) if isinstance(n, ast.Name)}
+            short = sorted(n for n in used & set(NP_NAMES) if n not in self.ns)
+            if short:
+                imports.append(f"from numpy import {', '.join(short)}")
+        else:
+            num = {}
+            for k in re.findall(r"\{(\w+)\}", WAVEFORMS[c["wave"]]):
+                text = str(c.get(k, "")).strip()
+                v = (
+                    float(self._ts().time)
+                    if k == "t0" and not text
+                    else self._eval(text)
+                )
+                num[k] = _num(v)
+            wave = WAVEFORMS[c["wave"]].format(**num)
+            amp = self._vec(c["A"], ncomp)
+            amp = f"({', '.join(map(_num, amp))})" if ncomp > 1 else _num(amp)
+            body = f"np.multiply({amp}, {wave})" if ncomp > 1 else f"{amp} * {wave}"
+        term = f"lambda t: {body}"
+        fn = eval(term, env)
+        v = np.asarray(fn(float(self._ts().time)), dtype=float)  # check it now
+        if v.size != ncomp:
+            raise ValueError(
+                f"{c['param']} needs {ncomp} value(s) at a time, got {v.size}"
+            )
+        where, arg = c.get("where", "all"), str(c.get("whereValue", "")).strip()
+        if where == "region":
+            regions = f"{self._ref(c['target'])}.regions"
+            mask = f"np.asarray({regions} == {int(self._eval(arg))}, float)"
+        elif where == "mask":
+            mask = f"lambda x, y, z: float({arg})"
+        else:
+            mask = None
+        return {
+            "ref": ref,
+            "term": term,
+            "fn": fn,
+            "mask": mask,
+            "mask_value": None if mask is None else eval(mask, env),
+            "imports": imports,
+            "ncomp": ncomp,
+        }
+
+    def _excite_preview(self, c):
+        """Sample the waveform of the panel over a time window, for its preview."""
+        tm = self._term(c)
+        t0 = float(self._ts().time)
+        num = lambda k, d: float(self._eval(c[k])) if str(c.get(k, "")).strip() else d
+        start = num("t0", t0)
+        window = {
+            "sine": lambda: 5 / num("f", 1e9),
+            "gauss": lambda: 8 * num("sigma", 1e-10),
+            "rect": lambda: 1.4 * num("tau", 1e-10),
+            "sinc": lambda: 20 / num("fc", 1e10),
+        }.get(c["wave"], lambda: 1e-9)()
+        if str(c.get("window", "")).strip():
+            window = float(self._eval(c["window"]))
+        if c["wave"] in ("gauss", "sinc"):  # centred pulses
+            start -= window / 2
+        elif c["wave"] == "rect":
+            start -= window / 14
+        ts = start + np.linspace(0, window, 401)
+        vals = np.array([np.asarray(tm["fn"](t), dtype=float).reshape(-1) for t in ts])
+        return {"t": ts.tolist(), "values": vals.T.tolist(), "term": tm["term"]}
+
+    def _add_term(self, e):
+        param = getattr(self.targets[e["target"]], e["param"])
+        if e["mask_value"] is None:
+            param.add_time_term(e["fn"])
+        else:
+            param.add_time_term(e["fn"], e["mask_value"])
+
+    def _excite(self, c):
+        """Add an excitation: a time term of a parameter (Parameter.add_time_term)."""
+        tm = self._term(c)
+        param = getattr(self.targets[c["target"]], c["param"])
+        e = {
+            "id": self._next_excitation,
+            "target": c["target"],
+            "param": c["param"],
+            # the script's own time terms on this parameter (removing one of ours
+            # removes those too)
+            "foreign": bool(param.is_dynamic)
+            and not any(
+                x["target"] == c["target"] and x["param"] == c["param"]
+                for x in self.excitations
+            ),
+            **tm,
+        }
+        self._next_excitation += 1
+        self._add_term(e)
+        line = f"{tm['ref']}.add_time_term({tm['term']}"
+        line += f", mask={tm['mask']})" if tm["mask"] else ")"
+        e["label"] = f"{c['param']} += {tm['term'][len('lambda t: '):]}" + (
+            f"  where {c['where']} {c.get('whereValue', '')}" if tm["mask"] else ""
+        )
+        self.excitations.append(e)
+        self._did(line, tm["imports"])
+        self._dirty = True
+
+    def _excite_remove(self, eid):
+        """Remove an excitation; with no id, all time terms of its parameter.
+
+        mumax+ can only remove all time terms of a parameter, so the others added
+        here are added again.
+        """
+        e = next((x for x in self.excitations if x["id"] == eid), None)
+        if e is None:
+            raise ValueError(f"no excitation {eid!r}")
+        same = lambda x: x["target"] == e["target"] and x["param"] == e["param"]
+        foreign = any(x["foreign"] for x in self.excitations if same(x))
+        getattr(self.targets[e["target"]], e["param"]).remove_time_terms()
+        self._did(f"{e['ref']}.remove_time_terms()")
+        if foreign:
+            self.say(
+                f"this also removed the time terms the script added to {e['param']}"
+            )
+        self.excitations = [x for x in self.excitations if x is not e]
+        for x in self.excitations:
+            if same(x):
+                x["foreign"] = False
+                self._add_term(x)
+                line = f"{x['ref']}.add_time_term({x['term']}"
+                self._did(line + (f", mask={x['mask']})" if x["mask"] else ")"))
         self._dirty = True
 
     # ------------------------------------------------------------------- painting
