@@ -118,6 +118,8 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .pgrp { padding: 8px 8px 2px; font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--mute); }
 .pitem { display: flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; cursor: pointer; }
 .pitem:hover, .pitem.hl { background: var(--field); }
+.pitem.off { opacity: .45; cursor: default; }
+select.searchsrc { display: none !important; } /* shown as a button that opens the picker (searchable) */
 .pitem .pn { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12.5px var(--mono); }
 .pitem .pu { color: var(--mute); font-size: 11px; }
 .pitem .pc { display: flex; gap: 2px; }
@@ -578,6 +580,7 @@ $("addView").onclick = () => send({ cmd: "view_add" });
 
 function makeView(id) {
   const el = $("viewTpl").content.firstElementChild.cloneNode(true);
+  el.querySelectorAll("select").forEach(searchable);
   const V = { id, el, q: (c) => el.querySelector("." + c), frame: null, frameId: -1, mouse: null, arrowCells: 8, qkey: "", paintVals: {},
               off: document.createElement("canvas") };
   const { q } = V, render = (c) => send({ cmd: "render", view: id, ...c });
@@ -681,8 +684,8 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     if (V.qkey !== qkey || V.quant !== c.quant) {
       V.qkey = qkey; fillQuantities(V); if (V.paintTool === "brush") fillPaintQuants(V, true);
     }
-    if (document.activeElement !== q("renderComp") && [...q("renderComp").options].some((o) => o.value === c.comp)) q("renderComp").value = c.comp;
-    if (document.activeElement !== q("renderPlane")) q("renderPlane").value = c.plane;
+    if ([...q("renderComp").options].some((o) => o.value === c.comp)) q("renderComp").value = c.comp;
+    q("renderPlane").value = c.plane;
     if (document.activeElement !== q("renderLayer") && c.layer !== null) q("renderLayer").value = c.layer;
     q("renderAllRow").style.display = many ? "" : "none";
     q("renderAll").checked = !!c.all;
@@ -1258,9 +1261,9 @@ function drawPlot(Pl) {
   });
 }
 
-/* a searchable list that drops down from ``anchor`` (one at a time). items: { grp, name, unit, doc, on, pick,
-   comps: [{ label, title, pick }] } (on: the one shown now, ✓); Enter picks the first match, Esc closes.
-   ``extra`` (html) goes below the list, and setup(el) wires it */
+/* a searchable list that drops down from ``anchor`` (one at a time). items: { grp, name, unit, doc, on, off, pick,
+   comps: [{ label, title, pick }] } (grp: a heading, if any; on: the one shown now, ✓; off: shown, but cannot be
+   picked); Enter picks the first match, Esc closes. ``extra`` (html) goes below the list, and setup(el) wires it */
 let picker = null;
 function closePicker() { if (picker) { picker.remove(); picker = null; } }
 document.addEventListener("pointerdown", (e) => { if (picker && !picker.contains(e.target) && e.target !== picker.anchor) closePicker(); });
@@ -1276,21 +1279,21 @@ function openPicker(anchor, placeholder, items, extra = "", setup = null) {
   let first = null;
   const render = () => {
     const words = qi.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    const shown = items.filter((it) => words.every((w) => `${it.grp} ${it.name} ${it.doc || ""}`.toLowerCase().includes(w)));
+    const shown = items.filter((it) => words.every((w) => `${it.grp || ""} ${it.name} ${it.doc || ""}`.toLowerCase().includes(w)));
     list.innerHTML = shown.length ? "" : `<div class="pempty">nothing matches</div>`;
     first = null;
-    let grp = null, on = null;
+    let grp = "", on = null;
     for (const it of shown) {
-      if (it.grp !== grp) { grp = it.grp; list.insertAdjacentHTML("beforeend", `<div class="pgrp">${esc(grp)}</div>`); }
-      const row = document.createElement("div"); row.className = "pitem"; row.title = it.doc || "";
+      if ((it.grp || "") !== grp) { grp = it.grp || ""; if (grp) list.insertAdjacentHTML("beforeend", `<div class="pgrp">${esc(grp)}</div>`); }
+      const row = document.createElement("div"); row.className = "pitem" + (it.off ? " off" : ""); row.title = it.doc || "";
       row.innerHTML = `<span class="pn">${it.on ? "✓ " : ""}${esc(it.name)}</span><span class="pu">${esc(it.unit || "")}</span>`;
       if (it.comps && it.comps.length) {
         const pc = document.createElement("span"); pc.className = "pc";
         for (const k of it.comps) pc.append(smallButton(k.label, k.title, () => pick(k.pick)));
         row.append(pc);
       }
-      row.onclick = () => pick(it.pick);
-      first = first || row; if (it.on) on = on || row;
+      if (!it.off) { row.onclick = () => pick(it.pick); first = first || row; }
+      if (it.on) on = on || row;
       list.append(row);
     }
     if (on && !words.length) on.scrollIntoView({ block: "nearest" });
@@ -1302,6 +1305,26 @@ function openPicker(anchor, placeholder, items, extra = "", setup = null) {
   qi.focus();
 }
 const compLabel = (n, k) => (n === 3 ? "xyz"[k] : String(k));
+
+/* every <select> is shown as a button that opens the picker above. The select stays, hidden: the page sets and
+   reads its options and value as before, picking fires its "change" event, and the button follows it */
+const selectValue = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+function searchable(sel) {
+  const b = document.createElement("button"); b.type = "button"; b.className = "mono"; b.title = sel.title;
+  sel.classList.add("searchsrc"); sel.after(b);
+  const show = () => {
+    const o = sel.selectedOptions[0];
+    b.textContent = (o ? o.textContent : "") + " ▾"; b.disabled = sel.disabled; b.style.display = sel.style.display;
+  };
+  Object.defineProperty(sel, "value", { get: () => selectValue.get.call(sel), set: (v) => { selectValue.set.call(sel, v); show(); } });
+  new MutationObserver(show).observe(sel, { childList: true, subtree: true, attributes: true, attributeFilter: ["disabled", "style"] });
+  b.onclick = () => openPicker(b, "search", [...sel.options].map((o) => ({
+    name: o.textContent, doc: o.title, on: o.selected, off: o.disabled,
+    pick: () => { if (sel.value !== o.value) { sel.value = o.value; sel.dispatchEvent(new Event("change")); } },
+  })));
+  show();
+}
+document.querySelectorAll("select").forEach(searchable); // and in each new display panel (makeView)
 
 /* what to plot: a column of the table, any quantity of a magnet (its average; a vector one component, or all
    of them with a click on its name), or a new column of table.txt computed by a Python expression */
@@ -1393,7 +1416,7 @@ function showTick() {
   setText($("tableAutoSave"), num(T.autosave));
   showPyNote(); showCheckpoints(); showPerf(); showExcitations();
   syncPlots();
-  if (document.activeElement !== $("solvertype")) $("solvertype").value = T.method;
+  $("solvertype").value = T.method;
   $("methodnote").textContent = T.method_known ? "" : "(showing the default at startup)";
   if (document.activeElement !== $("region") && !$("region").classList.contains("dirty")) $("region").value = T.region;
   syncViews();
