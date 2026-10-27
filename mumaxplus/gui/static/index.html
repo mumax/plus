@@ -134,7 +134,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
   <div class="row" title="Record this display: a frame every so much simulation time, drawn by the simulation (it goes on with the page closed). The movie is saved next to table.txt when you stop">Movie: every
     <input type="text" class="movPeriod" value="1e-11" size="6"> s,
-    <select class="movFormat"><option value="gif" title="at most 256 colours: close to the data, not exact">GIF</option><option value="mp4" title="lossless: exactly the frames. Plays in VLC, mpv, ffplay; browsers, QuickTime and PowerPoint cannot play lossless RGB video">MP4 (lossless)</option><option value="png">PNG frames</option></select>
+    <select class="movFormat"><option value="mp4" title="lossless: exactly the frames. Plays in VLC, mpv, ffplay; browsers, QuickTime and PowerPoint cannot play lossless RGB video">MP4</option><option value="png">PNG frames</option></select>
     at <input type="text" class="movFps" value="10" size="3"> fps
     <button class="movRec">● Record</button> <span class="movNote gray" style="font-size:12px"></span></div>
   <div class="row" title="Paint the magnet under the image: drag with the brush to set m or any parameter, or click to place a vortex, skyrmion, ... (recorded in Copy as Python)">Paint:
@@ -589,7 +589,7 @@ function makeView(id) {
     q("movRec").disabled = false;
     if (r.ok === false) { q("movNote").textContent = r.error; return; }
     q("movNote").textContent = "saved " + file;
-    if (/\.(gif|mp4)$/.test(file)) { // and download it
+    if (/\.mp4$/.test(file)) { // and download it
       const b = await (await GET("/api/file?name=" + encodeURIComponent(file))).blob();
       download(file.split(/[\\/]/).pop(), b);
     }
@@ -644,7 +644,7 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     rec.classList.toggle("primary", !!mv);
     for (const k of ["movPeriod", "movFormat", "movFps"]) q(k).disabled = !!mv;
     if (mv) q("movNote").textContent = `${mv.frames} frame${mv.frames === 1 ? "" : "s"}`;
-    const mp4 = q("movFormat").querySelector("[value=mp4]"); mp4.disabled = !P.ffmpeg; mp4.title = P.ffmpeg ? "" : "needs ffmpeg";
+    const mp4 = q("movFormat").querySelector("[value=mp4]"); mp4.disabled = !P.ffmpeg; if (!P.ffmpeg) { mp4.title = "needs ffmpeg"; if (q("movFormat").value === "mp4") q("movFormat").value = "png"; }
     if (!t) return;
     // the display settings may also change from the console
     if (V.qkey !== qkey || (document.activeElement !== q("renderQuant") && q("renderQuant").value !== c.quant)) {

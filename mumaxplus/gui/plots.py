@@ -126,58 +126,33 @@ def _arrows(d, w, h, f, cells):
     return layer
 
 
-def write_movie(frames, path, fps, fmt):
-    """Encode the PNG files ``frames`` as a GIF (Pillow) or an MP4 (ffmpeg).
+def write_movie(frames, path, fps):
+    """Encode the PNG files ``frames`` as an MP4 (ffmpeg).
 
-    The MP4 is lossless (RGB, libx264rgb at crf 0): its pixels are the frames'. A
-    GIF has at most 256 colours, so its frames share one palette (made from all of
-    them) without dithering: a cell keeps its colour from frame to frame instead of
-    flickering between nearby palette colours.
+    The MP4 is lossless (RGB, libx264rgb at crf 0): its pixels are the frames'.
     """
-    if fmt == "gif":
-        from PIL import Image
+    import shutil
+    import subprocess
 
-        ims = [Image.open(f).convert("RGB") for f in frames]
-        step = max(1, len(ims) // 64)  # the palette from up to 64 frames
-        sample = ims[::step]
-        mosaic = Image.new("RGB", (sample[0].width, sample[0].height * len(sample)))
-        for i, im in enumerate(sample):
-            mosaic.paste(im, (0, i * im.height))
-        pal = mosaic.quantize(256, method=Image.Quantize.MEDIANCUT)
-        first, *rest = (
-            im.quantize(palette=pal, dither=Image.Dither.NONE) for im in ims
-        )
-        first.save(
-            path,
-            save_all=True,
-            append_images=rest,
-            duration=round(1000 / fps),
-            loop=0,
-            optimize=False,  # keep the shared palette
-        )
-    else:
-        import shutil
-        import subprocess
-
-        folder = Path(frames[0]).parent
-        subprocess.run(
-            [
-                shutil.which("ffmpeg"),
-                "-y",
-                "-loglevel",
-                "error",
-                "-framerate",
-                f"{fps:g}",
-                "-i",
-                str(folder / "%06d.png"),
-                "-c:v",
-                "libx264rgb",  # RGB, not YUV: no colour bleeding between cells
-                "-crf",
-                "0",  # lossless
-                "-pix_fmt",
-                "rgb24",
-                str(path),
-            ],
-            check=True,
-            capture_output=True,
-        )
+    folder = Path(frames[0]).parent
+    subprocess.run(
+        [
+            shutil.which("ffmpeg"),
+            "-y",
+            "-loglevel",
+            "error",
+            "-framerate",
+            f"{fps:g}",
+            "-i",
+            str(folder / "%06d.png"),
+            "-c:v",
+            "libx264rgb",  # RGB, not YUV: no colour bleeding between cells
+            "-crf",
+            "0",  # lossless
+            "-pix_fmt",
+            "rgb24",
+            str(path),
+        ],
+        check=True,
+        capture_output=True,
+    )

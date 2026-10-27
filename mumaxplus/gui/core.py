@@ -1718,13 +1718,13 @@ class Controller:
         period, fps = float(self._eval(c["period"])), float(
             self._eval(c.get("fps", 10))
         )
-        fmt = c.get("format", "gif")
+        fmt = c.get("format", "mp4")
         if period <= 0 or fps <= 0:
             raise ValueError("the period and the frame rate must be positive")
-        if fmt not in ("gif", "mp4", "png"):
+        if fmt not in ("mp4", "png"):
             raise ValueError(f"unknown movie format {fmt!r}")
         if fmt == "mp4" and not shutil.which("ffmpeg"):
-            raise ValueError("MP4 needs ffmpeg, which is not installed: use GIF")
+            raise ValueError("MP4 needs ffmpeg, which is not installed: use PNG frames")
         base = cfg["quant"] + (f"_{cfg['comp']}" if cfg["comp"] != "" else "")
         out = next(
             Path(f"{base}_movie_{i:03d}{'' if fmt == 'png' else '.' + fmt}").resolve()
@@ -1802,7 +1802,7 @@ class Controller:
             self.busy = "making the movie"
             self._publish()
             frames = sorted(mv["folder"].glob("*.png"))
-            write_movie(frames, mv["out"], mv["fps"], mv["format"])
+            write_movie(frames, mv["out"], mv["fps"])
         finally:
             self.busy = ""
             shutil.rmtree(mv["folder"], ignore_errors=True)

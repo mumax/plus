@@ -84,7 +84,7 @@ def _make_handler(ctrl: Controller, token: str):
                     return self._send(404, b"not found", "text/plain")
                 with open(name, "rb") as f:
                     body = f.read()
-                kind = {".gif": "image/gif", ".mp4": "video/mp4"}.get(
+                kind = {".mp4": "video/mp4"}.get(
                     os.path.splitext(name)[1], "application/octet-stream"
                 )
                 return self._send(200, body, kind)
