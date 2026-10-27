@@ -31,8 +31,21 @@ import traceback
 
 import numpy as np
 
+import mumaxplus
+import mumaxplus.util as U
+
+from .plots import movie_frame, vector_rgba, write_movie
+
 SOLVER_METHODS = ["Heun", "BogackiShampine", "CashKarp", "Fehlberg", "DormandPrince"]
 DEFAULT_METHOD = "Fehlberg"  # documented default; mumax+ cannot report the current one
+# the time solver's settings under "more solver settings" (fixdt and maxerr are above)
+SOLVER_SETTINGS = (
+    "headroom",
+    "lower_bound",
+    "upper_bound",
+    "sensible_factor",
+    "sensible_timestep_default",
+)
 CONFIGS = [
     "twodomain",
     "vortex",
@@ -69,6 +82,8 @@ NP_NAMES = (
     "abs",
     "heaviside",
 )
+# what the numbers typed in the page may use besides the script's namespace
+MATH = {k: getattr(math, k) for k in dir(math) if not k.startswith("_")}
 PERF_WINDOW = 2.0  # wall time over which steps/s and simulated time/s are measured
 NO_RESET = {
     "break",
@@ -161,11 +176,9 @@ def _num(v):
     )
 
 
-def _fmt(v):
-    """Short number format (float32-ish precision, like mumax3's float32(v))."""
-    if isinstance(v, (tuple, list, np.ndarray)):
-        return "(" + ", ".join(_fmt(x) for x in v) + ")"
-    return f"{float(v):.7g}"
+def _col_name(base, ncomp, i):
+    """Table column of component i of a quantity: m, or mx, my, mz, or m0, m1, ..."""
+    return base if ncomp == 1 else base + ("xyz"[i] if ncomp == 3 else str(i))
 
 
 class Table:
@@ -359,9 +372,8 @@ class Controller:
         self.method = DEFAULT_METHOD
         self.method_known = False
         self._nchunk = 1
-        self._fresh = (
-            True  # TimeSolver.steps resets the adaptive dt; only wanted after a change
-        )
+        # TimeSolver.steps resets the adaptive dt; only wanted after a change
+        self._fresh = True
         self.maxtorque = None
         self._last_torque = 0.0
         self.last_error = ""
@@ -370,9 +382,8 @@ class Controller:
         self.targets = {}
         self.sel = None  # selected magnet (display, parameters, mesh, initial m)
         self.region = -1
-        self.views = (
-            []
-        )  # one dict per display panel: {"id", "quant", "comp", "plane", "layer", ...}
+        # one dict per display panel: {"id", "quant", "comp", "plane", "layer", ...}
+        self.views = []
         self._next_view = 0
         self.table = Table(table_file)
         # one dict per plot panel: table columns x against y1,y2,... (names)
@@ -430,6 +441,9 @@ class Controller:
     def _ts(self):
         return self.world.timesolver
 
+    def _now(self):
+        return float(self.world.timesolver.time)
+
     # ------------------------------------------------------------- Copy as Python
     def record(self, code, imports=()):
         """Add ``code`` to the recorded script, after the run done so far."""
@@ -446,7 +460,7 @@ class Controller:
         """Record the part of the current run that was not recorded yet."""
         if not self.running or self._rec_t is None:
             return
-        ts = self._ts()
+        now = self._now()
         if self.steps_left is not None:
             n = self.steps_done - self._rec_n
             if n > 0:
@@ -454,11 +468,11 @@ class Controller:
         else:
             # a finished Run(t) records t, not t plus the overshoot of the last step
             end = self.run_until
-            if end is None or ts.time < end * (1 - 1e-12):
-                end = float(ts.time)
+            if end is None or now < end * (1 - 1e-12):
+                end = now
             if end > self._rec_t:
                 self.script.append(f"world.timesolver.run({end - self._rec_t:.10g})")
-        self._rec_t, self._rec_n = float(ts.time), self.steps_done
+        self._rec_t, self._rec_n = now, self.steps_done
 
     def script_text(self):
         """Return the recorded script, including the run so far."""
@@ -606,14 +620,14 @@ class Controller:
         if name:
             return name
         base = quant if len(self.targets) == 1 else f"{target}.{quant}"
-        name = base if n == 1 else base + ("xyz"[i] if n == 3 else str(i))
-        taken, k = self.table.names(), 2
-        while (f"{name}_{k}" if k > 2 else name) in taken:
+        base = _col_name(base, n, i)
+        taken, name, k = self.table.names(), base, 1
+        while name in taken:
             k += 1
-        name = f"{name}_{k}" if k > 2 else name
+            name = f"{base}_{k}"
         fn = (lambda: np.atleast_1d(obj.average())[i]) if field else obj.eval
         unit = getattr(obj, "unit", "") or ""
-        self.table.add(name, unit, fn, saved=False, key=key, t=float(self._ts().time))
+        self.table.add(name, unit, fn, saved=False, key=key, t=self._now())
         return name
 
     def _prune_columns(self):
@@ -631,11 +645,9 @@ class Controller:
         if not re.fullmatch(r"[A-Za-z_][\w.]*", name):
             raise ValueError("give the column a name: letters, digits, _ and .")
         code = compile(expr, "<table column>", "eval")
-        base = {k: getattr(math, k) for k in dir(math) if not k.startswith("_")}
-        base["np"] = np
 
         def fn():
-            return eval(code, {**base, **self.ns})
+            return eval(code, {**MATH, "np": np, **self.ns})
 
         float(np.asarray(fn()))  # an error now, rather than NaN in every row
         self.table_add(fn, name, unit)
@@ -644,7 +656,10 @@ class Controller:
             self._plot_set(p, y=[*p["y"].split(","), name])
 
     def _view(self, vid):
-        return next((v for v in self.views if v["id"] == vid), None)
+        v = next((v for v in self.views if v["id"] == vid), None)
+        if v is None:
+            raise ValueError(f"no display {vid!r}")
+        return v
 
     def _view_state(self, cfg):
         """Return what the page needs of a view: its settings and latest frame id."""
@@ -656,94 +671,56 @@ class Controller:
         return state
 
     # --------------------------------------------------------------- introspection
-    def _inspect(self, name, obj):
+    def _inspect(self, obj):
         info = {
             "quantities": [],
             "params": [],
             "switches": [],
             "paintable": [],
             "scalars": [],  # ScalarQuantity: can be plotted, not displayed
-            "doc": "",
         }
         cls = type(obj)
         for pname in sorted(dir(cls), key=str.lower):
-            if pname.startswith("_"):
-                continue
             prop = getattr(cls, pname, None)
-            if not isinstance(prop, property):
+            if pname.startswith("_") or not isinstance(prop, property):
                 continue
             try:
                 val = getattr(obj, pname)
-            except Exception:
-                continue
-            m = _mro(val)
-            doc = _doc(prop)
-            try:
+                m = _mro(val)
+                item = {
+                    "name": pname,
+                    "unit": getattr(val, "unit", ""),
+                    "doc": _doc(prop),
+                }
+                settable = prop.fset is not None
                 if "Parameter" in m and "InterParameter" not in m:
-                    info["params"].append(
-                        {
-                            "name": pname,
-                            "ncomp": int(val.ncomp),
-                            "unit": val.unit,
-                            "doc": doc,
-                        }
-                    )
-                    info["quantities"].append(
-                        {
-                            "name": pname,
-                            "ncomp": int(val.ncomp),
-                            "unit": val.unit,
-                            "doc": doc,
-                        }
-                    )
-                    info["paintable"].append(
-                        {"name": pname, "ncomp": int(val.ncomp), "unit": val.unit}
-                    )
+                    item["ncomp"] = int(val.ncomp)
+                    info["params"].append(item)
+                    info["quantities"].append(item)
+                    info["paintable"].append(item)
                 elif "FieldQuantity" in m or "Variable" in m:
-                    info["quantities"].append(
-                        {
-                            "name": pname,
-                            "ncomp": int(val.ncomp),
-                            "unit": val.unit,
-                            "doc": doc,
-                        }
-                    )
-                    if "Variable" in m and prop.fset is not None:  # m, elastic fields
-                        info["paintable"].append(
-                            {"name": pname, "ncomp": int(val.ncomp), "unit": val.unit}
-                        )
+                    item["ncomp"] = int(val.ncomp)
+                    info["quantities"].append(item)
+                    if "Variable" in m and settable:  # m, elastic fields
+                        info["paintable"].append(item)
                 elif "ScalarQuantity" in m:
-                    info["scalars"].append(
-                        {"name": pname, "unit": val.unit, "doc": doc}
-                    )
-                elif isinstance(val, bool) and prop.fset is not None:
-                    info["switches"].append(
-                        {"name": pname, "kind": "bool", "value": val, "doc": doc}
-                    )
-                elif (
-                    isinstance(val, (int, float))
-                    and not isinstance(val, bool)
-                    and prop.fset is not None
-                ):
-                    info["switches"].append(
-                        {"name": pname, "kind": "num", "value": val, "doc": doc}
-                    )
+                    info["scalars"].append(item)
+                elif isinstance(val, (bool, int, float)) and settable:
+                    kind = "bool" if isinstance(val, bool) else "num"
+                    info["switches"].append({**item, "kind": kind, "value": val})
             except Exception:
                 continue
         try:
-            g = obj.grid.size
-            c = obj.cellsize
-            geom = np.asarray(obj.geometry)
             info["mesh"] = {
-                "n": [int(v) for v in g],
-                "c": [float(v) for v in c],
-                "inside": float(geom.mean()),
+                "n": [int(v) for v in obj.grid.size],
+                "c": [float(v) for v in obj.cellsize],
+                "inside": float(np.asarray(obj.geometry).mean()),
             }
         except Exception:
             info["mesh"] = None
         return info
 
-    def _param_values(self, name, obj, params):
+    def _param_values(self, obj, params):
         out = {}
         for p in params:
             try:
@@ -755,9 +732,8 @@ class Controller:
                 else:
                     inside = np.asarray(obj.regions) == self.region
                     geom = np.asarray(obj.geometry, dtype=bool)
-                    idx = np.argwhere(
-                        inside & geom
-                    )  # a cell that is really part of the magnet
+                    # a cell that is really part of the magnet
+                    idx = np.argwhere(inside & geom)
                     if not len(idx):
                         idx = np.argwhere(inside)
                     if not len(idx):
@@ -772,12 +748,7 @@ class Controller:
 
     def _config_info(self):
         out = [{"name": "Uniform", "doc": "Uniform magnetization", "args": "(1, 0, 0)"}]
-        try:
-            import mumaxplus.util as U
-        except Exception:
-            return out
-        c = self._center()
-        cell = self._cell()
+        c, cell = self._center(), self._cell()
         defaults = {
             "position": f"({c[0]:.4g}, {c[1]:.4g}, {c[2]:.4g})",
             "diameter": f"{5 * cell:.4g}",
@@ -795,18 +766,11 @@ class Controller:
             fn = getattr(U, n, None)
             if fn is None:
                 continue
-            try:
-                args = ", ".join(
-                    defaults.get(p, "1") for p in inspect.signature(fn).parameters
-                )
-            except Exception:
-                args = ""
-            info = {"name": n, "doc": _doc(fn), "args": f"({args})"}
             params = list(inspect.signature(fn).parameters)
-            if params[:1] == [
-                "position"
-            ]:  # can be placed at a point with the paint tool
-                info["place"] = ", ".join(defaults.get(p, "1") for p in params[1:])
+            args = [defaults.get(p, "1") for p in params]
+            info = {"name": n, "doc": _doc(fn), "args": f"({', '.join(args)})"}
+            if params[:1] == ["position"]:  # can be placed with the paint tool
+                info["place"] = ", ".join(args[1:])
             out.append(info)
         return out
 
@@ -824,72 +788,45 @@ class Controller:
 
     def describe(self):
         """Rebuild everything the page needs besides the per-tick numbers."""
-        targets = {n: self._inspect(n, o) for n, o in self.targets.items()}
+        targets = {n: self._inspect(o) for n, o in self.targets.items()}
         for n, info in targets.items():
-            info["values"] = self._param_values(n, self.targets[n], info["params"])
+            info["values"] = self._param_values(self.targets[n], info["params"])
         ts = self._ts()
-        solver = {}
-        for key in (
-            "timestep",
-            "adaptive_timestep",
-            "max_error",
-            "headroom",
-            "lower_bound",
-            "upper_bound",
-            "sensible_factor",
-            "sensible_timestep_default",
-        ):
-            try:
-                solver[key] = _clean(getattr(ts, key))
-            except Exception:
-                pass
+        solver = {k: getattr(ts, k) for k in SOLVER_SETTINGS if hasattr(ts, k)}
         world_info = {"vectors": [], "numbers": [], "pbc": None}
         wcls = type(self.world)
         for pname in sorted(dir(wcls), key=str.lower):
             prop = getattr(wcls, pname, None)
-            if (
-                not isinstance(prop, property)
-                or pname.startswith("_")
-                or prop.fset is None
-            ):
+            if pname.startswith("_") or not isinstance(prop, property):
+                continue
+            if prop.fset is None:
                 continue
             try:
                 v = getattr(self.world, pname)
             except Exception:
                 continue
+            item = {"name": pname, "doc": _doc(prop)}
             if pname == "pbc_repetitions":
                 world_info["pbc"] = [int(x) for x in v]
-            elif (
-                isinstance(v, (tuple, list))
-                and len(v) == 3
-                and all(isinstance(x, (int, float)) for x in v)
+            elif isinstance(v, (tuple, list)) and all(
+                isinstance(x, (int, float)) for x in v
             ):
-                world_info["vectors"].append(
-                    {"name": pname, "value": [float(x) for x in v], "doc": _doc(prop)}
-                )
+                world_info["vectors"].append({**item, "value": [float(x) for x in v]})
             elif isinstance(v, (int, float)) and not isinstance(v, bool):
-                world_info["numbers"].append(
-                    {"name": pname, "value": float(v), "doc": _doc(prop)}
-                )
-        try:
-            import mumaxplus as mx
-
-            version = (
-                f"mumax⁺ {getattr(mx, '__version__', '')}  ·  "
-                f"{getattr(mx, 'FP_PRECISION', '')} precision"
-            )
-        except Exception:
-            version = "mumax⁺"
+                world_info["numbers"].append({**item, "value": float(v)})
+        version = (
+            f"mumax⁺ {getattr(mumaxplus, '__version__', '')}  ·  "
+            f"{getattr(mumaxplus, 'FP_PRECISION', '')} precision"
+        )
         desc = {
             "title": self.title,
             "version": version,
             "targets": targets,
             "world": world_info,
-            "solver": solver,
+            "solver": solver,  # the settings under "more solver settings"
             "methods": SOLVER_METHODS,
             "configs": self._config_info(),
             "ffmpeg": shutil.which("ffmpeg") is not None,  # MP4 movies
-            "table_columns": self.table.names(),
         }
         with self.lock:
             self.desc = _clean(desc)
@@ -954,7 +891,7 @@ class Controller:
             cfg["_err"] = msg
             return
         cfg.pop("_err", None)
-        ncomp, nz, ny, nx = arr.shape
+        ncomp = arr.shape[0]
         axes = PLANES[cfg.get("plane", "xy")]
         n = arr.shape[3 - axes[2]]  # slices; world axis a is array axis 3 - a
         if cfg["layer"] is None:
@@ -975,8 +912,6 @@ class Controller:
         vector = ncomp == 3 and comp == ""
         rgba = b""
         if vector:
-            from .plots import vector_rgba
-
             data = sl
             empty = np.isnan(sl[0])
             img = vector_rgba(np.nan_to_num(sl))
@@ -1004,9 +939,7 @@ class Controller:
             "vmin": float(finite.min()) if finite.size else 0.0,
             "vmax": float(finite.max()) if finite.size else 0.0,
             "unit": getattr(fq, "unit", ""),
-            "fullnx": nx,
-            "fullny": ny,
-            "time": float(self._ts().time),
+            "time": self._now(),
             "boxes": boxes,
             "origin": lo,  # "show all": world cell (x, y, z) of the composed cell 0
         }
@@ -1024,64 +957,50 @@ class Controller:
         added, per component), a ScalarQuantity, or any function without arguments
         that returns a number (e.g. a domain wall position).
         """
-        obj = (
-            getattr(self.targets[self.sel], quantity)
-            if isinstance(quantity, str)
-            else quantity
-        )
+        by_name = isinstance(quantity, str)
+        obj = getattr(self.targets[self.sel], quantity) if by_name else quantity
         m = _mro(obj)
+        field = "FieldQuantity" in m or "Variable" in m
+        scalar = "ScalarQuantity" in m
+        if not (field or scalar or callable(obj)):
+            raise TypeError(
+                f"cannot add {obj!r} to the table: "
+                "give a quantity or a function returning a number"
+            )
         if name is None:
-            if isinstance(quantity, str):
+            if by_name:
                 name = quantity
-            elif "FieldQuantity" in m or "Variable" in m or "ScalarQuantity" in m:
+            elif field or scalar:
                 name = getattr(obj, "name", "quantity").replace(":", "_")
             else:
                 name = getattr(obj, "__name__", "quantity")
         unit = getattr(obj, "unit", "") if unit is None else unit
-        field = "FieldQuantity" in m or "Variable" in m
         n = int(obj.ncomp) if field else 1
-        cols = [
-            name if n == 1 else name + ("xyz"[i] if n == 3 else str(i))
-            for i in range(n)
-        ]
         keys = [None] * n
-        if isinstance(quantity, str):
+        if by_name:
             keys = [f"{self.sel}:{quantity}:{i if field else ''}" for i in range(n)]
             shown = [self.table.find(k) for k in keys]
             if all(shown):  # plotted already: save those columns from now on
                 for col in shown:
                     self.table.save(col)
                 self.say(f"saving {', '.join(shown)} in {self.table.path}")
-                self.describe()
                 return
-        t = float(self._ts().time)  # the last row gets the new column's value
+        cols = [_col_name(name, n, i) for i in range(n)]
         taken = [col for col in cols if col in self.table.names()]
         if taken:
             raise ValueError(
                 f"table already has a column {taken[0]!r}; "
                 "choose another one with name=..."
             )
-        if field:
-            for i, col in enumerate(cols):
-                self.table.add(
-                    col,
-                    unit,
-                    (lambda o=obj, i=i: np.atleast_1d(o.average())[i]),
-                    key=keys[i],
-                    t=t,
-                )
-        elif "ScalarQuantity" in m:
-            self.table.add(name, unit, lambda o=obj: o.eval(), key=keys[0], t=t)
-        elif callable(obj):
-            self.table.add(name, unit, obj, t=t)
-        else:
-            raise TypeError(
-                f"cannot add {obj!r} to the table: "
-                "give a quantity or a function returning a number"
-            )
+        t = self._now()  # the last row gets the new column's value
+        for i, col in enumerate(cols):
+            if field:
+                fn = lambda o=obj, i=i: np.atleast_1d(o.average())[i]  # noqa: E731
+            else:
+                fn = obj.eval if scalar else obj
+            self.table.add(col, unit, fn, key=keys[i], t=t)
         cols = ", ".join(f"{i + 1}={n}" for i, n in enumerate(self.table.names()))
         self.say(f"table columns: {cols}")
-        self.describe()
 
     def _live_sample(self):
         """Take a live-preview row (only when TableAutosave is 0).
@@ -1092,7 +1011,7 @@ class Controller:
             self._table_tick(force=True)
 
     def _table_tick(self, force=False):
-        t = float(self._ts().time)
+        t = self._now()
         tb = self.table
         if tb.period > 0:
             if tb.next_save is None:
@@ -1198,9 +1117,7 @@ class Controller:
     # numbers typed in the page are expressions, like in mumax3
     # (e.g. 1e-9, 5e-9*2, (0,0,1))
     def _eval(self, text):
-        env = {k: getattr(math, k) for k in dir(math) if not k.startswith("_")}
-        env.update(self.ns)
-        return eval(str(text), env)
+        return eval(str(text), {**MATH, **self.ns})
 
     def _vec(self, text, ncomp):
         v = self._eval(text)
@@ -1212,16 +1129,22 @@ class Controller:
         return v
 
     def _start_run(self, t=None, n=None):
-        ts = self._ts()
+        """Run for a time t, n steps, or (neither) until Break."""
+        self._break()
+        now = self._now()
         self.running = True
-        self._run_t0, self._run_n0 = float(ts.time), self.steps_done
-        self.run_until = float(ts.time) + float(t) if t is not None else None
+        self._run_t0 = self._rec_t = now
+        self._run_n0 = self._rec_n = self.steps_done
+        self.run_until = now + float(t) if t is not None else None
         self.steps_left = int(n) if n is not None else None
         self.progress = 0
         self._fresh = True
-        self._rec_t, self._rec_n = float(ts.time), self.steps_done
         self._perf.clear()
-        self._perf.append((time.perf_counter(), float(ts.time), self.steps_done))
+        self._perf.append((time.perf_counter(), now, self.steps_done))
+
+    def _set_method(self, method):
+        self._ts().set_method(method)
+        self.method, self.method_known = method, True
 
     def _break(self):
         self._record_run()
@@ -1232,37 +1155,27 @@ class Controller:
 
     def _execute(self, c):
         name = c["cmd"]
-        ts = self._ts()
         if name not in NO_RESET:
             self._fresh = True
             self.last_error = ""
         if name == "run":
-            self._break()
             txt = str(c["text"]).strip()
-            if txt.lower() in (
-                "",
-                "inf",
-                "forever",
-                "indefinite",
-                "0",
-            ):  # run until Break
+            if txt.lower() in ("", "inf", "forever", "indefinite", "0"):
                 self.say("Run()  # until Break", "in")
                 self._start_run()
             else:
                 self.say(f"Run({txt})", "in")
                 self._start_run(t=self._eval(txt))
         elif name == "steps":
-            self._break()
             self.say(f"Steps({c['text']})", "in")
             self._start_run(n=int(self._eval(c["text"])))
         elif name == "break":
             self._break()
         elif name in ("relax", "minimize"):
             self._break()
-            self._blocking(name, lambda: getattr(self.world, name)())
+            self._blocking(name, getattr(self.world, name))
         elif name == "solver_type":
-            ts.set_method(c["value"])
-            self.method, self.method_known = c["value"], True
+            self._set_method(c["value"])
             self._did(f"world.timesolver.set_method({c['value']!r})")
         elif name == "solver_set":
             self._solver_set(c["name"], c["text"])
@@ -1275,12 +1188,8 @@ class Controller:
             self._did(f"{self._ref(c['target'])}.{c['name']} = {value!r}")
             self.describe()
         elif name == "world_set":
-            cur = getattr(self.world, c["name"])
-            value = (
-                self._vec(c["text"], 3)
-                if isinstance(cur, (tuple, list))
-                else self._eval(c["text"])
-            )
+            vector = isinstance(getattr(self.world, c["name"]), (tuple, list))
+            value = self._vec(c["text"], 3) if vector else self._eval(c["text"])
             setattr(self.world, c["name"], value)
             self._did(f"world.{c['name']} = {value!r}")
             self.describe()
@@ -1302,9 +1211,8 @@ class Controller:
         elif name == "select":
             if c["target"] in self.targets:
                 self.sel = c["target"]
-                names = [
-                    q["name"] for q in self.desc["targets"][self.sel]["quantities"]
-                ]
+                quantities = self.desc["targets"][self.sel]["quantities"]
+                names = [q["name"] for q in quantities]
                 for cfg in self.views:
                     if cfg["quant"] not in names:
                         cfg["quant"], cfg["comp"] = self._default_quantity(), ""
@@ -1312,8 +1220,6 @@ class Controller:
                 self._dirty = True
         elif name == "render":
             cfg = self._view(c.get("view", self.views[0]["id"] if self.views else None))
-            if cfg is None:
-                raise ValueError(f"no display {c.get('view')!r}")
             for k in ("quant", "comp", "plane", "layer", "all"):
                 if k in c:
                     cfg[k] = c[k]
@@ -1323,29 +1229,22 @@ class Controller:
             self._dirty = True
         elif name == "view_add":
             return {"ok": True, "view": self.add_view()}
-        elif name in ("movie_start", "movie_stop"):
-            cfg = self._view(c["view"])
-            if cfg is None:
-                raise ValueError(f"no display {c['view']!r}")
-            if name == "movie_start":
-                self._movie_start(cfg, c)
-            else:
-                return {"ok": True, "file": self._movie_stop(cfg)}
+        elif name == "movie_start":
+            self._movie_start(self._view(c["view"]), c)
+        elif name == "movie_stop":
+            return {"ok": True, "file": self._movie_stop(self._view(c["view"]))}
+        elif name == "save_ovf":
+            return {"ok": True, "file": self._save_ovf(self._view(c["view"]))}
+        elif name == "view_autosave":
+            self._view_autosave(self._view(c["view"]), self._eval(c["text"]))
         elif name == "view_remove":
-            cfg = self._view(c["view"])
-            if len(self.views) > 1 and cfg is not None and cfg.get("_movie"):
-                self._movie_stop(cfg)  # keep what was recorded
-            if len(self.views) > 1:
-                self.views = [v for v in self.views if v["id"] != c["view"]]
+            gone = [v for v in self.views if v["id"] == c["view"]]
+            if gone and len(self.views) > 1:
+                if gone[0].get("_movie"):
+                    self._movie_stop(gone[0])  # keep what was recorded
+                self.views.remove(gone[0])
                 with self.lock:
                     self.frames.pop(c["view"], None)
-        elif name in ("save_ovf", "view_autosave"):
-            cfg = self._view(c["view"])
-            if cfg is None:
-                raise ValueError(f"no display {c['view']!r}")
-            if name == "save_ovf":
-                return {"ok": True, "file": self._save_ovf(cfg)}
-            self._view_autosave(cfg, self._eval(c["text"]))
         elif name == "checkpoint":
             self._checkpoint()
         elif name == "checkpoint_restore":
@@ -1374,9 +1273,7 @@ class Controller:
             self._table_custom(c)
         elif name == "plot_add":
             return {"ok": True, "plot": self.add_plot()}
-        elif (
-            name == "call"
-        ):  # a function from the script (GUI methods called while the loop runs)
+        elif name == "call":  # GUI methods the script calls while the loop runs
             return {"ok": True, "value": c["fn"]()}
         elif name == "plot_remove":
             if len(self.plots) > 1:
@@ -1465,17 +1362,8 @@ class Controller:
             value = tuple(float(x) for x in self._eval(args))
             code = f"{self._ref(target)}.magnetization = {value}"
         else:
-            import mumaxplus.util as U
-
             fn = getattr(U, config)
-            value = eval(
-                f"fn{args}",
-                {
-                    **{k: getattr(math, k) for k in dir(math) if not k.startswith("_")},
-                    **self.ns,
-                    "fn": fn,
-                },
-            )
+            value = eval(f"fn{args}", {**MATH, **self.ns, "fn": fn})
             code = f"{self._ref(target)}.magnetization = {config}{args}"
             if self.ns.get(config) is not fn:  # the script did not import it
                 imports.append(f"from mumaxplus.util import {config}")
@@ -1511,7 +1399,7 @@ class Controller:
         self._autosave_tick()
 
     def _autosave_tick(self):
-        t = float(self._ts().time)
+        t = self._now()
         for cfg in self.views:
             period, due = cfg["autosave"], cfg["_next_save"]
             if period <= 0 or (due is not None and t < due * (1 - 1e-12)):
@@ -1608,19 +1496,16 @@ class Controller:
             num = {}
             for k in re.findall(r"\{(\w+)\}", WAVEFORMS[c["wave"]]):
                 text = str(c.get(k, "")).strip()
-                v = (
-                    float(self._ts().time)
-                    if k == "t0" and not text
-                    else self._eval(text)
+                num[k] = _num(
+                    self._now() if k == "t0" and not text else self._eval(text)
                 )
-                num[k] = _num(v)
             wave = WAVEFORMS[c["wave"]].format(**num)
             amp = self._vec(c["A"], ncomp)
             amp = f"({', '.join(map(_num, amp))})" if ncomp > 1 else _num(amp)
             body = f"np.multiply({amp}, {wave})" if ncomp > 1 else f"{amp} * {wave}"
         term = f"lambda t: {body}"
         fn = eval(term, env)
-        v = np.asarray(fn(float(self._ts().time)), dtype=float)  # check it now
+        v = np.asarray(fn(self._now()), dtype=float)  # check it now
         if v.size != ncomp:
             raise ValueError(
                 f"{c['param']} needs {ncomp} value(s) at a time, got {v.size}"
@@ -1639,14 +1524,15 @@ class Controller:
             "fn": fn,
             "mask": mask,
             "mask_value": None if mask is None else eval(mask, env),
+            "code": f"{ref}.add_time_term({term}"
+            + (f", mask={mask})" if mask else ")"),
             "imports": imports,
-            "ncomp": ncomp,
         }
 
     def _excite_preview(self, c):
         """Sample the waveform of the panel over a time window, for its preview."""
         tm = self._term(c)
-        t0 = float(self._ts().time)
+        t0 = self._now()
         num = lambda k, d: float(self._eval(c[k])) if str(c.get(k, "")).strip() else d
         start = num("t0", t0)
         window = {
@@ -1691,17 +1577,15 @@ class Controller:
         }
         self._next_excitation += 1
         self._add_term(e)
-        line = f"{tm['ref']}.add_time_term({tm['term']}"
-        line += f", mask={tm['mask']})" if tm["mask"] else ")"
         e["label"] = f"{c['param']} += {tm['term'][len('lambda t: '):]}" + (
             f"  where {c['where']} {c.get('whereValue', '')}" if tm["mask"] else ""
         )
         self.excitations.append(e)
-        self._did(line, tm["imports"])
+        self._did(tm["code"], tm["imports"])
         self._dirty = True
 
     def _excite_remove(self, eid):
-        """Remove an excitation; with no id, all time terms of its parameter.
+        """Remove an excitation.
 
         mumax+ can only remove all time terms of a parameter, so the others added
         here are added again.
@@ -1722,8 +1606,7 @@ class Controller:
             if same(x):
                 x["foreign"] = False
                 self._add_term(x)
-                line = f"{x['ref']}.add_time_term({x['term']}"
-                self._did(line + (f", mask={x['mask']})" if x["mask"] else ")"))
+                self._did(x["code"])
         self._dirty = True
 
     # ------------------------------------------------------------------- painting
@@ -1772,13 +1655,10 @@ class Controller:
         boxes = meta.get("boxes")
         if boxes:  # "show all magnets": the magnet the stroke starts on
             x, y, z = *first, int(c.get("layer", 0))
-            under = [
-                b
-                for b in boxes
-                if b["x0"] <= x < b["x0"] + b["nx"] and b["y0"] <= y < b["y0"] + b["ny"]
-            ]
+            on = lambda b, k, v: b[f"{k}0"] <= v < b[f"{k}0"] + b[f"n{k}"]  # noqa
+            under = [b for b in boxes if on(b, "x", x) and on(b, "y", y)]
             # the one the shown slice goes through, if any (magnets overlap in a cut)
-            under.sort(key=lambda b: not b["z0"] <= z < b["z0"] + b["nz"])
+            under.sort(key=lambda b: not on(b, "z", z))
             if not under:
                 return None
             b = under[0]
@@ -1786,9 +1666,7 @@ class Controller:
         obj = self.targets.get(name)
         tool = c.get("tool", "brush")
         quant = (
-            "magnetization"
-            if tool == "place"
-            else str(c.get("quant") or "magnetization")
+            "magnetization" if tool == "place" else c.get("quant") or "magnetization"
         )
         prop = getattr(type(obj), quant, None)
         if not isinstance(prop, property) or prop.fset is None:
@@ -1830,8 +1708,6 @@ class Controller:
             "env": {},
         }
         if st["tool"] == "place":
-            import mumaxplus.util as U
-
             fn = getattr(U, str(c["config"]))
             st["config"], st["env"] = fn.__name__, {fn.__name__: fn}
             st["args"] = str(c.get("args", "")).strip().strip("()").strip()
@@ -1922,9 +1798,8 @@ class Controller:
         """
         if cfg.get("_movie"):
             raise ValueError("this display is already recording")
-        period, fps = float(self._eval(c["period"])), float(
-            self._eval(c.get("fps", 10))
-        )
+        period = float(self._eval(c["period"]))
+        fps = float(self._eval(c.get("fps", 10)))
         fmt = c.get("format", "mp4")
         if period <= 0 or fps <= 0:
             raise ValueError("the period and the frame rate must be positive")
@@ -1933,16 +1808,16 @@ class Controller:
         if fmt == "mp4" and not shutil.which("ffmpeg"):
             raise ValueError("MP4 needs ffmpeg, which is not installed: use PNG frames")
         base = cfg["quant"] + (f"_{cfg['comp']}" if cfg["comp"] != "" else "")
-        out = next(
-            Path(f"{base}_movie_{i:03d}{'' if fmt == 'png' else '.' + fmt}").resolve()
-            for i in range(1000)
-            if not Path(f"{base}_movie_{i:03d}.{fmt}").exists()
-            and not Path(f"{base}_movie_{i:03d}").exists()
+        stem = next(
+            s
+            for s in (f"{base}_movie_{i:03d}" for i in range(1000))
+            if not Path(s).exists() and not Path(f"{s}.{fmt}").exists()
         )
         if fmt == "png":  # the frames are the result
+            out = folder = Path(stem).resolve()
             out.mkdir()
-            folder = out
         else:
+            out = Path(f"{stem}.{fmt}").resolve()
             folder = Path(tempfile.mkdtemp(prefix="mumaxplus_movie_"))
         cfg["_movie"] = {
             "period": period,
@@ -1959,7 +1834,7 @@ class Controller:
 
     def _movie_tick(self):
         """Add a frame to the movies that are due (at the step nearest their time)."""
-        t, dt = float(self._ts().time), float(self._ts().timestep or 0.0)
+        t, dt = self._now(), float(self._ts().timestep or 0.0)
         for cfg in self.views:
             mv = cfg.get("_movie")
             if not mv:
@@ -1979,8 +1854,6 @@ class Controller:
             mv["next"] = due
 
     def _movie_frame(self, cfg, mv):
-        from .plots import movie_frame
-
         self._render_view(cfg)  # the display as it is now
         with self.lock:
             meta, buf = self.frames[cfg["id"]]
@@ -1995,8 +1868,6 @@ class Controller:
 
     def _movie_stop(self, cfg):
         """Stop recording and make the movie; return its file (or folder)."""
-        from .plots import write_movie
-
         mv = cfg.pop("_movie", None)
         if mv is None:
             raise ValueError("this display is not recording")
@@ -2008,8 +1879,7 @@ class Controller:
                 raise ValueError("no frames were recorded")
             self.busy = "making the movie"
             self._publish()
-            frames = sorted(mv["folder"].glob("*.png"))
-            write_movie(frames, mv["out"], mv["fps"])
+            write_movie(mv["folder"], mv["out"], mv["fps"])
         finally:
             self.busy = ""
             shutil.rmtree(mv["folder"], ignore_errors=True)
@@ -2030,11 +1900,9 @@ class Controller:
         """mumax3-style functions available in the GUI console and the user's script."""
 
         def Run(t=None):
-            self._break()
             self._start_run(t=None if t is None or t == float("inf") else float(t))
 
         def Steps(n):
-            self._break()
             self._start_run(n=int(n))
 
         def Break():
@@ -2053,33 +1921,19 @@ class Controller:
             self._table_autosave(period)
 
         def TableSave():
-            self.table.sample(float(self._ts().time), to_file=True)
+            self.table.sample(self._now(), to_file=True)
 
         def SetSolver(method):
-            self._ts().set_method(method)
-            self.method, self.method_known = method, True
+            self._set_method(method)
             self.record(f"world.timesolver.set_method({method!r})")
 
-        for fn in (
-            Run,
-            Steps,
-            Break,
-            Relax,
-            Minimize,
-            TableAdd,
-            TableAutosave,
-            TableSave,
-            SetSolver,
-        ):
+        helpers = [Run, Steps, Break, Relax, Minimize]
+        helpers += [TableAdd, TableAutosave, TableSave, SetSolver]
+        for fn in helpers:
             self.ns.setdefault(fn.__name__, fn)
         # the console lines that use them are not recorded as typed (Run, Relax, ...
         # record what they do themselves)
-        self._helpers = {
-            k
-            for k, v in self.ns.items()
-            if inspect.isfunction(v)
-            and v.__qualname__.startswith("Controller._install_helpers")
-        }
+        self._helpers = {f.__name__ for f in helpers if self.ns[f.__name__] is f}
 
     def _cli(self, code):
         out = io.StringIO()
@@ -2098,15 +1952,10 @@ class Controller:
                     print(repr(result))
                 self._record_cli(code, tree, result, at)
             except Exception as e:
-                tb = [
-                    f
-                    for f in traceback.extract_tb(e.__traceback__)
-                    if f.filename == "<gui>"
-                ]
-                print(
-                    f"{type(e).__name__}: {e}"
-                    + (f" (line {tb[-1].lineno})" if tb else "")
-                )
+                tb = traceback.extract_tb(e.__traceback__)
+                lines = [f.lineno for f in tb if f.filename == "<gui>"]
+                where = f" (line {lines[-1]})" if lines else ""
+                print(f"{type(e).__name__}: {e}{where}")
                 failed = True
         text = out.getvalue().rstrip()
         for line in text.splitlines():
@@ -2132,16 +1981,13 @@ class Controller:
             self.record(code)
 
     # --------------------------------------------------------------------- the loop
-    def _call(self, name, arg):
+    def _steps(self, n):
         ts = self._ts()
         if self._fresh or not hasattr(ts, "_impl"):
             self._fresh = False
-            return getattr(ts, name)(
-                arg
-            )  # public API: assures a sensible dt after a change
-        return getattr(ts._impl, name)(
-            arg
-        )  # keep the adaptive dt between chunks (like TimeSolver.solve)
+            ts.steps(n)  # public API: assures a sensible dt after a change
+        else:
+            ts._impl.steps(n)  # keep the adaptive dt between chunks (like solve())
 
     def _chunk(self):
         ts = self._ts()
@@ -2166,17 +2012,12 @@ class Controller:
             dt = ts.timestep or 0.0
             if remaining > 0 and dt > 0:
                 n = max(1, min(n, int(0.5 * remaining / dt)))
-        self._call("steps", n)
+        self._steps(n)
         self.steps_done += n
         self._measure()
-        wall = max(time.perf_counter() - t0, 1e-4)
-        self._nchunk = max(
-            1,
-            min(
-                int(n * CHUNK_SECONDS / wall) if n == self._nchunk else self._nchunk,
-                self._nchunk * 2,
-            ),
-        )
+        if n == self._nchunk:  # a whole chunk: aim for CHUNK_SECONDS of wall time
+            wall = max(time.perf_counter() - t0, 1e-4)
+            self._nchunk = max(1, min(int(n * CHUNK_SECONDS / wall), 2 * n))
         if self.steps_left is not None:
             self.steps_left -= n
         self._table_tick()
@@ -2209,7 +2050,7 @@ class Controller:
         so this is the speed you get, not only that of the solver.
         """
         now, perf = time.perf_counter(), self._perf
-        perf.append((now, float(self._ts().time), self.steps_done))
+        perf.append((now, self._now(), self.steps_done))
         while len(perf) > 2 and now - perf[1][0] > PERF_WINDOW:
             perf.popleft()
         (w0, t0, n0), (w1, t1, n1) = perf[0], perf[-1]
@@ -2224,7 +2065,7 @@ class Controller:
         if not self.running:
             return None
         if self.run_until is not None and self.perf["sim_s"]:
-            return max(self.run_until - float(self._ts().time), 0) / self.perf["sim_s"]
+            return max(self.run_until - self._now(), 0) / self.perf["sim_s"]
         if self.steps_left is not None and self.perf["steps_s"]:
             return self.steps_left / self.perf["steps_s"]
         return None

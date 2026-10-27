@@ -128,7 +128,8 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .pcustom .perr { grid-column: 1 / -1; color: var(--err); font-size: 12px; }
 
 /* parameters */
-#ptable td.n, #stable td.n, #wtable td.n { padding-right: 14px; font: 13px var(--mono); }
+#ptable td.n, #stable td.n, #wtable td.n, #moresolver td.n { padding-right: 14px; font: 13px var(--mono); }
+#moresolver input[type=text] { width: 9em; }
 #ptable input[type=text], #stable input[type=text], #wtable input[type=text] { width: 100%; min-width: 130px; }
 #pwrap { max-height: 52vh; overflow: auto; padding-right: 4px; }
 .sub { margin: 14px 0 4px; font-weight: 650; color: var(--mute); font-size: .92em; }
@@ -537,8 +538,8 @@ function buildConfigs() {
   setConfigDefaults(false);
 }
 function setConfigDefaults(overwrite) {
-  const c = P.configs.find((x) => x.name === $("mselect").value) || P.configs[0];
-  if (overwrite || !$("margs").classList.contains("dirty")) { if (overwrite || !$("margs").value) $("margs").value = c.args; }
+  const c = P.configs.find((x) => x.name === $("mselect").value) || P.configs[0], a = $("margs");
+  if (overwrite || (!a.classList.contains("dirty") && !a.value)) a.value = c.args;
   $("mdoc").textContent = c.doc;
 }
 $("mselect").onchange = () => { $("margs").classList.remove("dirty"); setConfigDefaults(true); };
@@ -555,20 +556,12 @@ $("minimize").onclick = () => send({ cmd: "minimize" });
 $("solvertype").onchange = (e) => send({ cmd: "solver_type", value: e.target.value });
 bindText($("fixdt"), (v) => send({ cmd: "solver_set", name: "fixdt", text: v }));
 bindText($("maxerr"), (v) => send({ cmd: "solver_set", name: "maxerr", text: v }));
-const MORE = ["headroom", "lower_bound", "upper_bound", "sensible_factor", "sensible_timestep_default"];
-function buildSolver() {
+function buildSolver() { // the settings the simulation lists in P.solver
   $("solvertype").innerHTML = P.methods.map((m) => `<option>${m}</option>`).join("");
-  $("moresolver").innerHTML = "";
-  for (const k of MORE) {
-    if (P.solver[k] === undefined) continue;
-    const tr = document.createElement("tr"), a = document.createElement("td"), b = document.createElement("td"), i = document.createElement("input");
-    a.textContent = k + ":"; a.className = "mono"; i.type = "text"; i.size = 8; i.id = "s_" + k; b.appendChild(i); tr.append(a, b);
-    $("moresolver").appendChild(tr);
-    bindText(i, (v) => send({ cmd: "solver_set", name: k, text: v }));
-  }
+  for (const k in P.solver) addRow($("moresolver"), "solver", k, "", "", textInput((v) => send({ cmd: "solver_set", name: k, text: v })));
 }
 function showSolver() {
-  for (const k of MORE) { const i = $("s_" + k); if (i) setText(i, num(P.solver[k])); }
+  for (const k in P.solver) setText(rows.solver[k], num(P.solver[k]));
 }
 
 /* ---------- display ----------
@@ -640,14 +633,11 @@ function makeView(id) {
   };
   disp.onpointerup = () => { if (V.stroke) { V.stroke.done = true; paintFlush(V); } if (V.pdrag) setTimeout(() => (V.pdrag = null)); }; // after the click event
   disp.onmousemove = (e) => {
+    const pd = V.pdrag;
     if (V.paintTool && V.frame) { // brush outline, and the stroke
       V.paintMouse = cellAt(V, e); if (V.stroke) paintMove(V, V.paintMouse);
       drawOverlay(V);
-      const r = disp.getBoundingClientRect(); V.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }; updateLoupe(V);
-      return;
-    }
-    const pd = V.pdrag;
-    if (pd && (pd.moved || Math.hypot(e.clientX - pd.x, e.clientY - pd.y) > 4)) {
+    } else if (pd && (pd.moved || Math.hypot(e.clientX - pd.x, e.clientY - pd.y) > 4)) {
       pd.moved = true; V.prof = { a: pd.a, b: cellAt(V, e) }; V.mouse = null; q("loupe").style.display = "none";
       drawOverlay(V); updateProfile(V); return;
     }
@@ -661,14 +651,14 @@ function makeView(id) {
     if (b && b.name !== T.sel) send({ cmd: "select", target: b.name });
   };
   disp.onmouseleave = () => { V.mouse = V.paintMouse = null; q("loupe").style.display = "none"; q("hover").innerHTML = "&nbsp;"; drawOverlay(V); };
+  el.redraw = () => drawFrame(V);
   $("views").appendChild(el); views.set(id, V); panelObserver.observe(el);
   return V;
 }
-function dropView(V) { V.el.remove(); views.delete(V.id); }
 
 function syncViews() { // add/remove panels to match the simulation, and show their settings
   const ids = T.views.map((v) => v.id);
-  for (const V of [...views.values()]) if (!ids.includes(V.id)) dropView(V);
+  for (const V of [...views.values()]) if (!ids.includes(V.id)) { V.el.remove(); views.delete(V.id); }
   const t = cur(), qkey = T.sel + "|" + (t ? t.quantities.map((x) => x.name).join(",") : "");
   const many = T.targets.filter((n) => !n.includes(":sub")).length > 1;
   T.views.forEach((c, i) => {
@@ -711,7 +701,7 @@ function fillComps(V) {
   const opts = x.ncomp === 3 ? ["", "x", "y", "z"] : x.ncomp === 1 ? [""] : Array.from({ length: x.ncomp }, (_, i) => String(i));
   q("renderComp").innerHTML = opts.map((o) => `<option value="${o}">${o === "" ? (x.ncomp === 3 ? "(vector)" : "") : o}</option>`).join("");
   q("renderComp").style.display = opts.length > 1 ? "" : "none";
-  const want = c ? c.comp : ""; q("renderComp").value = opts.includes(want) ? want : opts[0];
+  q("renderComp").value = opts.includes(c.comp) ? c.comp : opts[0];
   q("renderDoc").textContent = x.doc;
 }
 
@@ -758,12 +748,12 @@ function drawFrame(V) {
 
 /* "show all magnets": outline and name every magnet, the selected one in the accent colour */
 function drawBoxes(ctx, fx, fy, meta) {
-  const dpr = window.devicePixelRatio || 1, css = getComputedStyle(document.body);
-  ctx.font = `${11 * dpr}px ${css.fontFamily}`; ctx.textBaseline = "top";
+  const dpr = window.devicePixelRatio || 1;
+  ctx.font = `${11 * dpr}px ${getComputedStyle(document.body).fontFamily}`; ctx.textBaseline = "top";
   for (const b of meta.boxes) {
     const x = b.x0 * fx, y = (meta.h - b.y0 - b.ny) * fy, w = b.nx * fx, h = b.ny * fy;
     const on = b.name === T.sel, inLayer = meta.layer >= b.z0 && meta.layer < b.z0 + b.nz;
-    ctx.strokeStyle = on ? css.getPropertyValue("--accent") : "rgba(128,128,128,0.8)";
+    ctx.strokeStyle = on ? css("--accent") : "rgba(128,128,128,0.8)";
     ctx.lineWidth = (on ? 2 : 1) * dpr; ctx.setLineDash(inLayer ? [] : [4 * dpr, 3 * dpr]);
     ctx.strokeRect(x + ctx.lineWidth / 2, y + ctx.lineWidth / 2, w - ctx.lineWidth, h - ctx.lineWidth);
     ctx.fillStyle = ctx.strokeStyle; ctx.fillText(b.name, x + 4 * dpr, y + 4 * dpr);
@@ -884,6 +874,7 @@ function profileOn(V, on) {
   V.q("profile").hidden = !on; V.q("profOn").checked = on;
   drawOverlay(V); updateProfile(V);
 }
+const profNames = (meta) => (meta.vector ? ["x", "y", "z"] : [meta.comp !== "" ? meta.comp : meta.quant]);
 function cellAt(V, e) { // mouse -> position in cells of the shown image
   const { meta } = V.frame, r = V.q("disp").getBoundingClientRect();
   return { x: Math.max(0, Math.min(meta.w, ((e.clientX - r.left) / r.width) * meta.w)), y: Math.max(0, Math.min(meta.h, (1 - (e.clientY - r.top) / r.height) * meta.h)) };
@@ -907,8 +898,7 @@ function updateProfile(V) {
   if (!V.profOn || !V.chart) return;
   if (!V.frame || !V.prof) return drawChart(V.chart, { message: "drag a line across the image" });
   const { meta } = V.frame, P = V.profData = profileData(V), unit = meta.unit ? ` (${meta.unit})` : "";
-  const names = meta.vector ? ["x", "y", "z"] : [meta.comp !== "" ? meta.comp : meta.quant];
-  const u = meta.unit ? " " + esc(meta.unit) : "";
+  const names = profNames(meta), u = meta.unit ? " " + esc(meta.unit) : "";
   drawChart(V.chart, {
     X: P.X, Y: P.Y, names,
     xlabel: "distance (nm)", ylabel: meta.quant + (meta.vector || meta.comp === "" ? "" : " " + meta.comp) + unit,
@@ -945,8 +935,7 @@ function drawOverlay(V) {
 }
 function profileCsv(V) {
   const P = V.profData, { meta } = V.frame; if (!P) return;
-  const names = meta.vector ? ["x", "y", "z"] : [meta.comp !== "" ? meta.comp : meta.quant];
-  const [h, v, n] = meta.axes.map((a) => "xyz"[a]);
+  const names = profNames(meta), [h, v, n] = meta.axes.map((a) => "xyz"[a]);
   const head = [`# ${meta.quant} along a line in the ${h}${v} plane, slice i${n} = ${meta.layer}, t = ${meta.time} s` + (meta.unit ? `, unit ${meta.unit}` : ""),
                 ["distance (nm)", "i" + h, "i" + v, ...names].join("\t")];
   const lines = P.X.map((d, k) => [g(d), P.cells[k][0], P.cells[k][1], ...P.Y.map((S) => (S[k] === null ? "nan" : S[k]))].join("\t"));
@@ -979,17 +968,12 @@ function cell3(meta, ix, iy) { // a cell of the shown image -> "ix, iy, iz" (of 
 }
 let resizeTimer = null;
 window.addEventListener("resize", () => { views.forEach(drawFrame); clearTimeout(resizeTimer); resizeTimer = setTimeout(() => plots.forEach(drawPlot), 100); });
-/* a panel also changes width when another one is added or closed: redraw it to fit */
-const panelWidth = new WeakMap();
+/* a panel also changes width when another one is added or closed: redraw it to fit (el.redraw) */
 const panelObserver = new ResizeObserver((entries) => {
-  for (const e of entries) {
-    const w = Math.round(e.contentRect.width), el = e.target;
-    if (panelWidth.get(el) === w) continue; // height changes come from our own redraws
-    panelWidth.set(el, w);
-    const V = [...views.values()].find((V) => V.el === el);
-    if (V) { drawFrame(V); continue; }
-    const Pl = [...plots.values()].find((Pl) => Pl.el === el);
-    if (Pl) drawPlot(Pl);
+  for (const { target: el, contentRect } of entries) {
+    const w = Math.round(contentRect.width);
+    if (el.lastWidth === w) continue; // height changes come from our own redraws
+    el.lastWidth = w; el.redraw();
   }
 });
 
@@ -1209,6 +1193,7 @@ function makePlot(id) {
     q("plotcv").toBlob((b) => b && download(`${stem()}_${name}.png`, b), "image/png");
     Pl.chart.legend = false; drawChart(Pl.chart);
   };
+  el.redraw = () => drawPlot(Pl);
   $("plots").appendChild(el); plots.set(id, Pl); panelObserver.observe(el);
   return Pl;
 }
@@ -1350,7 +1335,7 @@ function openPlotPicker(anchor, pid, axis) {
 
 /* ---------- parameters ---------- */
 bindText($("region"), (v) => send({ cmd: "region", value: v }));
-const rows = { p: {}, s: {}, w: {} };
+const rows = { p: {}, s: {}, w: {}, solver: {} }; // the inputs of the parameters, switches, world and solver tables, by name
 function addRow(table, key, name, doc, unit, input) {
   const tr = document.createElement("tr"); tr.title = doc || "";
   const a = document.createElement("td"), b = document.createElement("td"), c = document.createElement("td");
@@ -1390,8 +1375,7 @@ function showParams() {
 
 /* ---------- page refresh (mumax3: OnUpdate) ---------- */
 function showTick() {
-  $("title").textContent = P ? P.title : "mumax⁺";
-  document.title = (P ? P.title : "mumax⁺") + " – mumax⁺";
+  $("title").textContent = P.title; document.title = P.title + " – mumax⁺";
   $("prog").firstChild.style.width = (T.progress || 0) + "%";
   const b = $("busy"); b.textContent = T.busy;
   b.className = T.busy === "Running" ? "running" : T.busy === "Paused" ? "" : "working";
@@ -1407,7 +1391,7 @@ function showTick() {
   $("methodnote").textContent = T.method_known ? "" : "(showing the default at startup)";
   if (document.activeElement !== $("region") && !$("region").classList.contains("dirty")) $("region").value = T.region;
   syncViews();
-  const pick = $("magnetPick"); pick.style.display = T.targets.length > 1 ? "flex" : "none";
+  $("magnetPick").style.display = T.targets.length > 1 ? "flex" : "none";
 }
 const built = { solver: false, targets: "", cfg: "" };
 function rebuildPage() {

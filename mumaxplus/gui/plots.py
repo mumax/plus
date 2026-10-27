@@ -113,9 +113,8 @@ def _arrows(d, comps, w, h, fx, fy, cells):
             cx, cy = int((ix + 0.5) * sx), int((iy + 0.5) * sy)
             if not inside[cy, cx]:
                 continue
-            ys, xs = slice(int(iy * sy), int((iy + 1) * sy)), slice(
-                int(ix * sx), int((ix + 1) * sx)
-            )
+            ys = slice(int(iy * sy), int((iy + 1) * sy))
+            xs = slice(int(ix * sx), int((ix + 1) * sx))
             on = inside[ys, xs]
             if not on.any():
                 continue
@@ -144,33 +143,17 @@ def _arrows(d, comps, w, h, fx, fy, cells):
     return layer
 
 
-def write_movie(frames, path, fps):
-    """Encode the PNG files ``frames`` as an MP4 (ffmpeg).
+def write_movie(folder, path, fps):
+    """Encode the frames 000000.png, 000001.png, ... in ``folder`` as an MP4 (ffmpeg).
 
     The MP4 is lossless (RGB, libx264rgb at crf 0): its pixels are the frames'.
+    libx264rgb, not a YUV codec, so the colours of neighbouring cells do not bleed.
     """
     import shutil
     import subprocess
 
-    folder = Path(frames[0]).parent
-    subprocess.run(
-        [
-            shutil.which("ffmpeg"),
-            "-y",
-            "-loglevel",
-            "error",
-            "-framerate",
-            f"{fps:g}",
-            "-i",
-            str(folder / "%06d.png"),
-            "-c:v",
-            "libx264rgb",  # RGB, not YUV: no colour bleeding between cells
-            "-crf",
-            "0",  # lossless
-            "-pix_fmt",
-            "rgb24",
-            str(path),
-        ],
-        check=True,
-        capture_output=True,
-    )
+    frames = str(Path(folder) / "%06d.png")
+    codec = ["-c:v", "libx264rgb", "-crf", "0", "-pix_fmt", "rgb24"]
+    cmd = [shutil.which("ffmpeg"), "-y", "-loglevel", "error"]
+    cmd += ["-framerate", f"{fps:g}", "-i", frames, *codec, str(path)]
+    subprocess.run(cmd, check=True, capture_output=True)

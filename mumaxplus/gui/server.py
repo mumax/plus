@@ -13,6 +13,8 @@ import webbrowser
 
 from .core import Controller, _check_plane, _clean
 
+FORBIDDEN = b"forbidden: missing or wrong token"
+
 
 def _make_handler(ctrl: Controller, token: str):
     page = resources.files(__package__).joinpath("static/index.html").read_bytes()
@@ -45,9 +47,7 @@ def _make_handler(ctrl: Controller, token: str):
             q = parse_qs(url.query)
             arg = lambda k, d="": (q.get(k) or [d])[0]
             if not self._authorized(q):
-                return self._send(
-                    403, b"forbidden: missing or wrong token", "text/plain"
-                )
+                return self._send(403, FORBIDDEN, "text/plain")
             if url.path in ("/", "/index.html"):
                 return self._send(200, page, "text/html; charset=utf-8")
             if url.path == "/api/tick":  # what mumax3 refreshes on every update
@@ -100,7 +100,7 @@ def _make_handler(ctrl: Controller, token: str):
         def do_POST(self):
             url = urlparse(self.path)
             if not self._authorized(parse_qs(url.query)):
-                return self._send(403, b"forbidden", "text/plain")
+                return self._send(403, FORBIDDEN, "text/plain")
             if url.path != "/api/cmd":
                 return self._send(404, b"not found", "text/plain")
             try:
@@ -146,9 +146,8 @@ class GUI:
         self._httpd = None
         self._thread = None
         self._loop = None  # the simulation thread of run(block=False)
-        self._script_plots = self._script_views = (
-            False  # replaced the default plot / display yet?
-        )
+        # replaced the default plot / display yet?
+        self._script_plots = self._script_views = False
 
     # --------------------------------------------------------- set up from the script
     def table_add(self, quantity, name=None, unit=None):
@@ -197,8 +196,13 @@ class GUI:
         middle of the others). The first call replaces the default display
         (magnetization); later calls add displays.
         """
-        cfg = {"quant": quantity, "comp": comp, "plane": plane, "layer": layer}
-        cfg["all"] = all
+        cfg = {
+            "quant": quantity,
+            "comp": comp,
+            "plane": plane,
+            "layer": layer,
+            "all": all,
+        }
         _check_plane(cfg)
 
         def add():
