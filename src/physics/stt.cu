@@ -160,19 +160,27 @@ __global__ void k_Slonczewski(CuField torque,
   torque.setVectorInCell(idx, t);
 }
 
-Field evalSpinTransferTorque(const Ferromagnet* magnet) {
+static Field evalZhangLiTorque(const Ferromagnet* magnet) {
   Field torque(magnet->system(), 3);
-
-  if (spinTransferTorqueAssuredZero(magnet)) {
-    torque.makeZero();
-    return torque;
-  }
-
   int ncells = magnet->grid().ncells();
   auto m = magnet->magnetization()->field().cu();
   auto msat = magnet->msat.cu();
   auto pol = magnet->pol.cu();
   auto xi = magnet->xi.cu();
+  auto alpha = magnet->alpha.cu();
+  auto jcur = magnet->jcur.cu();
+  auto frozenSpins = magnet->frozenSpins.cu();
+  cudaLaunch(ncells, k_ZhangLi, torque.cu(), m, msat, pol, xi, alpha, frozenSpins, jcur,
+             magnet->world()->mastergrid());
+  return torque;
+}
+
+static Field evalSlonczewskiTorque(const Ferromagnet* magnet) {
+  Field torque(magnet->system(), 3);
+  int ncells = magnet->grid().ncells();
+  auto m = magnet->magnetization()->field().cu();
+  auto msat = magnet->msat.cu();
+  auto pol = magnet->pol.cu();
   auto alpha = magnet->alpha.cu();
   auto gamma = magnet->gamma.cu();
   auto jcur = magnet->jcur.cu();
@@ -182,18 +190,26 @@ Field evalSpinTransferTorque(const Ferromagnet* magnet) {
   auto freeLayerThickness = magnet->freeLayerThickness.cu();
   bool fixedLayerOnTop = magnet->fixedLayerOnTop;
   auto frozenSpins = magnet->frozenSpins.cu();
+  cudaLaunch(ncells, k_Slonczewski, torque.cu(), m, msat, pol, lambda, alpha, gamma,
+             jcur, epsilonPrime, fixedLayer, freeLayerThickness, frozenSpins,
+             fixedLayerOnTop);
+  return torque;
+}
 
-  auto cellsize = magnet->world()->cellsize();
+Field evalSpinTransferTorque(const Ferromagnet* magnet) {
+  if (spinTransferTorqueAssuredZero(magnet)) {
+    Field torque(magnet->system(), 3);
+    torque.makeZero();
+    return torque;
+  }
 
-  // Either Zhang Li xor Slonczewski, can't have both TODO: should that be
-  // possible?
+  // Zhang-Li and Slonczewski torques add (as in mumax³)
   if (SlonczewskiSTTAssuredZero(magnet))
-    cudaLaunch(ncells, k_ZhangLi, torque.cu(), m, msat, pol, xi, alpha, frozenSpins,
-               jcur, magnet->world()->mastergrid());
-  else
-    cudaLaunch(ncells, k_Slonczewski, torque.cu(), m, msat, pol, lambda, alpha, gamma,
-               jcur, epsilonPrime, fixedLayer, freeLayerThickness, frozenSpins,
-               fixedLayerOnTop);
+    return evalZhangLiTorque(magnet);
+  if (ZhangLiSTTAssuredZero(magnet))
+    return evalSlonczewskiTorque(magnet);
+  Field torque = evalZhangLiTorque(magnet);
+  torque += evalSlonczewskiTorque(magnet);
   return torque;
 }
 

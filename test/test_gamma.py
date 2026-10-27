@@ -68,6 +68,8 @@ def test_gyromagnetic_ratio_Slonczewski():
 
     magnet.msat = 800e3
     magnet.alpha = 0.01
+    # the Zhang-Li torque, added to the Slonczewski torque, does not scale with gamma
+    magnet.enable_zhang_li_torque = False
 
     magnet.jcur = (1, 1, 1)
     magnet.fixed_layer = (1, 1, 1)

@@ -141,6 +141,8 @@ class TestDynamicDomainWall:
         self.magnet.Lambda = 1
         self.magnet.free_layer_thickness = 2e-9
         self.magnet.jcur = (0, 0, 1e12)
+        # the analytical speed has no Zhang-Li term, which this current would add
+        self.magnet.enable_zhang_li_torque = False
 
     def test_domain_wall_speed(self):
         result = get_domain_wall_speed(self.world, self.magnet)

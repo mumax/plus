@@ -109,9 +109,11 @@ class Ferromagnet(Magnet):
 
         Default = True.
 
+        If the Slonczewski torque is also present, both torques are added.
+
         See Also
         --------
-        enable_slonczewski_torque
+        enable_slonczewski_torque, spin_transfer_torque
         """
         return self._impl.enable_zhang_li_torque
 
@@ -121,13 +123,15 @@ class Ferromagnet(Magnet):
 
     @property
     def enable_slonczewski_torque(self) -> bool:
-        """Enable/disable Slonczewski spin transfer torue.
+        """Enable/disable Slonczewski spin transfer torque.
 
         Default = True.
 
+        If the Zhang-Li torque is also present, both torques are added.
+
         See Also
         --------
-        enable_zhang_li_torque
+        enable_zhang_li_torque, spin_transfer_torque
         """
         return self._impl.enable_slonczewski_torque
 
@@ -781,7 +785,25 @@ class Ferromagnet(Magnet):
 
     @property
     def spin_transfer_torque(self) -> FieldQuantity:
-        """Spin transfer torque exerted on the magnetization (rad/s)."""
+        """Spin transfer torque exerted on the magnetization (rad/s).
+
+        This is the sum of the Zhang-Li torque and the Slonczewski torque. Both
+        use the current density :attr:`jcur` and the polarization :attr:`pol`:
+        the Zhang-Li torque uses all components of :attr:`jcur`, the Slonczewski
+        torque only its z-component. Either torque can be switched off with
+        :attr:`enable_zhang_li_torque` or :attr:`enable_slonczewski_torque`.
+
+        Warning
+        -------
+        If the z-component of :attr:`jcur` only stands for a spin current (for
+        example to model a spin-orbit torque with the Slonczewski term), it also
+        drives a Zhang-Li torque wherever the magnetization varies along z. Set
+        :attr:`enable_zhang_li_torque` to False to avoid this.
+
+        See Also
+        --------
+        enable_slonczewski_torque, enable_zhang_li_torque, jcur, pol
+        """
         return FieldQuantity(_cpp.spin_transfer_torque(self._impl))
 
     @property
