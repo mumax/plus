@@ -99,6 +99,18 @@ def _mro(obj):
     return {c.__name__ for c in type(obj).__mro__}
 
 
+def _param_json(x):
+    """Make a parameter value JSON friendly, keeping non-finite floats visible.
+
+    NaN/inf become "nan"/"inf"/"-inf" (valid input for ``_eval``) instead of None,
+    so the page does not mistake them for a non-uniform parameter.
+    """
+    if isinstance(x, (list, tuple, np.ndarray)):
+        return [_param_json(v) for v in x]
+    x = float(x)
+    return x if math.isfinite(x) else str(x)
+
+
 def _clean(x):
     """Make an object JSON friendly (numpy -> python, NaN/inf -> None)."""
     if isinstance(x, dict):
@@ -589,7 +601,9 @@ class Controller:
             try:
                 q = getattr(obj, p["name"])
                 if self.region < 0:
-                    out[p["name"]] = _clean(q.uniform_value) if q.is_uniform else None
+                    out[p["name"]] = (
+                        _param_json(q.uniform_value) if q.is_uniform else None
+                    )
                 else:
                     inside = np.asarray(obj.regions) == self.region
                     geom = np.asarray(obj.geometry, dtype=bool)
@@ -603,9 +617,7 @@ class Controller:
                         continue
                     iz, iy, ix = idx[0]
                     v = np.asarray(q.eval())[:, iz, iy, ix]
-                    out[p["name"]] = (
-                        float(v[0]) if p["ncomp"] == 1 else [float(x) for x in v]
-                    )
+                    out[p["name"]] = _param_json(v[0] if p["ncomp"] == 1 else v)
             except Exception:
                 out[p["name"]] = None
         return out
