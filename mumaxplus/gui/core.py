@@ -85,6 +85,9 @@ NO_RESET = {
     "view_remove",
     "plot_add",
     "plot_remove",
+    "plot_quantity",
+    "column_save",
+    "table_custom",
     "call",
     "script",
     "script_clear",
@@ -153,23 +156,31 @@ def _fmt(v):
 
 
 class Table:
-    """The mumax3 table: columns (t, mx, my, mz, ...) sampled during the run."""
+    """The mumax3 table: t and the columns the user added, sampled during the run.
+
+    Columns added with TableAdd are saved in the table file. The plots can also show
+    any quantity of a magnet without adding it to the file: those columns are
+    "plot-only", sampled like the others but only kept in memory, and dropped when no
+    plot shows them any more.
+    """
 
     def __init__(self, path="table.txt"):
         self.path = path
-        self.cols = []  # (name, unit, fn) ; fn() -> float
-        self.rows = []
+        # {"name", "unit", "fn", "saved", "key"}; fn() -> float, key identifies the
+        # quantity ("magnet:quantity:component") so a plot reuses its column
+        self.cols = []
+        self.rows = []  # one value per column, saved or not
         self.period = 0.0  # TableAutosave: 0 = live preview only (not saved)
         self.next_save = None
         self._header_written = False
         # the page fetches new rows only; rows that change otherwise (clear, thinning,
-        # rewind) make a new version, which it fetches whole
+        # rewind, a column added or removed) make a new version, which it fetches whole
         self.version = 0
         self.lock = threading.Lock()
 
     def names(self):
         """Return the column names, starting with t."""
-        return ["t"] + [c[0] for c in self.cols]
+        return ["t"] + [c["name"] for c in self.cols]
 
     def clear(self):
         """Remove all rows; the header is written again on the next save."""
@@ -178,41 +189,84 @@ class Table:
             self.version += 1
         self._header_written = False
 
-    def add(self, name, unit, fn):
-        """Add a column; return False if the name is already taken."""
-        if any(c[0] == name for c in self.cols):
+    def add(self, name, unit, fn, saved=True, key=None, t=None):
+        """Add a column; return False if the name is already taken.
+
+        The rows so far get NaN in it, except a last row at time ``t`` (the current
+        time), which gets its value, so a paused simulation shows it at once.
+        """
+        if any(c["name"] == name for c in self.cols):
             return False
-        self.cols.append((name, unit, fn))
-        self.clear()
+        col = {"name": name, "unit": unit, "fn": fn, "saved": saved, "key": key}
+        with self.lock:
+            self.cols.append(col)
+            for r in self.rows:
+                r.append(float("nan"))
+            if self.rows and t is not None and self.rows[-1][0] == t:
+                self.rows[-1][-1] = self._value(col)
+            self.version += 1
+        if saved:
+            self._header_written = False
         return True
+
+    def remove(self, name):
+        """Remove a plot-only column."""
+        i = next(i for i, c in enumerate(self.cols) if c["name"] == name)
+        if self.cols[i]["saved"]:
+            raise ValueError(f"column {name!r} is saved in {self.path}")
+        with self.lock:
+            del self.cols[i]
+            for r in self.rows:
+                del r[i + 1]
+            self.version += 1
+
+    def save(self, name):
+        """Save a plot-only column in the table file from now on."""
+        col = next(c for c in self.cols if c["name"] == name)
+        if not col["saved"]:
+            col["saved"] = True
+            self._header_written = False
+            with self.lock:
+                self.version += 1
+
+    def find(self, key):
+        """Return the name of the column of quantity ``key``, or None."""
+        return next((c["name"] for c in self.cols if c["key"] == key), None)
+
+    @staticmethod
+    def _value(col):
+        try:
+            return float(col["fn"]())
+        except Exception:
+            return float("nan")
 
     def sample(self, t, to_file):
         """Append a row at time t, and write it to the table file if to_file."""
-        row = [float(t)]
-        for _, _, fn in self.cols:
-            try:
-                row.append(float(fn()))
-            except Exception:
-                row.append(float("nan"))
+        row = [float(t)] + [self._value(c) for c in self.cols]
         with self.lock:
             self.rows.append(row)
             if len(self.rows) > TABLE_MAX_ROWS:
                 self.rows[:] = self.rows[::2]
                 self.version += 1
         if to_file:
+            saved = self._saved()
             with open(self.path, "a") as f:
                 if not self._header_written:
-                    f.write(self._header())
+                    f.write(self._header(saved))
                     self._header_written = True
-                f.write(self._line(row))
+                f.write(self._line(row, saved))
 
-    def _header(self):
-        head = ["t (s)"] + [f"{n} ({u})" for n, u, _ in self.cols]
-        return "# " + "\t".join(head) + "\n"
+    def _saved(self):
+        """Return the indices (into a row) of t and the saved columns."""
+        return [0] + [i + 1 for i, c in enumerate(self.cols) if c["saved"]]
+
+    def _header(self, idx):
+        head = ["t (s)"] + [f"{c['name']} ({c['unit']})" for c in self.cols]
+        return "# " + "\t".join(head[i] for i in idx) + "\n"
 
     @staticmethod
-    def _line(row):
-        return "\t".join(f"{v:.8g}" for v in row) + "\n"
+    def _line(row, idx):
+        return "\t".join(f"{row[i]:.8g}" for i in idx) + "\n"
 
     def rewind(self, t):
         """Go back to time t (a checkpoint was restored).
@@ -229,10 +283,11 @@ class Table:
                 f.write(f"# checkpoint restored: back to t = {t:.8g} s\n")
 
     def text(self):
-        """Return the rows in memory, in the format of the table file."""
+        """Return the rows in memory, plot-only columns too, as the file has them."""
         with self.lock:
             rows = list(self.rows)
-        return self._header() + "".join(map(self._line, rows))
+        idx = list(range(len(self.cols) + 1))
+        return self._header(idx) + "".join(self._line(r, idx) for r in rows)
 
     def since(self, version, start):
         """Return the rows the page does not have yet.
@@ -247,7 +302,8 @@ class Table:
                 "version": self.version,
                 "start": start,
                 "names": self.names(),
-                "units": ["s"] + [c[1] for c in self.cols],
+                "units": ["s"] + [c["unit"] for c in self.cols],
+                "saved": [True] + [c["saved"] for c in self.cols],
                 "rows": [r[:] for r in self.rows[start:]],
             }
 
@@ -306,8 +362,8 @@ class Controller:
         )  # one dict per display panel: {"id", "quant", "comp", "layer", "all"}
         self._next_view = 0
         self.table = Table(table_file)
-        # one dict per plot panel: plot "table.txt" using x:y1,y2,...
-        self.plots = [{"id": 0, "x": "1", "y": "2", "logx": False, "logy": False}]
+        # one dict per plot panel: table columns x against y1,y2,... (names)
+        self.plots = [{"id": 0, "x": "t", "y": "", "logx": False, "logy": False}]
         self._next_plot = 1
         self.desc = {}
         self.desc_version = 0
@@ -345,7 +401,6 @@ class Controller:
 
         self._install_helpers()
         self.refresh_targets()
-        self._default_table()
         self._init_selection()
         self.describe()
 
@@ -489,16 +544,89 @@ class Controller:
         self.plots.append(p)
         return p["id"]
 
-    @staticmethod
-    def _plot_set(p, x=None, y=None, logx=None, logy=None):
+    def _plot(self, pid):
+        p = next((p for p in self.plots if p["id"] == pid), None)
+        if p is None:
+            raise ValueError(f"no plot {pid!r}")
+        return p
+
+    def _plot_set(self, p, x=None, y=None, logx=None, logy=None):
+        """Set a plot's columns.
+
+        Column numbers become names, as plot-only columns come and go (and the
+        numbers after them change).
+        """
+
+        def name(spec):
+            try:
+                return self.table.names()[self.table.column(spec)]
+            except ValueError:
+                return str(spec).strip()  # not (yet) a column: the page says so
+
         if x is not None:
-            p["x"] = str(x)
+            p["x"] = name(x)
         if y is not None:
-            p["y"] = ",".join(map(str, y)) if isinstance(y, (list, tuple)) else str(y)
+            ys = y if isinstance(y, (list, tuple)) else str(y).split(",")
+            p["y"] = ",".join(name(v) for v in ys if str(v).strip())
         if logx is not None:
             p["logx"] = bool(logx)
         if logy is not None:
             p["logy"] = bool(logy)
+
+    def _series(self, target, quant, comp=None):
+        """Return the table column of a quantity of a magnet.
+
+        That is a ScalarQuantity, or component ``comp`` of the average of a
+        FieldQuantity. Without one yet, a plot-only column is added (not saved in
+        the table file).
+        """
+        obj = getattr(self.targets[target], quant)
+        field = hasattr(obj, "average")
+        n = int(obj.ncomp) if field else 1
+        i = int(comp or 0) if field else None
+        if field and not 0 <= i < n:
+            raise ValueError(f"{quant} has no component {comp!r}")
+        key = f"{target}:{quant}:{'' if i is None else i}"
+        name = self.table.find(key)
+        if name:
+            return name
+        base = quant if len(self.targets) == 1 else f"{target}.{quant}"
+        name = base if n == 1 else base + ("xyz"[i] if n == 3 else str(i))
+        taken, k = self.table.names(), 2
+        while (f"{name}_{k}" if k > 2 else name) in taken:
+            k += 1
+        name = f"{name}_{k}" if k > 2 else name
+        fn = (lambda: np.atleast_1d(obj.average())[i]) if field else obj.eval
+        unit = getattr(obj, "unit", "") or ""
+        self.table.add(name, unit, fn, saved=False, key=key, t=float(self._ts().time))
+        return name
+
+    def _prune_columns(self):
+        """Drop the plot-only columns that no plot shows."""
+        used = {s for p in self.plots for s in [p["x"], *p["y"].split(",")]}
+        for c in list(self.table.cols):
+            if not c["saved"] and c["name"] not in used:
+                self.table.remove(c["name"])
+
+    def _table_custom(self, c):
+        """Add a column (saved in the table file) computed by a Python expression."""
+        name, expr, unit = (
+            str(c.get(k) or "").strip() for k in ("name", "expr", "unit")
+        )
+        if not re.fullmatch(r"[A-Za-z_][\w.]*", name):
+            raise ValueError("give the column a name: letters, digits, _ and .")
+        code = compile(expr, "<table column>", "eval")
+        base = {k: getattr(math, k) for k in dir(math) if not k.startswith("_")}
+        base["np"] = np
+
+        def fn():
+            return eval(code, {**base, **self.ns})
+
+        float(np.asarray(fn()))  # an error now, rather than NaN in every row
+        self.table_add(fn, name, unit)
+        if c.get("plot") is not None:
+            p = self._plot(c["plot"])
+            self._plot_set(p, y=[*p["y"].split(","), name])
 
     def _view(self, vid):
         return next((v for v in self.views if v["id"] == vid), None)
@@ -519,6 +647,7 @@ class Controller:
             "params": [],
             "switches": [],
             "paintable": [],
+            "scalars": [],  # ScalarQuantity: can be plotted, not displayed
             "doc": "",
         }
         cls = type(obj)
@@ -568,6 +697,10 @@ class Controller:
                         info["paintable"].append(
                             {"name": pname, "ncomp": int(val.ncomp), "unit": val.unit}
                         )
+                elif "ScalarQuantity" in m:
+                    info["scalars"].append(
+                        {"name": pname, "unit": val.unit, "doc": doc}
+                    )
                 elif isinstance(val, bool) and prop.fset is not None:
                     info["switches"].append(
                         {"name": pname, "kind": "bool", "value": val, "doc": doc}
@@ -853,20 +986,6 @@ class Controller:
             self.frames[cfg["id"]] = (_clean(meta), data.tobytes() + rgba)
 
     # ----------------------------------------------------------------------- table
-    def _default_table(self):
-        """mumax3's default table: t, mx, my, mz."""
-        prim = self._primary()
-        for name in prim:
-            try:
-                m = self.targets[name].magnetization
-            except Exception:
-                continue
-            for i, comp in enumerate("xyz"):
-                col = f"m{comp}" if len(prim) == 1 else f"{name}.m{comp}"
-                self.table.add(
-                    col, "", (lambda m=m, i=i: np.atleast_1d(m.average())[i])
-                )
-
     def table_add(self, quantity, name=None, unit=None):
         """TableAdd(quantity).
 
@@ -894,6 +1013,17 @@ class Controller:
             name if n == 1 else name + ("xyz"[i] if n == 3 else str(i))
             for i in range(n)
         ]
+        keys = [None] * n
+        if isinstance(quantity, str):
+            keys = [f"{self.sel}:{quantity}:{i if field else ''}" for i in range(n)]
+            shown = [self.table.find(k) for k in keys]
+            if all(shown):  # plotted already: save those columns from now on
+                for col in shown:
+                    self.table.save(col)
+                self.say(f"saving {', '.join(shown)} in {self.table.path}")
+                self.describe()
+                return
+        t = float(self._ts().time)  # the last row gets the new column's value
         taken = [col for col in cols if col in self.table.names()]
         if taken:
             raise ValueError(
@@ -903,12 +1033,16 @@ class Controller:
         if field:
             for i, col in enumerate(cols):
                 self.table.add(
-                    col, unit, (lambda o=obj, i=i: np.atleast_1d(o.average())[i])
+                    col,
+                    unit,
+                    (lambda o=obj, i=i: np.atleast_1d(o.average())[i]),
+                    key=keys[i],
+                    t=t,
                 )
         elif "ScalarQuantity" in m:
-            self.table.add(name, unit, lambda o=obj: o.eval())
+            self.table.add(name, unit, lambda o=obj: o.eval(), key=keys[0], t=t)
         elif callable(obj):
-            self.table.add(name, unit, obj)
+            self.table.add(name, unit, obj, t=t)
         else:
             raise TypeError(
                 f"cannot add {obj!r} to the table: "
@@ -1187,11 +1321,23 @@ class Controller:
         elif name == "table_autosave":
             self._table_autosave(self._eval(c["text"]))
         elif name == "table_using":
-            pid = c.get("plot", self.plots[0]["id"])
-            p = next((p for p in self.plots if p["id"] == pid), None)
-            if p is None:
-                raise ValueError(f"no plot {pid!r}")
+            p = self._plot(c.get("plot", self.plots[0]["id"]))
             self._plot_set(p, c.get("x"), c.get("y"), c.get("logx"), c.get("logy"))
+            self._prune_columns()
+        elif name == "plot_quantity":  # any quantity of a magnet, as x or another y
+            p = self._plot(c["plot"])
+            col = self._series(c["target"], c["quant"], c.get("comp"))
+            if c.get("axis") == "x":
+                self._plot_set(p, x=col)
+            else:
+                ys = p["y"].split(",")
+                self._plot_set(p, y=ys if col in ys else [*ys, col])
+            self._prune_columns()
+        elif name == "column_save":
+            self.table.save(c["name"])
+            self.say(f"saving {c['name']} in {self.table.path}")
+        elif name == "table_custom":
+            self._table_custom(c)
         elif name == "plot_add":
             return {"ok": True, "plot": self.add_plot()}
         elif (
@@ -1201,6 +1347,7 @@ class Controller:
         elif name == "plot_remove":
             if len(self.plots) > 1:
                 self.plots = [p for p in self.plots if p["id"] != c["plot"]]
+                self._prune_columns()
         elif name == "excite_preview":
             return {"ok": True, **self._excite_preview(c)}
         elif name == "excite":

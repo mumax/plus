@@ -82,16 +82,50 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .loupe { position: absolute; display: none; pointer-events: none; width: 150px; height: 150px; border: 1px solid #000;
          border-radius: 2% 50% 50%; box-shadow: 3px 3px 8px rgba(0,0,0,.4); image-rendering: pixelated; }
 .hover { font: 12px var(--mono); color: var(--mute); min-height: 18px; }
-#plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 8px; }
-.plot { min-width: 0; }
-#plots:has(.plot + .plot) .plot { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
-#plots:has(.plot + .plot) .vhead { display: flex; }
-.using { font-weight: 700; gap: 4px 8px; }
-.using span { white-space: nowrap; }
 .plotErr { color: var(--err); font-weight: 600; }
 .overlay { position: absolute; pointer-events: none; }
-.plotcv, .profcv { display: block; width: 100%; height: 340px; border-radius: 8px; border: 1px solid var(--line); margin-top: 8px; cursor: crosshair; touch-action: none; }
-.profcv { height: 220px; }
+.plotcv, .profcv { display: block; width: 100%; height: 300px; border-radius: 8px; cursor: crosshair; touch-action: none; }
+.profcv { height: 220px; border: 1px solid var(--line); margin-top: 8px; }
+
+/* plots: cards with the series as chips (also the legend), and a quantity picker */
+#plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; margin-top: 6px; }
+.plot { min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px 8px; }
+.ptool { display: flex; align-items: flex-start; gap: 8px; }
+.series { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
+.pbtns { display: flex; gap: 4px; flex: none; }
+.chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 2px 2px 2px 10px; border: 1px solid var(--line); border-radius: 99px;
+        background: var(--field); font: 12px var(--mono); }
+.chip > i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.chip > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip .u { color: var(--mute); }
+.chip.live { border-style: dashed; }
+.chip.bad { border-color: var(--err); color: var(--err); }
+.chip button, .ghost { border: 0; background: none; padding: 0 6px; color: var(--mute); font-weight: 500; line-height: 1.5; }
+.chip button:hover, .ghost:hover { color: var(--ink); }
+.addSeries, .xbtn { border-style: dashed; border-radius: 99px; padding: 2px 10px; font: 12px var(--mono); background: none; color: var(--mute); }
+.addSeries:hover, .xbtn:hover { color: var(--ink); }
+.tog { padding: 2px 8px; font-size: 12px; background: none; color: var(--mute); }
+.tog.on { color: var(--accent); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.plotwrap { position: relative; margin-top: 6px; }
+.tip { position: absolute; display: none; pointer-events: none; z-index: 2; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px;
+       background: var(--card); box-shadow: 0 4px 16px rgba(0,0,0,.14); font: 12px/1.55 var(--mono); white-space: nowrap; }
+.tip i, .pitem i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.xrow { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--mute); }
+.picker { position: absolute; z-index: 30; width: 360px; max-width: calc(100vw - 16px); max-height: min(460px, 70vh); display: flex; flex-direction: column;
+          background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.2); }
+.picker .pq { margin: 8px 8px 4px; }
+.plist { overflow: auto; padding: 0 4px 6px; }
+.pgrp { padding: 8px 8px 2px; font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--mute); }
+.pitem { display: flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; cursor: pointer; }
+.pitem:hover, .pitem.hl { background: var(--field); }
+.pitem .pn { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12.5px var(--mono); }
+.pitem .pu { color: var(--mute); font-size: 11px; }
+.pitem .pc { display: flex; gap: 2px; }
+.pitem .pc button { padding: 0 7px; font: 11px var(--mono); }
+.pempty { padding: 10px; color: var(--mute); font-size: 12px; }
+.pcustom { display: grid; grid-template-columns: 1fr 80px; gap: 6px; padding: 8px; border-top: 1px solid var(--line); }
+.pcustom .pexpr { grid-column: 1 / -1; }
+.pcustom .perr { grid-column: 1 / -1; color: var(--err); font-size: 12px; }
 
 /* parameters */
 #ptable td.n, #stable td.n, #wtable td.n { padding-right: 14px; font: 13px var(--mono); }
@@ -123,20 +157,12 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
 </div></section>
 <template id="viewTpl"><div class="view">
   <div class="vhead"><span class="vname"></span><button class="vremove" title="Remove this display">×</button></div>
-  <div class="row">Quantity: <input type="text" class="quantSearch" placeholder="search…" size="10" title="Filter quantities by name or description; Enter selects the first match, Esc clears"> <select class="renderQuant"></select> <select class="renderComp"></select> <span class="renderDoc gray"></span></div>
+  <div class="row">Quantity: <button class="quantBtn mono" title="Pick the quantity to show (type to search by name or description)"></button> <select class="renderComp"></select> <span class="renderDoc gray"></span></div>
   <div class="row renderAllRow" title="Draw every magnet at its place in the world (the selected one is outlined). Click a magnet to select it"><label><input type="checkbox" class="renderAll"> show all magnets</label></div>
   <table>
     <tr title="Slice through z layers"><td>Slice: <input type="range" class="renderLayer" min="0" max="0" value="0"></td><td class="renderLayerLabel">1/1</td></tr>
     <tr class="arrowSizeRow" title="Arrow spacing in cells"><td>Arrows: <input type="range" class="arrowSize" min="2" max="64" value="8"></td><td class="arrowSizeLabel">8</td></tr>
   </table>
-  <div class="row">Save: <button class="savePng" title="Download the image as shown here, with its arrows">PNG</button><button class="saveOvf" title="Save the quantity of the selected magnet as an OVF file, in the folder the script runs in">OVF</button>
-    <span title="Save the quantity as OVF now and every this many seconds of simulation time while running. 0 = off">AutoSave: <input type="text" class="autosave" size="7"> s</span></div>
-  <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
-  <div class="row" title="Record this display: a frame every so much simulation time, drawn by the simulation (it goes on with the page closed). The movie is saved next to table.txt when you stop">Movie: every
-    <input type="text" class="movPeriod" value="1e-11" size="6"> s,
-    <select class="movFormat"><option value="mp4" title="lossless: exactly the frames. Plays in VLC, mpv, ffplay; browsers, QuickTime and PowerPoint cannot play lossless RGB video">MP4</option><option value="png">PNG frames</option></select>
-    at <input type="text" class="movFps" value="10" size="3"> fps
-    <button class="movRec">● Record</button> <span class="movNote gray" style="font-size:12px"></span></div>
   <div class="row" title="Paint the magnet: drag with the brush to set a parameter, or click to place a vortex, skyrmion, ...">Paint:
     <select class="paintTool"><option value="">off</option><option value="brush">brush</option><option value="place">place m</option></select>
     <span class="brushOpts" hidden><select class="paintQuant" title="what to paint"></select> = <input type="text" class="paintValue" size="9" title="the value to paint"> <span class="paintUnit gray"></span></span>
@@ -144,6 +170,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
     <span class="paintOpts" hidden>radius <input type="text" class="paintRadius" value="3" size="3"> cells
       <label title="Paint through all layers, or only the shown one"><input type="checkbox" class="paintAll" checked> all layers</label>
       <button class="paintUndo" title="Undo the last stroke (possible until something else changes the state)">Undo</button></span></div>
+  <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
   <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="overlay" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
   <div class="hover">&nbsp;</div>
   <div class="profile" hidden>
@@ -152,22 +179,33 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
     <canvas class="profcv"></canvas>
     <div class="hover profHover">&nbsp;</div>
   </div>
+  <div class="row">Save: <button class="savePng" title="Download the image as shown here, with its arrows">PNG</button><button class="saveOvf" title="Save the quantity of the selected magnet as an OVF file, in the folder the script runs in">OVF</button>
+    <span title="Save the quantity as OVF now and every this many seconds of simulation time while running. 0 = off">AutoSave: <input type="text" class="autosave" size="7"> s</span></div>
+  <div class="row" title="Record this display: a frame every so much simulation time, drawn by the simulation (it goes on with the page closed). The movie is saved next to table.txt when you stop">Movie: every
+    <input type="text" class="movPeriod" value="1e-11" size="6"> s,
+    <select class="movFormat"><option value="mp4" title="lossless: exactly the frames. Plays in VLC, mpv, ffplay; browsers, QuickTime and PowerPoint cannot play lossless RGB video">MP4</option><option value="png">PNG frames</option></select>
+    at <input type="text" class="movFps" value="10" size="3"> fps
+    <button class="movRec">● Record</button> <span class="movNote gray" style="font-size:12px"></span></div>
 </div></template>
 
 <section id="s-plot"><h2 title="Click to show/hide">Plot</h2><div class="body">
-  <div class="row" title="Save a row of the table every this many seconds of simulation time into table.txt. 0 = only keep a live preview, nothing is saved"><span>TableAutosave:</span> <input type="text" id="tableAutoSave" size="8"> s <span class="gray" style="font-size:12px">(0: live preview only, not saved)</span></div>
-  <div id="cols" class="gray" style="font-size:12px"></div>
+  <div class="row" title="Save a row of the table every this many seconds of simulation time into table.txt. 0 = only keep a live preview, nothing is saved"><span>Autosave table:</span> <input type="text" id="tableAutoSave" size="8"> s <span class="gray" style="font-size:12px">(0: live preview only, not saved)</span></div>
   <div id="plots"></div>
   <div class="row"><button id="addPlot" title="Add another plot">+ Add plot</button><button id="saveTable" title="Download the table rows shown in the plots (with TableAutosave 0 these are live samples that table.txt does not have)">Save table</button></div>
 </div></section>
 <template id="plotTpl"><div class="plot">
-  <div class="vhead"><span class="vname"></span><button class="vremove" title="Remove this plot">×</button></div>
-  <div class="row using mono"><span>plot "table.txt" using</span> <span><input type="text" class="usingx" size="6" value="1" title="x column: a name or number"> : <input type="text" class="usingy" size="12" value="2" title="y column(s): names or numbers, separated by commas, e.g. mx,my,mz or 2,3,4"></span> <span>with lines</span></div>
-  <div class="row"><label><input type="checkbox" class="logx"> log x</label><label><input type="checkbox" class="logy"> log y</label>
-    <button class="zoomReset" hidden title="Show all data again (or double-click the plot)">Reset zoom</button><button class="savePlot" title="Download the plot as shown">PNG</button></div>
+  <div class="ptool">
+    <div class="series"></div>
+    <div class="pbtns">
+      <button class="tog zoomReset" hidden title="Show all data again (or double-click the plot)">⟲ zoom</button>
+      <button class="tog logx" title="Logarithmic x axis">log x</button><button class="tog logy" title="Logarithmic y axis">log y</button>
+      <button class="tog savePlot" title="Download the plot as shown, with a legend">PNG</button>
+      <button class="ghost vremove" title="Remove this plot">×</button>
+    </div>
+  </div>
   <div class="plotErr"></div>
-  <canvas class="plotcv"></canvas>
-  <div class="hover plotHover">&nbsp;</div>
+  <div class="plotwrap"><canvas class="plotcv" title="Drag to zoom (a box, or a range of x or y), double-click to zoom out"></canvas><div class="tip"></div></div>
+  <div class="xrow">x axis <button class="xbtn" title="Plot against another column or quantity">t ▾</button></div>
 </div></template>
 
 <section id="s-console"><h2 title="Click to show/hide">Console</h2><div class="body">
@@ -547,15 +585,12 @@ function makeView(id) {
               off: document.createElement("canvas") };
   const { q } = V, render = (c) => send({ cmd: "render", view: id, ...c });
   q("vremove").onclick = () => send({ cmd: "view_remove", view: id }); // syncViews drops the panel
-  q("renderQuant").onchange = (e) => pickQuant(V, e.target.value);
-  q("quantSearch").oninput = () => fillQuantities(V);
-  q("quantSearch").onkeydown = (e) => {
-    if (e.key === "Escape") { e.target.value = ""; fillQuantities(V); }
-    else if (e.key === "Enter") {
-      const f = e.target.value.trim().toLowerCase(), t = cur(); if (!t || !f) return;
-      const m = t.quantities.find((x) => x.name.toLowerCase().includes(f)) || t.quantities.find((x) => (x.doc || "").toLowerCase().includes(f));
-      if (m) { pickQuant(V, m.name); fillQuantities(V); }
-    }
+  q("quantBtn").onclick = (e) => {
+    const t = cur(), c = cfgOf(V); if (!t || !c) return;
+    openPicker(e.currentTarget, "search quantities", t.quantities.map((x) => ({
+      grp: "Quantities", name: x.name, unit: x.unit, doc: x.doc, on: x.name === c.quant, pick: () => pickQuant(V, x.name),
+      comps: x.ncomp < 2 ? [] : [...Array(x.ncomp).keys()].map((k) => ({ label: compLabel(x.ncomp, k), title: `its ${compLabel(x.ncomp, k)} component`, pick: () => pickQuant(V, x.name, compLabel(x.ncomp, k)) })),
+    })));
   };
   q("renderComp").onchange = (e) => render({ comp: e.target.value });
   q("renderLayer").oninput = (e) => render({ layer: +e.target.value });
@@ -648,7 +683,7 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     const mp4 = q("movFormat").querySelector("[value=mp4]"); mp4.disabled = !P.ffmpeg; if (!P.ffmpeg) { mp4.title = "needs ffmpeg"; if (q("movFormat").value === "mp4") q("movFormat").value = "png"; }
     if (!t) return;
     // the display settings may also change from the console
-    if (V.qkey !== qkey || (document.activeElement !== q("renderQuant") && q("renderQuant").value !== c.quant)) {
+    if (V.qkey !== qkey || V.quant !== c.quant) {
       V.qkey = qkey; fillQuantities(V); if (V.paintTool === "brush") fillPaintQuants(V, true);
     }
     if (document.activeElement !== q("renderComp") && [...q("renderComp").options].some((o) => o.value === c.comp)) q("renderComp").value = c.comp;
@@ -660,22 +695,17 @@ function syncViews() { // add/remove panels to match the simulation, and show th
 }
 
 function fillQuantities(V) {
-  const t = cur(), c = cfgOf(V); if (!t || !c) return;
-  const sel = V.q("renderQuant"), f = V.q("quantSearch").value.trim().toLowerCase();
-  const match = (x) => !f || x.name.toLowerCase().includes(f) || (x.doc || "").toLowerCase().includes(f);
-  // always keep the current quantity in the list so the select keeps showing it
-  const qs = t.quantities.filter((x) => match(x) || x.name === c.quant);
-  sel.innerHTML = qs.map((x) => `<option value="${x.name}">${x.name}</option>`).join("");
-  sel.value = c.quant; fillComps(V);
+  const c = cfgOf(V); if (!cur() || !c) return;
+  V.quant = c.quant; V.q("quantBtn").textContent = c.quant + " ▾"; fillComps(V);
 }
-function pickQuant(V, name) {
-  send({ cmd: "render", view: V.id, quant: name, comp: "" });
-  const c = cfgOf(V); if (c) { c.quant = name; c.comp = ""; }
-  fillComps(V);
+function pickQuant(V, name, comp = "") {
+  send({ cmd: "render", view: V.id, quant: name, comp });
+  const c = cfgOf(V); if (c) { c.quant = name; c.comp = comp; }
+  fillQuantities(V);
   if (V.paintTool === "brush") fillPaintQuants(V, true); // the brush follows the shown quantity
 }
 function fillComps(V) {
-  const t = cur(), c = cfgOf(V), { q } = V, x = t && t.quantities.find((x) => x.name === q("renderQuant").value); if (!x) return;
+  const t = cur(), c = cfgOf(V), { q } = V, x = t && c && t.quantities.find((x) => x.name === c.quant); if (!x) return;
   const opts = x.ncomp === 3 ? ["", "x", "y", "z"] : x.ncomp === 1 ? [""] : Array.from({ length: x.ncomp }, (_, i) => String(i));
   q("renderComp").innerHTML = opts.map((o) => `<option value="${o}">${o === "" ? (x.ncomp === 3 ? "(vector)" : "") : o}</option>`).join("");
   q("renderComp").style.display = opts.length > 1 ? "" : "none";
@@ -954,9 +984,11 @@ const panelObserver = new ResizeObserver((entries) => {
 
 /* ---------- charts: drawn in the page, for the plots of the table and the line profiles ----------
    C = a chart's state (zoom, mouse, ...); C.data = what it shows:
-   { X, Y: [series], names, xlabel, ylabel, logx, logy, empty, readout(k, colors) } or { message } */
-function makeChart(cv, hoverEl, resetBtn) {
-  const C = { cv, hoverEl, resetBtn, data: null, zoom: null, drag: null, mouse: null, geom: null, raf: 0, onHover: null };
+   { X, Y: [series], names, xlabel, ylabel, logx, logy, empty, chips, readout(k, colors) } or { message }
+   The values at the mouse go in hoverEl (below the chart), or in a tooltip ``tip`` that follows it.
+   chips: the page shows the series names, so the legend is only drawn for C.legend (a saved PNG). */
+function makeChart(cv, hoverEl, resetBtn, tip) {
+  const C = { cv, hoverEl, resetBtn, tip, data: null, zoom: null, drag: null, mouse: null, geom: null, raf: 0, onHover: null, legend: false };
   // hover: values at the nearest point; drag: zoom to a box (or a range of x or y); double-click: zoom out
   const at = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   const redraw = () => { cancelAnimationFrame(C.raf); C.raf = requestAnimationFrame(() => drawChart(C)); };
@@ -1015,7 +1047,9 @@ function drawChart(C, data) {
   C.resetBtn.hidden = !C.zoom;
   const message = (text) => {
     C.geom = null; ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, W / 2, H / 2);
-    C.hoverEl.innerHTML = "&nbsp;"; if (C.onHover) C.onHover(-1);
+    if (C.hoverEl) C.hoverEl.innerHTML = "&nbsp;";
+    if (C.tip) C.tip.style.display = "none";
+    if (C.onHover) C.onHover(-1);
   };
   if (d.message !== undefined) return message(d.message);
 
@@ -1034,18 +1068,20 @@ function drawChart(C, data) {
 
   // layout: room for the tick labels and the axis titles
   const ytk = plotTicks(y0, y1, ly, Math.max(2, Math.round(H / 60))), ylab = ytk.map((v) => g(ly ? 10 ** v : v));
-  const L = 24 + Math.max(...ylab.map((s) => ctx.measureText(s).width), 10), R = W - 14, Tp = 10, B = H - 40;
+  const L = 24 + Math.max(...ylab.map((s) => ctx.measureText(s).width), 10), R = W - 10, Tp = 10, B = H - 40;
   const xtk = plotTicks(x0, x1, lx, Math.max(2, Math.round((R - L) / 90)));
   const px = (x) => L + ((x - x0) / (x1 - x0)) * (R - L), py = (y) => B - ((y - y0) / (y1 - y0)) * (B - Tp);
   C.geom = { ix: (p) => x0 + ((p - L) / (R - L)) * (x1 - x0), iy: (p) => y0 + ((B - p) / (B - Tp)) * (y1 - y0) };
 
-  // grid, ticks and axis titles
+  // horizontal grid lines, an x axis with ticks, and the axis titles
   ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.beginPath();
-  for (const v of xtk) { const p = Math.round(px(v)) + 0.5; ctx.moveTo(p, Tp); ctx.lineTo(p, B); }
   for (const v of ytk) { const p = Math.round(py(v)) + 0.5; ctx.moveTo(L, p); ctx.lineTo(R, p); }
-  ctx.stroke(); ctx.strokeRect(L + 0.5, Tp + 0.5, R - L - 1, B - Tp - 1);
+  ctx.stroke();
+  ctx.strokeStyle = mute; ctx.beginPath(); ctx.moveTo(L, Math.round(B) + 0.5); ctx.lineTo(R, Math.round(B) + 0.5);
+  for (const v of xtk) { const p = Math.round(px(v)) + 0.5; ctx.moveTo(p, B); ctx.lineTo(p, B + 4); }
+  ctx.stroke();
   ctx.fillStyle = mute; ctx.textAlign = "center"; ctx.textBaseline = "top";
-  xtk.forEach((v) => ctx.fillText(g(lx ? 10 ** v : v), px(v), B + 5));
+  xtk.forEach((v) => ctx.fillText(g(lx ? 10 ** v : v), px(v), B + 7));
   ctx.textAlign = "right"; ctx.textBaseline = "middle";
   ytk.forEach((v, k) => ctx.fillText(ylab[k], L - 5, py(v)));
   ctx.font = `12px ${font}`; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
@@ -1055,7 +1091,7 @@ function drawChart(C, data) {
   // the lines (with lines)
   const colors = seriesColors();
   ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, R - L, B - Tp); ctx.clip();
-  ctx.lineWidth = 1.5; ctx.lineJoin = "round";
+  ctx.lineWidth = 2; ctx.lineJoin = "round";
   Y.forEach((S, s) => {
     ctx.strokeStyle = colors[s % colors.length]; ctx.beginPath(); let pen = false;
     for (let k = 0; k < S.length; k++) {
@@ -1075,8 +1111,13 @@ function drawChart(C, data) {
   if (best >= 0) {
     ctx.strokeStyle = mute; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px(X[best]), Tp); ctx.lineTo(px(X[best]), B); ctx.stroke(); ctx.setLineDash([]);
     Y.forEach((S, s) => { if (isNaN(S[best])) return; ctx.fillStyle = colors[s % colors.length]; ctx.beginPath(); ctx.arc(px(X[best]), py(S[best]), 3.5, 0, 2 * Math.PI); ctx.fill(); });
-    C.hoverEl.innerHTML = d.readout(best, colors);
-  } else C.hoverEl.innerHTML = C.mouse ? "&nbsp;" : "drag to zoom, double-click to zoom out";
+    if (C.tip) { // next to the point, on the side with room
+      const t = C.tip, x = px(X[best]); t.innerHTML = d.readout(best, colors); t.style.display = "block";
+      t.style.left = (x + 14 + t.offsetWidth > W ? x - 14 - t.offsetWidth : x + 14) + "px";
+      t.style.top = Math.max(0, Math.min(H - t.offsetHeight, m.y - t.offsetHeight / 2)) + "px";
+    } else C.hoverEl.innerHTML = d.readout(best, colors);
+  } else if (C.tip) C.tip.style.display = "none";
+  else C.hoverEl.innerHTML = C.mouse ? "&nbsp;" : "drag to zoom, double-click to zoom out";
   if (C.onHover) C.onHover(best);
 
   // zoom box while dragging
@@ -1090,7 +1131,7 @@ function drawChart(C, data) {
   ctx.restore();
 
   // legend, for more than one line
-  if (Y.length > 1) {
+  if (Y.length > 1 && (!d.chips || C.legend)) {
     ctx.font = `11px ${font}`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
     const w = 30 + Math.max(...d.names.map((n) => ctx.measureText(n).width)), h = 8 + 16 * Y.length, x = R - w - 8, y = Tp + 8;
     ctx.globalAlpha = 0.85; ctx.fillStyle = card; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
@@ -1106,11 +1147,12 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { pl
 /* ---------- plot ---------- */
 $("saveTable").onclick = async () => download(stem() + "_table.txt", await (await GET("/api/table.txt")).blob());
 bindText($("tableAutoSave"), (v) => send({ cmd: "table_autosave", text: v }));
-/* One or more plot panels, like the display panels: each draws its own x:y1,y2,... columns of the one table
-   (gnuplot: plot "table.txt" using x:y with lines). The page keeps a copy of the table and only fetches new rows.
+/* One or more plot panels, like the display panels: each draws columns y1,y2,... of the one table against a column x.
+   The picker also offers every quantity of the magnets: the simulation then samples it in a plot-only column, which
+   table.txt does not get unless asked for (⤓ on its chip). The page keeps a copy of the table and only fetches new rows.
    Pl = the panel's page state, cfg = its columns as the simulation reports them in /api/tick. */
 const plots = new Map(); // plot id -> Pl
-const TB = { version: -1, names: [], units: [], rows: [], busy: false };
+const TB = { version: -1, names: [], units: [], saved: [], rows: [], busy: false };
 $("addPlot").onclick = () => send({ cmd: "plot_add" });
 
 async function fetchTable() {
@@ -1119,8 +1161,8 @@ async function fetchTable() {
     const d = await (await GET(`/api/table?version=${TB.version}&since=${TB.rows.length}`)).json();
     const changed = d.rows.length > 0 || d.version !== TB.version || d.names.join("\n") !== TB.names.join("\n");
     if (d.start === 0) TB.rows = d.rows; else for (const r of d.rows) TB.rows.push(r);
-    Object.assign(TB, { version: d.version, names: d.names, units: d.units });
-    if (changed) plots.forEach(drawPlot);
+    Object.assign(TB, { version: d.version, names: d.names, units: d.units, saved: d.saved || [] });
+    if (changed && T) plots.forEach((Pl) => { showSeries(Pl); drawPlot(Pl); });
   } catch (e) { /* next tick */ }
   TB.busy = false;
 }
@@ -1130,22 +1172,31 @@ function column(spec) { // 1-based number or name -> index into a row
   const i = TB.names.indexOf(spec); if (i >= 0) return i;
   throw new Error(`unknown column "${spec}"; columns are: ` + TB.names.map((n, i) => `${i + 1}=${n}`).join(", "));
 }
+const columnOrNone = (spec) => { try { return column(spec); } catch (e) { return -1; } };
 const colLabel = (i) => (TB.units[i] ? `${TB.names[i]} (${TB.units[i]})` : TB.names[i]);
+const ysOf = (c) => String(c.y || "").split(",").map((v) => v.trim()).filter(Boolean);
+const cfgOfPlot = (id) => T && T.plots.find((p) => p.id === id);
+function smallButton(text, title, onclick) {
+  const b = document.createElement("button"); b.textContent = text; b.title = title;
+  b.onclick = (e) => { e.stopPropagation(); onclick(e); }; return b;
+}
 
 function makePlot(id) {
   const el = $("plotTpl").content.firstElementChild.cloneNode(true);
-  const q = (c) => el.querySelector("." + c), cfg = () => T.plots.find((p) => p.id === id);
-  const Pl = { id, el, q, key: "", chart: makeChart(q("plotcv"), q("plotHover"), q("zoomReset")) };
-  const sendUsing = () => send({ cmd: "table_using", plot: id, x: q("usingx").value, y: q("usingy").value });
-  bindText(q("usingx"), sendUsing); bindText(q("usingy"), sendUsing);
-  for (const k of ["logx", "logy"]) q(k).onchange = (e) => {
-    const c = cfg(); if (c) c[k] = e.target.checked; // show it now, the tick confirms
-    Pl.chart.zoom = null; send({ cmd: "table_using", plot: id, [k]: e.target.checked }); drawPlot(Pl);
+  const q = (c) => el.querySelector("." + c), cfg = () => cfgOfPlot(id);
+  const Pl = { id, el, q, key: "", seriesKey: "", chart: makeChart(q("plotcv"), null, q("zoomReset"), q("tip")) };
+  for (const k of ["logx", "logy"]) q(k).onclick = () => {
+    const c = cfg(); if (!c) return;
+    c[k] = !c[k]; q(k).classList.toggle("on", c[k]); // show it now, the tick confirms
+    Pl.chart.zoom = null; send({ cmd: "table_using", plot: id, [k]: c[k] }); drawPlot(Pl);
   };
+  q("xbtn").onclick = (e) => openPlotPicker(e.currentTarget, id, "x");
   q("vremove").onclick = () => send({ cmd: "plot_remove", plot: id }); // syncPlots drops the panel
   q("savePlot").onclick = () => {
     const c = cfg(), name = c ? `${c.y}_vs_${c.x}`.replace(/[^\w.,-]+/g, "_") : "plot";
+    Pl.chart.legend = true; drawChart(Pl.chart); // the chips are not in the image: draw a legend in it
     q("plotcv").toBlob((b) => b && download(`${stem()}_${name}.png`, b), "image/png");
+    Pl.chart.legend = false; drawChart(Pl.chart);
   };
   $("plots").appendChild(el); plots.set(id, Pl); panelObserver.observe(el);
   return Pl;
@@ -1156,31 +1207,133 @@ function syncPlots() { // add/remove panels to match the simulation, and show th
   T.plots.forEach((c, i) => {
     const Pl = plots.get(c.id) || makePlot(c.id), box = $("plots"), { q } = Pl;
     if (box.children[i] !== Pl.el) box.insertBefore(Pl.el, box.children[i] || null); // keep the simulation's order
-    q("vname").textContent = "Plot " + (i + 1);
-    setText(q("usingx"), c.x); setText(q("usingy"), c.y);
-    q("logx").checked = !!c.logx; q("logy").checked = !!c.logy;
+    q("vremove").hidden = T.plots.length < 2;
+    q("logx").classList.toggle("on", !!c.logx); q("logy").classList.toggle("on", !!c.logy);
+    showSeries(Pl);
     const key = [c.x, c.y, c.logx, c.logy].join("|");
     if (key !== Pl.key) { if (Pl.key) Pl.chart.zoom = null; Pl.key = key; drawPlot(Pl); }
   });
 }
+/* the y columns as chips (in the colours of their lines: the legend), and the x column */
+function showSeries(Pl) {
+  const c = cfgOfPlot(Pl.id); if (!c) return;
+  const key = [c.x, c.y, TB.names, TB.units, TB.saved, theme()].join("|");
+  if (key === Pl.seriesKey) return; Pl.seriesKey = key;
+  const colors = seriesColors(), box = Pl.q("series"), ys = ysOf(c), known = TB.names.length > 0;
+  box.innerHTML = "";
+  ys.forEach((spec, s) => {
+    const j = columnOrNone(spec), live = j >= 0 && TB.saved[j] === false, chip = document.createElement("span");
+    chip.className = "chip" + (known && j < 0 ? " bad" : live ? " live" : "");
+    chip.title = known && j < 0 ? `no column "${spec}"` : live ? "Sampled for the plots only: not saved in table.txt" : "A column of table.txt";
+    const unit = j >= 0 && TB.units[j] ? ` <span class="u">${esc(TB.units[j])}</span>` : "";
+    chip.innerHTML = `<i style="background:${colors[s % colors.length]}"></i><span>${esc(j >= 0 ? TB.names[j] : spec)}${unit}</span>`;
+    if (live) chip.append(smallButton("⤓", "Save this column in table.txt too", () => send({ cmd: "column_save", name: TB.names[j] })));
+    chip.append(smallButton("×", "Remove it from this plot", () => send({ cmd: "table_using", plot: Pl.id, y: ys.filter((v, k) => k !== s).join(",") })));
+    box.append(chip);
+  });
+  const add = smallButton("+ add", "Plot another column or quantity", (e) => openPlotPicker(e.currentTarget, Pl.id, "y"));
+  add.className = "addSeries"; box.append(add);
+  const xi = columnOrNone(c.x || "t");
+  Pl.q("xbtn").textContent = (xi >= 0 ? TB.names[xi] : c.x) + " ▾";
+}
 function drawPlot(Pl) {
-  const c = T && T.plots.find((p) => p.id === Pl.id); if (!c) return;
+  const c = cfgOfPlot(Pl.id); if (!c) return;
   if (!TB.names.length) return drawChart(Pl.chart, { message: "no data yet: run the simulation" });
-  let xi, ys;
-  try {
-    xi = column(c.x || "1"); ys = String(c.y || "2").split(",").filter((s) => s.trim()).map(column);
-    Pl.q("plotErr").textContent = "";
-  } catch (e) { Pl.q("plotErr").textContent = e.message; return drawChart(Pl.chart, { message: "" }); }
-  if (!ys.length) return drawChart(Pl.chart, { message: "no y column" });
-  const rows = TB.rows, unit = (j) => (TB.units[j] ? " " + esc(TB.units[j]) : "");
-  const units = new Set(ys.map((j) => TB.units[j]));
+  let xi;
+  try { xi = column(c.x || "t"); Pl.q("plotErr").textContent = ""; }
+  catch (e) { Pl.q("plotErr").textContent = e.message; return drawChart(Pl.chart, { message: "" }); }
+  const ys = ysOf(c).map(columnOrNone), ok = ys.filter((j) => j >= 0); // an unknown column keeps its colour, without a line
+  if (!ok.length) return drawChart(Pl.chart, { message: ys.length ? "" : "nothing to plot: + add a quantity" });
+  const rows = TB.rows, unit = (j) => (TB.units[j] ? " " + esc(TB.units[j]) : ""), gv = (v) => (v === null ? "NaN" : g(v));
+  const units = new Set(ok.map((j) => TB.units[j]));
   drawChart(Pl.chart, {
-    X: rows.map((r) => r[xi]), Y: ys.map((j) => rows.map((r) => r[j])), names: ys.map((j) => TB.names[j]),
+    X: rows.map((r) => r[xi]), Y: ys.map((j) => rows.map((r) => (j >= 0 ? r[j] : null))), names: ys.map((j) => (j >= 0 ? TB.names[j] : "")),
     xlabel: colLabel(xi),
-    ylabel: ys.length === 1 ? colLabel(ys[0]) : ys.map((j) => TB.names[j]).join(", ") + (units.size === 1 && TB.units[ys[0]] ? ` (${TB.units[ys[0]]})` : ""),
-    logx: c.logx, logy: c.logy, empty: rows.length < 2 ? "no data yet: run the simulation" : undefined,
-    readout: (k, colors) => `${esc(TB.names[xi])} = ${g(rows[k][xi])}${unit(xi)}` + ys.map((j, s) =>
-      `&ensp;<b style="color:${colors[s % colors.length]}">${esc(TB.names[j])}</b> = ${rows[k][j] === null ? "NaN" : g(rows[k][j])}${unit(j)}`).join(""),
+    ylabel: ok.length === 1 ? colLabel(ok[0]) : ok.map((j) => TB.names[j]).join(", ") + (units.size === 1 && TB.units[ok[0]] ? ` (${TB.units[ok[0]]})` : ""),
+    logx: c.logx, logy: c.logy, chips: true, empty: rows.length < 2 ? "no data yet: run the simulation" : undefined,
+    readout: (k, colors) => `<div class="gray">${esc(TB.names[xi])} = ${gv(rows[k][xi])}${unit(xi)}</div>` + ys.map((j, s) => j < 0 ? "" :
+      `<div><i style="background:${colors[s % colors.length]}"></i>${esc(TB.names[j])} = <b>${gv(rows[k][j])}</b>${unit(j)}</div>`).join(""),
+  });
+}
+
+/* a searchable list that drops down from ``anchor`` (one at a time). items: { grp, name, unit, doc, on, pick,
+   comps: [{ label, title, pick }] } (on: the one shown now, ✓); Enter picks the first match, Esc closes.
+   ``extra`` (html) goes below the list, and setup(el) wires it */
+let picker = null;
+function closePicker() { if (picker) { picker.remove(); picker = null; } }
+document.addEventListener("pointerdown", (e) => { if (picker && !picker.contains(e.target) && e.target !== picker.anchor) closePicker(); });
+function openPicker(anchor, placeholder, items, extra = "", setup = null) {
+  const again = picker && picker.anchor === anchor; closePicker(); if (again) return;
+  const el = document.createElement("div"); el.className = "picker"; el.anchor = anchor; picker = el;
+  el.innerHTML = `<input type="text" class="pq" placeholder="${esc(placeholder)}…" spellcheck="false" autocomplete="off"><div class="plist"></div>` + extra;
+  document.body.append(el);
+  const r = anchor.getBoundingClientRect();
+  el.style.left = scrollX + Math.max(8, Math.min(innerWidth - el.offsetWidth - 8, r.left)) + "px";
+  el.style.top = scrollY + r.bottom + 4 + "px";
+  const qi = el.querySelector(".pq"), list = el.querySelector(".plist"), pick = (fn) => { closePicker(); fn(); };
+  let first = null;
+  const render = () => {
+    const words = qi.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const shown = items.filter((it) => words.every((w) => `${it.grp} ${it.name} ${it.doc || ""}`.toLowerCase().includes(w)));
+    list.innerHTML = shown.length ? "" : `<div class="pempty">nothing matches</div>`;
+    first = null;
+    let grp = null, on = null;
+    for (const it of shown) {
+      if (it.grp !== grp) { grp = it.grp; list.insertAdjacentHTML("beforeend", `<div class="pgrp">${esc(grp)}</div>`); }
+      const row = document.createElement("div"); row.className = "pitem"; row.title = it.doc || "";
+      row.innerHTML = `<span class="pn">${it.on ? "✓ " : ""}${esc(it.name)}</span><span class="pu">${esc(it.unit || "")}</span>`;
+      if (it.comps && it.comps.length) {
+        const pc = document.createElement("span"); pc.className = "pc";
+        for (const k of it.comps) pc.append(smallButton(k.label, k.title, () => pick(k.pick)));
+        row.append(pc);
+      }
+      row.onclick = () => pick(it.pick);
+      first = first || row; if (it.on) on = on || row;
+      list.append(row);
+    }
+    if (on && !words.length) on.scrollIntoView({ block: "nearest" });
+  };
+  render();
+  qi.oninput = render;
+  qi.onkeydown = (e) => { if (e.key === "Enter" && first) first.click(); if (e.key === "Escape") closePicker(); };
+  if (setup) setup(el);
+  qi.focus();
+}
+const compLabel = (n, k) => (n === 3 ? "xyz"[k] : String(k));
+
+/* what to plot: a column of the table, any quantity of a magnet (its average; a vector one component, or all
+   of them with a click on its name), or a new column of table.txt computed by a Python expression */
+function openPlotPicker(anchor, pid, axis) {
+  const c = cfgOfPlot(pid); if (!c) return;
+  const ys = ysOf(c), shownNow = new Set([...ys.map(columnOrNone), columnOrNone(c.x)]), items = [];
+  const pickColumn = (name) => send(axis === "x" ? { cmd: "table_using", plot: pid, x: name } : { cmd: "table_using", plot: pid, y: [...ys.filter((v) => v !== name), name].join(",") });
+  const pickQuantity = async (target, quant, comps) => {
+    for (const comp of comps) await send({ cmd: "plot_quantity", plot: pid, axis, target, quant, comp });
+    fetchTable();
+  };
+  TB.names.forEach((n, j) => items.push({ grp: "Table", name: n, unit: TB.units[j], on: shownNow.has(j), pick: () => pickColumn(n),
+    doc: TB.saved[j] === false ? "sampled for the plots, not saved in table.txt" : "a column of table.txt" }));
+  for (const tn of T.targets) {
+    const t = P.targets[tn]; if (!t) continue;
+    const grp = T.targets.length > 1 ? tn : "Quantities", qs = [];
+    for (const x of t.quantities) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc,
+      pick: () => pickQuantity(tn, x.name, axis === "x" || x.ncomp < 2 ? [0] : [...Array(x.ncomp).keys()]),
+      comps: x.ncomp < 2 ? [] : [...Array(x.ncomp).keys()].map((k) => ({ label: compLabel(x.ncomp, k), title: `the ${compLabel(x.ncomp, k)} component of its average`, pick: () => pickQuantity(tn, x.name, [k]) })) });
+    for (const x of t.scalars || []) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc, pick: () => pickQuantity(tn, x.name, [0]) });
+    items.push(...qs.sort((a, b) => a.name.localeCompare(b.name)));
+  }
+  const custom = axis !== "y" ? "" : `<div class="pcustom" title="A new column of table.txt: a Python expression, evaluated at every row in the script's namespace (with math and np). Enter adds it">
+    <input type="text" class="pname" placeholder="new column" spellcheck="false"><input type="text" class="punit" placeholder="unit" spellcheck="false">
+    <input type="text" class="pexpr" placeholder="expression, e.g. magnet.magnetization.average()[0]**2" spellcheck="false"><div class="perr"></div></div>`;
+  openPicker(anchor, axis === "x" ? "search the x axis" : "search quantities", items, custom, (el) => {
+    if (!custom) return;
+    const f = (k) => el.querySelector("." + k);
+    for (const k of ["pname", "punit", "pexpr"]) f(k).onkeydown = async (e) => {
+      if (e.key === "Escape") return closePicker();
+      if (e.key !== "Enter") return;
+      const res = await send({ cmd: "table_custom", plot: pid, name: f("pname").value, unit: f("punit").value, expr: f("pexpr").value });
+      if (res && res.ok) { closePicker(); fetchTable(); } else f("perr").textContent = (res && res.error) || "failed";
+    };
   });
 }
 
@@ -1255,7 +1408,6 @@ function rebuildPage() {
   if (ck !== built.cfg) { built.cfg = ck; buildConfigs(); }
   buildParams(); buildExcite();
   $("version").textContent = P.version;
-  $("cols").textContent = "columns: " + P.table_columns.map((n, i) => `${i + 1} = ${n}`).join(",  ");
 }
 function showPage() { showMesh(); showSolver(); showParams(); }
 

@@ -175,7 +175,7 @@ class GUI:
 
         Columns are names or 1-based numbers; ``y`` can be several, as a list or
         comma-separated (``"mx,my,mz"``). ``logx`` / ``logy`` use logarithmic axes.
-        The first call replaces the default plot (mx against t); later calls add plots.
+        The first call replaces the default (empty) plot; later calls add plots.
         """
 
         def add():
