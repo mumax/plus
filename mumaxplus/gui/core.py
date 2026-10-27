@@ -55,6 +55,7 @@ NO_RESET = {
     "table_using",
     "region",
     "log_only",
+    "paint",
     "view_add",
     "view_remove",
     "plot_add",
@@ -275,6 +276,10 @@ class Controller:
         self.script = []
         self._script_imports = []
         self._rec_t = self._rec_n = None  # time / step of the unrecorded part of a run
+
+        # painting on a display: the stroke being painted, and how to undo the last one
+        self._stroke = None
+        self._paint_undo = None
 
         # checkpoints: copies of the state (m, elastic fields, time) in host memory
         self.checkpoints = []
@@ -579,7 +584,13 @@ class Controller:
                 )
             except Exception:
                 args = ""
-            out.append({"name": n, "doc": _doc(fn), "args": f"({args})"})
+            info = {"name": n, "doc": _doc(fn), "args": f"({args})"}
+            params = list(inspect.signature(fn).parameters)
+            if params[:1] == [
+                "position"
+            ]:  # can be placed at a point with the paint tool
+                info["place"] = ", ".join(defaults.get(p, "1") for p in params[1:])
+            out.append(info)
         return out
 
     def _center(self):
@@ -895,6 +906,7 @@ class Controller:
                     "desc_version": self.desc_version,
                     "log_id": self.log_id,
                     "script_lines": len(self.script),
+                    "paint_undo": self._paint_undo is not None,
                     "perf": dict(self.perf, eta=self._eta()),
                     "checkpoints": [
                         {k: v for k, v in cp.items() if k != "state"}
@@ -1104,6 +1116,10 @@ class Controller:
         elif name == "plot_remove":
             if len(self.plots) > 1:
                 self.plots = [p for p in self.plots if p["id"] != c["plot"]]
+        elif name == "paint":
+            self._paint(c)
+        elif name == "paint_undo":
+            self._undo_paint()
         elif name == "cli":
             return self._cli(c["code"])
         elif name == "script":
@@ -1293,6 +1309,156 @@ class Controller:
         self._autosave_tick()
         self._update_torque()
         self._dirty = True
+
+    # ------------------------------------------------------------------- painting
+    def _paint(self, c):
+        """Paint on the magnetization of the magnet under a display's image.
+
+        ``c["points"]`` are positions in cells of the display's image (x right, y
+        up; cell i spans [i, i + 1)). The "brush" tool sets m to ``c["value"]`` within
+        ``c["radius"]`` cells of the points; "place" puts the configuration
+        ``c["config"]`` (vortex, skyrmion, ...) centred on the point, within the
+        radius. Points with the same ``c["stroke"]`` make one stroke: one recorded
+        piece of Python, and one undo.
+        """
+        with self.lock:
+            meta = self.frames.get(c["view"], ({}, b""))[0]
+        pts = [(float(x), float(y)) for x, y in c["points"]]
+        st = self._stroke
+        if st is None or st["id"] != c["stroke"]:
+            st = self._new_stroke(c, meta, pts[0])
+            if st is None:
+                return
+        pts = [(x - st["dx"], y - st["dy"]) for x, y in pts]  # cells of the magnet
+        code, imports = self._paint_code(st, pts)
+        env = {**self.ns, "np": np, **st["env"]}
+        exec(compile(code, "<paint>", "exec"), env)  # the same code as recorded
+        self._record_run()
+        if st["entry"] is not None and st["entry"] == len(self.script) - 1:
+            st["points"] += pts  # the stroke goes on: one piece of Python
+            self.script[st["entry"]] = self._paint_code(st, st["points"])[0]
+        else:
+            if st["entry"] is not None:  # the run went on during the stroke
+                self._paint_undo = None  # its m from before the run: no undo
+            st["points"] = pts
+            self.record(code, imports)
+            st["entry"] = len(self.script) - 1
+        if self._paint_undo is not None:
+            self._paint_undo["entry"] = st["entry"]
+        self._dirty = True
+        self._live_sample()
+
+    def _new_stroke(self, c, meta, first):
+        """Find the magnet under the first point and remember how to undo."""
+        dx = dy = dz = 0
+        name = self.sel
+        boxes = meta.get("boxes")
+        if boxes:  # "show all magnets": the magnet the stroke starts on
+            x, y = first
+            b = next(
+                (
+                    b
+                    for b in boxes
+                    if b["x0"] <= x < b["x0"] + b["nx"]
+                    and b["y0"] <= y < b["y0"] + b["ny"]
+                ),
+                None,
+            )
+            if b is None:
+                return None
+            name, dx, dy, dz = b["name"], b["x0"], b["y0"], b["z0"]
+        obj = self.targets.get(name)
+        if obj is None or not isinstance(
+            getattr(type(obj), "magnetization", None), property
+        ):
+            raise ValueError(f"{name} has no magnetization to paint (a sublattice has)")
+        nz = int(obj.grid.size[2])
+        layer = None if c.get("all") else int(c.get("layer", 0)) - dz
+        if layer is not None and not 0 <= layer < nz:
+            return None
+        st = {
+            "id": c["stroke"],
+            "name": name,
+            "ref": self._ref(name),
+            "dx": dx,
+            "dy": dy,
+            "layer": layer,
+            "radius": max(float(self._eval(c.get("radius", 1))), 0.5),
+            "tool": c.get("tool", "brush"),
+            "points": [],
+            "entry": None,
+            "env": {},
+        }
+        if st["tool"] == "place":
+            import mumaxplus.util as U
+
+            fn = getattr(U, str(c["config"]))
+            st["config"], st["env"] = fn.__name__, {fn.__name__: fn}
+            st["args"] = str(c.get("args", "")).strip().strip("()").strip()
+            st["origin"], st["cell"] = tuple(obj.origin), self._cell_size()
+        else:
+            st["value"] = self._vec(c["value"], 3)
+        self._record_run()
+        self._paint_undo = {
+            "name": name,
+            "m": np.array(obj.magnetization.eval()),
+            "entry": None,
+        }
+        self._stroke = st
+        what = st.get("config") or str(st.get("value"))
+        self.say(f"paint {what} on {st['ref']}, radius {st['radius']:g} cells")
+        return st
+
+    def _cell_size(self):
+        return tuple(float(v) for v in self.world.cellsize)
+
+    def _paint_code(self, st, pts):
+        """Python that paints ``pts`` of stroke ``st``, and the imports it needs."""
+        ref, r2 = st["ref"], st["radius"] ** 2
+        z = ":" if st["layer"] is None else f"{st['layer']}:{st['layer'] + 1}"
+        lines = [f"_m = {ref}.magnetization.eval()"]
+        imports = ["import numpy as np"]
+        if st["tool"] == "place":  # the configuration centred on the point
+            (x, y), o, c = pts[-1], st["origin"], st["cell"]
+            pos = (o[0] + (x - 0.5) * c[0], o[1] + (y - 0.5) * c[1], o[2])
+            args = ", ".join(f"{v:.6g}" for v in pos) + ")"
+            args = f"({args}" + (f", {st['args']}" if st["args"] else "")
+            lines.append(f"{ref}.magnetization = {st['config']}({args})")
+            lines.append(f"_new = {ref}.magnetization.eval()")
+            if self.ns.get(st["config"]) is not st["env"][st["config"]]:
+                imports.append(f"from mumaxplus.util import {st['config']}")
+            centres, value = [pts[-1]], f"_new[:, {z}, _on]"
+        else:
+            centres, value = pts, f"np.reshape({st['value']!r}, (3, 1, 1))"
+        lines += [
+            "_y, _x = np.mgrid[: _m.shape[2], : _m.shape[3]] + 0.5  # cell centres",
+            "_on = np.zeros(_m.shape[2:], bool)",
+        ]
+        if len(centres) == 1:
+            ((x, y),) = centres
+            lines.append(
+                f"_on |= (_x - {x:.4g}) ** 2 + (_y - {y:.4g}) ** 2 <= {r2:.4g}"
+            )
+        else:
+            cs = ", ".join(f"({x:.4g}, {y:.4g})" for x, y in centres)
+            lines.append(f"for _cx, _cy in [{cs}]:")
+            lines.append(f"    _on |= (_x - _cx) ** 2 + (_y - _cy) ** 2 <= {r2:.4g}")
+        lines += [f"_m[:, {z}, _on] = {value}", f"{ref}.magnetization = _m"]
+        return "\n".join(lines), imports
+
+    def _undo_paint(self):
+        """Undo the last paint stroke, if nothing changed the state since."""
+        u = self._paint_undo
+        self._record_run()
+        if u is None or u["entry"] is None or u["entry"] != len(self.script) - 1:
+            self._paint_undo = None
+            raise ValueError("nothing to undo: the state changed since the last stroke")
+        setattr(self.targets[u["name"]], "magnetization", u["m"])
+        del self.script[u["entry"]]
+        self._paint_undo = self._stroke = None
+        self.say("undid the last paint stroke")
+        self._dirty = True
+        self._live_sample()
 
     def _table_autosave(self, period):
         period = float(period)

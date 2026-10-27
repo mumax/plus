@@ -132,6 +132,13 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <div class="row">Save: <button class="savePng" title="Download the image as shown here, with its arrows">PNG</button><button class="saveOvf" title="Save the quantity of the selected magnet as an OVF file, in the folder the script runs in (save_ovf)">OVF</button>
     <span title="Save the quantity as OVF now and every this many seconds of simulation time while running (mumax3: AutoSave). 0 = off">AutoSave: <input type="text" class="autosave" size="7"> s</span></div>
   <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
+  <div class="row" title="Paint the magnetization of the magnet under the image: drag with the brush, or click to place a vortex, skyrmion, ... (recorded in Copy as Python)">Paint:
+    <select class="paintTool"><option value="">off</option><option value="brush">brush m</option><option value="place">place</option></select>
+    <span class="brushOpts" hidden>m = <input type="text" class="paintValue" value="(0, 0, 1)" size="9" title="the direction to paint"></span>
+    <span class="placeOpts" hidden><select class="placeConfig"></select> <input type="text" class="placeArgs" size="12" title="its arguments after the position (which is where you click)"></span>
+    <span class="paintOpts" hidden>radius <input type="text" class="paintRadius" value="3" size="3"> cells
+      <label title="Paint through all layers, or only the shown one"><input type="checkbox" class="paintAll" checked> all layers</label>
+      <button class="paintUndo" title="Undo the last stroke (possible until something else changes the state)">Undo</button></span></div>
   <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="overlay" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
   <div class="hover">&nbsp;</div>
   <div class="profile" hidden>
@@ -472,14 +479,24 @@ function makeView(id) {
   q("profOn").onchange = (e) => profileOn(V, e.target.checked);
   q("profCsv").onclick = () => profileCsv(V);
   q("profPng").onclick = () => q("profcv").toBlob((b) => b && download(`${stem()}_${V.frame ? V.frame.meta.quant : "profile"}_profile.png`, b), "image/png");
+  q("paintTool").onchange = (e) => paintTool(V, e.target.value);
+  q("placeConfig").onchange = () => { const c = P.configs.find((x) => x.name === q("placeConfig").value); if (c) q("placeArgs").value = c.place; };
+  q("paintUndo").onclick = () => send({ cmd: "paint_undo" });
   const disp = q("disp");
-  // line profile: drag on the image draws the line (a click still selects a magnet in "show all")
+  // painting: drag paints (or a click places); line profile: drag draws the line. A click still selects a magnet in "show all"
   disp.onpointerdown = (e) => {
+    if (V.paintTool && V.frame && e.button === 0) { paintStart(V, e); disp.setPointerCapture(e.pointerId); return; }
     if (!V.profOn || !V.frame || e.button !== 0) return;
     V.pdrag = { a: cellAt(V, e), x: e.clientX, y: e.clientY, moved: false }; disp.setPointerCapture(e.pointerId);
   };
-  disp.onpointerup = () => { if (V.pdrag) setTimeout(() => (V.pdrag = null)); }; // after the click event
+  disp.onpointerup = () => { if (V.stroke) { V.stroke.done = true; paintFlush(V); } if (V.pdrag) setTimeout(() => (V.pdrag = null)); }; // after the click event
   disp.onmousemove = (e) => {
+    if (V.paintTool && V.frame) { // brush outline, and the stroke
+      V.paintMouse = cellAt(V, e); if (V.stroke) paintMove(V, V.paintMouse);
+      drawOverlay(V);
+      const r = disp.getBoundingClientRect(); V.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }; updateLoupe(V);
+      return;
+    }
     const pd = V.pdrag;
     if (pd && (pd.moved || Math.hypot(e.clientX - pd.x, e.clientY - pd.y) > 4)) {
       pd.moved = true; V.prof = { a: pd.a, b: cellAt(V, e) }; V.mouse = null; q("loupe").style.display = "none";
@@ -488,13 +505,13 @@ function makeView(id) {
     const r = disp.getBoundingClientRect(); V.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }; updateLoupe(V);
   };
   disp.onclick = (e) => {
-    if (V.pdrag && V.pdrag.moved) return;
+    if (V.paintTool || (V.pdrag && V.pdrag.moved)) return;
     if (!V.frame || !V.frame.meta.boxes) return;
     const { meta } = V.frame, r = disp.getBoundingClientRect();
     const b = boxAt(meta, Math.floor((e.clientX - r.left) / r.width * meta.w), Math.floor((1 - (e.clientY - r.top) / r.height) * meta.h));
     if (b && b.name !== T.sel) send({ cmd: "select", target: b.name });
   };
-  disp.onmouseleave = () => { V.mouse = null; q("loupe").style.display = "none"; q("hover").innerHTML = "&nbsp;"; };
+  disp.onmouseleave = () => { V.mouse = V.paintMouse = null; q("loupe").style.display = "none"; q("hover").innerHTML = "&nbsp;"; drawOverlay(V); };
   $("views").appendChild(el); views.set(id, V); panelObserver.observe(el);
   return V;
 }
@@ -509,6 +526,7 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     const V = views.get(c.id) || makeView(c.id), { q } = V;
     const box = $("views"); if (box.children[i] !== V.el) box.insertBefore(V.el, box.children[i] || null); // keep the simulation's order
     q("vname").textContent = "Display " + (i + 1);
+    q("paintUndo").disabled = !T.paint_undo;
     if (!t) return;
     // the display settings may also change from the console
     if (V.qkey !== qkey || (document.activeElement !== q("renderQuant") && q("renderQuant").value !== c.quant)) { V.qkey = qkey; fillQuantities(V); }
@@ -637,9 +655,52 @@ function drawArrows(V, ctx, f, w, h) {
   ctx.fill(); // one fill for all arrows
 }
 
+/* ---------- painting on a display: brush m, or place a vortex / skyrmion / ... at a point ----------
+   A stroke's points (in cells of the shown image) go to the simulation as they come, one request at a time */
+let strokeIds = 0;
+function paintTool(V, tool) {
+  const q = V.q, old = V.paintTool || "";
+  V.paintRadius = V.paintRadius || { brush: "3", place: "10" }; // each tool keeps its own radius
+  if (old) V.paintRadius[old] = q("paintRadius").value;
+  if (tool) q("paintRadius").value = V.paintRadius[tool];
+  if (tool && V.profOn) profileOn(V, false);
+  V.paintTool = tool; q("paintTool").value = tool; updateLoupe(V);
+  q("brushOpts").hidden = tool !== "brush"; q("placeOpts").hidden = tool !== "place"; q("paintOpts").hidden = !tool;
+  if (tool === "place") {
+    const sel = q("placeConfig"), keep = sel.value, cs = P.configs.filter((c) => c.place !== undefined);
+    sel.innerHTML = cs.map((c) => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join("");
+    if (cs.some((c) => c.name === keep)) sel.value = keep; else sel.onchange();
+  }
+  q("disp").style.cursor = tool ? "none" : ""; // the brush outline is the cursor
+  drawOverlay(V);
+}
+function paintStart(V, e) {
+  const p = cellAt(V, e);
+  V.stroke = { id: ++strokeIds, pending: [p], last: p, busy: false, done: V.paintTool === "place" };
+  paintFlush(V);
+}
+function paintMove(V, p) {
+  const s = V.stroke, step = Math.max(0.5, parseFloat(V.q("paintRadius").value) / 2 || 0.5);
+  const d = Math.hypot(p.x - s.last.x, p.y - s.last.y);
+  if (V.paintTool !== "brush" || d < step) return;
+  const a = s.last, k = Math.ceil(d / step); // points along a fast move too, so the stroke has no gaps
+  for (let i = 1; i <= k; i++) s.pending.push({ x: a.x + ((p.x - a.x) * i) / k, y: a.y + ((p.y - a.y) * i) / k });
+  s.last = p; paintFlush(V);
+}
+function paintFlush(V) {
+  const s = V.stroke, q = V.q;
+  if (!s || s.busy) return;
+  if (!s.pending.length) { if (s.done) V.stroke = null; return; }
+  const pts = s.pending.map((p) => [p.x, p.y]); s.pending = []; s.busy = true;
+  send({ cmd: "paint", view: V.id, stroke: s.id, tool: V.paintTool, points: pts, layer: V.frame.meta.layer, all: q("paintAll").checked,
+         radius: q("paintRadius").value, value: q("paintValue").value, config: q("placeConfig").value, args: q("placeArgs").value })
+    .then((r) => { s.busy = false; if (r.ok === false) { if (V.stroke === s) V.stroke = null; return; } paintFlush(V); }); // an error ends the stroke
+}
+
 /* ---------- line profiles: the shown quantity along a line dragged across a display ----------
    V.prof = the line's ends, in cells of the shown image (x right, y up, floats) */
 function profileOn(V, on) {
+  if (on && V.paintTool) paintTool(V, "");
   V.profOn = on; V.prof = null; V.profK = -1;
   V.q("profile").hidden = !on; V.q("profOn").checked = on;
   drawOverlay(V); updateProfile(V);
@@ -683,9 +744,20 @@ function drawOverlay(V) {
   Object.assign(ov.style, { left: cv.offsetLeft + "px", top: cv.offsetTop + "px", width: cv.style.width, height: cv.style.height });
   ov.width = cv.width; ov.height = cv.height;
   const ctx = ov.getContext("2d"); ctx.clearRect(0, 0, ov.width, ov.height);
-  if (!V.prof || !V.frame) return;
+  if (!V.frame) return;
   const { meta } = V.frame, sx = ov.width / meta.w, sy = ov.height / meta.h, dpr = window.devicePixelRatio || 1;
-  const P = (p) => [p.x * sx, (meta.h - p.y) * sy], [ax, ay] = P(V.prof.a), [bx, by] = P(V.prof.b);
+  const P = (p) => [p.x * sx, (meta.h - p.y) * sy];
+  const pm = V.paintMouse, rad = parseFloat(V.q("paintRadius").value);
+  if (V.paintTool && pm && rad > 0) { // the brush: the cells within the radius get painted
+    const [x, y] = P(pm);
+    for (const [color, dash] of [["rgba(0,0,0,0.7)", []], ["#fff", [4 * dpr, 4 * dpr]]]) {
+      ctx.strokeStyle = color; ctx.lineWidth = 1.5 * dpr; ctx.setLineDash(dash);
+      ctx.beginPath(); ctx.ellipse(x, y, rad * sx, rad * sy, 0, 0, 2 * Math.PI); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+  if (!V.prof) return;
+  const [ax, ay] = P(V.prof.a), [bx, by] = P(V.prof.b);
   ctx.lineCap = "round";
   for (const [color, wd] of [["rgba(0,0,0,0.6)", 4], ["#fff", 2]]) { ctx.strokeStyle = color; ctx.lineWidth = wd * dpr; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); }
   const dot = (x, y, r, fill) => { ctx.beginPath(); ctx.arc(x, y, r * dpr, 0, 2 * Math.PI); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = "rgba(0,0,0,0.7)"; ctx.stroke(); };
@@ -710,7 +782,7 @@ function updateLoupe(V) {
   lp.width = 150 * dpr; lp.height = 150 * dpr;
   const c = lp.getContext("2d"); c.imageSmoothingEnabled = false;
   c.drawImage(cv, (mouse.x - src / 2) * dpr, (mouse.y - src / 2) * dpr, src * dpr, src * dpr, 0, 0, lp.width, lp.height);
-  lp.style.display = "block";
+  lp.style.display = V.paintTool ? "none" : "block"; // painting: the brush outline is enough in the way
   const pad = 10;
   lp.style.left = pad + mouse.x + "px"; lp.style.top = pad + mouse.y + "px"; // top-left corner at the cursor
   const { meta, data } = V.frame, ix = Math.min(meta.w - 1, Math.floor(mouse.x / mouse.w * meta.w)), iy = Math.min(meta.h - 1, Math.floor((1 - mouse.y / mouse.h) * meta.h)), N = meta.w * meta.h;
