@@ -5,6 +5,7 @@ from __future__ import annotations
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
 import json
+import os
 import secrets
 import threading
 from urllib.parse import parse_qs, urlparse
@@ -75,6 +76,18 @@ def _make_handler(ctrl: Controller, token: str):
                 since = int(arg("since", "0"))
                 with ctrl.lock:
                     return self._json([m for m in ctrl.log if m["id"] > since])
+            if url.path == "/api/file":  # a movie made by the GUI
+                name = arg("name")
+                with ctrl.lock:
+                    ok = name in ctrl.outputs
+                if not ok:
+                    return self._send(404, b"not found", "text/plain")
+                with open(name, "rb") as f:
+                    body = f.read()
+                kind = {".gif": "image/gif", ".mp4": "video/mp4"}.get(
+                    os.path.splitext(name)[1], "application/octet-stream"
+                )
+                return self._send(200, body, kind)
             if url.path == "/api/table.txt":  # the table rows in memory
                 with ctrl.lock:
                     text = ctrl.table.text()

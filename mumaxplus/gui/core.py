@@ -22,7 +22,9 @@ import os
 from pathlib import Path
 import queue
 import re
+import shutil
 import sys
+import tempfile
 import threading
 import time
 import traceback
@@ -77,6 +79,8 @@ NO_RESET = {
     "log_only",
     "paint",
     "excite_preview",
+    "movie_start",
+    "movie_stop",
     "view_add",
     "view_remove",
     "plot_add",
@@ -308,6 +312,9 @@ class Controller:
         self._script_imports = []
         self._rec_t = self._rec_n = None  # time / step of the unrecorded part of a run
 
+        # files the page may download (movies made here)
+        self.outputs = set()
+
         # excitations added in the page (time terms of parameters), see _excite
         self.excitations = []
         self._next_excitation = 1
@@ -489,11 +496,19 @@ class Controller:
         frame = self.frames.get(cfg["id"])
         state = {k: v for k, v in cfg.items() if not k.startswith("_")}
         state["frame_id"] = frame[0]["id"] if frame else -1
+        mv = cfg.get("_movie")
+        state["movie"] = mv and {"frames": mv["n"], "period": mv["period"]}
         return state
 
     # --------------------------------------------------------------- introspection
     def _inspect(self, name, obj):
-        info = {"quantities": [], "params": [], "switches": [], "doc": ""}
+        info = {
+            "quantities": [],
+            "params": [],
+            "switches": [],
+            "paintable": [],
+            "doc": "",
+        }
         cls = type(obj)
         for pname in sorted(dir(cls), key=str.lower):
             if pname.startswith("_"):
@@ -525,6 +540,9 @@ class Controller:
                             "doc": doc,
                         }
                     )
+                    info["paintable"].append(
+                        {"name": pname, "ncomp": int(val.ncomp), "unit": val.unit}
+                    )
                 elif "FieldQuantity" in m or "Variable" in m:
                     info["quantities"].append(
                         {
@@ -534,6 +552,10 @@ class Controller:
                             "doc": doc,
                         }
                     )
+                    if "Variable" in m and prop.fset is not None:  # m, elastic fields
+                        info["paintable"].append(
+                            {"name": pname, "ncomp": int(val.ncomp), "unit": val.unit}
+                        )
                 elif isinstance(val, bool) and prop.fset is not None:
                     info["switches"].append(
                         {"name": pname, "kind": "bool", "value": val, "doc": doc}
@@ -706,6 +728,7 @@ class Controller:
             "solver": solver,
             "methods": SOLVER_METHODS,
             "configs": self._config_info(),
+            "ffmpeg": shutil.which("ffmpeg") is not None,  # MP4 movies
             "table_columns": self.table.names(),
         }
         with self.lock:
@@ -1120,7 +1143,18 @@ class Controller:
             self._dirty = True
         elif name == "view_add":
             return {"ok": True, "view": self.add_view()}
+        elif name in ("movie_start", "movie_stop"):
+            cfg = self._view(c["view"])
+            if cfg is None:
+                raise ValueError(f"no display {c['view']!r}")
+            if name == "movie_start":
+                self._movie_start(cfg, c)
+            else:
+                return {"ok": True, "file": self._movie_stop(cfg)}
         elif name == "view_remove":
+            cfg = self._view(c["view"])
+            if len(self.views) > 1 and cfg is not None and cfg.get("_movie"):
+                self._movie_stop(cfg)  # keep what was recorded
             if len(self.views) > 1:
                 self.views = [v for v in self.views if v["id"] != c["view"]]
                 with self.lock:
@@ -1501,11 +1535,12 @@ class Controller:
 
     # ------------------------------------------------------------------- painting
     def _paint(self, c):
-        """Paint on the magnetization of the magnet under a display's image.
+        """Paint on a field of the magnet under a display's image.
 
         ``c["points"]`` are positions in cells of the display's image (x right, y
-        up; cell i spans [i, i + 1)). The "brush" tool sets m to ``c["value"]`` within
-        ``c["radius"]`` cells of the points; "place" puts the configuration
+        up; cell i spans [i, i + 1)). The "brush" tool sets the quantity
+        ``c["quant"]`` (m, or any parameter or variable) to ``c["value"]`` within
+        ``c["radius"]`` cells of the points; "place" puts the m configuration
         ``c["config"]`` (vortex, skyrmion, ...) centred on the point, within the
         radius. Points with the same ``c["stroke"]`` make one stroke: one recorded
         piece of Python, and one undo.
@@ -1557,10 +1592,28 @@ class Controller:
                 return None
             name, dx, dy, dz = b["name"], b["x0"], b["y0"], b["z0"]
         obj = self.targets.get(name)
-        if obj is None or not isinstance(
-            getattr(type(obj), "magnetization", None), property
-        ):
-            raise ValueError(f"{name} has no magnetization to paint (a sublattice has)")
+        tool = c.get("tool", "brush")
+        quant = (
+            "magnetization"
+            if tool == "place"
+            else str(c.get("quant") or "magnetization")
+        )
+        prop = getattr(type(obj), quant, None)
+        if not isinstance(prop, property) or prop.fset is None:
+            if quant == "magnetization":
+                raise ValueError(
+                    f"{name} has no magnetization to paint (a sublattice has)"
+                )
+            raise ValueError(f"{name} has no {quant} to paint")
+        field = getattr(obj, quant)
+        m = _mro(field)
+        if not ("Variable" in m or ("Parameter" in m and "InterParameter" not in m)):
+            raise ValueError(f"{quant} of {name} can not be painted")
+        if "Parameter" in m and field.is_dynamic:  # set() would remove its time terms
+            raise ValueError(
+                f"{quant} of {name} has time terms, which painting would remove;"
+                " remove them first, or paint before adding them"
+            )
         nz = int(obj.grid.size[2])
         layer = None if c.get("all") else int(c.get("layer", 0)) - dz
         if layer is not None and not 0 <= layer < nz:
@@ -1569,11 +1622,13 @@ class Controller:
             "id": c["stroke"],
             "name": name,
             "ref": self._ref(name),
+            "quant": quant,
+            "ncomp": int(field.ncomp),
             "dx": dx,
             "dy": dy,
             "layer": layer,
             "radius": max(float(self._eval(c.get("radius", 1))), 0.5),
-            "tool": c.get("tool", "brush"),
+            "tool": tool,
             "points": [],
             "entry": None,
             "env": {},
@@ -1586,15 +1641,16 @@ class Controller:
             st["args"] = str(c.get("args", "")).strip().strip("()").strip()
             st["origin"], st["cell"] = tuple(obj.origin), self._cell_size()
         else:
-            st["value"] = self._vec(c["value"], 3)
+            st["value"] = self._vec(c["value"], st["ncomp"])
         self._record_run()
         self._paint_undo = {
             "name": name,
-            "m": np.array(obj.magnetization.eval()),
+            "quant": quant,
+            "old": np.array(field.eval()),
             "entry": None,
         }
         self._stroke = st
-        what = st.get("config") or str(st.get("value"))
+        what = st.get("config") or f"{quant} = {st['value']!r}"
         self.say(f"paint {what} on {st['ref']}, radius {st['radius']:g} cells")
         return st
 
@@ -1605,7 +1661,8 @@ class Controller:
         """Python that paints ``pts`` of stroke ``st``, and the imports it needs."""
         ref, r2 = st["ref"], st["radius"] ** 2
         z = ":" if st["layer"] is None else f"{st['layer']}:{st['layer'] + 1}"
-        lines = [f"_m = {ref}.magnetization.eval()"]
+        field = f"{ref}.{st['quant']}"
+        lines = [f"_m = {field}.eval()"]
         imports = ["import numpy as np"]
         if st["tool"] == "place":  # the configuration centred on the point
             (x, y), o, c = pts[-1], st["origin"], st["cell"]
@@ -1618,7 +1675,7 @@ class Controller:
                 imports.append(f"from mumaxplus.util import {st['config']}")
             centres, value = [pts[-1]], f"_new[:, {z}, _on]"
         else:
-            centres, value = pts, f"np.reshape({st['value']!r}, (3, 1, 1))"
+            centres, value = pts, f"np.reshape({st['value']!r}, ({st['ncomp']}, 1, 1))"
         lines += [
             "_y, _x = np.mgrid[: _m.shape[2], : _m.shape[3]] + 0.5  # cell centres",
             "_on = np.zeros(_m.shape[2:], bool)",
@@ -1632,7 +1689,7 @@ class Controller:
             cs = ", ".join(f"({x:.4g}, {y:.4g})" for x, y in centres)
             lines.append(f"for _cx, _cy in [{cs}]:")
             lines.append(f"    _on |= (_x - _cx) ** 2 + (_y - _cy) ** 2 <= {r2:.4g}")
-        lines += [f"_m[:, {z}, _on] = {value}", f"{ref}.magnetization = _m"]
+        lines += [f"_m[:, {z}, _on] = {value}", f"{field} = _m"]
         return "\n".join(lines), imports
 
     def _undo_paint(self):
@@ -1642,12 +1699,116 @@ class Controller:
         if u is None or u["entry"] is None or u["entry"] != len(self.script) - 1:
             self._paint_undo = None
             raise ValueError("nothing to undo: the state changed since the last stroke")
-        setattr(self.targets[u["name"]], "magnetization", u["m"])
+        setattr(self.targets[u["name"]], u["quant"], u["old"])
         del self.script[u["entry"]]
         self._paint_undo = self._stroke = None
         self.say("undid the last paint stroke")
         self._dirty = True
         self._live_sample()
+
+    # --------------------------------------------------------------------- movies
+    def _movie_start(self, cfg, c):
+        """Record a movie of a display: a frame every ``period`` s of simulation time.
+
+        Frames are drawn here (plots.movie_frame) and kept as PNG files until
+        _movie_stop makes the movie, so it records with or without the page.
+        """
+        if cfg.get("_movie"):
+            raise ValueError("this display is already recording")
+        period, fps = float(self._eval(c["period"])), float(
+            self._eval(c.get("fps", 10))
+        )
+        fmt = c.get("format", "gif")
+        if period <= 0 or fps <= 0:
+            raise ValueError("the period and the frame rate must be positive")
+        if fmt not in ("gif", "mp4", "png"):
+            raise ValueError(f"unknown movie format {fmt!r}")
+        if fmt == "mp4" and not shutil.which("ffmpeg"):
+            raise ValueError("MP4 needs ffmpeg, which is not installed: use GIF")
+        base = cfg["quant"] + (f"_{cfg['comp']}" if cfg["comp"] != "" else "")
+        out = next(
+            Path(f"{base}_movie_{i:03d}{'' if fmt == 'png' else '.' + fmt}").resolve()
+            for i in range(1000)
+            if not Path(f"{base}_movie_{i:03d}.{fmt}").exists()
+            and not Path(f"{base}_movie_{i:03d}").exists()
+        )
+        if fmt == "png":  # the frames are the result
+            out.mkdir()
+            folder = out
+        else:
+            folder = Path(tempfile.mkdtemp(prefix="mumaxplus_movie_"))
+        cfg["_movie"] = {
+            "period": period,
+            "fps": fps,
+            "format": fmt,
+            "arrows": int(c.get("arrows", 8)),
+            "folder": folder,
+            "out": out,
+            "n": 0,
+            "next": None,
+        }
+        self.say(f"recording {base}: a frame every {period:g} s, into {out}")
+        self._movie_tick()  # the first frame: now
+
+    def _movie_tick(self):
+        """Add a frame to the movies that are due (at the step nearest their time)."""
+        t, dt = float(self._ts().time), float(self._ts().timestep or 0.0)
+        for cfg in self.views:
+            mv = cfg.get("_movie")
+            if not mv:
+                continue
+            tol = 0.5 * min(dt, mv["period"])  # t has rounding errors
+            if mv["next"] is not None and t < mv["next"] - tol:
+                continue
+            try:
+                self._movie_frame(cfg, mv)
+            except Exception as e:  # stop recording, keep what was recorded
+                self.say(f"movie of {cfg['quant']}: {type(e).__name__}: {e}", "err")
+                self._movie_stop(cfg)
+                continue
+            due = t if mv["next"] is None else mv["next"]
+            while due <= t + tol:
+                due += mv["period"]
+            mv["next"] = due
+
+    def _movie_frame(self, cfg, mv):
+        from .plots import movie_frame
+
+        self._render_view(cfg)  # the display as it is now
+        with self.lock:
+            meta, buf = self.frames[cfg["id"]]
+        n = meta["ncomp"] * meta["w"] * meta["h"]
+        data = np.frombuffer(buf[: 4 * n], "<f4").reshape(
+            meta["ncomp"], meta["h"], meta["w"]
+        )
+        rgba = np.frombuffer(buf[4 * n :], np.uint8) if meta["vector"] else None
+        img = movie_frame(meta, data, rgba, mv["arrows"])
+        img.save(mv["folder"] / f"{mv['n']:06d}.png")
+        mv["n"] += 1
+
+    def _movie_stop(self, cfg):
+        """Stop recording and make the movie; return its file (or folder)."""
+        from .plots import write_movie
+
+        mv = cfg.pop("_movie", None)
+        if mv is None:
+            raise ValueError("this display is not recording")
+        if mv["format"] == "png":
+            self.say(f"saved {mv['n']} frames in {mv['out']}")
+            return str(mv["out"])
+        try:
+            if mv["n"] == 0:
+                raise ValueError("no frames were recorded")
+            self.busy = "making the movie"
+            self._publish()
+            frames = sorted(mv["folder"].glob("*.png"))
+            write_movie(frames, mv["out"], mv["fps"], mv["format"])
+        finally:
+            self.busy = ""
+            shutil.rmtree(mv["folder"], ignore_errors=True)
+        self.outputs.add(str(mv["out"]))
+        self.say(f"saved {mv['out']} ({mv['n']} frames at {mv['fps']:g} fps)")
+        return str(mv["out"])
 
     def _table_autosave(self, period):
         period = float(period)
@@ -1787,6 +1948,7 @@ class Controller:
                 self.run_until,
                 self.table.next_save if self.table.period > 0 else None,
                 *(v["_next_save"] for v in self.views if v["autosave"] > 0),
+                *(v["_movie"]["next"] for v in self.views if v.get("_movie")),
             )
             if x is not None
         ]
@@ -1812,6 +1974,7 @@ class Controller:
             self.steps_left -= n
         self._table_tick()
         self._autosave_tick()
+        self._movie_tick()
         # progress and end of run, like mumax3's Run/Steps
         if self.run_until is not None:
             total = self.run_until - self._run_t0
