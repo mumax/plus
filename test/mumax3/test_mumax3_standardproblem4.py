@@ -162,7 +162,7 @@ class TestStandardProblem4:
 
     def test_demag_energy(self, simulations):
         mumaxplusoutput, mumax3sim = simulations
-        # semirelative: E_demag is probably always positive, but sometimes too close to 0
+        # semirelative: E_demag is probably always positive, sometimes too close to 0
         err = max_semirelative_error(
             result=mumaxplusoutput["E_demag"], wanted=mumax3sim.get_column("E_demag")
         )

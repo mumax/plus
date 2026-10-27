@@ -59,8 +59,7 @@ class TestBoundaryTraction3DGeom:
             # 4/3 from stencil; 1/cellsize from derivative
             num_force[c, ...] = (1 / self.world.cellsize[orientation]
                                  * 4.0 / 3.0
-                                 * boundaries * self.traction[c, ...]
-            )  # fmt: skip
+                                 * boundaries * self.traction[c, ...])  # fmt: skip
 
         return num_force
 

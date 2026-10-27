@@ -34,7 +34,8 @@ def magnetic_moment_precession(time, initial_magnetization, hfield_z, damping):
 
 
 def single_system(method, dt):
-    """This function simulates a single spin in a magnetic field of 0.1 T without damping.
+    """This function simulates a single spin in a magnetic field of 0.1 T without
+    damping.
 
     Returns the absolute error between the simulation and the exact solution.
 
@@ -84,7 +85,7 @@ def run_with_precision(precision: Literal["SINGLE", "DOUBLE"]):
         try: import mumaxplus
         except ModuleNotFoundError: exit()
         from {Path(__file__).stem} import single_system
-        
+
         assert mumaxplus._cpp.FP_PRECISION == {FP_PRECISION_CPP}
         assert mumaxplus.FP_PRECISION == "{precision}"
         assert single_system("DormandPrince", 1.1e-11) {PREC_TEST}

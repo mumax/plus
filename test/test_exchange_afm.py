@@ -37,10 +37,10 @@ def compute_fm_exchange_numpy(magnet):
 
 
 def compute_homo_exchange_numpy(magnet, sub):
-    l = magnet.latcon.average()[0]
+    latcon = magnet.latcon.average()[0]
     a = magnet.afmex_cell.average()[0]
     m2 = sub.magnetization.get()
-    return np.full(m2.shape, 4 * a * m2 / (l * l * sub.msat.average()[0]))
+    return np.full(m2.shape, 4 * a * m2 / (latcon * latcon * sub.msat.average()[0]))
 
 
 def compute_inhomo_exchange_numpy(magnet, sub):
@@ -167,7 +167,7 @@ class TestAfmExchange:
         ]
         assert max(error) < 1e-2
 
-    def test_exchange_spiral(self):
+    def test_exchange_spiral2(self):
         """This test compares numerical and analytical exchange energy for
         magnetizations as a function of the angle between spins at a
         single simulation cell.
@@ -177,7 +177,7 @@ class TestAfmExchange:
         msat = 800e3
         afmex_nn = -15e-12
         afmex_cell = -100e-12
-        l = 0.35e-9  # Default lattice constant
+        lc = 0.35e-9  # Default lattice constant
 
         length, width, thickness = 100e-6, 1e-9, 1e-9
         nx, ny, nz = int(length / 1e-9), 1, 1
@@ -206,7 +206,7 @@ class TestAfmExchange:
             E_inhomo_mumax.append(
                 magnet.sub1.inhomogeneous_exchange_energy() / (Km(msat) * V)
             )
-            E_homo_theory.append(2 * afmex_cell * np.cos(phi) / (l * l * Km(msat)))
+            E_homo_theory.append(2 * afmex_cell * np.cos(phi) / (lc * lc * Km(msat)))
             E_inhomo_theory.append(-0.5 * afmex_nn * kx * kx * np.cos(phi) / Km(msat))
 
             phi += np.pi / 180

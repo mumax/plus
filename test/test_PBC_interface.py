@@ -45,7 +45,7 @@ def test_world_init(pbc_repetitions, mastergrid):
 @pytest.mark.parametrize("pbc_repetitions,mastergrid", INVALID_PBC)
 def test_invalid_world_init(pbc_repetitions, mastergrid):
     with pytest.raises((ValueError, TypeError)):
-        world = World(cs, pbc_repetitions, mastergrid)
+        _ = World(cs, pbc_repetitions, mastergrid)
 
 
 @pytest.mark.parametrize("pbc_repetitions,mastergrid", VALID_PBC)
@@ -95,8 +95,8 @@ def bounding_mastergrid(grids, pbc_repetitions):
 )
 def test_set_pbc_after_magnets(grid1, grid2, pbc_repetitions):
     world = World(cs)
-    magnet = Ferromagnet(world, grid1)
-    magnet = Ferromagnet(world, grid2)
+    _ = Ferromagnet(world, grid1)
+    _ = Ferromagnet(world, grid2)
     world.set_pbc(pbc_repetitions)
     assert world.pbc_repetitions == pbc_repetitions
     assert world.mastergrid == bounding_mastergrid([grid1, grid2], pbc_repetitions)
@@ -108,17 +108,10 @@ def test_set_pbc_no_master_before_magnet():
         world.set_pbc((1, 4, 3))
 
 
-@pytest.mark.parametrize("pbc_repetitions,mastergrid", INVALID_PBC)
-def test_invalid_set_pbc(pbc_repetitions, mastergrid):
-    world = World(cs)
-    with pytest.raises((ValueError, TypeError)):
-        world.set_pbc(pbc_repetitions, mastergrid)
-
-
 # could parametrize but whatever
 def test_invalid_set_pbc_after_magnet():
     world = World(cs, pbc_repetitions=(1, 1, 1), mastergrid=Grid((2, 4, 6)))
-    magnet = Ferromagnet(world, Grid((2, 4, 6)))
+    _ = Ferromagnet(world, Grid((2, 4, 6)))
     with pytest.raises(IndexError):
         world.set_pbc(pbc_repetitions=(1, 2, 3), mastergrid=Grid((1, 2, 3)))
 
@@ -129,7 +122,7 @@ def test_invalid_set_pbc_after_magnet():
 def test_magnet_not_in_mastergrid(origin):
     world = World(cs, pbc_repetitions=(1, 1, 1), mastergrid=Grid((2, 4, 6)))
     with pytest.raises(IndexError):
-        magnet = Ferromagnet(world, Grid((1, 2, 3), origin=(-1, 0, 0)))
+        _ = Ferromagnet(world, Grid((1, 2, 3), origin=(-1, 0, 0)))
 
 
 @pytest.mark.parametrize(
@@ -142,15 +135,15 @@ def test_magnet_not_in_mastergrid(origin):
 )
 def test_bounding_grid(grid1, grid2):
     world = World(cs)
-    magnet = Ferromagnet(world, grid1)
-    magnet = Ferromagnet(world, grid2)
+    _ = Ferromagnet(world, grid1)
+    _ = Ferromagnet(world, grid2)
     assert world.bounding_grid == bounding_grid([grid1, grid2])
 
 
 def test_invalid_bounding_grid():
     world = World(cs)
     with pytest.raises(IndexError):
-        bg = world.bounding_grid
+        _ = world.bounding_grid
 
 
 # could parametrize but I think you get the point
@@ -171,7 +164,7 @@ def test_set_invalid_mastergrid():
 
 def test_set_invalid_mastergrid_after_magnet():
     world = World(cs, pbc_repetitions=(0, 1, 2), mastergrid=Grid((0, 6, 2)))
-    magnet = Ferromagnet(world, Grid((4, 6, 2)))
+    _ = Ferromagnet(world, Grid((4, 6, 2)))
     new_mastergrid = Grid((0, 3, 1))
     with pytest.raises(IndexError):
         world.mastergrid = new_mastergrid

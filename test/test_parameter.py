@@ -21,8 +21,8 @@ def test_assign_scalar_value(test_parameters: Tuple[World, Ferromagnet]):
     ku1_value = 1e6
 
     magnet.ku1 = ku1_value
-    assert magnet.ku1.is_dynamic == False
-    assert magnet.ku1.is_uniform == True
+    assert magnet.ku1.is_dynamic is False
+    assert magnet.ku1.is_uniform is True
     assert_almost_equal(magnet.ku1.eval(), ku1_value)
 
 
@@ -34,8 +34,8 @@ def test_assign_vector_value(test_parameters: Tuple[World, Ferromagnet]):
     expected_value[2, :, :, :] = b_value[2]
 
     magnet.bias_magnetic_field = b_value
-    assert magnet.bias_magnetic_field.is_dynamic == False
-    assert magnet.bias_magnetic_field.is_uniform == True
+    assert magnet.bias_magnetic_field.is_dynamic is False
+    assert magnet.bias_magnetic_field.is_uniform is True
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value)
 
 
@@ -45,11 +45,11 @@ def test_assign_array_value(test_parameters: Tuple[World, Ferromagnet]):
     b_value = np.random.rand(3, *magnet.grid.shape)
 
     magnet.alpha = alpha_value
-    assert magnet.alpha.is_uniform == False
+    assert magnet.alpha.is_uniform is False
     assert_almost_equal(magnet.alpha.eval(), alpha_value)
 
     magnet.bias_magnetic_field = b_value
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_uniform is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), b_value)
 
 
@@ -59,12 +59,12 @@ def test_assign_scalar_time_dependent_term(test_parameters: Tuple[World, Ferroma
     term = lambda t: 24 * np.sinc(t)
 
     magnet.ku1 = term
-    assert magnet.ku1.is_dynamic == True
-    assert magnet.ku1.is_uniform == True
+    assert magnet.ku1.is_dynamic is True
+    assert magnet.ku1.is_uniform is True
     assert_almost_equal(magnet.ku1.eval(), term(world.timesolver.time))
 
     magnet.ku1.remove_time_terms()
-    assert magnet.ku1.is_dynamic == False
+    assert magnet.ku1.is_dynamic is False
     assert_almost_equal(magnet.ku1.eval(), 0)
 
 
@@ -80,15 +80,15 @@ def test_assign_scalar_time_dependent_term_mask(
     # correct mask shape
     test_mask1 = mask_value1 * np.ones(shape=(ncomp, *magnet.grid.shape))
     magnet.ku1 = (term, test_mask1)
-    assert magnet.ku1.is_dynamic == True
-    assert magnet.ku1.is_uniform == False
+    assert magnet.ku1.is_dynamic is True
+    assert magnet.ku1.is_uniform is False
     assert_almost_equal(magnet.ku1.eval(), mask_value1 * term(world.timesolver.time))
 
     # mask without components
     test_mask2 = mask_value2 * np.ones(shape=magnet.grid.shape)
     magnet.ku1 = (term, test_mask2)
-    assert magnet.ku1.is_dynamic == True
-    assert magnet.ku1.is_uniform == False
+    assert magnet.ku1.is_dynamic is True
+    assert magnet.ku1.is_uniform is False
     assert_almost_equal(magnet.ku1.eval(), mask_value2 * term(world.timesolver.time))
 
     # incorrect mask shape
@@ -109,15 +109,15 @@ def test_assign_scalar_time_dependent_term_mask_func(
     # correct mask shape
     test_mask1 = lambda x, y, z: (mask_value1)
     magnet.ku1 = (term, test_mask1)
-    assert magnet.ku1.is_dynamic == True
-    assert magnet.ku1.is_uniform == False
+    assert magnet.ku1.is_dynamic is True
+    assert magnet.ku1.is_uniform is False
     assert_almost_equal(magnet.ku1.eval(), mask_value1 * term(world.timesolver.time))
 
     # mask without components
     test_mask2 = lambda x, y, z: mask_value2
     magnet.ku1 = (term, test_mask2)
-    assert magnet.ku1.is_dynamic == True
-    assert magnet.ku1.is_uniform == False
+    assert magnet.ku1.is_dynamic is True
+    assert magnet.ku1.is_uniform is False
     assert_almost_equal(magnet.ku1.eval(), mask_value2 * term(world.timesolver.time))
 
     # incorrect mask shape
@@ -142,8 +142,8 @@ def test_add_multiple_scalar_time_dependent_terms(
         term2, mask_value2 * np.ones(shape=(ncomp, *magnet.grid.shape))
     )
 
-    assert magnet.alpha.is_dynamic == True
-    assert magnet.alpha.is_uniform == False
+    assert magnet.alpha.is_dynamic is True
+    assert magnet.alpha.is_uniform is False
     assert_almost_equal(
         magnet.alpha.eval(),
         alpha_value
@@ -151,7 +151,7 @@ def test_add_multiple_scalar_time_dependent_terms(
         + mask_value2 * term2(world.timesolver.time),
     )
     magnet.alpha.remove_time_terms()
-    assert magnet.alpha.is_dynamic == False
+    assert magnet.alpha.is_dynamic is False
     assert_almost_equal(magnet.alpha.eval(), alpha_value)
 
 
@@ -169,12 +169,12 @@ def test_assign_vector_time_dependent_term(test_parameters: Tuple[World, Ferroma
 
     magnet.bias_magnetic_field.eval()
 
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == True
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is True
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value)
 
     magnet.bias_magnetic_field.remove_time_terms()
-    assert magnet.bias_magnetic_field.is_dynamic == False
+    assert magnet.bias_magnetic_field.is_dynamic is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), 0)
 
 
@@ -197,16 +197,16 @@ def test_assign_vector_time_dependent_term_mask(
     test_mask1 = mask_value1 * np.ones(shape=(ncomp, *magnet.grid.shape))
     expected_value1 = mask_value1 * expected_value
     magnet.bias_magnetic_field = (term, test_mask1)
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value1)
 
     # correct mask without components
     test_mask2 = mask_value2 * np.ones(shape=magnet.grid.shape)
     magnet.bias_magnetic_field = (term, test_mask2)
     expected_value2 = mask_value2 * expected_value
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value2)
 
     # correct mask shape with different components
@@ -219,8 +219,8 @@ def test_assign_vector_time_dependent_term_mask(
     expected_value3[1, ...] *= mask_values3[1]
     expected_value3[2, ...] *= mask_values3[2]
     magnet.bias_magnetic_field = (term, test_mask3)
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value3)
 
     # incorrect mask shape
@@ -248,16 +248,16 @@ def test_assign_vector_time_dependent_term_mask_func(
     test_mask1 = lambda x, y, z: (mask_value1, mask_value1, mask_value1)
     expected_value1 = mask_value1 * expected_value
     magnet.bias_magnetic_field = (term, test_mask1)
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value1)
 
     # correct mask without components
     test_mask2 = lambda x, y, z: mask_value2
     magnet.bias_magnetic_field = (term, test_mask2)
     expected_value2 = mask_value2 * expected_value
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value2)
 
     # correct mask shape with different components
@@ -267,8 +267,8 @@ def test_assign_vector_time_dependent_term_mask_func(
     expected_value3[1, ...] *= mask_values3[1]
     expected_value3[2, ...] *= mask_values3[2]
     magnet.bias_magnetic_field = (term, test_mask3)
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value3)
 
     # incorrect mask shape
@@ -303,8 +303,8 @@ def test_add_multiple_vector_time_dependent_terms(
         term2, mask_value2 * np.ones(shape=(ncomp, *magnet.grid.shape))
     )
 
-    assert magnet.bias_magnetic_field.is_dynamic == True
-    assert magnet.bias_magnetic_field.is_uniform == False
+    assert magnet.bias_magnetic_field.is_dynamic is True
+    assert magnet.bias_magnetic_field.is_uniform is False
 
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value)
 
@@ -315,5 +315,5 @@ def test_add_multiple_vector_time_dependent_terms(
     expected_value2[1, :, :, :] = b_value[1]
     expected_value2[2, :, :, :] = b_value[2]
 
-    assert magnet.bias_magnetic_field.is_dynamic == False
+    assert magnet.bias_magnetic_field.is_dynamic is False
     assert_almost_equal(magnet.bias_magnetic_field.eval(), expected_value2)

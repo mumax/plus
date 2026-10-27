@@ -7,7 +7,8 @@ def expectv(result, wanted, tol):
 
 
 def test_frozenspins():
-    """Based on standard problem 4, but all spins are fixed, so there should be no dynamics."""
+    """Based on standard problem 4, but all spins are fixed, so there should be no
+    dynamics."""
 
     world = World((500e-9 / 128, 125e-9 / 32, 3e-9 / 2))
     magnet = Ferromagnet(world, Grid((128, 32, 2)))
@@ -28,7 +29,7 @@ def test_frozenspins():
 
 def test_frozenspins_inhomogeneous():
     """Frozen spins in half the geometry.
-    Compare to vectors to make sure the behaviour did not change as of writing this test.
+    Compare to vectors to make sure the behaviour did not change as of writing this.
     """
     world = World((500e-9 / 128, 125e-9 / 32, 3e-9 / 2))
     magnet = Ferromagnet(world, Grid((128, 32, 2)))

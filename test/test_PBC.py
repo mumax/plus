@@ -103,7 +103,8 @@ class TestPBC:
         assert err < RTOL
 
     def test_PBC_run_center(self):
-        """Perform the same comparison with the PBC as in mumax³ with the magnet in the center."""
+        """Perform the same comparison with the PBC as in mumax³ with the magnet in the
+        center."""
         world_PBC, magnet_PBC = simulate_PBC()
         world_PBC.timesolver.run(1e-9)
         av_mag = magnet_PBC.magnetization.average()
@@ -113,7 +114,8 @@ class TestPBC:
         assert err < RTOL
 
     def test_PBC_run_corners(self):
-        """Perform the same comparison with the PBC as in mumax³ with the magnet in the corners."""
+        """Perform the same comparison with the PBC as in mumax³ with the magnet in the
+        corners."""
         world_PBC, magnet_PBC = simulate_PBC(True)
         world_PBC.timesolver.run(1e-9)
         av_mag = magnet_PBC.magnetization.average()

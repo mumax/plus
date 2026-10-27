@@ -75,7 +75,7 @@ class TestInitialConditions:
         w, g = World((1, 1, 1)), Grid((10, 10, 10))
         geo = np.ones(g.shape)
         geo[0, 0, 0] = 0
-        magnet = Ferromagnet(w, g, geometry=geo)
+        _ = Ferromagnet(w, g, geometry=geo)
         with pytest.raises((RuntimeError)):
             w.center_domain_wall(0, 0)
 
@@ -83,14 +83,14 @@ class TestInitialConditions:
         w, g = World((1, 1, 1)), Grid((10, 10, 10))
         reg = np.zeros(g.shape)
         reg[0, 0, 0] = 1
-        magnet = Ferromagnet(w, g, regions=reg)
+        _ = Ferromagnet(w, g, regions=reg)
         with pytest.raises((RuntimeError)):
             w.center_domain_wall(0, 0)
 
     def test_multiple_magnets(self):
         world = World((1, 1, 1))
-        magnet_1 = Ferromagnet(world, Grid((10, 10, 1)))
-        magnet_2 = Antiferromagnet(world, Grid((10, 10, 1), origin=(0, 0, 1)))
+        _ = Ferromagnet(world, Grid((10, 10, 1)))
+        _ = Antiferromagnet(world, Grid((10, 10, 1), origin=(0, 0, 1)))
         with pytest.raises((RuntimeError)):
             world.center_domain_wall(0, 0)
 
@@ -99,7 +99,7 @@ class TestInitialConditions:
         cellsize = (2e-9, 3e-9, 4e-9)
         origin_phys = np.array(origin) * np.array(cellsize)
         world = World(cellsize)
-        magnet = Ferromagnet(world, Grid((11, 12, 13), origin=origin))
+        _ = Ferromagnet(world, Grid((11, 12, 13), origin=origin))
         assert np.all(np.isclose(world.window.position, origin_phys, atol=cs / 10))
 
     def test_offset_domain_wall(self):
