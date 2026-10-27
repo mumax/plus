@@ -12,7 +12,9 @@ import time
 from urllib.parse import parse_qs, urlparse
 import webbrowser
 
-from .core import Controller, _check_plane, _clean
+from .common import _clean
+from .core import Controller
+from .display import _check_plane
 
 FORBIDDEN = b"forbidden: missing or wrong token"
 EVENT_GAP = 0.15  # minimum time (s) between two pushed updates of the page
