@@ -18,7 +18,7 @@
 body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
 code, .mono, input[type=text], textarea, select { font-family: var(--mono); }
 
-/* ---- header: title, progress, busy, error (mumax3: title / progress / busy / ErrorBox) ---- */
+/* ---- header: title, progress, busy, error ---- */
 header { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); }
 .hwrap { max-width: 1500px; margin: 0 auto; padding: 10px 20px 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
 #title { font-size: 1.45em; font-weight: 700; color: var(--mute); letter-spacing: -.01em; }
@@ -36,7 +36,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 14px 20px 40px; }
 .col { min-width: 0; }
 @media (max-width: 1000px) { .cols { grid-template-columns: 1fr; } }
 
-/* ---- collapsible sections (mumax3: "▾ heading", click to show/hide) ---- */
+/* ---- collapsible sections (click to show/hide) ---- */
 section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; }
 section > h2 { margin: 0; padding: 10px 14px; font-size: 1.05em; font-weight: 650; color: var(--mute); cursor: pointer; user-select: none; }
 section > h2::before { content: "▾"; display: inline-block; width: 1.1em; transition: transform .15s; }
@@ -336,7 +336,7 @@ function download(name, blob) {
 const stem = () => (P ? P.title : "mumaxplus");
 
 /* number formatting */
-function num(v) { // like mumax3's float32(v)
+function num(v) { // like float32(v)
   if (v === null || v === undefined) return "";
   if (typeof v === "string") return v; // "nan", "inf", "-inf"
   if (Array.isArray(v)) return "(" + v.map(num).join(", ") + ")";
@@ -733,7 +733,7 @@ function drawFrame(V) {
   off.width = w; off.height = h;
   const octx = off.getContext("2d"), img = octx.createImageData(w, h), px = img.data;
   let vmin = meta.vmin, vmax = meta.vmax;
-  if (vmin === vmax) { vmin -= 1; vmax += 1; }                // mumax3: make it gray instead of black
+  if (vmin === vmax) { vmin -= 1; vmax += 1; }                // make it gray instead of black
   for (let iy = 0; iy < h; iy++) for (let ix = 0; ix < w; ix++) {
     const i = iy * w + ix, o = 4 * ((h - 1 - iy) * w + ix); // y axis points up
     if (rgba) { px[o] = rgba[4 * i]; px[o + 1] = rgba[4 * i + 1]; px[o + 2] = rgba[4 * i + 2]; px[o + 3] = rgba[4 * i + 3]; }
@@ -964,7 +964,7 @@ function profileCsv(V) {
   download(`${stem()}_${meta.quant}_profile.txt`, new Blob([[...head, ...lines].join("\n") + "\n"], { type: "text/plain" }));
 }
 
-/* loupe (5× magnifier, as in mumax3) + value under the cursor */
+/* loupe (5× magnifier) + value under the cursor */
 function updateLoupe(V) {
   const lp = V.q("loupe"), cv = V.q("disp"), mouse = V.mouse;
   if (!mouse || !V.frame) return;
@@ -1417,7 +1417,7 @@ function showParams() {
   for (const v of [...(P.world.vectors || []), ...(P.world.numbers || [])]) { const el = rows.w[v.name]; if (el) setText(el, num(v.value)); }
 }
 
-/* ---------- page refresh (mumax3: OnUpdate) ---------- */
+/* ---------- page refresh ---------- */
 function showTick() {
   $("title").textContent = P.title; document.title = P.title + " – mumax⁺";
   $("prog").firstChild.style.width = (T.progress || 0) + "%";

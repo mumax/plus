@@ -55,7 +55,7 @@ def _make_handler(ctrl: Controller, token: str):
                 return self._send(403, FORBIDDEN, "text/plain")
             if url.path in ("/", "/index.html"):
                 return self._send(200, page, "text/html; charset=utf-8")
-            if url.path == "/api/tick":  # what mumax3 refreshes on every update
+            if url.path == "/api/tick":  # what changes on every update
                 return self._json(ctrl.snapshot())
             if url.path == "/api/events":  # the same, pushed whenever it changes
                 return self._events()
@@ -147,19 +147,19 @@ def _make_handler(ctrl: Controller, token: str):
 
 
 class GUI:
-    """Web GUI for a mumax+ world, modelled on the mumax3 GUI.
+    """Web GUI for a mumax+ world.
 
     Parameters
     ----------
     world : mumaxplus.World
     namespace : dict, optional
         Namespace of the console, typically ``globals()`` of your script, so that you
-        can type ``magnet.alpha = 0.1`` (and mumax3-style ``Run(1e-9)``) in the GUI
+        can type ``magnet.alpha = 0.1`` (and commands like ``Run(1e-9)``) in the GUI
         console.
     title : str, optional
         Page title (default: the name of the script).
     host, port : where to listen. The default only accepts local connections; the first
-        free port from ``port`` on is used (mumax3 also starts at 35367).
+        free port from ``port`` on is used.
     open_browser : bool
         Open the page in the default browser.
     """
@@ -184,7 +184,7 @@ class GUI:
 
     # --------------------------------------------------------- set up from the script
     def table_add(self, quantity, name=None, unit=None):
-        """Add a column to the table (mumax3: TableAdd), to plot and save it.
+        """Add a column to the table, to plot and save it.
 
         The table is saved in table.txt. ``quantity`` is a FieldQuantity (its average
         is added, one column per component), a ScalarQuantity, the name of a quantity
@@ -198,7 +198,7 @@ class GUI:
     def table_autosave(self, period):
         """Save a table row in table.txt every ``period`` s of simulation time.
 
-        mumax3: TableAutosave. 0 = keep only a live preview in the page.
+        0 = keep only a live preview in the page.
         """
         self._do(lambda: self.ctrl._table_autosave(period))
 
@@ -283,7 +283,7 @@ class GUI:
             webbrowser.open(self.url)
 
     def run(self, block=True):
-        """Serve the GUI and drive the simulation (like ``mumax3 -i``).
+        """Serve the GUI and drive the simulation.
 
         With ``block=True`` (default) the simulation loop runs on the calling thread
         until Ctrl-C or :meth:`stop`. With ``block=False`` it runs in a background

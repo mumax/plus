@@ -66,7 +66,7 @@ class DisplayMixin:
         )
         base.update({k: v for k, v in cfg.items() if k in keys})
         _check_plane(base)
-        base["autosave"] = 0.0  # mumax3 AutoSave period of the shown quantity (OVF)
+        base["autosave"] = 0.0  # AutoSave period of the shown quantity (OVF)
         base["_next_save"] = None
         base["id"] = self._next_view
         self._next_view += 1
@@ -217,7 +217,7 @@ class DisplayMixin:
         return tuple(float(v) for v in self.world.cellsize)
 
     def _save_ovf(self, cfg, record=True):
-        """Save the quantity of a display as an OVF file (mumax3: Save)."""
+        """Save the quantity of a display as an OVF file."""
         if self.sel not in self.targets or not cfg["quant"]:
             raise ValueError("nothing to save")
         fq = getattr(self.targets[self.sel], cfg["quant"])
@@ -233,7 +233,7 @@ class DisplayMixin:
         return file
 
     def _view_autosave(self, cfg, period):
-        """Save the display's quantity now and every ``period`` s (mumax3: AutoSave)."""
+        """Save the display's quantity now and every ``period`` s."""
         cfg["autosave"] = max(float(period), 0.0)
         cfg["_next_save"] = None
         if cfg["autosave"] == 0:

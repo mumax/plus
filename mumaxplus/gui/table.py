@@ -1,4 +1,4 @@
-"""The table (mumax3: TableAdd, TableAutosave) and the plots of its columns."""
+"""The table (TableAdd, TableAutosave) and the plots of its columns."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ TABLE_MAX_ROWS = 20000
 
 
 class Table:
-    """The mumax3 table: t and the columns the user added, sampled during the run.
+    """The table: t and the columns the user added, sampled during the run.
 
     Columns added with TableAdd are saved in the table file. The plots can also show
     any quantity of a magnet without adding it to the file: those columns are

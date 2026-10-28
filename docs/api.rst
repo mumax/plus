@@ -48,3 +48,4 @@ API
    :maxdepth: 1
 
    util
+   gui

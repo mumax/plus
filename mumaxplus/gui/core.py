@@ -1,9 +1,8 @@
-"""Simulation controller of the mumax+ GUI, modelled on the mumax3 GUI (engine/gui.go).
+"""Simulation controller of the mumax+ GUI.
 
 Everything that touches the mumax+ world happens on ONE thread: the thread that calls
 :meth:`Controller.loop`. It advances the solver in short chunks and executes the
-commands that the web page queued in between (mumax3 does the same with its ``Inject``
-channel).
+commands that the web page queued in between.
 HTTP threads only queue commands and read published snapshots, so a GUI edit never races
 with a solver step, and nothing GPU-related is called from another thread. (The mumax+
 bindings do not release the GIL, so one long ``run()`` would also freeze the web
@@ -94,7 +93,7 @@ class Controller(
         self.ns = namespace if namespace is not None else {}
         self.ns.setdefault("world", world)
 
-        # run state (mumax3: pause / Run / Steps / Break)
+        # run state (pause / Run / Steps / Break)
         self.running = False
         self.run_until = None  # stop when time >= this
         self.steps_left = None
@@ -294,7 +293,7 @@ class Controller(
             except queue.Empty:
                 return True
 
-    # numbers typed in the page are expressions, like in mumax3
+    # numbers typed in the page are expressions
     # (e.g. 1e-9, 5e-9*2, (0,0,1))
     def _eval(self, text):
         return eval(str(text), {**MATH, **self.ns})
@@ -446,7 +445,7 @@ class Controller(
     def _solver_set(self, key, text):
         ts = self._ts()
         v = float(self._eval(text))
-        if key == "fixdt":  # mumax3 FixDt: 0 = adaptive
+        if key == "fixdt":  # 0 = adaptive
             if v > 0:
                 ts.adaptive_timestep = False
                 ts.timestep = v
@@ -541,7 +540,7 @@ class Controller(
         self._table_tick()
         self._autosave_tick()
         self._movie_tick()
-        # progress and end of run, like mumax3's Run/Steps
+        # progress and end of run of Run/Steps
         if self.run_until is not None:
             total = self.run_until - self._run_t0
             self.progress = (

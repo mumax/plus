@@ -1,6 +1,6 @@
 """The console and "Copy as Python".
 
-The console runs Python typed in the page, with mumax3-style Run, Relax, ...; "Copy as
+The console runs Python typed in the page, with the commands Run, Relax, ...; "Copy as
 Python" gives what was done in the page as lines to add to the script.
 """
 
@@ -62,7 +62,7 @@ class ConsoleMixin:
         return "\n".join(head + imports + [""] + self.script) + "\n"
 
     def _install_helpers(self):
-        """mumax3-style functions available in the GUI console and the user's script."""
+        """Add the simulation commands to the console and the user's script."""
 
         def Run(t=None):
             self._start_run(t=None if t is None or t == float("inf") else float(t))

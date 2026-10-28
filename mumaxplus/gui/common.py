@@ -47,7 +47,7 @@ def _clean(x):
 
 
 def _doc(obj):
-    """First paragraph of a docstring on one line (mumax3 shows these as tooltips)."""
+    """First paragraph of a docstring on one line (shown as tooltips)."""
     text = inspect.getdoc(obj) or ""
     return re.sub(r"\s+", " ", text.split("\n\n")[0]).strip()
 

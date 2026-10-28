@@ -18,7 +18,7 @@ import numpy as np
 def vector_rgba(sl):
     """(3, h, w) float array -> (h, w, 4) uint8 using ``mumaxplus.util.get_rgb``.
 
-    Like mumax3, the vectors are normalised by the largest norm, and cells with a zero
+    The vectors are normalised by the largest norm, and cells with a zero
     vector (outside the geometry) come out gray.
     """
     from mumaxplus.util import get_rgb
@@ -71,7 +71,7 @@ def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
         img = np.array(rgba, dtype=np.uint8).reshape(h, w, 4)
     else:
         lo, hi = meta["vmin"], meta["vmax"]
-        if lo == hi:  # mumax3: gray instead of black
+        if lo == hi:  # gray instead of black
             lo, hi = lo - 1, hi + 1
         v = data[0]
         g = np.round(255 * np.clip((np.nan_to_num(v) - lo) / (hi - lo), 0, 1))

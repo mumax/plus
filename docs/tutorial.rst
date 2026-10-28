@@ -18,3 +18,4 @@ started!
    tutorial/langevin
    tutorial/precision
    tutorial/plot_field
+   tutorial/gui
