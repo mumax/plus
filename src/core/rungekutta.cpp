@@ -147,5 +147,7 @@ real RungeKuttaStepper::RungeKuttaStageExecutor::getError() const {
   for (int i = 0; i < stepper.nStages(); i++)
     addTo(err, dt * (butcher.weights1[i] - butcher.weights2[i]), k[i]);
 
-  return maxVecNorm(err);
+  if (err.ncomp() == 3)
+    return maxVecNorm(err);
+  return maxAbsValue(err);
 }
