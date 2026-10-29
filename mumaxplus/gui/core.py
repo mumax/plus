@@ -377,7 +377,8 @@ class Controller(
         self.describe()
 
     def _cmd_setm(self, c):
-        self._set_m(c["target"], c["config"], c["args"])
+        field = c.get("field") or "magnetization"
+        self._set_m(c["target"], c["config"], c["args"], field)
 
     def _cmd_region(self, c):
         self.region = int(self._eval(c["value"]))
@@ -480,19 +481,26 @@ class Controller(
         self.describe()
         self._dirty = True
 
-    def _set_m(self, target, config, args):
+    def _set_m(self, target, config, args, field="magnetization"):
+        """Set the magnetization (or the elastic displacement) to a configuration."""
+        if field not in ("magnetization", "elastic_displacement"):
+            raise ValueError(f"can not set {field}")
         obj = self.targets[target]
+        if field == "elastic_displacement" and not getattr(
+            obj, "enable_elastodynamics", 0
+        ):
+            raise ValueError(f"enable_elastodynamics of {target} first")
         imports = []
         if config == "Uniform":
             value = tuple(float(x) for x in self._eval(args))
-            code = f"{self._ref(target)}.magnetization = {value}"
+            code = f"{self._ref(target)}.{field} = {value}"
         else:
             fn = getattr(U, config)
             value = eval(f"fn{args}", {**MATH, **self.ns, "fn": fn})
-            code = f"{self._ref(target)}.magnetization = {config}{args}"
+            code = f"{self._ref(target)}.{field} = {config}{args}"
             if self.ns.get(config) is not fn:  # the script did not import it
                 imports.append(f"from mumaxplus.util import {config}")
-        obj.magnetization = value
+        setattr(obj, field, value)
         self._did(code, imports)
         self._dirty = True
         self._live_sample()

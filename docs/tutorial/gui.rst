@@ -63,6 +63,12 @@ Passing ``namespace=globals()`` makes the variables of your script (here
    and open the printed URL in the browser on your own computer. If port 35367
    is taken, the GUI uses the next free one; forward that port instead.
 
+The page that opens will look like this:
+
+.. image:: ../images/GUI.png
+   :align: center
+   :width: 600px
+
 What is in the page
 -------------------
 
@@ -73,12 +79,11 @@ The page consists of panels that you can show or hide by clicking their title.
   the slice through the magnet (``xy``, ``xz`` or ``yz``), draw a line profile,
   save the image as PNG or the quantity as OVF, and record a movie. With
   *+ Add display* you can show several quantities at once.
-- **Paint**: below each display. With the brush you set m or any parameter in
-  the cells you drag over; with *place m* you click to put a vortex, skyrmion,
-  ... at that position. Strokes can be undone.
-- **Plot**: plots of the table columns against time (or against another
-  column). Pick the columns to show in the plot; quantities that are not in the
-  table are sampled for the plot only.
+- **Paint**: on each display. With the brush you set any parameter in
+  the cells you drag over; with *place m* and *place u* you click to put an object such
+  as a skyrmion or Gaussian spherical at that position.
+- **Plot**: plots of the table columns against another column. Pick the columns to show
+  in the plot. Quantities that are not saved in the table are sampled for the plot only.
 - **Console**: type Python, e.g. ``magnet.alpha = 0.1``, or commands such
   as ``Run(1e-9)``. See the :doc:`API <../gui>` for the full list.
   *Copy as Python* gives everything you changed in the page as lines to add to
@@ -90,10 +95,12 @@ The page consists of panels that you can show or hide by clicking their title.
   change ``fixdt``, ``maxerr`` and other solver settings.
 - **Checkpoints**: keep a copy of the state (magnetization, elastic fields,
   time) in memory and go back to it later.
-- **Initial m**: set the magnetization to a configuration of
-  :mod:`mumaxplus.util.config`, e.g. a vortex or a skyrmion.
-- **Excitation**: add a sine, pulse or any expression of time to a parameter,
-  such as ``bias_magnetic_field``, in the whole magnet, a region or a mask.
+- **State**: set the magnetization to a configuration of
+  :mod:`mumaxplus.util.config`, e.g. a vortex or a skyrmion. With
+  ``enable_elastodynamics`` on, the elastic displacement u can be set there too,
+  e.g. to a Gaussian bump.
+- **Excitation**: add an expression of time to a parameter in the whole magnet, a region
+  or a mask.
 - **Parameters**: all material parameters of the selected magnet. Set a value
   everywhere (region ``-1``) or in one region.
 
@@ -127,23 +134,6 @@ table columns, plots and displays from the script, before calling
 With ``gui.table_autosave(0)`` (the default) nothing is written to
 ``table.txt``; the plots then show a live preview only. *Save table* in the
 page downloads the rows shown in the plots.
-
-Trying it out
--------------
-
-With the vortex script above running, press *Run* in the Solver panel and try
-the following:
-
-1. In **Parameters**, set ``bias_magnetic_field`` to ``0.01, 0, 0`` (T) and
-   watch the vortex core move away from the center.
-2. In the **Console**, type ``magnet.alpha = 0.1`` to damp the motion faster.
-3. In **Initial m**, pick ``vortex`` and press *Set* to start over, or use a
-   checkpoint saved earlier.
-4. In the **Console**, press *Copy as Python* to get what you did as Python,
-   ready to paste at the end of your script in place of ``gui.run()``.
-
-A longer example with two magnets can be found in
-:file:`mumaxplus/gui/examples/vortex_gui.py`.
 
 Using the GUI in Jupyter
 ------------------------

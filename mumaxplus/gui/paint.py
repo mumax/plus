@@ -1,7 +1,7 @@
 """Painting on a display.
 
-A brush for m or any parameter, or placing a vortex, skyrmion, ... at a point. Every
-stroke is recorded as Python, and can be undone.
+A brush for m or any parameter, or placing a vortex, skyrmion, ... of m (or a
+Gaussian of u) at a point. Every stroke is recorded as Python, and can be undone.
 """
 
 from __future__ import annotations
@@ -28,10 +28,10 @@ class PaintMixin:
         ``c["points"]`` are positions in cells of the display's image (x right, y
         up, in its plane; cell i spans [i, i + 1)). The "brush" tool sets the quantity
         ``c["quant"]`` (m, or any parameter or variable) to ``c["value"]`` within
-        ``c["radius"]`` cells of the points; "place" puts the m configuration
-        ``c["config"]`` (vortex, skyrmion, ...) centred on the point, within the
-        radius. Points with the same ``c["stroke"]`` make one stroke: one recorded
-        piece of Python, and one undo.
+        ``c["radius"]`` cells of the points; "place" puts the configuration
+        ``c["config"]`` (vortex, skyrmion, ... of m, or a Gaussian of u) of the field
+        ``c["field"]`` centred on the point, within the radius. Points with the same
+        ``c["stroke"]`` make one stroke: one recorded piece of Python, and one undo.
         """
         with self.lock:
             meta = self.frames.get(c["view"], ({}, b""))[0]
@@ -77,9 +77,7 @@ class PaintMixin:
             name, dx, dy, dz = b["name"], b["x0"], b["y0"], b["z0"]
         obj = self.targets.get(name)
         tool = c.get("tool", "brush")
-        quant = (
-            "magnetization" if tool == "place" else c.get("quant") or "magnetization"
-        )
+        quant = c.get("field" if tool == "place" else "quant") or "magnetization"
         prop = getattr(type(obj), quant, None)
         if not isinstance(prop, property) or prop.fset is None:
             if quant == "magnetization":
@@ -155,8 +153,8 @@ class PaintMixin:
                 pos[an] = o[an] + st["shown"] * c[an]
             args = ", ".join(f"{v:.6g}" for v in pos) + ")"
             args = f"({args}" + (f", {st['args']}" if st["args"] else "")
-            lines.append(f"{ref}.magnetization = {st['config']}({args})")
-            lines.append(f"_new = {ref}.magnetization.eval()")
+            lines.append(f"{field} = {st['config']}({args})")
+            lines.append(f"_new = {field}.eval()")
             if cut:
                 lines.append(f"_new = np.moveaxis(_new, {3 - an}, 1)")
             if self.ns.get(st["config"]) is not st["env"][st["config"]]:

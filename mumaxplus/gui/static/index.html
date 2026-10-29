@@ -168,8 +168,8 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
     <tr title="The plane of the image (xz and yz: cross-sections), and which slice of the magnet along the axis normal to it"><td>Slice: <select class="renderPlane"><option>xy</option><option>xz</option><option>yz</option></select> <input type="range" class="renderLayer" min="0" max="0" value="0"></td><td class="renderLayerLabel">1/1</td></tr>
     <tr class="arrowSizeRow" title="Arrow spacing in cells"><td>Arrows: <input type="range" class="arrowSize" min="2" max="64" value="8"></td><td class="arrowSizeLabel">8</td></tr>
   </table>
-  <div class="row" title="Paint the magnet: drag with the brush to set a parameter, or click to place a vortex, skyrmion, ...">Paint:
-    <select class="paintTool"><option value="">off</option><option value="brush">brush</option><option value="place">place m</option></select>
+  <div class="row" title="Paint the magnet: drag with the brush to set a parameter, or click to place a vortex, skyrmion, ... (m) or a Gaussian (u: the elastic displacement)">Paint:
+    <select class="paintTool"><option value="">off</option><option value="brush">brush</option><option value="place">place m</option><option value="placeu" hidden>place u</option></select>
     <span class="brushOpts" hidden><select class="paintQuant" title="what to paint"></select> = <input type="text" class="paintValue" size="9" title="the value to paint"> <span class="paintUnit gray"></span></span>
     <span class="placeOpts" hidden><select class="placeConfig"></select> <input type="text" class="placeArgs" size="12" title="its arguments after the position (which is where you click)"></span>
     <span class="paintOpts" hidden>radius <input type="text" class="paintRadius" value="3" size="3"> cells
@@ -217,7 +217,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
 <section id="s-console"><h2 title="Click to show/hide">Console</h2><div class="body">
   <div id="console"></div>
   <input id="cli" type="text" placeholder="type commands here (python), or up/down" autocomplete="off" spellcheck="false">
-  <div class="row" id="pyrow" title="Everything done in this page that changes the simulation (parameters, initial m, solver, runs, console lines), as Python lines to add to the end of your script">
+  <div class="row" id="pyrow" title="Everything done in this page that changes the simulation as Python lines to add to the end of your script">
     <button id="pyCopy">Copy as Python</button><button id="pySave">Save .py</button><button id="pyClear" title="Forget what was recorded so far">Clear</button>
     <span id="pyNote" class="gray" style="font-size:12px"></span>
   </div>
@@ -271,12 +271,15 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <table id="ckpts" class="mono" style="font-size:12px"></table>
 </div></section>
 
-<section id="s-m"><h2 title="Click to show/hide">Initial m</h2><div class="body">
+<section id="s-m"><h2 title="Click to show/hide">State</h2><div class="body">
   <div class="row"><code>m =</code> <select id="mselect"></select> <input type="text" id="margs" size="42"> <button id="setm">Set</button></div>
   <span id="mdoc" class="gray"></span>
+  <div id="urow" title="The elastic displacement (m); there is one when enable_elastodynamics is on">
+    <div class="row"><code>u =</code> <select id="uselect"></select> <input type="text" id="uargs" size="42"> <button id="setu">Set</button></div>
+    <span id="udoc" class="gray"></span></div>
 </div></section>
 
-<section id="s-excite"><h2 title="Click to show/hide">Excitation</h2><div class="body">
+<section id="s-excite" class="collapsed"><h2 title="Click to show/hide">Excitation</h2><div class="body">
   <div class="row" title="A time-dependent term added to a parameter of the selected magnet; t is the simulation time">add to <select id="exParam"></select> <span id="exUnit" class="gray"></span></div>
   <div class="row">waveform <select id="exWave"><option value="sine">sine</option><option value="gauss">Gaussian pulse</option><option value="rect">rectangular pulse</option>
     <option value="sinc">sinc pulse (broadband)</option><option value="expr">expression of t</option></select></div>
@@ -539,21 +542,32 @@ function showMesh() {
   $("geominfo").textContent = `${(100 * m.inside).toFixed(1)} % of the ${m.n[0] * m.n[1] * m.n[2]} cells are inside the geometry.`;
 }
 
-/* ---------- initial m ---------- */
+/* ---------- initial m and u ---------- */
+const INIT = { m: "magnetization", u: "elastic_displacement" }; // row prefix -> the field its configs set
+const configsOf = (k) => P.configs.filter((c) => c.field === INIT[k]);
 function buildConfigs() {
-  const sel = $("mselect"), keep = sel.value;
-  sel.innerHTML = P.configs.map((c) => `<option>${c.name}</option>`).join("");
-  if (P.configs.some((c) => c.name === keep)) sel.value = keep;
-  setConfigDefaults(false);
+  for (const k in INIT) {
+    const sel = $(k + "select"), keep = sel.value;
+    sel.innerHTML = configsOf(k).map((c) => `<option>${c.name}</option>`).join("");
+    if (configsOf(k).some((c) => c.name === keep)) sel.value = keep;
+    setConfigDefaults(k, false);
+  }
 }
-function setConfigDefaults(overwrite) {
-  const c = P.configs.find((x) => x.name === $("mselect").value) || P.configs[0], a = $("margs");
+function setConfigDefaults(k, overwrite) {
+  const cs = configsOf(k), c = cs.find((x) => x.name === $(k + "select").value) || cs[0], a = $(k + "args");
+  if (!c) return;
   if (overwrite || (!a.classList.contains("dirty") && !a.value)) a.value = c.args;
-  $("mdoc").textContent = c.doc;
+  $(k + "doc").textContent = c.doc;
 }
-$("mselect").onchange = () => { $("margs").classList.remove("dirty"); setConfigDefaults(true); };
-$("margs").addEventListener("input", () => $("margs").classList.add("dirty"));
-$("setm").onclick = () => send({ cmd: "setm", target: T.sel, config: $("mselect").value, args: $("margs").value });
+for (const k in INIT) {
+  $(k + "select").onchange = () => { $(k + "args").classList.remove("dirty"); setConfigDefaults(k, true); };
+  $(k + "args").addEventListener("input", () => $(k + "args").classList.add("dirty"));
+  $("set" + k).onclick = () => send({ cmd: "setm", target: T.sel, field: INIT[k], config: $(k + "select").value, args: $(k + "args").value });
+}
+function showInitU() { // only for a magnet with elastodynamics on
+  const t = cur();
+  $("urow").hidden = !(t && t.paintable.some((p) => p.name === INIT.u));
+}
 
 /* ---------- solver ---------- */
 $("run").onclick = () => send({ cmd: "run", text: $("runtime").value });
@@ -683,6 +697,9 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     if (mv) q("movNote").textContent = `${mv.frames} frame${mv.frames === 1 ? "" : "s"}`;
     const mp4 = q("movFormat").querySelector("[value=mp4]"); mp4.disabled = !P.ffmpeg; if (!P.ffmpeg) { mp4.title = "needs ffmpeg"; if (q("movFormat").value === "mp4") q("movFormat").value = "png"; }
     if (!t) return;
+    const hasU = (t.paintable || []).some((p) => p.name === "elastic_displacement"); // elastodynamics enabled
+    q("paintTool").querySelector("[value=placeu]").hidden = !hasU;
+    if (!hasU && V.paintTool === "placeu") paintTool(V, "");
     // the display settings may also change from the console
     if (V.qkey !== qkey || V.quant !== c.quant) {
       V.qkey = qkey; fillQuantities(V); if (V.paintTool === "brush") fillPaintQuants(V, true);
@@ -825,19 +842,20 @@ function drawArrows(V, ctx, fx, fy, w, h) {
   ctx.fill(); // one fill for all arrows
 }
 
-/* ---------- painting on a display: brush m, or place a vortex / skyrmion / ... at a point ----------
+/* ---------- painting on a display: brush m, or place a vortex / skyrmion / ... (m) or a Gaussian (u) at a point ----------
    A stroke's points (in cells of the shown image) go to the simulation as they come, one request at a time */
 let strokeIds = 0;
+const PLACE = { place: "magnetization", placeu: "elastic_displacement" }; // the field each place tool sets
 function paintTool(V, tool) {
   const q = V.q, old = V.paintTool || "";
-  V.paintRadius = V.paintRadius || { brush: "3", place: "10" }; // each tool keeps its own radius
+  V.paintRadius = V.paintRadius || { brush: "3", place: "10", placeu: "10" }; // each tool keeps its own radius
   if (old) V.paintRadius[old] = q("paintRadius").value;
   if (tool) q("paintRadius").value = V.paintRadius[tool];
   if (tool && V.profOn) profileOn(V, false);
   V.paintTool = tool; q("paintTool").value = tool; updateLoupe(V);
-  q("brushOpts").hidden = tool !== "brush"; q("placeOpts").hidden = tool !== "place"; q("paintOpts").hidden = !tool;
-  if (tool === "place") {
-    const sel = q("placeConfig"), keep = sel.value, cs = P.configs.filter((c) => c.place !== undefined);
+  q("brushOpts").hidden = tool !== "brush"; q("placeOpts").hidden = !PLACE[tool]; q("paintOpts").hidden = !tool;
+  if (PLACE[tool]) {
+    const sel = q("placeConfig"), keep = sel.value, cs = P.configs.filter((c) => c.place !== undefined && c.field === PLACE[tool]);
     sel.innerHTML = cs.map((c) => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join("");
     if (cs.some((c) => c.name === keep)) sel.value = keep; else sel.onchange();
   }
@@ -867,7 +885,7 @@ function paintQuant(V, name) {
 }
 function paintStart(V, e) {
   const p = cellAt(V, e);
-  V.stroke = { id: ++strokeIds, pending: [p], last: p, busy: false, done: V.paintTool === "place" };
+  V.stroke = { id: ++strokeIds, pending: [p], last: p, busy: false, done: !!PLACE[V.paintTool] };
   paintFlush(V);
 }
 function paintMove(V, p) {
@@ -883,7 +901,7 @@ function paintFlush(V) {
   if (!s || s.busy) return;
   if (!s.pending.length) { if (s.done) V.stroke = null; return; }
   const pts = s.pending.map((p) => [p.x, p.y]); s.pending = []; s.busy = true;
-  send({ cmd: "paint", view: V.id, stroke: s.id, tool: V.paintTool, points: pts, layer: V.frame.meta.layer, all: q("paintAll").checked,
+  send({ cmd: "paint", view: V.id, stroke: s.id, tool: PLACE[V.paintTool] ? "place" : V.paintTool, field: PLACE[V.paintTool], points: pts, layer: V.frame.meta.layer, all: q("paintAll").checked,
          radius: q("paintRadius").value, quant: q("paintQuant").value, value: q("paintValue").value, config: q("placeConfig").value, args: q("placeArgs").value })
     .then((r) => { s.busy = false; if (r.ok === false) { if (V.stroke === s) V.stroke = null; return; } paintFlush(V); }); // an error ends the stroke
 }
@@ -1429,7 +1447,7 @@ function showTick() {
   $("maxtorque").textContent = T.maxtorque === null ? "--" : sci(T.maxtorque, 3) + " T";
   setText($("fixdt"), num(T.fixdt)); setText($("maxerr"), num(T.maxerr));
   setText($("tableAutoSave"), num(T.autosave));
-  showPyNote(); showCheckpoints(); showPerf(); showExcitations();
+  showPyNote(); showCheckpoints(); showPerf(); showExcitations(); showInitU();
   syncPlots();
   $("solvertype").value = T.method;
   $("methodnote").textContent = T.method_known ? "" : "(showing the default at startup)";
@@ -1443,7 +1461,7 @@ function rebuildPage() {
   if (tk !== built.targets) { built.targets = tk; $("selMagnet").innerHTML = T.targets.map((n) => `<option>${n}</option>`).join(""); }
   $("selMagnet").value = T.sel;
   if (!built.solver) { buildSolver(); built.solver = true; }
-  const ck = P.configs.map((c) => c.name).join("|");
+  const ck = P.configs.map((c) => c.field + ":" + c.name).join("|");
   if (ck !== built.cfg) { built.cfg = ck; buildConfigs(); }
   buildParams(); buildExcite();
   $("version").textContent = P.version;

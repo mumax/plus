@@ -37,6 +37,8 @@ CONFIGS = [
     "gaussian_spherical_IP",
     "gaussian_uniform_IP",
 ]
+# the configurations of CONFIGS that are elastic displacements (u), not m
+U_CONFIGS = {"gaussian_spherical_OoP", "gaussian_spherical_IP", "gaussian_uniform_IP"}
 
 
 class DescribeMixin:
@@ -125,7 +127,20 @@ class DescribeMixin:
         return out
 
     def _config_info(self):
-        out = [{"name": "Uniform", "doc": "Uniform magnetization", "args": "(1, 0, 0)"}]
+        out = [
+            {
+                "name": "Uniform",
+                "doc": "Uniform magnetization",
+                "args": "(1, 0, 0)",
+                "field": "magnetization",
+            },
+            {
+                "name": "Uniform",
+                "doc": "Uniform elastic displacement (m)",
+                "args": "(0, 0, 0)",
+                "field": "elastic_displacement",
+            },
+        ]
         c, cell = self._center(), self._cell()
         defaults = {
             "position": f"({c[0]:.4g}, {c[1]:.4g}, {c[2]:.4g})",
@@ -139,6 +154,14 @@ class DescribeMixin:
             "m2": "(-1, 0, 0)",
             "wallposition": f"{c[0]:.4g}",
             "wallthickness": f"{4 * cell:.4g}",
+            "amplitude": "1e-15",
+            "sigma_x": f"{5 * cell:.4g}",
+            "sigma_y": f"{5 * cell:.4g}",
+            "sigma": f"{5 * cell:.4g}",
+            "gausspos": f"{c[0]:.4g}",
+            "angle": "0",
+            "theta": "0",
+            "phi": "0",
         }
         for n in CONFIGS:
             fn = getattr(U, n, None)
@@ -147,6 +170,9 @@ class DescribeMixin:
             params = list(inspect.signature(fn).parameters)
             args = [defaults.get(p, "1") for p in params]
             info = {"name": n, "doc": _doc(fn), "args": f"({', '.join(args)})"}
+            info["field"] = (
+                "elastic_displacement" if n in U_CONFIGS else "magnetization"
+            )
             if params[:1] == ["position"]:  # can be placed with the paint tool
                 info["place"] = ", ".join(args[1:])
             out.append(info)
