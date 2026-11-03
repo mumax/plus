@@ -27,7 +27,7 @@ def _make_handler(ctrl: Controller, token: str):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
 
-        def log_message(self, *args):  # silence request logging
+        def log_message(self, *args):  # silence request logging to not flood terminal
             pass
 
         def _send(self, code, body=b"", ctype="application/json", headers=None):
@@ -309,8 +309,3 @@ class GUI:
             self._httpd.shutdown()
             self._httpd.server_close()
             self._httpd = None
-
-
-def serve(world, **kwargs):
-    """Shortcut for ``GUI(world, **kwargs).run()``."""
-    GUI(world, **kwargs).run()

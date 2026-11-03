@@ -17,7 +17,6 @@ library. See the :doc:`GUI tutorial <tutorial/gui>` to get started.
    :caption: gui
 
    GUI
-   serve
 
 Console commands
 ----------------

@@ -1,6 +1,6 @@
 """A web GUI for mumax+ (live field view, parameters, solver control)."""
 
-from .server import GUI, serve
+from .server import GUI
 
-__all__ = ["GUI", "serve"]
+__all__ = ["GUI"]
 __version__ = "0.1.0"
