@@ -66,7 +66,7 @@ class PaintMixin:
         name = self.sel
         boxes = meta.get("boxes")
         if boxes:  # "show all magnets": the magnet the stroke starts on
-            x, y, z = *first, int(c.get("layer", 0))
+            x, y, z = *first, int(c["layer"])
             on = lambda b, k, v: b[f"{k}0"] <= v < b[f"{k}0"] + b[f"n{k}"]  # noqa
             under = [b for b in boxes if on(b, "x", x) and on(b, "y", y)]
             # the one the shown slice goes through, if any (magnets overlap in a cut)
@@ -76,7 +76,7 @@ class PaintMixin:
             b = under[0]
             name, dx, dy, dz = b["name"], b["x0"], b["y0"], b["z0"]
         obj = self.targets.get(name)
-        tool = c.get("tool", "brush")
+        tool = c["tool"]
         quant = c.get("field" if tool == "place" else "quant") or "magnetization"
         prop = getattr(type(obj), quant, None)
         if not isinstance(prop, property) or prop.fset is None:
@@ -96,8 +96,8 @@ class PaintMixin:
             )
         axes = tuple(meta.get("axes", PLANES["xy"]))
         n = int(obj.grid.size[axes[2]])
-        shown = int(c.get("layer", 0)) - dz  # the shown slice, in the magnet
-        layer = None if c.get("all") else shown
+        shown = int(c["layer"]) - dz  # the shown slice, in the magnet
+        layer = None if c["all"] else shown
         if layer is not None and not 0 <= layer < n:
             return None
         st = {
@@ -111,7 +111,7 @@ class PaintMixin:
             "axes": axes,
             "layer": layer,
             "shown": shown,
-            "radius": max(float(self._eval(c.get("radius", 1))), 0.5),
+            "radius": max(float(self._eval(c["radius"])), 0.5),
             "tool": tool,
             "points": [],
             "entry": None,
@@ -120,7 +120,7 @@ class PaintMixin:
         if st["tool"] == "place":
             fn = getattr(U, str(c["config"]))
             st["config"], st["env"] = fn.__name__, {fn.__name__: fn}
-            st["args"] = str(c.get("args", "")).strip().strip("()").strip()
+            st["args"] = str(c["args"]).strip().strip("()").strip()
             st["origin"], st["cell"] = tuple(obj.origin), self._cell_size()
         else:
             st["value"] = self._vec(c["value"], st["ncomp"])
@@ -149,7 +149,7 @@ class PaintMixin:
             (x, y), o, c = pts[-1], st["origin"], st["cell"]
             pos = list(o)
             pos[ah], pos[av] = o[ah] + (x - 0.5) * c[ah], o[av] + (y - 0.5) * c[av]
-            if an != 2:  # in the shown slice (xy: at the bottom layer's z, as before)
+            if an != 2:  # in the shown slice (xy: at the bottom layer's z)
                 pos[an] = o[an] + st["shown"] * c[an]
             args = ", ".join(f"{v:.6g}" for v in pos) + ")"
             args = f"({args}" + (f", {st['args']}" if st["args"] else "")

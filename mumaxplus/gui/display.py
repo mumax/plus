@@ -19,9 +19,9 @@ PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}
 
 def _check_plane(cfg):
     """Check a display's plane; a layer of None is its middle slice, xy's bottom one."""
-    if cfg.get("plane", "xy") not in PLANES:
+    if cfg["plane"] not in PLANES:
         raise ValueError(f"plane must be xy, xz or yz, not {cfg['plane']!r}")
-    if cfg.get("layer") is None and cfg.get("plane", "xy") == "xy":
+    if cfg.get("layer") is None and cfg["plane"] == "xy":
         cfg["layer"] = 0
 
 
@@ -157,7 +157,7 @@ class DisplayMixin:
             return
         cfg.pop("_err", None)
         ncomp = arr.shape[0]
-        axes = PLANES[cfg.get("plane", "xy")]
+        axes = PLANES[cfg["plane"]]
         n = arr.shape[3 - axes[2]]  # slices; world axis a is array axis 3 - a
         if cfg["layer"] is None:
             cfg["layer"] = n // 2
@@ -214,7 +214,6 @@ class DisplayMixin:
         with self.lock:
             self.frame_id += 1
             meta["id"] = self.frame_id
-            meta["view"] = cfg["id"]
             self.frames[cfg["id"]] = (_clean(meta), data.tobytes() + rgba)
 
     def _cell_size(self):
@@ -263,7 +262,7 @@ class DisplayMixin:
 
     # ------------------------------------------------------------------- commands
     def _cmd_render(self, c):
-        cfg = self._view(c.get("view", self.views[0]["id"] if self.views else None))
+        cfg = self._view(c["view"])
         new = {k: c[k] for k in ("quant", "comp", "plane", "layer", "all") if k in c}
         if "plane" in c and "layer" not in c:
             new["layer"] = None  # another plane: start in its middle

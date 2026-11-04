@@ -41,6 +41,15 @@ CONFIGS = [
 U_CONFIGS = {"gaussian_spherical_OoP", "gaussian_spherical_IP", "gaussian_uniform_IP"}
 
 
+def _properties(cls):
+    """Return (name, property) of the public properties of a class, sorted by name."""
+    return [
+        (name, getattr(cls, name))
+        for name in sorted(dir(cls), key=str.lower)
+        if not name.startswith("_") and isinstance(getattr(cls, name, None), property)
+    ]
+
+
 class DescribeMixin:
     """The Controller's description of the simulation for the page."""
 
@@ -56,11 +65,7 @@ class DescribeMixin:
             "paintable": [],
             "scalars": [],  # ScalarQuantity: can be plotted, not displayed
         }
-        cls = type(obj)
-        for pname in sorted(dir(cls), key=str.lower):
-            prop = getattr(cls, pname, None)
-            if pname.startswith("_") or not isinstance(prop, property):
-                continue
+        for pname, prop in _properties(type(obj)):
             try:
                 val = getattr(obj, pname)
                 m = _mro(val)
@@ -198,11 +203,7 @@ class DescribeMixin:
         ts = self._ts()
         solver = {k: getattr(ts, k) for k in SOLVER_SETTINGS if hasattr(ts, k)}
         world_info = {"vectors": [], "numbers": [], "pbc": None}
-        wcls = type(self.world)
-        for pname in sorted(dir(wcls), key=str.lower):
-            prop = getattr(wcls, pname, None)
-            if pname.startswith("_") or not isinstance(prop, property):
-                continue
+        for pname, prop in _properties(type(self.world)):
             if prop.fset is None:
                 continue
             try:

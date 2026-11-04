@@ -44,7 +44,6 @@ PERF_WINDOW = 2.0  # wall time over which steps/s and simulated time/s are measu
 NO_RESET = {
     "break",
     "render",
-    "refresh",
     "table_using",
     "region",
     "select",
@@ -81,7 +80,7 @@ class Controller(
 ):
     """Drives a mumax⁺ world for the page (see the module docstring)."""
 
-    def __init__(self, world, namespace=None, title=None, table_file="table.txt"):
+    def __init__(self, world, namespace=None, title=None):
         self.world = world
         self.lock = threading.RLock()  # Protect data shared between threads
         # command queue from HTTP threads to sim threads
@@ -131,14 +130,15 @@ class Controller(
         self._init_script()
         self._init_describe()
         self._init_display()
-        self._init_table(table_file)
+        self._init_table()
         self._init_movies()
         self._init_excitations()
         self._init_paint()
         self._init_checkpoints()
         self._install_helpers()
         self.refresh_targets()  # Lists magnets and sublattices
-        self._init_selection()  # Select the first magnet and create the first displays
+        self.sel = next(iter(self.targets), None)  # Select the first magnet
+        self.add_view()  # and create the first display
         self.describe()  # Build the page description
 
     # ------------------------------------------------------------------- logging
@@ -161,7 +161,7 @@ class Controller(
     def refresh_targets(self):
         """Update the selectable magnets from the world."""
         targets = {}
-        for name, magnet in dict(self.world.magnets).items():
+        for name, magnet in self.world.magnets.items():
             targets[name] = magnet
             subs = getattr(type(magnet), "sublattices", None)
             if isinstance(subs, property):
@@ -191,17 +191,7 @@ class Controller(
                 return k
         return f"world.magnets[{name!r}]"
 
-    def _init_selection(self):
-        names = list(self.targets)
-        self.sel = names[0] if names else None
-        self.add_view()
-
     # ------------------------------------------------------------------ snapshots
-    def snapshot(self):
-        """Return a copy of the state shown in the page."""
-        with self.lock:
-            return dict(self.snap)
-
     def wait_snapshot(self, last, timeout):
         """Wait up to ``timeout`` s for a snapshot newer than the one with id ``last``.
 
@@ -232,7 +222,6 @@ class Controller(
                 "sel": self.sel,
                 "region": self.region,
                 "views": [self._view_state(cfg) for cfg in self.views],
-                "frame_id": self.frame_id,
                 "desc_version": self.desc_version,
                 "log_id": self.log_id,
                 "script_lines": len(self.script),
@@ -296,7 +285,7 @@ class Controller(
         while True:
             cmd, box, done = item
             try:
-                box["result"] = self._execute(cmd) or {"ok": True}
+                box["result"] = self._execute(cmd)
             except Exception as e:  # a bad command must never kill the loop
                 self.say(f"{type(e).__name__}: {e}", "err")
                 box["result"] = {"ok": False, "error": f"{type(e).__name__}: {e}"}
@@ -367,7 +356,7 @@ class Controller(
 
     def _cmd_switch(self, c):
         obj = self.targets[c["target"]]
-        value = c["value"] if c.get("kind") == "bool" else self._eval(c["value"])
+        value = c["value"] if c["kind"] == "bool" else self._eval(c["value"])
         setattr(obj, c["name"], value)
         self._did(f"{self._ref(c['target'])}.{c['name']} = {value!r}")
         self.describe()
@@ -391,8 +380,7 @@ class Controller(
         self.describe()
 
     def _cmd_setm(self, c):
-        field = c.get("field") or "magnetization"
-        self._set_m(c["target"], c["config"], c["args"], field)
+        self._set_m(c["target"], c["config"], c["args"], c["field"])
 
     def _cmd_region(self, c):
         self.region = int(self._eval(c["value"]))
@@ -412,10 +400,6 @@ class Controller(
     def _cmd_call(self, c):
         """Run a method another thread calls while the loop runs (Controller.call)."""
         return {"ok": True, "value": c["fn"]()}
-
-    def _cmd_refresh(self, c):
-        self.refresh_targets()
-        self.describe()
 
     # ----------------------------------------------------------------- run control
     def _start_run(self, t=None, n=None):
@@ -500,7 +484,7 @@ class Controller(
         self.describe()
         self._dirty = True
 
-    def _set_m(self, target, config, args, field="magnetization"):
+    def _set_m(self, target, config, args, field):
         """Set the magnetization (or the elastic displacement) to a configuration."""
         if field not in ("magnetization", "elastic_displacement"):
             raise ValueError(f"can not set {field}")
@@ -527,7 +511,7 @@ class Controller(
     # --------------------------------------------------------------------- the loop
     def _steps(self, n):
         ts = self._ts()
-        if self._fresh or not hasattr(ts, "_impl"):
+        if self._fresh:
             self._fresh = False
             ts.steps(n)  # public API: assures a sensible dt after a change
         else:

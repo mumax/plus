@@ -27,8 +27,8 @@ class MovieMixin:
         if cfg.get("_movie"):
             raise ValueError("this display is already recording")
         period = float(self._eval(c["period"]))
-        fps = float(self._eval(c.get("fps", 10)))
-        fmt = c.get("format", "mp4")
+        fps = float(self._eval(c["fps"]))
+        fmt = c["format"]
         if period <= 0 or fps <= 0:
             raise ValueError("the period and the frame rate must be positive")
         if fmt not in ("mp4", "png"):
@@ -51,7 +51,7 @@ class MovieMixin:
             "period": period,
             "fps": fps,
             "format": fmt,
-            "arrows": int(c.get("arrows", 8)),
+            "arrows": int(c["arrows"]),
             "folder": folder,
             "out": out,
             "n": 0,

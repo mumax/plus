@@ -119,7 +119,7 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .plist { overflow: auto; padding: 0 4px 6px; }
 .pgrp { padding: 8px 8px 2px; font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--mute); }
 .pitem { display: flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; cursor: pointer; }
-.pitem:hover, .pitem.hl { background: var(--field); }
+.pitem:hover { background: var(--field); }
 .pitem.off { opacity: .45; cursor: default; }
 select.searchsrc { display: none !important; } /* shown as a button that opens the picker (searchable) */
 .pitem .pn { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12.5px var(--mono); }
@@ -364,7 +364,7 @@ function setText(el, value) {
 }
 
 let P = null;         // /api/page
-let T = null;         // /api/tick
+let T = null;         // the snapshot (/api/events)
 let lastDesc = -1, lastLog = 0;
 
 /* ---------- console ---------- */
@@ -419,7 +419,7 @@ $("pySave").onclick = async () => {
 $("pyClear").onclick = () => { send({ cmd: "script_clear" }); pyNote("cleared"); };
 function showPyNote() {
   if (!T) return;
-  const n = T.script_lines || 0;
+  const n = T.script_lines;
   $("pyNote").textContent = pyFlash || (n ? `${n} line${n === 1 ? "" : "s"} recorded` + (T.running ? " + the run so far" : "") : T.running ? "the run so far is recorded" : "nothing recorded yet");
 }
 
@@ -445,7 +445,7 @@ function si(v, unit) { // 8.5e-10 -> "850 p" + unit
 }
 function duration(s) { return s < 90 ? `${Math.ceil(s)} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`; }
 function showPerf() {
-  const p = T.perf || {};
+  const p = T.perf;
   const speed = p.steps_s === null || p.steps_s === undefined ? "" : `${si(p.steps_s, "steps/s")}, ${si(p.sim_s, "s/s")}`;
   $("speed").textContent = speed || "--";
   $("hdrPerf").textContent = T.running && speed ? speed + (p.eta !== null && p.eta !== undefined ? ` · ${duration(p.eta)} left` : "") : "";
@@ -537,7 +537,7 @@ function showMesh() {
   ["nx", "ny", "nz"].forEach((id, i) => ($(id).textContent = m.n[i]));
   ["cx", "cy", "cz"].forEach((id, i) => ($(id).textContent = num(m.c[i])));
   ["wx", "wy", "wz"].forEach((id, i) => ($(id).textContent = num(m.c[i] * m.n[i] * 1e9)));
-  const pbc = (P.world && P.world.pbc) || [0, 0, 0];
+  const pbc = P.world.pbc || [0, 0, 0];
   ["px", "py", "pz"].forEach((id, i) => setText($(id), pbc[i]));
   $("geominfo").textContent = `${(100 * m.inside).toFixed(1)} % of the ${m.n[0] * m.n[1] * m.n[2]} cells are inside the geometry.`;
 }
@@ -590,7 +590,7 @@ function showSolver() {
 /* ---------- display ----------
    One or more display panels ("views"). Each has its own quantity, component, slice, "show all"
    setting and arrow spacing; they all show the selected magnet. V = the panel's page state,
-   cfgOf(V) = its settings as the simulation reports them in /api/tick. */
+   cfgOf(V) = its settings as the simulation reports them in the snapshot. */
 const views = new Map(); // view id -> V
 const cfgOf = (V) => (T && T.views.find((v) => v.id === V.id)) || null;
 $("addView").onclick = () => send({ cmd: "view_add" });
@@ -697,7 +697,7 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     if (mv) q("movNote").textContent = `${mv.frames} frame${mv.frames === 1 ? "" : "s"}`;
     const mp4 = q("movFormat").querySelector("[value=mp4]"); mp4.disabled = !P.ffmpeg; if (!P.ffmpeg) { mp4.title = "needs ffmpeg"; if (q("movFormat").value === "mp4") q("movFormat").value = "png"; }
     if (!t) return;
-    const hasU = (t.paintable || []).some((p) => p.name === "elastic_displacement"); // elastodynamics enabled
+    const hasU = t.paintable.some((p) => p.name === "elastic_displacement"); // elastodynamics enabled
     q("paintTool").querySelector("[value=placeu]").hidden = !hasU;
     if (!hasU && V.paintTool === "placeu") paintTool(V, "");
     // the display settings may also change from the console
@@ -865,7 +865,7 @@ function paintTool(V, tool) {
 }
 function fillPaintQuants(V, follow) { // what the brush can paint: m and the other variables, and every parameter
   const t = cur(), sel = V.q("paintQuant"), c = cfgOf(V); if (!t) return;
-  const ps = t.paintable || [], keep = sel.value, key = ps.map((p) => p.name).join(",");
+  const ps = t.paintable, keep = sel.value, key = ps.map((p) => p.name).join(",");
   if (sel.dataset.key !== key) {
     sel.innerHTML = ps.map((p) => `<option value="${esc(p.name)}">${esc(p.name)}</option>`).join(""); sel.dataset.key = key;
   }
@@ -874,10 +874,10 @@ function fillPaintQuants(V, follow) { // what the brush can paint: m and the oth
   paintQuant(V, sel.value);
 }
 function paintQuant(V, name) {
-  const q = V.q, t = cur(), p = t && (t.paintable || []).find((x) => x.name === name);
+  const q = V.q, t = cur(), p = t && t.paintable.find((x) => x.name === name);
   q("paintQuant").value = name; q("paintUnit").textContent = p && p.unit ? p.unit : "";
   if (!(name in V.paintVals)) { // start from its value now, if uniform
-    const v = t && t.values ? t.values[name] : null;
+    const v = t ? t.values[name] : null;
     V.paintVals[name] = name === "magnetization" ? "(0, 0, 1)" : v === null || v === undefined ? (p && p.ncomp === 3 ? "(0, 0, 0)" : "0")
       : Array.isArray(v) ? `(${v.map(num).join(", ")})` : num(v);
   }
@@ -1185,7 +1185,7 @@ bindText($("tableAutoSave"), (v) => send({ cmd: "table_autosave", text: v }));
 /* One or more plot panels, like the display panels: each draws columns y1,y2,... of the one table against a column x.
    The picker also offers every quantity of the magnets: the simulation then samples it in a plot-only column, which
    table.txt does not get unless asked for (⤓ on its chip). The page keeps a copy of the table and only fetches new rows.
-   Pl = the panel's page state, cfg = its columns as the simulation reports them in /api/tick. */
+   Pl = the panel's page state, cfg = its columns as the simulation reports them in the snapshot. */
 const plots = new Map(); // plot id -> Pl
 const TB = { version: -1, names: [], units: [], saved: [], rows: [], busy: false };
 $("addPlot").onclick = () => send({ cmd: "plot_add" });
@@ -1197,7 +1197,7 @@ async function fetchTable() {
     const d = await (await GET(`/api/table?version=${TB.version}&since=${TB.rows.length}`)).json();
     const changed = d.rows.length > 0 || d.version !== TB.version || d.names.join("\n") !== TB.names.join("\n");
     if (d.start === 0) TB.rows = d.rows; else for (const r of d.rows) TB.rows.push(r);
-    Object.assign(TB, { version: d.version, names: d.names, units: d.units, saved: d.saved || [] });
+    Object.assign(TB, { version: d.version, names: d.names, units: d.units, saved: d.saved });
     if (changed && T) plots.forEach((Pl) => { showSeries(Pl); drawPlot(Pl); });
     TB.busy = false;
     if (tableBehind()) fetchTable(); // it changed while fetching
@@ -1340,7 +1340,7 @@ function openPicker(anchor, placeholder, items, extra = "", setup = null) {
 const compLabel = (n, k) => (n === 3 ? "xyz"[k] : String(k));
 
 /* every <select> is shown as a button that opens the picker above. The select stays, hidden: the page sets and
-   reads its options and value as before, picking fires its "change" event, and the button follows it */
+   reads its options and value as usual, picking fires its "change" event, and the button follows it */
 const selectValue = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
 function searchable(sel) {
   const b = document.createElement("button"); b.type = "button"; b.className = "mono"; b.title = sel.title;
@@ -1377,7 +1377,7 @@ function openPlotPicker(anchor, pid, axis) {
     for (const x of t.quantities.filter((x) => !x.noplot)) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc,
       pick: () => pickQuantity(tn, x.name, axis === "x" || x.ncomp < 2 ? [0] : [...Array(x.ncomp).keys()]),
       comps: x.ncomp < 2 ? [] : [...Array(x.ncomp).keys()].map((k) => ({ label: compLabel(x.ncomp, k), title: `the ${compLabel(x.ncomp, k)} component of its average`, pick: () => pickQuantity(tn, x.name, [k]) })) });
-    for (const x of t.scalars || []) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc, pick: () => pickQuantity(tn, x.name, [0]) });
+    for (const x of t.scalars) qs.push({ grp, name: x.name, unit: x.unit, doc: x.doc, pick: () => pickQuantity(tn, x.name, [0]) });
     items.push(...qs.sort((a, b) => a.name.localeCompare(b.name)));
   }
   const custom = axis !== "y" ? "" : `<div class="pcustom" title="A new column of table.txt: a Python expression, evaluated at every row in the script's namespace (with math and np). Enter adds it">
@@ -1390,7 +1390,7 @@ function openPlotPicker(anchor, pid, axis) {
       if (e.key === "Escape") return closePicker();
       if (e.key !== "Enter") return;
       const res = await send({ cmd: "table_custom", plot: pid, name: f("pname").value, unit: f("punit").value, expr: f("pexpr").value });
-      if (res && res.ok) { closePicker(); fetchTable(); } else f("perr").textContent = (res && res.error) || "failed";
+      if (res.ok) { closePicker(); fetchTable(); } else f("perr").textContent = res.error || "failed";
     };
   });
 }
@@ -1420,7 +1420,7 @@ function buildParams() {
     else inp = textInput((v) => send({ cmd: "switch", target: T.sel, name: s.name, kind: "num", value: v }));
     addRow($("stable"), "s", s.name, s.doc, "", inp);
   }
-  const W = P.world || { vectors: [], numbers: [] };
+  const W = P.world;
   $("worldhead").textContent = W.vectors.length + W.numbers.length ? "World" : "";
   for (const v of [...W.vectors, ...W.numbers]) addRow($("wtable"), "w", v.name, v.doc, "", textInput((x) => send({ cmd: "world_set", name: v.name, text: x })));
 }
@@ -1432,13 +1432,13 @@ function showParams() {
     if (v === null || v === undefined) { setText(el, ""); el.placeholder = "non-uniform"; } else { setText(el, num(v)); el.placeholder = ""; }
   }
   for (const s of t.switches) { const el = rows.s[s.name]; if (!el) continue; if (s.kind === "bool") el.checked = !!s.value; else setText(el, num(s.value)); }
-  for (const v of [...(P.world.vectors || []), ...(P.world.numbers || [])]) { const el = rows.w[v.name]; if (el) setText(el, num(v.value)); }
+  for (const v of [...P.world.vectors, ...P.world.numbers]) { const el = rows.w[v.name]; if (el) setText(el, num(v.value)); }
 }
 
 /* ---------- page refresh ---------- */
 function showTick() {
   $("title").textContent = P.title; document.title = P.title + " – mumax⁺";
-  $("prog").firstChild.style.width = (T.progress || 0) + "%";
+  $("prog").firstChild.style.width = T.progress + "%";
   const b = $("busy"); b.textContent = T.busy;
   b.className = T.busy === "Running" ? "running" : T.busy === "Paused" ? "" : "working";
   $("errbox").textContent = T.error ? "⚠ " + T.error : "";
@@ -1468,7 +1468,7 @@ function rebuildPage() {
 }
 function showPage() { showMesh(); showSolver(); showParams(); }
 
-/* The simulation pushes the snapshot (/api/tick) whenever it changes (/api/events, at most every 0.15 s);
+/* The simulation pushes the snapshot whenever it changes (/api/events, at most every 0.15 s);
    the page then fetches what it says changed. One update at a time: a snapshot that comes meanwhile waits
    (only the newest). update() without one redoes the current snapshot. */
 let updating = false, nextT = null;

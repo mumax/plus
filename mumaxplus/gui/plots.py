@@ -84,7 +84,7 @@ def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
     img = img[::-1]  # y up
     rgb = np.where(img[..., 3:] > 0, img[..., :3], np.array(MOVIE_BG, np.uint8))
     kx, ky = pixel_scale(meta, size, size)
-    im = Image.fromarray(rgb.astype(np.uint8)).resize((w * kx, h * ky), Image.NEAREST)
+    im = Image.fromarray(rgb).resize((w * kx, h * ky), Image.NEAREST)
     im = im.convert("RGBA")
     if meta["vector"] and arrow_cells:
         arrows = _arrows(data, meta["axes"][:2], w, h, kx, ky, arrow_cells)

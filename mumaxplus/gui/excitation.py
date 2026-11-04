@@ -78,7 +78,7 @@ class ExcitationMixin:
             raise ValueError(
                 f"{c['param']} needs {ncomp} value(s) at a time, got {v.size}"
             )
-        where, arg = c.get("where", "all"), str(c.get("whereValue", "")).strip()
+        where, arg = c["where"], str(c["whereValue"]).strip()
         if where == "region":
             regions = f"{self._ref(c['target'])}.regions"
             mask = f"np.asarray({regions} == {int(self._eval(arg))}, float)"
@@ -121,32 +121,24 @@ class ExcitationMixin:
 
     def _add_term(self, e):
         param = getattr(self.targets[e["target"]], e["param"])
-        if e["mask_value"] is None:
-            param.add_time_term(e["fn"])
-        else:
-            param.add_time_term(e["fn"], e["mask_value"])
+        param.add_time_term(e["fn"], e["mask_value"])
 
     def _excite(self, c):
         """Add an excitation: a time term of a parameter (Parameter.add_time_term)."""
         tm = self._term(c)
-        param = getattr(self.targets[c["target"]], c["param"])
         e = {
             "id": self._next_excitation,
             "target": c["target"],
             "param": c["param"],
             # the script's own time terms on this parameter (removing one of ours
             # removes those too)
-            "foreign": bool(param.is_dynamic)
-            and not any(
-                x["target"] == c["target"] and x["param"] == c["param"]
-                for x in self.excitations
-            ),
+            "foreign": self._foreign_terms(c["target"], c["param"]),
             **tm,
         }
         self._next_excitation += 1
         self._add_term(e)
         e["label"] = f"{c['param']} += {tm['term'][len('lambda t: '):]}" + (
-            f"  where {c['where']} {c.get('whereValue', '')}" if tm["mask"] else ""
+            f"  where {c['where']} {c['whereValue']}" if tm["mask"] else ""
         )
         self.excitations.append(e)
         self._did(tm["code"], tm["imports"])
@@ -195,4 +187,4 @@ class ExcitationMixin:
         self._excite(c)
 
     def _cmd_excite_remove(self, c):
-        self._excite_remove(c.get("id"))
+        self._excite_remove(c["id"])

@@ -5,7 +5,6 @@ from __future__ import annotations
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
 import json
-import os
 import secrets
 import threading
 import time
@@ -56,20 +55,13 @@ def _make_handler(ctrl: Controller, token: str):
                 return self._send(403, FORBIDDEN, "text/plain")
             if url.path in ("/", "/index.html"):
                 return self._send(200, page, "text/html; charset=utf-8")
-            if url.path == "/api/tick":  # what changes on every update
-                return self._json(ctrl.snapshot())
-            if url.path == "/api/events":  # the same, pushed whenever it changes
+            if url.path == "/api/events":  # the snapshot, pushed whenever it changes
                 return self._events()
             if url.path == "/api/page":  # parameters, mesh, solver settings, ...
                 return self._json(ctrl.desc)  # replaced whole, never changed in place
             if url.path == "/api/frame":  # the image data of one display (?view=id)
-                vid = arg("view")
                 with ctrl.lock:
-                    frame = (
-                        ctrl.frames.get(int(vid))
-                        if vid
-                        else next(iter(ctrl.frames.values()), None)
-                    )
+                    frame = ctrl.frames.get(int(arg("view")))
                 if frame is None:
                     return self._send(204)
                 meta, data = frame
@@ -92,10 +84,7 @@ def _make_handler(ctrl: Controller, token: str):
                     return self._send(404, b"not found", "text/plain")
                 with open(name, "rb") as f:
                     body = f.read()
-                kind = {".mp4": "video/mp4"}.get(
-                    os.path.splitext(name)[1], "application/octet-stream"
-                )
-                return self._send(200, body, kind)
+                return self._send(200, body, "video/mp4")
             if url.path == "/api/table.txt":  # the table rows in memory
                 text = ctrl.table.text()  # the table has its own lock
                 return self._send(200, text.encode(), "text/plain; charset=utf-8")
@@ -177,7 +166,6 @@ class GUI:
         self.token = secrets.token_urlsafe(16)
         self.host, self.port, self.open_browser = host, port, open_browser
         self._httpd = None
-        self._thread = None
         self._loop = None  # the simulation thread of run(block=False)
         # replaced the default plot / display yet?
         self._script_plots = self._script_views = False
@@ -193,14 +181,14 @@ class GUI:
         ``name`` and ``unit`` label the column (needed to name a function's column
         nicely).
         """
-        self._do(lambda: self.ctrl.table_add(quantity, name, unit))
+        self.ctrl.call(lambda: self.ctrl.table_add(quantity, name, unit))
 
     def table_autosave(self, period):
         """Save a table row in table.txt every ``period`` s of simulation time.
 
         0 = keep only a live preview in the page.
         """
-        self._do(lambda: self.ctrl._table_autosave(period))
+        self.ctrl.call(lambda: self.ctrl._table_autosave(period))
 
     def add_plot(self, x="t", y=None, logx=False, logy=False):
         """Show a plot of table column(s) ``y`` against column ``x``.
@@ -217,7 +205,7 @@ class GUI:
             else:
                 self.ctrl.add_plot(x, y, logx, logy)
 
-        self._do(add)
+        self.ctrl.call(add)
 
     def add_display(self, quantity, comp="", layer=None, all=False, plane="xy"):
         """Show a display of ``quantity``.
@@ -247,11 +235,7 @@ class GUI:
             else:
                 self.ctrl.add_view(**cfg)
 
-        self._do(add)
-
-    def _do(self, fn):
-        """Run ``fn`` now, or on the simulation thread if the loop runs elsewhere."""
-        return self.ctrl.call(fn)
+        self.ctrl.call(add)
 
     @property
     def url(self):
@@ -270,9 +254,7 @@ class GUI:
                 continue
         else:
             raise OSError("no free port found")
-        self._httpd.daemon_threads = True
-        self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
-        self._thread.start()
+        threading.Thread(target=self._httpd.serve_forever, daemon=True).start()
         print(f"//entering interactive mode: open {self.url}")
         if self.open_browser:
             webbrowser.open(self.url)

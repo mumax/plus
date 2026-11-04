@@ -187,8 +187,8 @@ class Table:
 class TableMixin:
     """The Controller's table and plot panels."""
 
-    def _init_table(self, table_file):
-        self.table = Table(table_file)
+    def _init_table(self):
+        self.table = Table()
         # one dict per plot panel: table columns x against y1,y2,... (names)
         self.plots = [{"id": 0, "x": "t", "y": "", "logx": False, "logy": False}]
         self._next_plot = 1
@@ -271,9 +271,7 @@ class TableMixin:
 
     def _table_custom(self, c):
         """Add a column (saved in the table file) computed by a Python expression."""
-        name, expr, unit = (
-            str(c.get(k) or "").strip() for k in ("name", "expr", "unit")
-        )
+        name, expr, unit = (str(c[k]).strip() for k in ("name", "expr", "unit"))
         if not re.fullmatch(r"[A-Za-z_][\w.]*", name):
             raise ValueError("give the column a name: letters, digits, _ and .")
         code = compile(expr, "<table column>", "eval")
@@ -283,9 +281,8 @@ class TableMixin:
 
         float(np.asarray(fn()))  # an error now, rather than NaN in every row
         self.table_add(fn, name, unit)
-        if c.get("plot") is not None:
-            p = self._plot(c["plot"])
-            self._plot_set(p, y=[*p["y"].split(","), name])
+        p = self._plot(c["plot"])
+        self._plot_set(p, y=[*p["y"].split(","), name])
 
     def table_add(self, quantity, name=None, unit=None):
         """TableAdd(quantity).
@@ -353,7 +350,7 @@ class TableMixin:
         if tb.period > 0:
             if tb.next_save is None:
                 tb.next_save = t + tb.period if tb.rows else t
-            if t >= tb.next_save * (1 - 1e-12) or force:
+            if t >= tb.next_save * (1 - 1e-12):
                 tb.sample(t, to_file=True)
                 tb.next_save = _next_due(tb.next_save, t * (1 + 1e-12), tb.period)
         else:
@@ -378,15 +375,15 @@ class TableMixin:
         self._table_autosave(self._eval(c["text"]))
 
     def _cmd_table_using(self, c):
-        p = self._plot(c.get("plot", self.plots[0]["id"]))
+        p = self._plot(c["plot"])
         self._plot_set(p, c.get("x"), c.get("y"), c.get("logx"), c.get("logy"))
         self._prune_columns()
 
     def _cmd_plot_quantity(self, c):
         """Plot any quantity of a magnet, as x or another y."""
         p = self._plot(c["plot"])
-        col = self._series(c["target"], c["quant"], c.get("comp"))
-        if c.get("axis") == "x":
+        col = self._series(c["target"], c["quant"], c["comp"])
+        if c["axis"] == "x":
             self._plot_set(p, x=col)
         else:
             ys = p["y"].split(",")
