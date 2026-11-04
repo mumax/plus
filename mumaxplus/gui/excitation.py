@@ -155,27 +155,37 @@ class ExcitationMixin:
     def _excite_remove(self, eid):
         """Remove an excitation.
 
-        mumax+ can only remove all time terms of a parameter, so the others added
+        mumax⁺ can only remove all time terms of a parameter, so the others added
         here are added again.
         """
         e = next((x for x in self.excitations if x["id"] == eid), None)
         if e is None:
             raise ValueError(f"no excitation {eid!r}")
-        same = lambda x: x["target"] == e["target"] and x["param"] == e["param"]
-        foreign = any(x["foreign"] for x in self.excitations if same(x))
+        foreign = self._foreign_terms(e["target"], e["param"])
         getattr(self.targets[e["target"]], e["param"]).remove_time_terms()
         self._did(f"{e['ref']}.remove_time_terms()")
-        if foreign:
-            self.say(
-                f"this also removed the time terms the script added to {e['param']}"
-            )
         self.excitations = [x for x in self.excitations if x is not e]
+        self._terms_removed(e["target"], e["param"], foreign)
+        self._dirty = True
+
+    def _foreign_terms(self, target, param):
+        """Return whether a parameter has time terms that were not added in the page."""
+        own = [
+            x for x in self.excitations if x["target"] == target and x["param"] == param
+        ]
+        if own:
+            return any(x["foreign"] for x in own)
+        return bool(getattr(getattr(self.targets[target], param), "is_dynamic", False))
+
+    def _terms_removed(self, target, param, foreign):
+        """All time terms of a parameter are gone: add those of the page back."""
+        if foreign:
+            self.say(f"this also removed the time terms the script added to {param}")
         for x in self.excitations:
-            if same(x):
+            if x["target"] == target and x["param"] == param:
                 x["foreign"] = False
                 self._add_term(x)
                 self._did(x["code"])
-        self._dirty = True
 
     # ------------------------------------------------------------------- commands
     def _cmd_excite_preview(self, c):

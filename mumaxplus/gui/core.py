@@ -1,12 +1,10 @@
-"""Simulation controller of the mumax+ GUI.
+"""Simulation controller of the mumax⁺ GUI.
 
-Everything that touches the mumax+ world happens on ONE thread: the thread that calls
+Everything that touches the mumax⁺ world happens on ONE thread: the thread that calls
 :meth:`Controller.loop`. It advances the solver in short chunks and executes the
 commands that the web page queued in between.
 HTTP threads only queue commands and read published snapshots, so a GUI edit never races
-with a solver step, and nothing GPU-related is called from another thread. (The mumax+
-bindings do not release the GIL, so one long ``run()`` would also freeze the web
-server.)
+with a solver step, and nothing GPU-related is called from another thread.
 
 The Controller is put together from the mixins of the other modules, one per part of
 the page (table and plots, displays, movies, excitations, painting, checkpoints,
@@ -37,7 +35,7 @@ from .movie import MovieMixin
 from .paint import PaintMixin
 from .table import TableMixin
 
-DEFAULT_METHOD = "Fehlberg"  # documented default; mumax+ cannot report the current one
+DEFAULT_METHOD = "Fehlberg"  # documented default; mumax⁺ cannot report the current one
 CHUNK_SECONDS = 0.05  # wall time of one simulation chunk
 TORQUE_INTERVAL = 0.5
 PERF_WINDOW = 2.0  # wall time over which steps/s and simulated time/s are measured
@@ -49,7 +47,8 @@ NO_RESET = {
     "refresh",
     "table_using",
     "region",
-    "paint",
+    "select",
+    "table_autosave",
     "excite_preview",
     "movie_start",
     "movie_stop",
@@ -65,6 +64,7 @@ NO_RESET = {
     "script_clear",
     "save_ovf",
     "view_autosave",
+    "checkpoint",
     "checkpoint_remove",
 }
 
@@ -79,17 +79,19 @@ class Controller(
     CheckpointMixin,
     ConsoleMixin,
 ):
-    """Drives a mumax+ world for the page (see the module docstring)."""
+    """Drives a mumax⁺ world for the page (see the module docstring)."""
 
     def __init__(self, world, namespace=None, title=None, table_file="table.txt"):
         self.world = world
-        self.lock = threading.RLock()
+        self.lock = threading.RLock()  # Protect data shared between threads
+        # command queue from HTTP threads to sim threads
         self.cmds: "queue.Queue" = queue.Queue()
         self._stop = False
+        self._loop_thread = None  # the thread in loop(), if any
         self.title = title or (
-            Path(sys.argv[0]).stem if sys.argv and sys.argv[0] else "mumax+"
+            Path(sys.argv[0]).stem if sys.argv and sys.argv[0] else "mumax⁺"
         )
-
+        # TODO: should `globals()` be the default namespace
         self.ns = namespace if namespace is not None else {}
         self.ns.setdefault("world", world)
 
@@ -117,7 +119,7 @@ class Controller(
         self.region = -1
         self.snap = {}
         self.snap_id = 0  # goes up when the snapshot changes
-        self.changed = threading.Condition(self.lock)  # notified then
+        self.changed = threading.Condition(self.lock)  # used to wake waiting pages
         self.log = []
         self.log_id = 0
 
@@ -125,6 +127,7 @@ class Controller(
         self._perf = collections.deque()
         self.perf = {"steps_s": None, "sim_s": None}
 
+        # activate every mixin class
         self._init_script()
         self._init_describe()
         self._init_display()
@@ -134,9 +137,9 @@ class Controller(
         self._init_paint()
         self._init_checkpoints()
         self._install_helpers()
-        self.refresh_targets()
-        self._init_selection()
-        self.describe()
+        self.refresh_targets()  # Lists magnets and sublattices
+        self._init_selection()  # Select the first magnet and create the first displays
+        self.describe()  # Build the page description
 
     # ------------------------------------------------------------------- logging
     def say(self, text, kind="out"):
@@ -167,8 +170,9 @@ class Controller(
                         targets[f"{name}:sub{i}"] = sub
                 except Exception:
                     pass
+        if self.ns.get("magnets", self.targets) is self.targets:  # not the script's own
+            self.ns["magnets"] = targets
         self.targets = targets
-        self.ns.setdefault("magnets", targets)
 
     def _primary(self):
         return [n for n in self.targets if ":sub" not in n]
@@ -273,6 +277,16 @@ class Controller(
         if done.wait(wait):
             return box.get("result", {"ok": True})
         return {"ok": True, "pending": True}
+
+    def call(self, fn):
+        """Run ``fn`` on the simulation thread: now if this is it or no loop runs."""
+        thread = self._loop_thread
+        if thread is None or thread is threading.current_thread():
+            return fn()
+        r = self.submit({"cmd": "call", "fn": fn}, wait=60.0)
+        if r.get("ok") is False:
+            raise RuntimeError(r.get("error"))
+        return r.get("value")
 
     def _drain(self, timeout=0.0):
         try:
@@ -396,7 +410,7 @@ class Controller(
             self._dirty = True
 
     def _cmd_call(self, c):
-        """Run a GUI method the script calls while the loop runs (GUI._do)."""
+        """Run a method another thread calls while the loop runs (Controller.call)."""
         return {"ok": True, "value": c["fn"]()}
 
     def _cmd_refresh(self, c):
@@ -407,6 +421,8 @@ class Controller(
     def _start_run(self, t=None, n=None):
         """Run for a time t, n steps, or (neither) until Break."""
         self._break()
+        if (t is not None and t <= 0) or (n is not None and n <= 0):
+            return  # nothing to do; _chunk always takes at least one step
         now = self._now()
         self.running = True
         self._run_t0 = self._rec_t = now
@@ -438,6 +454,7 @@ class Controller(
             fn()
         finally:
             self.busy = ""
+            self._fresh = True
         self.say(f"{label} done in {time.perf_counter() - t0:.2f} s")
         self._live_sample()
         self._update_torque()
@@ -469,12 +486,14 @@ class Controller(
         value = self._vec(text, int(q.ncomp))
         ref = f"{self._ref(target)}.{pname}"
         if self.region < 0:
+            foreign = self._foreign_terms(target, pname)
             attr = getattr(type(obj), pname)
             if attr.fset is not None:
                 setattr(obj, pname, value)
             else:
                 q.set(value)
             self._did(f"{ref} = {value!r}")
+            self._terms_removed(target, pname, foreign)  # Parameter.set removed them
         else:
             q.set_in_region(self.region, value)
             self._did(f"{ref}.set_in_region({self.region}, {value!r})")
@@ -535,8 +554,8 @@ class Controller(
         if limits:
             remaining = min(limits) - ts.time
             dt = ts.timestep or 0.0
-            if remaining > 0 and dt > 0:
-                n = max(1, min(n, int(0.5 * remaining / dt)))
+            if remaining > 0 and dt > 0:  # (remaining can be inf)
+                n = max(1, int(min(n, 0.5 * remaining / dt)))
         self._steps(n)
         self.steps_done += n
         self._measure()
@@ -597,31 +616,36 @@ class Controller(
 
     def loop(self):
         """Drive the simulation on the calling thread until stop()."""
-        self._render()
-        self._publish()
-        last_pub = 0.0
-        while not self._stop:
-            try:
-                self._drain(timeout=0.0 if self.running else 0.05)
-                if self.running:
-                    self._chunk()
-                    if time.perf_counter() - self._last_torque > TORQUE_INTERVAL:
-                        self._update_torque()
-                now = time.perf_counter()
-                if self._dirty or (
-                    self.running and now - self._last_render > RENDER_INTERVAL
-                ):
-                    self._render()
-                if self.running or now - last_pub > 0.25:
+        self._loop_thread = threading.current_thread()
+        try:
+            self._render()
+            self._publish()
+            last_pub = 0.0
+            while not self._stop:
+                try:
+                    self._drain(timeout=0.0 if self.running else 0.05)
+                    if self.running:
+                        self._chunk()
+                        if time.perf_counter() - self._last_torque > TORQUE_INTERVAL:
+                            self._update_torque()
+                    now = time.perf_counter()
+                    if self._dirty or (
+                        self.running and now - self._last_render > RENDER_INTERVAL
+                    ):
+                        self._render()
+                    if self.running or now - last_pub > 0.25:
+                        self._publish()
+                        last_pub = now
+                except Exception as e:
+                    with contextlib.suppress(Exception):
+                        self._record_run()
+                    self.running = False
+                    self.say(f"simulation stopped: {type(e).__name__}: {e}", "err")
+                    self.say(traceback.format_exc(limit=4).rstrip(), "err")
                     self._publish()
-                    last_pub = now
-            except Exception as e:
-                with contextlib.suppress(Exception):
-                    self._record_run()
-                self.running = False
-                self.say(f"simulation stopped: {type(e).__name__}: {e}", "err")
-                self.say(traceback.format_exc(limit=4).rstrip(), "err")
-                self._publish()
+        finally:
+            self._finish_movies()
+            self._loop_thread = None
 
     def stop(self):
         """Ask the simulation loop to stop (and end the pushed updates)."""

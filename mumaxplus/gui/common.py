@@ -62,6 +62,18 @@ def _num(v):
     )
 
 
+def _next_due(due, t, period):
+    """Return the first time due + k * period (k = 0, 1, ...) after t.
+
+    Computed, not stepped: a period below the precision of t, or far smaller than the
+    time since ``due``, must not hang the simulation thread.
+    """
+    if due > t:
+        return due
+    due += (math.floor((t - due) / period) + 1) * period
+    return due if due > t else math.nextafter(t, math.inf)
+
+
 def _col_name(base, ncomp, i):
     """Table column of component i of a quantity: m, or mx, my, mz, or m0, m1, ..."""
     return base if ncomp == 1 else base + ("xyz"[i] if ncomp == 3 else str(i))

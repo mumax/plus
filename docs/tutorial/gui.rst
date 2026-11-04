@@ -133,7 +133,8 @@ table columns, plots and displays from the script, before calling
 
 With ``gui.table_autosave(0)`` (the default) nothing is written to
 ``table.txt``; the plots then show a live preview only. *Save table* in the
-page downloads the rows shown in the plots.
+page downloads the rows shown in the plots. Each run of the script starts a new
+``table.txt``: the first row it saves overwrites the file of an earlier run.
 
 Using the GUI in Jupyter
 ------------------------

@@ -1,4 +1,4 @@
-"""Tiny token-protected HTTP server (standard library only) for the mumax+ GUI."""
+"""Tiny token-protected HTTP server (standard library only) for the mumax⁺ GUI."""
 
 from __future__ import annotations
 
@@ -45,7 +45,8 @@ def _make_handler(ctrl: Controller, token: str):
 
         def _authorized(self, query):
             supplied = self.headers.get("X-Token") or (query.get("token") or [""])[0]
-            return secrets.compare_digest(supplied, token)
+            # as bytes: comparing str raises TypeError on a non-ASCII token
+            return secrets.compare_digest(supplied.encode(), token.encode())
 
         def do_GET(self):
             url = urlparse(self.path)
@@ -60,8 +61,7 @@ def _make_handler(ctrl: Controller, token: str):
             if url.path == "/api/events":  # the same, pushed whenever it changes
                 return self._events()
             if url.path == "/api/page":  # parameters, mesh, solver settings, ...
-                with ctrl.lock:
-                    return self._json(ctrl.desc)
+                return self._json(ctrl.desc)  # replaced whole, never changed in place
             if url.path == "/api/frame":  # the image data of one display (?view=id)
                 vid = arg("view")
                 with ctrl.lock:
@@ -82,7 +82,8 @@ def _make_handler(ctrl: Controller, token: str):
             if url.path == "/api/log":
                 since = int(arg("since", "0"))
                 with ctrl.lock:
-                    return self._json([m for m in ctrl.log if m["id"] > since])
+                    lines = [m for m in ctrl.log if m["id"] > since]
+                return self._json(lines)  # not holding the lock: a slow page
             if url.path == "/api/file":  # a movie made by the GUI
                 name = arg("name")
                 with ctrl.lock:
@@ -96,8 +97,7 @@ def _make_handler(ctrl: Controller, token: str):
                 )
                 return self._send(200, body, kind)
             if url.path == "/api/table.txt":  # the table rows in memory
-                with ctrl.lock:
-                    text = ctrl.table.text()
+                text = ctrl.table.text()  # the table has its own lock
                 return self._send(200, text.encode(), "text/plain; charset=utf-8")
             if url.path == "/api/table":  # new rows for the plots (drawn in the page)
                 ver, since = int(arg("version", "-1")), int(arg("since", "0"))
@@ -147,7 +147,7 @@ def _make_handler(ctrl: Controller, token: str):
 
 
 class GUI:
-    """Web GUI for a mumax+ world.
+    """Web GUI for a mumax⁺ world.
 
     Parameters
     ----------
@@ -250,13 +250,8 @@ class GUI:
         self._do(add)
 
     def _do(self, fn):
-        """Run ``fn`` now, or on the simulation thread if run(block=False) drives it."""
-        if self._loop is None or not self._loop.is_alive():
-            return fn()
-        r = self.ctrl.submit({"cmd": "call", "fn": fn}, wait=60.0)
-        if r.get("ok") is False:
-            raise RuntimeError(r.get("error"))
-        return r.get("value")
+        """Run ``fn`` now, or on the simulation thread if the loop runs elsewhere."""
+        return self.ctrl.call(fn)
 
     @property
     def url(self):
@@ -287,8 +282,14 @@ class GUI:
 
         With ``block=True`` (default) the simulation loop runs on the calling thread
         until Ctrl-C or :meth:`stop`. With ``block=False`` it runs in a background
-        thread (handy in Jupyter).
+        thread (handy in Jupyter). Only one loop can run: with ``block=False``, a loop
+        already in the background is returned. After :meth:`stop` it can run again.
         """
+        if self._loop is not None and self._loop.is_alive():
+            if block:
+                raise RuntimeError("the simulation already runs: call stop() first")
+            return self._loop
+        self.ctrl._stop = False
         if self._httpd is None:
             self.start_server()
         if not block:
@@ -305,6 +306,8 @@ class GUI:
     def stop(self):
         """Stop the simulation loop and the web server."""
         self.ctrl.stop()
+        if self._loop is not None and self._loop is not threading.current_thread():
+            self._loop.join()  # it may still make a movie
         if self._httpd is not None:
             self._httpd.shutdown()
             self._httpd.server_close()

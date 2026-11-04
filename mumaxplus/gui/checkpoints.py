@@ -63,7 +63,10 @@ class CheckpointMixin:
         self._live_sample()
         for cfg in self.views:  # AutoSave: save now and every period from here
             cfg["_next_save"] = None
+            if cfg.get("_movie"):  # a movie goes on from here too
+                cfg["_movie"]["next"] = None
         self._autosave_tick()
+        self._movie_tick()
         self._update_torque()
         self._dirty = True
 

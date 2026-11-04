@@ -8,7 +8,7 @@ import time
 
 import numpy as np
 
-from .common import MATH, _col_name, _mro
+from .common import MATH, _col_name, _mro, _next_due
 
 LIVE_SAMPLE_INTERVAL = 0.15  # live table sampling (wall time) when TableAutosave is 0
 
@@ -33,6 +33,7 @@ class Table:
         self.period = 0.0  # TableAutosave: 0 = live preview only (not saved)
         self.next_save = None
         self._header_written = False
+        self._file_started = False  # the first row replaces the file of an earlier run
         # the page fetches new rows only; rows that change otherwise (clear, thinning,
         # rewind, a column added or removed) make a new version, which it fetches whole
         self.version = 0
@@ -110,7 +111,8 @@ class Table:
                 self.version += 1
         if to_file:
             saved = self._saved()
-            with open(self.path, "a") as f:
+            with open(self.path, "a" if self._file_started else "w") as f:
+                self._file_started = True
                 if not self._header_written:
                     f.write(self._header(saved))
                     self._header_written = True
@@ -144,10 +146,11 @@ class Table:
 
     def text(self):
         """Return the rows in memory, plot-only columns too, as the file has them."""
-        with self.lock:
-            rows = list(self.rows)
-        idx = list(range(len(self.cols) + 1))
-        return self._header(idx) + "".join(self._line(r, idx) for r in rows)
+        with self.lock:  # columns and rows change together; rows change in place
+            rows = [r[:] for r in self.rows]
+            idx = list(range(len(self.cols) + 1))
+            header = self._header(idx)
+        return header + "".join(self._line(r, idx) for r in rows)
 
     def since(self, version, start):
         """Return the rows the page does not have yet.
@@ -352,8 +355,7 @@ class TableMixin:
                 tb.next_save = t + tb.period if tb.rows else t
             if t >= tb.next_save * (1 - 1e-12) or force:
                 tb.sample(t, to_file=True)
-                while tb.next_save <= t * (1 + 1e-12):
-                    tb.next_save += tb.period
+                tb.next_save = _next_due(tb.next_save, t * (1 + 1e-12), tb.period)
         else:
             # live preview: sample every LIVE_SAMPLE_INTERVAL of wall time
             # (and at the end of a run)

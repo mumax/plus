@@ -1,7 +1,7 @@
 """Images made on the server.
 
 The display image's vector colours come from ``mumaxplus.util.get_rgb`` (reused, not
-re-implemented), so they match ``mumaxplus.util.plot_field`` and the rest of mumax+;
+re-implemented), so they match ``mumaxplus.util.plot_field`` and the rest of mumax⁺;
 a map of the regions gets a colour per region (region_rgba).
 The table plots are drawn in the page. Movie frames are drawn here, like the page draws
 a display, so a recording does not need the page to be open.
@@ -24,7 +24,10 @@ def vector_rgba(sl):
     from mumaxplus.util import get_rgb
 
     field = np.ascontiguousarray(sl[:, None, :, :], dtype=float)  # (3, 1, h, w)
-    rgb = get_rgb(field, OoP_axis_idx=2, layer=0)  # (h, w, 3) in [0, 1]
+    if field.any():
+        rgb = get_rgb(field, OoP_axis_idx=2, layer=0)  # (h, w, 3) in [0, 1]
+    else:  # get_rgb's normalisation would divide 0 by 0
+        rgb = np.full((*sl.shape[1:], 3), 0.5)
     out = np.empty((*rgb.shape[:2], 4), dtype=np.uint8)
     out[..., :3] = np.round(np.clip(rgb, 0, 1) * 255)
     out[..., 3] = 255

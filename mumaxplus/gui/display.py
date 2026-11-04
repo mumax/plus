@@ -7,7 +7,7 @@ import time
 
 import numpy as np
 
-from .common import _clean
+from .common import _clean, _next_due
 from .plots import region_rgba, vector_rgba
 
 RENDER_INTERVAL = 0.10  # minimum wall time between two display frames while running
@@ -41,8 +41,10 @@ class DisplayMixin:
         if self.sel is None:
             return None
         cls = type(self.targets[self.sel])
-        if isinstance(getattr(cls, "magnetization", None), property):
-            return "magnetization"
+        # an antiferromagnet has no magnetization of its own, only of its sublattices
+        for name in ("magnetization", "full_magnetization"):
+            if isinstance(getattr(cls, name, None), property):
+                return name
         return next(
             (n for n in dir(cls) if isinstance(getattr(cls, n, None), property)), None
         )
@@ -131,10 +133,12 @@ class DisplayMixin:
         return out, boxes, lo
 
     def _render(self):
-        for cfg in self.views:
-            self._render_view(cfg)
-        self._last_render = time.perf_counter()
-        self._dirty = False
+        try:
+            for cfg in self.views:
+                self._render_view(cfg)
+        finally:  # an error stops the loop's run once, not on every pass
+            self._last_render = time.perf_counter()
+            self._dirty = False
 
     def _render_view(self, cfg):
         if self.sel not in self.targets or not cfg["quant"]:
@@ -255,19 +259,17 @@ class DisplayMixin:
                 self.say(f"autosave of {cfg['quant']} stopped: {e}", "err")
                 continue
             due = t if due is None else due
-            while due <= t * (1 + 1e-12):
-                due += period
-            cfg["_next_save"] = due
+            cfg["_next_save"] = _next_due(due, t * (1 + 1e-12), period)
 
     # ------------------------------------------------------------------- commands
     def _cmd_render(self, c):
         cfg = self._view(c.get("view", self.views[0]["id"] if self.views else None))
-        for k in ("quant", "comp", "plane", "layer", "all"):
-            if k in c:
-                cfg[k] = c[k]
+        new = {k: c[k] for k in ("quant", "comp", "plane", "layer", "all") if k in c}
         if "plane" in c and "layer" not in c:
-            cfg["layer"] = None  # another plane: start in its middle
-        _check_plane(cfg)
+            new["layer"] = None  # another plane: start in its middle
+        new = {**cfg, **new}
+        _check_plane(new)  # before the display changes
+        cfg.update(new)
         self._dirty = True
 
     def _cmd_view_add(self, c):
@@ -277,7 +279,7 @@ class DisplayMixin:
         gone = [v for v in self.views if v["id"] == c["view"]]
         if gone and len(self.views) > 1:
             if gone[0].get("_movie"):
-                self._movie_stop(gone[0])  # keep what was recorded
+                self._movie_end(gone[0])  # keep what was recorded
             self.views.remove(gone[0])
             with self.lock:
                 self.frames.pop(c["view"], None)

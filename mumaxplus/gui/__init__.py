@@ -1,4 +1,4 @@
-"""A web GUI for mumax+ (live field view, parameters, solver control)."""
+"""A web GUI for mumax⁺ (live field view, parameters, solver control)."""
 
 from .server import GUI
 

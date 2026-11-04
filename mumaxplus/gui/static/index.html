@@ -844,7 +844,7 @@ function drawArrows(V, ctx, fx, fy, w, h) {
 
 /* ---------- painting on a display: brush m, or place a vortex / skyrmion / ... (m) or a Gaussian (u) at a point ----------
    A stroke's points (in cells of the shown image) go to the simulation as they come, one request at a time */
-let strokeIds = 0;
+let strokeIds = Date.now(); // not from 0: after a reload, a stroke must not continue the simulation's last one
 const PLACE = { place: "magnetization", placeu: "elastic_displacement" }; // the field each place tool sets
 function paintTool(V, tool) {
   const q = V.q, old = V.paintTool || "";

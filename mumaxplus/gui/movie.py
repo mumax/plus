@@ -8,6 +8,7 @@ import tempfile
 
 import numpy as np
 
+from .common import _next_due
 from .plots import movie_frame, write_movie
 
 
@@ -73,12 +74,10 @@ class MovieMixin:
                 self._movie_frame(cfg, mv)
             except Exception as e:  # stop recording, keep what was recorded
                 self.say(f"movie of {cfg['quant']}: {type(e).__name__}: {e}", "err")
-                self._movie_stop(cfg)
+                self._movie_end(cfg)
                 continue
             due = t if mv["next"] is None else mv["next"]
-            while due <= t + tol:
-                due += mv["period"]
-            mv["next"] = due
+            mv["next"] = _next_due(due, t + tol, mv["period"])
 
     def _movie_frame(self, cfg, mv):
         self._render_view(cfg)  # the display as it is now
@@ -101,18 +100,41 @@ class MovieMixin:
         if mv["format"] == "png":
             self.say(f"saved {mv['n']} frames in {mv['out']}")
             return str(mv["out"])
+        if mv["n"] == 0:
+            shutil.rmtree(mv["folder"], ignore_errors=True)
+            raise ValueError("no frames were recorded")
         try:
-            if mv["n"] == 0:
-                raise ValueError("no frames were recorded")
             self.busy = "making the movie"
             self._publish()
             write_movie(mv["folder"], mv["out"], mv["fps"])
+        except Exception as e:  # the frames took a whole run to make: keep them
+            why = (getattr(e, "stderr", b"") or b"").decode(errors="replace").strip()
+            raise ValueError(
+                f"could not make {mv['out']} ({why or e}); "
+                f"its frames are kept in {mv['folder']}"
+            ) from e
         finally:
             self.busy = ""
-            shutil.rmtree(mv["folder"], ignore_errors=True)
+        shutil.rmtree(mv["folder"], ignore_errors=True)
         self.outputs.add(str(mv["out"]))
         self.say(f"saved {mv['out']} ({mv['n']} frames at {mv['fps']:g} fps)")
         return str(mv["out"])
+
+    def _movie_end(self, cfg):
+        """Stop recording; a failure is reported, and the simulation goes on."""
+        try:
+            self._movie_stop(cfg)
+        except Exception as e:
+            self.say(f"movie of {cfg['quant']}: {e}", "err")
+
+    def _finish_movies(self):
+        """Make the movies still recording when the loop ends (the page is gone)."""
+        for cfg in self.views:
+            if cfg.get("_movie"):
+                try:
+                    print(f"//saved {self._movie_stop(cfg)}")
+                except Exception as e:
+                    print(f"//movie of {cfg['quant']}: {e}")
 
     # ------------------------------------------------------------------- commands
     def _cmd_movie_start(self, c):

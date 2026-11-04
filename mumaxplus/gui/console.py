@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import contextlib
+import functools
 import io
 import traceback
 
@@ -92,8 +93,16 @@ class ConsoleMixin:
             self._set_method(method)
             self.record(f"world.timesolver.set_method({method!r})")
 
+        def on_sim_thread(fn):  # the script can call them while the loop runs elsewhere
+            @functools.wraps(fn)
+            def call(*args, **kwargs):
+                return self.call(lambda: fn(*args, **kwargs))
+
+            return call
+
         helpers = [Run, Steps, Break, Relax, Minimize]
         helpers += [TableAdd, TableAutosave, TableSave, SetSolver]
+        helpers = [on_sim_thread(fn) for fn in helpers]
         for fn in helpers:
             self.ns.setdefault(fn.__name__, fn)
         # the console lines that use them are not recorded as typed (Run, Relax, ...
@@ -155,3 +164,4 @@ class ConsoleMixin:
     def _cmd_script_clear(self, c):
         self._record_run()  # forget the run so far too
         self.script, self._script_imports = [], []
+        self._paint_undo = self._stroke = None  # they point at lines of the script
