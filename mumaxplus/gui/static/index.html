@@ -477,7 +477,11 @@ function buildExcite() {
   const sel = $("exParam"), keep = sel.value || "bias_magnetic_field";
   sel.innerHTML = t.params.map((x) => `<option value="${esc(x.name)}">${esc(x.name)}</option>`).join("");
   sel.value = t.params.some((x) => x.name === keep) ? keep : (t.params[0] || {}).name;
-  if (!exChart) exChart = makeChart($("exCv"), $("exHover"), $("exReset"));
+  if (!exChart) {
+    exChart = makeChart($("exCv"), $("exHover"), $("exReset"));
+    $("exCv").redraw = () => drawChart(exChart); // the section starts collapsed: draw when it opens
+    panelObserver.observe($("exCv"));
+  }
   exBuildFields();
 }
 function exBuildFields() {
