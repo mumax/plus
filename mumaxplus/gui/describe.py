@@ -15,6 +15,7 @@ import mumaxplus
 import mumaxplus.util as U
 
 from .common import _clean, _doc, _mro, _param_json
+from .plots import colormap_stops
 
 SOLVER_METHODS = ["Heun", "BogackiShampine", "CashKarp", "Fehlberg", "DormandPrince"]
 
@@ -232,6 +233,7 @@ class DescribeMixin:
             "methods": SOLVER_METHODS,
             "configs": self._config_info(),
             "ffmpeg": shutil.which("ffmpeg") is not None,  # MP4 movies
+            "colormaps": colormap_stops(),  # the displays' colorbars
         }
         with self.lock:
             self.desc = _clean(desc)

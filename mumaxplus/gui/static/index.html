@@ -77,8 +77,9 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 .vhead { display: none; align-items: center; gap: 8px; font-weight: 650; color: var(--mute); font-size: .92em; }
 #views:has(.view + .view) .vhead { display: flex; }
 .vhead button { margin-left: auto; padding: 0 8px; line-height: 1.4; }
-.imgwrap { position: relative; display: block; width: fit-content; margin: 10px 0 4px; background: var(--img); border-radius: 8px; padding: 10px; max-width: 100%; }
-.disp { display: block; max-width: 100%; image-rendering: pixelated; cursor: crosshair; }
+.imgwrap { position: relative; display: flex; align-items: flex-start; gap: 8px; width: fit-content; margin: 10px 0 4px; background: var(--img); border-radius: 8px; padding: 10px; max-width: 100%; }
+.disp { display: block; max-width: 100%; min-width: 0; image-rendering: pixelated; cursor: crosshair; }
+.cbar { flex: none; }
 .loupe { position: absolute; display: none; pointer-events: none; width: 150px; height: 150px; border: 1px solid #000;
          border-radius: 2% 50% 50%; box-shadow: 3px 3px 8px rgba(0,0,0,.4); image-rendering: pixelated; }
 .hover { font: 12px var(--mono); color: var(--mute); min-height: 18px; }
@@ -166,6 +167,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
   <div class="row renderAllRow" title="Draw every magnet at its place in the world (the selected one is outlined). Click a magnet to select it"><label><input type="checkbox" class="renderAll"> show all magnets</label></div>
   <table>
     <tr title="The plane of the image (xz and yz: cross-sections), and which slice of the magnet along the axis normal to it"><td>Slice: <select class="renderPlane"><option>xy</option><option>xz</option><option>yz</option></select> <input type="range" class="renderLayer" min="0" max="0" value="0"></td><td class="renderLayerLabel">1/1</td></tr>
+    <tr class="cmapRow" title="The colours of the image, from its minimum to its maximum. coolwarm, bwr, RdBu_r and seismic have 0 in the middle"><td colspan="2">Colormap: <select class="renderCmap"></select></td></tr>
     <tr class="arrowSizeRow" title="Arrow spacing in cells"><td>Arrows: <input type="range" class="arrowSize" min="2" max="64" value="8"></td><td class="arrowSizeLabel">8</td></tr>
   </table>
   <div class="row" title="Paint the magnet: drag with the brush to set a parameter, or click to place a vortex, skyrmion, ... (m) or a Gaussian (u: the elastic displacement)">Paint:
@@ -176,7 +178,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
       <label title="Paint through all slices (along the axis normal to the image), or only the shown one"><input type="checkbox" class="paintAll" checked> all slices</label>
       <button class="paintUndo" title="Undo the last stroke (possible until something else changes the state)">Undo</button></span></div>
   <div class="row" title="Drag a line across the image to plot the quantity along it"><label><input type="checkbox" class="profOn"> line profile</label></div>
-  <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="overlay" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
+  <div class="imgwrap"><canvas class="disp" width="10" height="10"></canvas><canvas class="cbar" hidden></canvas><canvas class="overlay" width="10" height="10"></canvas><canvas class="loupe" width="150" height="150"></canvas></div>
   <div class="hover">&nbsp;</div>
   <div class="legend" hidden></div>
   <div class="profile" hidden>
@@ -185,7 +187,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
     <canvas class="profcv"></canvas>
     <div class="hover profHover">&nbsp;</div>
   </div>
-  <div class="row">Save: <button class="savePng" title="Download the image as shown here, with its arrows">PNG</button><button class="saveOvf" title="Save the quantity of the selected magnet as an OVF file, in the folder the script runs in">OVF</button>
+  <div class="row">Save: <button class="savePng" title="Download the image as shown here, with its arrows and colorbar">PNG</button><button class="saveOvf" title="Save the quantity of the selected magnet as an OVF file, in the folder the script runs in">OVF</button>
     <span title="Save the quantity as OVF now and every this many seconds of simulation time while running. 0 = off">AutoSave: <input type="text" class="autosave" size="7"> s</span></div>
   <div class="row" title="Record this display: a frame every so much simulation time, drawn by the simulation (it goes on with the page closed). The movie is saved next to table.txt when you stop">Movie: every
     <input type="text" class="movPeriod" value="1e-11" size="6"> s,
@@ -601,6 +603,7 @@ $("addView").onclick = () => send({ cmd: "view_add" });
 
 function makeView(id) {
   const el = $("viewTpl").content.firstElementChild.cloneNode(true);
+  el.querySelector(".renderCmap").innerHTML = Object.keys(P.colormaps).map((n) => `<option>${n}</option>`).join("");
   el.querySelectorAll("select").forEach(searchable);
   const V = { id, el, q: (c) => el.querySelector("." + c), frame: null, frameId: -1, mouse: null, arrowCells: 8, qkey: "", paintVals: {},
               off: document.createElement("canvas") };
@@ -617,11 +620,20 @@ function makeView(id) {
   q("renderPlane").onchange = (e) => render({ plane: e.target.value }); // starts at its middle slice
   q("renderLayer").oninput = (e) => render({ layer: +e.target.value });
   q("renderAll").onchange = (e) => render({ all: e.target.checked });
+  q("renderCmap").onchange = (e) => render({ cmap: e.target.value });
   q("arrowSize").oninput = (e) => { V.arrowCells = +e.target.value; q("arrowSizeLabel").textContent = V.arrowCells; drawFrame(V); }; // client-side only
   q("savePng").onclick = () => {
     if (!V.frame) return;
     const m = V.frame.meta, name = `${stem()}_${m.quant}${m.comp === "" ? "" : "_" + m.comp}_t${sci(m.time, 4)}.png`;
-    q("disp").toBlob((b) => b && download(name, b), "image/png");
+    const disp = q("disp"), bar = q("cbar");
+    let out = disp;
+    if (!bar.hidden) { // the image and its colorbar, as shown
+      const gap = Math.round(8 * (window.devicePixelRatio || 1));
+      out = document.createElement("canvas"); out.width = disp.width + gap + bar.width; out.height = Math.max(disp.height, bar.height);
+      const c = out.getContext("2d"); c.fillStyle = css("--img"); c.fillRect(0, 0, out.width, out.height);
+      c.drawImage(disp, 0, 0); c.drawImage(bar, disp.width + gap, 0);
+    }
+    out.toBlob((b) => b && download(name, b), "image/png");
   };
   q("saveOvf").onclick = () => send({ cmd: "save_ovf", view: id }); // the console says where
   bindText(q("autosave"), (v) => send({ cmd: "view_autosave", view: id, text: v }));
@@ -713,6 +725,7 @@ function syncViews() { // add/remove panels to match the simulation, and show th
     if (document.activeElement !== q("renderLayer") && c.layer !== null) q("renderLayer").value = c.layer;
     q("renderAllRow").style.display = many ? "" : "none";
     q("renderAll").checked = !!c.all;
+    q("renderCmap").value = c.cmap;
     setText(q("autosave"), num(c.autosave));
   });
 }
@@ -742,7 +755,7 @@ async function fetchFrame(V) {
   const meta = JSON.parse(r.headers.get("X-Frame-Meta")), buf = await r.arrayBuffer();
   const n = meta.ncomp * meta.w * meta.h, old = V.frame && V.frame.meta;
   if (old && (old.w !== meta.w || old.h !== meta.h)) V.prof = null; // another image: the line means nothing there
-  V.frame = { meta, data: new Float32Array(buf, 0, n), rgba: meta.rgba ? new Uint8ClampedArray(buf, n * 4, meta.w * meta.h * 4) : null };
+  V.frame = { meta, data: new Float32Array(buf, 0, n), rgba: new Uint8ClampedArray(buf, n * 4, meta.w * meta.h * 4) };
   V.q("renderLayer").max = meta.nslices - 1;
   V.q("renderLayerLabel").textContent = `${"xyz"[meta.axes[2]]} ${meta.layer + 1}/${meta.nslices}`;
   drawFrame(V);
@@ -753,34 +766,55 @@ function drawFrame(V) {
   const { meta, data, rgba } = V.frame, w = meta.w, h = meta.h, off = V.off;
   off.width = w; off.height = h;
   const octx = off.getContext("2d"), img = octx.createImageData(w, h), px = img.data;
-  let vmin = meta.vmin, vmax = meta.vmax;
-  if (vmin === vmax) { vmin -= 1; vmax += 1; }                // make it gray instead of black
   for (let iy = 0; iy < h; iy++) for (let ix = 0; ix < w; ix++) {
     const i = iy * w + ix, o = 4 * ((h - 1 - iy) * w + ix); // y axis points up
-    if (rgba) { px[o] = rgba[4 * i]; px[o + 1] = rgba[4 * i + 1]; px[o + 2] = rgba[4 * i + 2]; px[o + 3] = rgba[4 * i + 3]; }
-    else { const g = 255 * Math.min(1, Math.max(0, (data[i] - vmin) / (vmax - vmin))); px[o] = px[o + 1] = px[o + 2] = g; px[o + 3] = isNaN(data[i]) ? 0 : 255; }
+    px[o] = rgba[4 * i]; px[o + 1] = rgba[4 * i + 1]; px[o + 2] = rgba[4 * i + 2]; px[o + 3] = rgba[4 * i + 3];
   }
   octx.putImageData(img, 0, 0);
 
   // show small images enlarged by a whole factor so they are not tiny, with pixels the shape of the cells
   // (e.g. the thin layers of a film in an xz cut); plots.pixel_scale does the same for movies
   const cv = V.q("disp"), dpr = window.devicePixelRatio || 1;
-  const maxW = Math.max(200, V.el.clientWidth - 20), asp = meta.cell[1] / meta.cell[0] || 1;
+  const maxW = Math.max(200, V.el.clientWidth - 20 - (meta.cmap ? CBAR_W + 8 : 0)), asp = meta.cell[1] / meta.cell[0] || 1;
   const kx = Math.max(1, Math.floor(Math.min(maxW / w, 560 / (h * asp)))), ky = Math.max(1, Math.round(kx * asp));
   cv.style.width = w * kx + "px"; cv.style.height = h * ky + "px";
   cv.width = Math.round(w * kx * dpr); cv.height = Math.round(h * ky * dpr);
   const ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false;
   ctx.drawImage(off, 0, 0, cv.width, cv.height);
   V.q("arrowSizeRow").style.display = meta.vector ? "" : "none";
+  V.q("cmapRow").style.display = meta.cmap ? "" : "none";
+  drawColorbar(V, h * ky);
   if (meta.vector) drawArrows(V, ctx, cv.width / w, cv.height / h, w, h);
   if (meta.boxes) drawBoxes(ctx, cv.width / w, cv.height / h, meta);
   updateLoupe(V); drawOverlay(V); updateProfile(V); showLegend(V);
 }
 
+/* the colormap of a scalar image, next to it (plots._with_colorbar does the same for movies) */
+const CBAR_W = 88;
+function drawColorbar(V, imgH) {
+  const { meta } = V.frame, cv = V.q("cbar"), stops = meta.cmap && P.colormaps[meta.cmap];
+  cv.hidden = !stops; if (!stops) return;
+  const dpr = window.devicePixelRatio || 1, H = Math.max(140, imgH), top = 20, bottom = H - 8, bar = 14;
+  cv.style.width = CBAR_W + "px"; cv.style.height = H + "px";
+  cv.width = Math.round(CBAR_W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext("2d"), ink = css("--ink"); ctx.scale(dpr, dpr);
+  const grad = ctx.createLinearGradient(0, bottom, 0, top);
+  stops.forEach((c, i) => grad.addColorStop(i / (stops.length - 1), c));
+  ctx.fillStyle = grad; ctx.fillRect(0.5, top, bar, bottom - top);
+  ctx.strokeStyle = ctx.fillStyle = ink; ctx.lineWidth = 1; ctx.strokeRect(0.5, top, bar, bottom - top);
+  ctx.font = `11px ${css("--mono")}`; ctx.textBaseline = "top"; ctx.fillText(meta.unit || "", 0, 2);
+  ctx.textBaseline = "middle";
+  for (const f of meta.vmin === meta.vmax ? [0.5] : [0, 0.25, 0.5, 0.75, 1]) { // one value: it has the middle colour
+    const y = Math.round(bottom - f * (bottom - top)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(bar, y); ctx.lineTo(bar + 4, y); ctx.stroke();
+    ctx.fillText((meta.vmin + f * (meta.vmax - meta.vmin)).toExponential(3), bar + 6, y);
+  }
+}
+
 /* a map of the regions: which colour is which region (those in the shown slice) */
 function showLegend(V) {
   const { meta, data, rgba } = V.frame, el = V.q("legend"), first = new Map(); // region -> its first cell
-  if (meta.quant === "regions" && rgba) for (let i = 0; i < data.length; i++) if (!isNaN(data[i]) && !first.has(data[i])) first.set(data[i], i);
+  if (meta.quant === "regions") for (let i = 0; i < data.length; i++) if (!isNaN(data[i]) && !first.has(data[i])) first.set(data[i], i);
   const regions = [...first.keys()].sort((a, b) => a - b), key = regions.join(",");
   if (el.dataset.key === key) return; // the same as shown (frames come often while running)
   el.dataset.key = key; el.hidden = !regions.length;

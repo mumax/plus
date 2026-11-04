@@ -13,7 +13,7 @@ import webbrowser
 
 from .common import _clean
 from .core import Controller
-from .display import _check_plane
+from .display import _check_view
 
 FORBIDDEN = b"forbidden: missing or wrong token"
 EVENT_GAP = 0.15  # minimum time (s) between two pushed updates of the page
@@ -207,15 +207,19 @@ class GUI:
 
         self.ctrl.call(add)
 
-    def add_display(self, quantity, comp="", layer=None, all=False, plane="xy"):
+    def add_display(
+        self, quantity, comp="", layer=None, all=False, plane="xy", cmap="gray"
+    ):
         """Show a display of ``quantity``.
 
         ``quantity`` is a quantity name of the selected magnet, e.g.
         ``"effective_field"``; ``comp`` is "" (vector), "x", "y", "z" or a component
         number. ``plane`` is "xy", or "xz" or "yz" for a cross-section; ``layer`` is
         the slice along the axis normal to it (default: the bottom layer of "xy", the
-        middle of the others). The first call replaces the default display
-        (magnetization); later calls add displays.
+        middle of the others). ``cmap`` is the colormap of a scalar image, e.g.
+        "viridis", or "coolwarm" (these diverging maps have 0 in the middle); see the
+        display's Colormap menu for the list. The first call replaces the default
+        display (magnetization); later calls add displays.
         """
         cfg = {
             "quant": quantity,
@@ -223,8 +227,9 @@ class GUI:
             "plane": plane,
             "layer": layer,
             "all": all,
+            "cmap": cmap,
         }
-        _check_plane(cfg)
+        _check_view(cfg)
 
         def add():
             if not self._script_views:

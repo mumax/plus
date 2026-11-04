@@ -8,7 +8,7 @@ import time
 import numpy as np
 
 from .common import _clean, _next_due
-from .plots import region_rgba, vector_rgba
+from .plots import COLORMAPS, DIVERGING, region_rgba, scalar_rgba, vector_rgba
 
 RENDER_INTERVAL = 0.10  # minimum wall time between two display frames while running
 
@@ -17,10 +17,15 @@ RENDER_INTERVAL = 0.10  # minimum wall time between two display frames while run
 PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}
 
 
-def _check_plane(cfg):
-    """Check a display's plane; a layer of None is its middle slice, xy's bottom one."""
+def _check_view(cfg):
+    """Check a display's plane and colormap.
+
+    A layer of None is the plane's middle slice, xy's bottom one.
+    """
     if cfg["plane"] not in PLANES:
         raise ValueError(f"plane must be xy, xz or yz, not {cfg['plane']!r}")
+    if cfg["cmap"] not in COLORMAPS:
+        raise ValueError(f"cmap must be one of {COLORMAPS}, not {cfg['cmap']!r}")
     if cfg.get("layer") is None and cfg["plane"] == "xy":
         cfg["layer"] = 0
 
@@ -54,7 +59,7 @@ class DisplayMixin:
 
         It starts as a copy of the last one (or the default quantity).
         """
-        keys = ("quant", "comp", "plane", "layer", "all")
+        keys = ("quant", "comp", "plane", "layer", "all", "cmap")
         base = (
             {k: self.views[-1][k] for k in keys}
             if self.views
@@ -64,10 +69,11 @@ class DisplayMixin:
                 "plane": "xy",
                 "layer": 0,
                 "all": False,
+                "cmap": COLORMAPS[0],
             }
         )
         base.update({k: v for k, v in cfg.items() if k in keys})
-        _check_plane(base)
+        _check_view(base)
         base["autosave"] = 0.0  # AutoSave period of the shown quantity (OVF)
         base["_next_save"] = None
         base["id"] = self._next_view
@@ -192,9 +198,18 @@ class DisplayMixin:
                 rgba = region_rgba(data[0]).tobytes()
         data = np.ascontiguousarray(data, dtype="<f4")
         finite = data[np.isfinite(data)]
+        vmin = float(finite.min()) if finite.size else 0.0
+        vmax = float(finite.max()) if finite.size else 0.0
+        cmap = None
+        if not rgba:
+            cmap = cfg["cmap"]
+            if cmap in DIVERGING:
+                vmax = max(abs(vmin), abs(vmax))
+                vmin = -vmax
+            rgba = scalar_rgba(data[0], vmin, vmax, cmap).tobytes()
         meta = {
             "vector": vector,
-            "rgba": bool(rgba),  # the colours come with the data (else: gray)
+            "cmap": cmap,  # of the colorbar; vectors and regions have none
             "ncomp": int(data.shape[0]),
             "w": int(data.shape[2]),
             "h": int(data.shape[1]),
@@ -204,8 +219,8 @@ class DisplayMixin:
             "cell": [cell[axes[0]], cell[axes[1]]],  # m, of the image's cells
             "quant": cfg["quant"],
             "comp": comp,
-            "vmin": float(finite.min()) if finite.size else 0.0,
-            "vmax": float(finite.max()) if finite.size else 0.0,
+            "vmin": vmin,  # the colormap's range
+            "vmax": vmax,
             "unit": getattr(fq, "unit", ""),
             "time": self._now(),
             "boxes": boxes,
@@ -263,11 +278,12 @@ class DisplayMixin:
     # ------------------------------------------------------------------- commands
     def _cmd_render(self, c):
         cfg = self._view(c["view"])
-        new = {k: c[k] for k in ("quant", "comp", "plane", "layer", "all") if k in c}
+        keys = ("quant", "comp", "plane", "layer", "all", "cmap")
+        new = {k: c[k] for k in keys if k in c}
         if "plane" in c and "layer" not in c:
             new["layer"] = None  # another plane: start in its middle
         new = {**cfg, **new}
-        _check_plane(new)  # before the display changes
+        _check_view(new)  # before the display changes
         cfg.update(new)
         self._dirty = True
 

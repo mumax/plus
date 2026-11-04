@@ -87,7 +87,7 @@ class MovieMixin:
         data = np.frombuffer(buf[: 4 * n], "<f4").reshape(
             meta["ncomp"], meta["h"], meta["w"]
         )
-        rgba = np.frombuffer(buf[4 * n :], np.uint8) if meta["rgba"] else None
+        rgba = np.frombuffer(buf[4 * n :], np.uint8)
         img = movie_frame(meta, data, rgba, mv["arrows"])
         img.save(mv["folder"] / f"{mv['n']:06d}.png")
         mv["n"] += 1

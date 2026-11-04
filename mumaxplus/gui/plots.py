@@ -2,7 +2,8 @@
 
 The display image's vector colours come from ``mumaxplus.util.get_rgb`` (reused, not
 re-implemented), so they match ``mumaxplus.util.plot_field`` and the rest of mumax⁺;
-a map of the regions gets a colour per region (region_rgba).
+a map of the regions gets a colour per region (region_rgba), and any other scalar
+image the colours of its colormap (scalar_rgba).
 The table plots are drawn in the page. Movie frames are drawn here, like the page draws
 a display, so a recording does not need the page to be open.
 """
@@ -10,9 +11,44 @@ a display, so a recording does not need the page to be open.
 from __future__ import annotations
 
 import colorsys
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
+
+# the colormaps a display can use (matplotlib's names); the first is the default
+COLORMAPS = (
+    "gray",
+    "viridis",
+    "plasma",
+    "inferno",
+    "magma",
+    "cividis",
+    "turbo",
+    "coolwarm",
+    "bwr",
+    "RdBu_r",
+    "seismic",
+)
+# these have a meaning at their middle: their range is symmetric, with 0 in the middle
+DIVERGING = {"coolwarm", "bwr", "RdBu_r", "seismic"}
+
+
+@lru_cache(maxsize=None)
+def _lut(cmap):
+    """Return the (256, 4) uint8 colours of a colormap."""
+    import matplotlib
+
+    return matplotlib.colormaps[cmap](np.linspace(0, 1, 256), bytes=True)
+
+
+def colormap_stops(n=33):
+    """Colours along each colormap, as "#rrggbb", for the page's colorbars."""
+    at = np.linspace(0, 255, n).round().astype(int)
+    return {
+        name: ["#%02x%02x%02x" % tuple(c[:3]) for c in _lut(name)[at].tolist()]
+        for name in COLORMAPS
+    }
 
 
 def vector_rgba(sl):
@@ -47,6 +83,19 @@ def region_rgba(regions):
     return out
 
 
+def scalar_rgba(v, lo, hi, cmap):
+    """(h, w) floats -> (h, w, 4) uint8 in a colormap from ``lo`` to ``hi``.
+
+    If ``lo`` equals ``hi``, everything gets the middle colour. NaN (no cell there) is
+    transparent.
+    """
+    v = np.asarray(v, dtype=float)
+    x = (v - lo) / (hi - lo) if hi > lo else np.full(v.shape, 0.5)
+    out = _lut(cmap)[np.round(255 * np.clip(np.nan_to_num(x), 0, 1)).astype(np.uint8)]
+    out[np.isnan(v), 3] = 0
+    return out
+
+
 # ------------------------------------------------------------------------- movies
 MOVIE_BG = (232, 234, 239)  # outside the magnets, as the page's light theme
 
@@ -60,27 +109,16 @@ def _si_time(t):
 
 
 def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
-    """One movie frame as a PIL image: the display's image, arrows, and the time.
+    """One movie frame as a PIL image: the display's image, arrows, colorbar, and time.
 
     ``meta``, ``data`` and ``rgba`` are a display frame as sent to the page; the
-    image is drawn like the page draws it (the colours in ``rgba``: vectors or
-    regions, or else gray from the minimum to the maximum), scaled up by a whole
-    factor to about ``size`` pixels, and with pixels the shape of the cells.
+    image is drawn like the page draws it, scaled up by a whole factor to about
+    ``size`` pixels, and with pixels the shape of the cells.
     """
     from PIL import Image, ImageDraw, ImageFont
 
     w, h = meta["w"], meta["h"]
-    if meta["rgba"]:
-        img = np.array(rgba, dtype=np.uint8).reshape(h, w, 4)
-    else:
-        lo, hi = meta["vmin"], meta["vmax"]
-        if lo == hi:  # gray instead of black
-            lo, hi = lo - 1, hi + 1
-        v = data[0]
-        g = np.round(255 * np.clip((np.nan_to_num(v) - lo) / (hi - lo), 0, 1))
-        img = np.empty((h, w, 4), np.uint8)
-        img[..., :3] = g[..., None]
-        img[..., 3] = np.where(np.isnan(v), 0, 255)
+    img = np.array(rgba, dtype=np.uint8).reshape(h, w, 4)
     img = img[::-1]  # y up
     rgb = np.where(img[..., 3:] > 0, img[..., :3], np.array(MOVIE_BG, np.uint8))
     kx, ky = pixel_scale(meta, size, size)
@@ -90,15 +128,50 @@ def movie_frame(meta, data, rgba, arrow_cells=8, size=512):
         arrows = _arrows(data, meta["axes"][:2], w, h, kx, ky, arrow_cells)
         im = Image.alpha_composite(im, arrows)
     d = ImageDraw.Draw(im)
+    font_size = max(12, im.width // 32)
     try:
-        font = ImageFont.load_default(size=max(12, im.width // 32))
+        font = ImageFont.load_default(size=font_size)
     except TypeError:  # Pillow < 10.1
         font = ImageFont.load_default()
     text = "t = " + _si_time(meta["time"])
     box = d.textbbox((8, 6), text, font=font)
     d.rectangle((box[0] - 4, box[1] - 3, box[2] + 4, box[3] + 3), fill=(255, 255, 255))
     d.text((8, 6), text, fill=(20, 20, 20), font=font)
+    if meta["cmap"]:
+        im = _with_colorbar(im, meta, font, font_size)
     return im.convert("RGB")
+
+
+def _with_colorbar(im, meta, font, size):
+    """Add the page's colorbar (drawColorbar) to the right of an image.
+
+    ``size`` is the font's size. The width only depends on the font and the unit, so
+    all frames of a movie have the same size.
+    """
+    from PIL import Image, ImageDraw
+
+    ink = (20, 20, 20)
+    bar, gap = max(14, size), size // 2
+    d = ImageDraw.Draw(im)
+    text_w = max(d.textlength(t, font=font) for t in ("-8.888e+88", meta["unit"]))
+    width = im.width + gap + bar + gap + round(text_w) + gap
+    height = max(im.height, 140)
+    out = Image.new("RGBA", (width, height), (*MOVIE_BG, 255))
+    out.paste(im, (0, 0))
+    d = ImageDraw.Draw(out)
+    x, top, bottom = im.width + gap, 2 * size, height - size
+    at = np.linspace(255, 0, bottom - top).round().astype(int)
+    colors = Image.fromarray(_lut(meta["cmap"])[at][:, None, :3])
+    out.paste(colors.resize((bar, bottom - top), Image.NEAREST), (x, top))
+    d.rectangle((x, top, x + bar, bottom), outline=ink)
+    d.text((x, 0), meta["unit"], fill=ink, font=font)
+    lo, hi = meta["vmin"], meta["vmax"]
+    for f in (0.5,) if lo == hi else (0, 0.25, 0.5, 0.75, 1):  # one value: the middle
+        y = bottom - f * (bottom - top)
+        d.line((x + bar, y, x + bar + gap // 2, y), fill=ink)
+        label = f"{lo + f * (hi - lo):.3e}"
+        d.text((x + bar + gap, y - size // 2), label, fill=ink, font=font)
+    return out
 
 
 def pixel_scale(meta, max_w, max_h):

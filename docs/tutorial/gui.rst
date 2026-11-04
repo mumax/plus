@@ -75,7 +75,8 @@ What is in the page
 The page consists of panels that you can show or hide by clicking their title.
 
 - **Display**: an image of a quantity of the selected magnet, e.g. the
-  magnetization or the effective field, or one of its components. You can pick
+  magnetization or the effective field, or one of its components. A single
+  component has a colorbar, and you can pick its colormap. You can pick
   the slice through the magnet (``xy``, ``xz`` or ``yz``), draw a line profile,
   save the image as PNG or the quantity as OVF, and record a movie. With
   *+ Add display* you can show several quantities at once.
