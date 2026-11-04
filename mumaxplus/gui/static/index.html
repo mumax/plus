@@ -1448,7 +1448,7 @@ function showTick() {
   $("errbox").textContent = T.error ? "⚠ " + T.error : "";
   $("hdrRun").textContent = T.running ? "⏸ Break" : "▶ Run"; $("hdrTime").textContent = sci(T.time, 4);
   $("nsteps").textContent = T.nsteps; $("time").textContent = sci(T.time, 5); $("dt").textContent = sci(T.dt, 3);
-  $("maxtorque").textContent = T.maxtorque === null ? "--" : sci(T.maxtorque, 3) + " T";
+  $("maxtorque").textContent = T.maxtorque === null ? "--" : sci(T.maxtorque, 3) + " rad/s";
   setText($("fixdt"), num(T.fixdt)); setText($("maxerr"), num(T.maxerr));
   setText($("tableAutoSave"), num(T.autosave));
   showPyNote(); showCheckpoints(); showPerf(); showExcitations(); showInitU();
