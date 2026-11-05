@@ -33,7 +33,7 @@ script, create a :class:`~mumaxplus.gui.GUI` and call its
     magnet.alpha = 0.01
     magnet.magnetization = vortex(magnet.center, 8e-9, 1, 1)
 
-    gui = GUI(world, namespace=globals(), open_browser=True)
+    gui = GUI(world, open_browser=True)
     gui.run()
 
 When the script reaches ``gui.run()``, it prints a line like
@@ -47,8 +47,9 @@ and, with ``open_browser=True``, opens this page in your browser. The
 control the simulation. ``gui.run()`` keeps the script alive until you press
 Ctrl-C.
 
-Passing ``namespace=globals()`` makes the variables of your script (here
-``world`` and ``magnet``) available in the console of the page.
+The global variables of your script (here ``world`` and ``magnet``) are
+available in the console of the page. Pass ``namespace`` to use a different
+dictionary instead.
 
 .. tip::
 
@@ -117,7 +118,7 @@ table columns, plots and displays from the script, before calling
 
 .. code-block:: python
 
-    gui = GUI(world, namespace=globals(), open_browser=True)
+    gui = GUI(world, open_browser=True)
 
     # columns of the table, saved in table.txt
     gui.table_add(magnet.magnetization, name="m")  # adds mx, my, mz
@@ -148,7 +149,7 @@ background thread, and you can keep using other cells. Methods like
 
 .. code-block:: python
 
-    gui = GUI(world, namespace=globals())
+    gui = GUI(world)
     gui.run(block=False)
     print(gui.url)
 

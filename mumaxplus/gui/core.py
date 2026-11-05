@@ -80,7 +80,7 @@ class Controller(
 ):
     """Drives a mumax⁺ world for the page (see the module docstring)."""
 
-    def __init__(self, world, namespace=None, title=None):
+    def __init__(self, world, namespace, title=None):
         self.world = world
         self.lock = threading.RLock()  # Protect data shared between threads
         # command queue from HTTP threads to sim threads
@@ -90,8 +90,7 @@ class Controller(
         self.title = title or (
             Path(sys.argv[0]).stem if sys.argv and sys.argv[0] else "mumax⁺"
         )
-        # TODO: should `globals()` be the default namespace
-        self.ns = namespace if namespace is not None else {}
+        self.ns = namespace
         self.ns.setdefault("world", world)
 
         # run state (pause / Run / Steps / Break)

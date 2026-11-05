@@ -23,7 +23,7 @@ Console commands
 
 Next to the variables in ``namespace``, the GUI console provides these
 simulation commands. They also work in the script once the :class:`GUI` has
-been created, as long as ``namespace=globals()`` was passed.
+been created, unless a different ``namespace`` was passed.
 
 .. list-table::
    :header-rows: 1

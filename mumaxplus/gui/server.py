@@ -6,6 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
 import json
 import secrets
+import sys
 import threading
 import time
 from urllib.parse import parse_qs, urlparse
@@ -142,9 +143,10 @@ class GUI:
     ----------
     world : mumaxplus.World
     namespace : dict, optional
-        Namespace of the console, typically ``globals()`` of your script, so that you
-        can type ``magnet.alpha = 0.1`` (and commands like ``Run(1e-9)``) in the GUI
-        console.
+        Namespace of the console, so that you can type ``magnet.alpha = 0.1`` (and
+        commands like ``Run(1e-9)``) in the GUI console. The default is the global
+        namespace of the module that creates the GUI, usually your script. Local
+        variables of a function are not included.
     title : str, optional
         Page title (default: the name of the script).
     host, port : where to listen. The default only accepts local connections; the first
@@ -162,6 +164,8 @@ class GUI:
         port=35367,
         open_browser=False,
     ):
+        if namespace is None:
+            namespace = sys._getframe(1).f_globals  # the globals() of the caller
         self.ctrl = Controller(world, namespace, title)
         self.token = secrets.token_urlsafe(16)
         self.host, self.port, self.open_browser = host, port, open_browser
