@@ -57,6 +57,8 @@ class PaintMixin:
             st["entry"] = len(self.script) - 1
         if self._paint_undo is not None:
             self._paint_undo["entry"] = st["entry"]
+        if st["param"]:  # the value shown in the parameters panel
+            self.describe()
         self._dirty = True
         self._live_sample()
 
@@ -105,6 +107,7 @@ class PaintMixin:
             "name": name,
             "ref": self._ref(name),
             "quant": quant,
+            "param": "Parameter" in m,
             "ncomp": int(field.ncomp),
             "dx": dx,
             "dy": dy,
@@ -129,6 +132,7 @@ class PaintMixin:
             "name": name,
             "quant": quant,
             "old": np.array(field.eval()),
+            "param": st["param"],
             "entry": None,
         }
         self._stroke = st
@@ -193,6 +197,8 @@ class PaintMixin:
         del self.script[u["entry"]]
         self._paint_undo = self._stroke = None
         self.say("undid the last paint stroke")
+        if u["param"]:
+            self.describe()
         self._dirty = True
         self._live_sample()
 
