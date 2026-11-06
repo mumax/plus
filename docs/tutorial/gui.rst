@@ -79,7 +79,8 @@ The page consists of panels that you can show or hide by clicking their title.
   magnetization or the effective field, or one of its components. A single
   component has a colorbar, and you can pick its colormap. You can pick
   the slice through the magnet (``xy``, ``xz`` or ``yz``), draw a line profile,
-  save the image as PNG or the quantity as OVF, and record a movie. With
+  save the image as PNG or the quantity as OVF, and record a movie. Both PNGs
+  and movies have a size menu, a large movie frames slow the run. With
   *+ Add display* you can show several quantities at once.
 - **Paint**: on each display. With the brush you set any parameter in
   the cells you drag over; with *place m* and *place u* you click to put an object such
@@ -87,7 +88,10 @@ The page consists of panels that you can show or hide by clicking their title.
 - **Plot**: plots of the table columns against another column. Pick the columns to show
   in the plot. Quantities that are not saved in the table are sampled for the plot only.
 - **Console**: type Python, e.g. ``magnet.alpha = 0.1``, or commands such
-  as ``Run(1e-9)``. See the :doc:`API <../gui>` for the full list.
+  as ``Run(1e-9)``. See the :doc:`API <../gui>` for the full list. Names are
+  suggested while you type: choose with the up and down keys, accept with *Tab*
+  and close the list with *Esc*. Inside the brackets of a function call, its
+  arguments are shown with the current one highlighted.
   *Copy as Python* gives everything you changed in the page as lines to add to
   your script.
 - **Mesh** and **Geometry**: the grid and cell size, and the number of periodic
@@ -104,7 +108,9 @@ The page consists of panels that you can show or hide by clicking their title.
 - **Excitation**: add an expression of time to a parameter in the whole magnet, a region
   or a mask.
 - **Parameters**: all material parameters of the selected magnet. Set a value
-  everywhere (region ``-1``) or in one region.
+  everywhere (region ``-1``) or in one region; a region that the magnet does not
+  have is refused, here and in *Excitation*. The search bar filters the
+  parameters, switches and world settings by name, unit or description.
 
 If the world has several magnets, choose which one the panels show with the
 *magnet* selector at the top of the page.
