@@ -203,8 +203,12 @@ void MumaxWorld::resetTimeSolverEquations(FM_Field torque) const {
   timesolver_->setEquations(equations);
 }
 
-void MumaxWorld::minimize(real tol, int nSamples) {
-  Minimizer minimizer(this, tol, nSamples);
+void MumaxWorld::minimize(real tol,
+                          int nSamples,
+                          int lineSearchMode,
+                          double maxStepAngle,
+                          int maxStall) {
+  Minimizer minimizer(this, tol, nSamples, lineSearchMode, maxStepAngle, maxStall);
   minimizer.exec();
 }
 

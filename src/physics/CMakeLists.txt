@@ -46,6 +46,8 @@ add_library(physics STATIC
     internalbodyforce.hpp
     local_dmi.cu
     local_dmi.hpp
+    linesearch.cpp
+    linesearch.hpp
     magnet.cpp
     magnet.hpp 
     magnetoelasticfield.cu
@@ -74,6 +76,8 @@ add_library(physics STATIC
     poyntingvector.hpp
     relaxer.hpp
     relaxer.cpp
+    rigidbodymodes_common.cuh
+    rigidbodymodes_common.hpp
     straintensor.cu
     straintensor.hpp
     stresstensor.cu
