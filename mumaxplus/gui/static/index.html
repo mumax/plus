@@ -65,9 +65,13 @@ input[type=range] { width: 200px; accent-color: var(--accent); vertical-align: m
 #console .out { color: var(--mute); } #console .err { color: var(--err); }
 #cliwrap { position: relative; margin-top: 8px; }
 #cli { width: 100%; font-size: 13px; padding: 7px 10px; }
-#clisug { position: absolute; z-index: 30; left: 0; bottom: calc(100% + 4px); width: min(520px, 100%); max-height: 216px; overflow: auto; padding: 4px;
-          background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.2); }
-#clisug[hidden] { display: none; }
+#clipop { position: absolute; z-index: 30; left: 0; bottom: calc(100% + 4px); width: min(520px, 100%); display: flex; flex-direction: column; gap: 4px; }
+#clisug, #clihint { background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.2); }
+#clisug { max-height: 216px; overflow: auto; padding: 4px; }
+#clihint { padding: 6px 10px; font: 12px/1.5 var(--mono); overflow-wrap: anywhere; }
+#clihint .on { font-weight: 700; color: var(--accent); }
+#clihint .hdoc { color: var(--mute); font-family: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#clisug[hidden], #clihint[hidden] { display: none; }
 #clisug .pitem.on { background: var(--field); outline: 1px solid var(--accent); outline-offset: -1px; }
 #clisug .pu { flex: none; font-family: var(--mono); }
 
@@ -226,8 +230,8 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
 <section id="s-console"><h2 title="Click to show/hide">Console</h2><div class="body">
   <div id="console"></div>
   <div id="cliwrap">
-    <div id="clisug" hidden></div>
-    <input id="cli" type="text" placeholder="type commands here (python), or up/down" title="Suggestions appear while typing: up/down to choose, Tab to accept, Esc to close" autocomplete="off" spellcheck="false">
+    <div id="clipop"><div id="clisug" hidden></div><div id="clihint" hidden></div></div>
+    <input id="cli" type="text" placeholder="type commands here (python), or up/down" title="Suggestions and the arguments of a function appear while typing: up/down to choose, Tab to accept, Esc to close" autocomplete="off" spellcheck="false">
   </div>
   <div class="row" id="pyrow" title="Everything done in this page that changes the simulation as Python lines to add to the end of your script">
     <button id="pyCopy">Copy as Python</button><button id="pySave">Save .py</button><button id="pyClear" title="Forget what was recorded so far">Clear</button>
@@ -385,10 +389,20 @@ $("console").onmouseenter = () => (consoleHover = true);
 $("console").onmouseleave = () => (consoleHover = false);
 const hist = []; let hidx = 0;
 /* suggestions while typing, from the namespace of the console */
-const sug = { items: [], at: -1, start: 0, text: "", closed: null, timer: 0, waiting: false, again: false };
+const sug = { items: [], at: -1, start: 0, text: "", closed: null, listOff: false, timer: 0, waiting: false, again: false };
 const sugOpen = () => !$("clisug").hidden;
 const beforeCursor = () => $("cli").value.slice(0, $("cli").selectionStart);
-function sugClose() { clearTimeout(sug.timer); sug.closed = beforeCursor(); $("clisug").hidden = true; sug.items = []; sug.at = -1; }
+function sugHideList() { $("clisug").hidden = true; sug.items = []; sug.at = -1; }
+function sugClose() { clearTimeout(sug.timer); sug.closed = beforeCursor(); sugHideList(); $("clihint").hidden = true; }
+function sugMoved() { // the cursor moved or a name was accepted: update the hint, no new list
+  clearTimeout(sug.timer); sug.closed = null; sug.listOff = true; sugHideList();
+  setTimeout(sugAsk, 0); // after the browser has moved the cursor
+}
+function sugHint(h) { // the arguments of the function being called
+  const box = $("clihint"); box.hidden = !h; if (!h) return;
+  const args = h.params && h.params.map((p, i) => (i === h.active ? `<span class="on">${esc(p)}</span>` : esc(p))).join(", ");
+  box.innerHTML = (h.params ? `<div>${esc(h.name)}(${args})</div>` : "") + (h.doc ? `<div class="hdoc" title="${esc(h.doc)}">${esc(h.doc)}</div>` : "");
+}
 function sugMark(at) {
   sug.at = at;
   [...$("clisug").children].forEach((row, i) => {
@@ -400,11 +414,12 @@ function sugAccept(item) {
   const cli = $("cli"), cursor = cli.selectionStart, head = cli.value.slice(0, sug.start) + item.name;
   cli.value = head + cli.value.slice(cursor);
   cli.setSelectionRange(head.length, head.length);
-  sugClose();
+  sugMoved();
 }
 function sugShow(r, text) {
   const typed = text.slice(r.start), box = $("clisug");
-  sug.items = r.matches; sug.start = r.start; sug.text = text; sug.at = -1;
+  sugHint(r.hint);
+  sug.items = sug.listOff ? [] : r.matches; sug.start = r.start; sug.text = text; sug.at = -1;
   box.replaceChildren(...sug.items.map((it) => {
     const row = document.createElement("div"); row.className = "pitem"; row.title = it.doc;
     row.innerHTML = `<span class="pn">${esc(it.name)}</span><span class="pu">${esc(it.kind)}</span>`;
@@ -426,12 +441,12 @@ async function sugAsk() {
   if (r.matches) sugShow(r, text); else sugClose(); // no answer: the simulation is busy
 }
 $("cli").addEventListener("input", () => {
-  sug.closed = null; sugMark(-1); // an open list stays until the new one arrives
+  sug.closed = null; sug.listOff = false; sugMark(-1); // an open list stays until the new one arrives
   clearTimeout(sug.timer);
   sug.timer = setTimeout(sugAsk, 100);
 });
 $("cli").addEventListener("blur", sugClose);
-$("cli").addEventListener("click", sugClose); // the cursor may have moved
+$("cli").addEventListener("click", sugMoved);
 $("cli").addEventListener("keydown", (e) => {
   const cli = e.target;
   const fresh = sug.text === beforeCursor(); // otherwise the list is for the text before the last key
@@ -442,7 +457,9 @@ $("cli").addEventListener("keydown", (e) => {
   }
   if (sugOpen() && e.key === "Tab") { if (fresh) sugAccept(sug.items[Math.max(sug.at, 0)]); e.preventDefault(); return; }
   if (sugOpen() && e.key === "Enter" && sug.at >= 0) { sugAccept(sug.items[sug.at]); e.preventDefault(); return; }
-  if (e.key === "Escape" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Home" || e.key === "End") { sugClose(); if (e.key === "Escape") return; }
+  if (e.key === "Escape") { sugClose(); return; }
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Home" || e.key === "End") { sugMoved(); return; }
+  if (e.key === "ArrowUp" || e.key === "ArrowDown") sugClose(); // on to the history
   if (e.key === "Enter" && cli.value.trim()) {
     send({ cmd: "cli", code: cli.value }); hist.push(cli.value); hidx = hist.length; cli.value = ""; sugClose();
   } else if (e.key === "ArrowUp") { if (hidx > 0) hidx--; if (hist[hidx] !== undefined) cli.value = hist[hidx]; e.preventDefault(); }

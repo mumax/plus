@@ -17,24 +17,41 @@ import re
 import traceback
 
 MAX_SUGGESTIONS = 1000  # enough for all attributes of a magnet, or of numpy
+_NOT_POSITIONAL = re.compile(r"\s*(\*|[A-Za-z_]\w*\s*=(?!=))")  # a=1, *a, **a
 
 
-def _in_string_or_comment(text):
-    """Return whether a line of Python, cut off at the cursor, ends in one of these."""
+def _blank_strings(text):
+    """Return a line of Python, cut off at the cursor, with its strings blanked.
+
+    Also returns what the line ends in: ``"code"``, ``"string"`` or ``"comment"``, where
+    a comment is left out of the returned line.
+    """
+    code = list(text)
     quote = None
     skip = False
-    for char in text:
-        if skip:
-            skip = False
-        elif quote:
-            skip = char == "\\"
-            if char == quote:
+    for i, char in enumerate(text):
+        if quote:
+            code[i] = " "
+            if skip:
+                skip = False
+            elif char == "\\":
+                skip = True
+            elif char == quote:
                 quote = None
         elif char in "'\"":
             quote = char
+            code[i] = " "
         elif char == "#":
-            return True
-    return quote is not None
+            return "".join(code[:i]), "comment"
+    return "".join(code), "string" if quote else "code"
+
+
+def _resolve(parts, ns):
+    """Return the object with this dotted name, without running anything but getters."""
+    obj = ns[parts[0]] if parts[0] in ns else getattr(builtins, parts[0])
+    for part in parts[1:]:
+        obj = getattr(obj, part)
+    return obj
 
 
 def _describe(name, value):
@@ -72,14 +89,12 @@ def complete(text, ns):
         return nothing
     if prefix and not prefix.isidentifier():
         return nothing
-    if _in_string_or_comment(text):
+    if _blank_strings(text)[1] != "code":
         return nothing
 
     if parts:
         try:
-            owner = ns[parts[0]] if parts[0] in ns else getattr(builtins, parts[0])
-            for part in parts[1:]:
-                owner = getattr(owner, part)
+            owner = _resolve(parts, ns)
             names = dir(owner)
         except Exception:  # not defined (yet), or its getter failed
             return nothing
@@ -109,6 +124,108 @@ def complete(text, ns):
         except Exception:
             matches.append({"name": name, "kind": "", "doc": ""})
     return {"matches": matches, "start": start}
+
+
+def _open_call(code):
+    """Return the name and state of the innermost call that ``code`` is still inside.
+
+    Returns None if there is none, or if what is called is not a plain name. Brackets
+    that only group or hold values are skipped: in ``f((1, [2,`` the call is ``f``.
+    """
+    stack = []
+    for i, char in enumerate(code):
+        if char in "([{":
+            stack.append(
+                {"bracket": char, "at": i, "arg": i + 1, "commas": 0, "named": False}
+            )
+        elif char in ")]}":
+            if stack:
+                stack.pop()
+        elif char == "," and stack:
+            top = stack[-1]
+            # after f(a=1, or f(*a, the position no longer says which parameter it is
+            if _NOT_POSITIONAL.match(code[top["arg"] : i]):
+                top["named"] = True
+            top["commas"] += 1
+            top["arg"] = i + 1
+    for top in reversed(stack):
+        if top["bracket"] != "(":
+            continue
+        before = code[: top["at"]]
+        name = re.search(r"[\w.]*$", before)[0]
+        if name and not keyword.iskeyword(name):
+            return name, top
+        if before.rstrip().endswith((")", "]")):  # f()( or a[0](: needs running
+            return None
+    return None
+
+
+def _signature_items(signature):
+    """Return the parameters as text, and for each name its position in that list."""
+    items, where = [], {}
+    params = list(signature.parameters.values())
+    has_star = any(p.kind == p.VAR_POSITIONAL for p in params)
+    for i, param in enumerate(params):
+        if param.kind == param.KEYWORD_ONLY and not has_star:
+            items.append("*")
+            has_star = True
+        where[param.name] = len(items)
+        items.append(str(param))
+        following = params[i + 1].kind if i + 1 < len(params) else None
+        if param.kind == param.POSITIONAL_ONLY and following != param.POSITIONAL_ONLY:
+            items.append("/")
+    return items, where
+
+
+def _active_parameter(signature, code, call):
+    """Return the name of the parameter the cursor is at, or None if that is unclear."""
+    params = list(signature.parameters.values())
+    current = code[call["arg"] :]
+    named = re.match(r"\s*([A-Za-z_]\w*)\s*=(?!=)", current)
+    if named:
+        if named[1] in signature.parameters:
+            return named[1]
+        return next((p.name for p in params if p.kind == p.VAR_KEYWORD), None)
+    if call["named"] or current.lstrip().startswith("*"):
+        return None
+    positional = [
+        p for p in params if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)
+    ]
+    if call["commas"] < len(positional):
+        return positional[call["commas"]].name
+    return next((p.name for p in params if p.kind == p.VAR_POSITIONAL), None)
+
+
+def call_hint(text, ns):
+    """Return what to show about the call that ``text``, up to the cursor, is inside.
+
+    Returns None if there is nothing to show, or else a dict with the ``name`` as typed,
+    its ``params`` as text (None if unknown, as for compiled functions), the index
+    ``active`` in them of the parameter at the cursor (or -1) and the first line of the
+    ``doc``. As in :func:`complete`, nothing is called but the getters on the way.
+    """
+    code, ends_in = _blank_strings(text)
+    call = _open_call(code)
+    if ends_in == "comment" or call is None:
+        return None
+    name, state = call
+    parts = name.split(".")
+    if not all(map(str.isidentifier, parts)):  # also .x (as in f().x(), and 1(
+        return None
+    try:
+        func = _resolve(parts, ns)
+        if not callable(func):
+            return None
+        doc = (inspect.getdoc(func) or "").partition("\n")[0]
+    except Exception:  # not defined (yet), or its getter failed
+        return None
+    try:
+        signature = inspect.signature(func)
+    except (ValueError, TypeError):  # e.g. compiled: the doc usually starts with it
+        return {"name": name, "params": None, "active": -1, "doc": doc} if doc else None
+    items, where = _signature_items(signature)
+    active = where.get(_active_parameter(signature, code, state), -1)
+    return {"name": name, "params": items, "active": active, "doc": doc}
 
 
 class ConsoleMixin:
@@ -257,7 +374,8 @@ class ConsoleMixin:
         return self._cli(c["code"])
 
     def _cmd_complete(self, c):
-        return {"ok": True, **complete(c["text"], self.ns)}
+        text = c["text"]
+        return {"ok": True, **complete(text, self.ns), "hint": call_hint(text, self.ns)}
 
     def _cmd_script(self, c):
         return {"ok": True, "script": self.script_text()}
