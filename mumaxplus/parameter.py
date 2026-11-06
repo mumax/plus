@@ -249,9 +249,11 @@ class Parameter(FieldQuantity):
             raise TypeError("Value must be uniform or returned by a function.")
 
     def _set_func(self, func):
-        X, Y, Z = self.meshgrid
-        values = _np.vectorize(func, otypes=[float] * self.shape[0])(X, Y, Z)
-        if self.shape[0] == 1:
+        try:
+            values = func(*self.meshgrid)
+        except Exception:
+            values = _np.vectorize(func, otypes=[float] * self.ncomp)(*self.meshgrid)
+        if self.ncomp == 1:
             values = [values]
         self._impl.set(values)
 
