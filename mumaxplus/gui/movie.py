@@ -28,9 +28,10 @@ class MovieMixin:
             raise ValueError("this display is already recording")
         period = float(self._eval(c["period"]))
         fps = float(self._eval(c["fps"]))
+        size = int(self._eval(c.get("size", "512")))
         fmt = c["format"]
-        if period <= 0 or fps <= 0:
-            raise ValueError("the period and the frame rate must be positive")
+        if period <= 0 or fps <= 0 or size <= 0:
+            raise ValueError("the period, frame rate and size must be positive")
         if fmt not in ("mp4", "png"):
             raise ValueError(f"unknown movie format {fmt!r}")
         if fmt == "mp4" and not shutil.which("ffmpeg"):
@@ -52,6 +53,7 @@ class MovieMixin:
             "fps": fps,
             "format": fmt,
             "arrows": int(c["arrows"]),
+            "size": size,
             "folder": folder,
             "out": out,
             "n": 0,
@@ -88,7 +90,7 @@ class MovieMixin:
             meta["ncomp"], meta["h"], meta["w"]
         )
         rgba = np.frombuffer(buf[4 * n :], np.uint8)
-        img = movie_frame(meta, data, rgba, mv["arrows"])
+        img = movie_frame(meta, data, rgba, mv["arrows"], mv["size"])
         img.save(mv["folder"] / f"{mv['n']:06d}.png")
         mv["n"] += 1
 

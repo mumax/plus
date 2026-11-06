@@ -155,7 +155,7 @@ def _with_colorbar(im, meta, font, size):
     d = ImageDraw.Draw(im)
     text_w = max(d.textlength(t, font=font) for t in ("-8.888e+88", meta["unit"]))
     width = im.width + gap + bar + gap + round(text_w) + gap
-    height = max(im.height, 140)
+    height = max(im.height, 140, 9 * size)  # room for the labels, at any font size
     out = Image.new("RGBA", (width, height), (*MOVIE_BG, 255))
     out.paste(im, (0, 0))
     d = ImageDraw.Draw(out)
@@ -182,7 +182,7 @@ def pixel_scale(meta, max_w, max_h):
     """
     w, h, (cx, cy) = meta["w"], meta["h"], meta["cell"]
     aspect = cy / cx if cx > 0 and cy > 0 else 1.0
-    k = max(1, min(16, round(min(max_w / w, max_h / (h * aspect)))))
+    k = max(1, round(min(max_w / w, max_h / (h * aspect))))
     return k, max(1, round(k * aspect))
 
 
