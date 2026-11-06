@@ -81,7 +81,8 @@ class ExcitationMixin:
         where, arg = c["where"], str(c["whereValue"]).strip()
         if where == "region":
             regions = f"{self._ref(c['target'])}.regions"
-            mask = f"np.asarray({regions} == {int(self._eval(arg))}, float)"
+            number = self._region_number(c["target"], arg)
+            mask = f"np.asarray({regions} == {number}, float)"
         elif where == "mask":
             mask = f"lambda x, y, z: float({arg})"
         else:

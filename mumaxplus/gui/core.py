@@ -23,6 +23,8 @@ import threading
 import time
 import traceback
 
+import numpy as np
+
 import mumaxplus.util as U
 
 from .checkpoints import CheckpointMixin
@@ -116,6 +118,7 @@ class Controller(
         self.targets = {}
         self.sel = None  # selected magnet (display, parameters, mesh, initial m)
         self.region = -1
+        self.region_note = ""  # why the region typed in the page was not used
         self.snap = {}
         self.snap_id = 0  # goes up when the snapshot changes
         self.changed = threading.Condition(self.lock)  # used to wake waiting pages
@@ -221,6 +224,7 @@ class Controller(
                 "plots": [dict(p) for p in self.plots],
                 "sel": self.sel,
                 "region": self.region,
+                "region_note": self.region_note,
                 "views": [self._view_state(cfg) for cfg in self.views],
                 "desc_version": self.desc_version,
                 "log_id": self.log_id,
@@ -382,8 +386,35 @@ class Controller(
     def _cmd_setm(self, c):
         self._set_m(c["target"], c["config"], c["args"], c["field"])
 
+    def _region_number(self, target, text, whole_magnet=False):
+        """Return the region typed in the page, if the magnet has it; else raise.
+
+        With ``whole_magnet``, -1 is allowed too. A region must have cells inside the
+        geometry, as a value set or an excitation added elsewhere would do nothing.
+        """
+        value = self._eval(text)
+        number = int(value)
+        if number != value:
+            raise ValueError(f"a region is a whole number, not {value}")
+        if whole_magnet and number == -1:
+            return number
+        obj = self.targets[target]
+        inside = np.asarray(obj.geometry, dtype=bool)
+        regions = np.unique(np.asarray(obj.regions)[inside]).tolist()
+        if number not in regions:
+            listed = ", ".join(map(str, regions[:20])) + ", ..." * (len(regions) > 20)
+            has = f"it has {listed}" if regions else "it has none"
+            raise ValueError(f"{target} has no region {number}: {has}")
+        return number
+
     def _cmd_region(self, c):
-        self.region = int(self._eval(c["value"]))
+        try:
+            self.region = self._region_number(self.sel, c["value"], whole_magnet=True)
+        except Exception as e:
+            self.region_note = str(e)
+            raise
+        if self.region_note:  # the refusal is over, also at the top of the page
+            self.region_note = self.last_error = ""
         self.describe()
 
     def _cmd_select(self, c):
@@ -394,6 +425,13 @@ class Controller(
             for cfg in self.views:
                 if cfg["quant"] not in names:
                     cfg["quant"], cfg["comp"] = self._default_quantity(), ""
+            self.region_note = ""
+            try:
+                self._region_number(self.sel, str(self.region), whole_magnet=True)
+            except ValueError as e:  # the previous magnet had it
+                self.region = -1
+                self.region_note = f"{e}. Using the whole magnet."
+                self.say(self.region_note, "err")
             self.describe()
             self._dirty = True
 

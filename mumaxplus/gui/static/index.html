@@ -317,7 +317,7 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
 
 <section id="s-params"><h2 title="Click to show/hide">Parameters</h2><div class="body">
   <input id="psearch" type="text" placeholder="search parameters, switches and world settings…" title="Search names, units and descriptions; Esc to clear" autocomplete="off" spellcheck="false">
-  <div class="row" title="-1 = the whole magnet; 0… = set/show the value in this region only">Region: <input type="text" id="region" size="4" value="-1"></div>
+  <div class="row" title="-1 = the whole magnet; 0… = set/show the value in this region only">Region: <input type="text" id="region" size="4" value="-1"> <span id="regionNote" class="plotErr"></span></div>
   <div id="pwrap"><table id="ptable"></table></div>
   <div id="switchhead" class="sub"></div><table id="stable"></table>
   <div id="worldhead" class="sub"></div><table id="wtable"></table>
@@ -1573,7 +1573,10 @@ function openPlotPicker(anchor, pid, axis) {
 }
 
 /* ---------- parameters ---------- */
-bindText($("region"), (v) => send({ cmd: "region", value: v }));
+bindText($("region"), async (v) => {
+  const r = await send({ cmd: "region", value: v });
+  if (r.ok === false) $("region").value = T.region; // refused: show the region that is still used
+});
 const rows = { p: {}, s: {}, w: {}, solver: {} }; // the inputs of the parameters, switches, world and solver tables, by name
 function addRow(table, key, name, doc, unit, input) {
   const tr = document.createElement("tr"); tr.title = doc || "";
@@ -1647,6 +1650,7 @@ function showTick() {
   $("solvertype").value = T.method;
   $("methodnote").textContent = T.method_known ? "" : "(showing the default at startup)";
   if (document.activeElement !== $("region") && !$("region").classList.contains("dirty")) $("region").value = T.region;
+  $("regionNote").textContent = T.region_note;
   syncViews();
   $("magnetPick").style.display = T.targets.length > 1 ? "flex" : "none";
 }
