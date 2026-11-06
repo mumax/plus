@@ -7,10 +7,108 @@ Python" gives what was done in the page as lines to add to the script.
 from __future__ import annotations
 
 import ast
+import builtins
 import contextlib
 import functools
+import inspect
 import io
+import keyword
+import re
 import traceback
+
+MAX_SUGGESTIONS = 1000  # enough for all attributes of a magnet, or of numpy
+
+
+def _in_string_or_comment(text):
+    """Return whether a line of Python, cut off at the cursor, ends in one of these."""
+    quote = None
+    skip = False
+    for char in text:
+        if skip:
+            skip = False
+        elif quote:
+            skip = char == "\\"
+            if char == quote:
+                quote = None
+        elif char in "'\"":
+            quote = char
+        elif char == "#":
+            return True
+    return quote is not None
+
+
+def _describe(name, value):
+    """Return a suggestion for ``name``, whose ``value`` must not be computed for it."""
+    if isinstance(value, (staticmethod, classmethod)):
+        value = value.__func__
+    if inspect.ismodule(value):
+        kind = "module"
+    elif inspect.isclass(value):
+        kind = "class"
+    elif callable(value):
+        kind = "function"
+    elif inspect.isdatadescriptor(value):
+        kind = "property"
+    else:  # a plain value: the docstring would be the one of its type
+        return {"name": name, "kind": type(value).__name__, "doc": ""}
+    doc = inspect.getdoc(value) or ""
+    return {"name": name, "kind": kind, "doc": doc.partition("\n")[0]}
+
+
+def complete(text, ns):
+    """Return suggestions for the name that ``text``, a line up to the cursor, ends in.
+
+    Returns a dict with the ``matches`` and the position ``start`` in ``text`` where the
+    part they replace begins. This runs while typing, so no code in the line is run:
+    only plain dotted names are looked up, like ``magnet.stray`` but not ``f().stray``.
+    Going through an attribute, as in ``magnet.stray_field.``, does run its getter.
+    """
+    word = re.search(r"[\w.]*$", text)[0]
+    start = len(text) - len(word.rpartition(".")[2])
+    nothing = {"matches": [], "start": start}
+    parts = word.split(".")
+    prefix = parts.pop()
+    if not word or not all(map(str.isidentifier, parts)):  # also .x (as in f().x), 1.5
+        return nothing
+    if prefix and not prefix.isidentifier():
+        return nothing
+    if _in_string_or_comment(text):
+        return nothing
+
+    if parts:
+        try:
+            owner = ns[parts[0]] if parts[0] in ns else getattr(builtins, parts[0])
+            for part in parts[1:]:
+                owner = getattr(owner, part)
+            names = dir(owner)
+        except Exception:  # not defined (yet), or its getter failed
+            return nothing
+        lookup = lambda name: inspect.getattr_static(owner, name, None)
+    else:
+        if not prefix:  # nothing typed yet
+            return nothing
+        names = {*ns, *vars(builtins), *keyword.kwlist}
+        lookup = lambda name: ns[name] if name in ns else vars(builtins).get(name)
+
+    # exact case first, then other cases (run: Run); each with the user's names first
+    low = prefix.lower()
+    found = [n for n in names if n.lower().startswith(low)]
+    if not prefix.startswith("_"):  # private names only when asked for
+        found = [n for n in found if not n.startswith("_")]
+    found.sort(
+        key=lambda n: (not n.startswith(prefix), not parts and n not in ns, n.lower())
+    )
+
+    matches = []
+    for name in found[:MAX_SUGGESTIONS]:
+        if not parts and keyword.iskeyword(name):
+            matches.append({"name": name, "kind": "keyword", "doc": ""})
+            continue
+        try:
+            matches.append(_describe(name, lookup(name)))
+        except Exception:
+            matches.append({"name": name, "kind": "", "doc": ""})
+    return {"matches": matches, "start": start}
 
 
 class ConsoleMixin:
@@ -157,6 +255,9 @@ class ConsoleMixin:
     # ------------------------------------------------------------------- commands
     def _cmd_cli(self, c):
         return self._cli(c["code"])
+
+    def _cmd_complete(self, c):
+        return {"ok": True, **complete(c["text"], self.ns)}
 
     def _cmd_script(self, c):
         return {"ok": True, "script": self.script_text()}

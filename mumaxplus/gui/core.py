@@ -59,6 +59,7 @@ NO_RESET = {
     "column_save",
     "table_custom",
     "call",
+    "complete",
     "script",
     "script_clear",
     "save_ovf",
