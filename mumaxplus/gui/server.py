@@ -106,6 +106,7 @@ def _make_handler(ctrl: Controller, token: str):
             self.send_header("Connection", "close")  # the stream ends with it
             self.end_headers()
             sid = 0  # the snapshot the page has: none yet
+            page = object()  # this page, for ctrl.page_sent
             try:
                 while (new := ctrl.wait_snapshot(sid, KEEPALIVE)) is not None:
                     if new[0] == sid:
@@ -116,9 +117,12 @@ def _make_handler(ctrl: Controller, token: str):
                     data = json.dumps(snap, allow_nan=False).encode()
                     self.wfile.write(b"data: " + data + b"\n\n")
                     self.wfile.flush()
+                    ctrl.page_sent(page, sid)
                     time.sleep(EVENT_GAP)
             except OSError:  # the page went away
                 pass
+            finally:
+                ctrl.page_gone(page)
 
         def do_POST(self):
             url = urlparse(self.path)

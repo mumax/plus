@@ -41,6 +41,7 @@ DEFAULT_METHOD = "Fehlberg"  # documented default; mumax⁺ cannot report the cu
 CHUNK_SECONDS = 0.05  # wall time of one simulation chunk
 TORQUE_INTERVAL = 0.5
 PERF_WINDOW = 2.0  # wall time over which steps/s and simulated time/s are measured
+BUSY_WAIT = 0.2  # longest wait (s) for the pages to get "busy" before a blocking call
 # commands that do not change the simulation: they keep the adaptive time step and the
 # error shown in the page (any other command resets both)
 NO_RESET = {
@@ -122,6 +123,7 @@ class Controller(
         self.snap = {}
         self.snap_id = 0  # goes up when the snapshot changes
         self.changed = threading.Condition(self.lock)  # used to wake waiting pages
+        self.page_sids = {}  # the snapshot id last sent to each open page
         self.log = []
         self.log_id = 0
 
@@ -204,6 +206,30 @@ class Controller(
         with self.changed:
             self.changed.wait_for(lambda: self.snap_id != last or self._stop, timeout)
             return None if self._stop else (self.snap_id, dict(self.snap))
+
+    def page_sent(self, page, sid):
+        """Note that snapshot ``sid`` went out to ``page`` (any key for that page)."""
+        with self.changed:
+            self.page_sids[page] = sid
+            self.changed.notify_all()
+
+    def page_gone(self, page):
+        """Forget ``page``: the wait for the pages must not count on it any more."""
+        with self.changed:
+            self.page_sids.pop(page, None)
+            self.changed.notify_all()
+
+    def _wait_sent(self):
+        """Wait until the open pages got the newest snapshot, at most BUSY_WAIT.
+
+        relax and minimize keep the GIL, so nothing can be sent while they run. This
+        takes as long as sending does, and no time at all without an open page.
+        """
+        with self.changed:
+            self.changed.wait_for(
+                lambda: all(s == self.snap_id for s in self.page_sids.values()),
+                BUSY_WAIT,
+            )
 
     def _publish(self):
         ts = self._ts()
@@ -471,6 +497,7 @@ class Controller(
         self._did(f"world.{label}()")
         self.busy = f"{label}: busy, the page updates when finished"
         self._publish()
+        self._wait_sent()
         t0 = time.perf_counter()
         try:
             fn()
