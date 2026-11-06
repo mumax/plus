@@ -188,9 +188,10 @@ class GUI:
         self.ctrl.call(lambda: self.ctrl.table_add(quantity, name, unit))
 
     def table_autosave(self, period):
-        """Save a table row in table.txt every ``period`` s of simulation time.
+        """Save a table row in table.txt at every multiple of ``period`` s.
 
-        0 = keep only a live preview in the page.
+        The solver lands on these times of the simulation. 0 = keep only a live
+        preview in the page.
         """
         self.ctrl.call(lambda: self.ctrl._table_autosave(period))
 

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import math
 import re
 import threading
 import time
 
 import numpy as np
 
-from .common import MATH, _col_name, _mro, _next_due
+from .common import MATH, TIME_TOLERANCE, _col_name, _mro, _next_due, _reached
 
 LIVE_SAMPLE_INTERVAL = 0.15  # live table sampling (wall time) when TableAutosave is 0
 
@@ -348,11 +349,18 @@ class TableMixin:
         t = self._now()
         tb = self.table
         if tb.period > 0:
-            if tb.next_save is None:
-                tb.next_save = t + tb.period if tb.rows else t
-            if t >= tb.next_save * (1 - 1e-12):
-                tb.sample(t, to_file=True)
-                tb.next_save = _next_due(tb.next_save, t * (1 + 1e-12), tb.period)
+            if tb.next_save is None:  # the first multiple of the period from now on
+                k = math.ceil(t / tb.period * (1 - TIME_TOLERANCE))
+                tb.next_save = k * tb.period
+                if tb.rows and _reached(tb.rows[-1][0], tb.next_save):  # saved already
+                    tb.next_save += tb.period
+            if _reached(t, tb.next_save):
+                # the time it landed on, without the rounding of the solver's time
+                landed = abs(t - tb.next_save) <= TIME_TOLERANCE * tb.next_save
+                tb.sample(tb.next_save if landed else t, to_file=True)
+                tb.next_save = _next_due(
+                    tb.next_save, t * (1 + TIME_TOLERANCE), tb.period
+                )
         else:
             # live preview: sample every LIVE_SAMPLE_INTERVAL of wall time
             # (and at the end of a run)

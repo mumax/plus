@@ -28,7 +28,7 @@ import numpy as np
 import mumaxplus.util as U
 
 from .checkpoints import CheckpointMixin
-from .common import MATH, _clean
+from .common import MATH, _clean, _reached
 from .console import ConsoleMixin
 from .describe import DescribeMixin
 from .display import RENDER_INTERVAL, DisplayMixin
@@ -558,6 +558,11 @@ class Controller(
     def _chunk(self):
         ts = self._ts()
         t0 = time.perf_counter()
+        if self._fresh:  # after a change: a sensible dt, before looking at it below
+            self._fresh = False
+            ts._assure_sensible_timestep()
+        if self.table.period > 0 and self.table.next_save is None:
+            self._table_tick()  # sets the next save time: this chunk must land on it
         n = self._nchunk
         if self.steps_left is not None:
             n = min(n, self.steps_left)
@@ -571,14 +576,21 @@ class Controller(
             )
             if x is not None
         ]
-        # land (almost) exactly on the stop / next table time,
-        # overshooting by at most one step
-        if limits:
+        # land on the stop / next save time: approach it, then one step of exactly the
+        # time left (as TimeSolver.run does); the next steps go on with the dt from
+        # before
+        dt_before = None
+        if limits and not _reached(ts.time, min(limits)):
             remaining = min(limits) - ts.time
             dt = ts.timestep or 0.0
-            if remaining > 0 and dt > 0:  # (remaining can be inf)
+            if dt > 0 and remaining <= dt:
+                n, dt_before = 1, dt
+                ts.timestep = remaining
+            elif dt > 0:  # (remaining can be inf)
                 n = max(1, int(min(n, 0.5 * remaining / dt)))
         self._steps(n)
+        if dt_before is not None:
+            ts.timestep = dt_before
         self.steps_done += n
         self._measure()
         if n == self._nchunk:  # a whole chunk: aim for CHUNK_SECONDS of wall time
@@ -597,7 +609,7 @@ class Controller(
                 if total > 0
                 else 100
             )
-            done = ts.time >= self.run_until * (1 - 1e-12)
+            done = _reached(ts.time, self.run_until)
         elif self.steps_left is not None:
             total = self.steps_left + (self.steps_done - self._run_n0)
             self.progress = int(100 * (self.steps_done - self._run_n0) / max(total, 1))

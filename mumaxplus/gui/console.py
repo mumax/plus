@@ -16,6 +16,8 @@ import keyword
 import re
 import traceback
 
+from .common import _reached
+
 MAX_SUGGESTIONS = 1000  # enough for all attributes of a magnet, or of numpy
 _NOT_POSITIONAL = re.compile(r"\s*(\*|[A-Za-z_]\w*\s*=(?!=))")  # a=1, *a, **a
 
@@ -259,7 +261,7 @@ class ConsoleMixin:
         else:
             # a finished Run(t) records t, not t plus the overshoot of the last step
             end = self.run_until
-            if end is None or now < end * (1 - 1e-12):
+            if end is None or not _reached(now, end):
                 end = now
             if end > self._rec_t:
                 self.script.append(f"world.timesolver.run({end - self._rec_t:.10g})")

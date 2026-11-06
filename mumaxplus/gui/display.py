@@ -7,7 +7,7 @@ import time
 
 import numpy as np
 
-from .common import _clean, _next_due
+from .common import TIME_TOLERANCE, _clean, _next_due, _reached
 from .plots import COLORMAPS, DIVERGING, region_rgba, scalar_rgba, vector_rgba
 
 RENDER_INTERVAL = 0.10  # minimum wall time between two display frames while running
@@ -264,7 +264,7 @@ class DisplayMixin:
         t = self._now()
         for cfg in self.views:
             period, due = cfg["autosave"], cfg["_next_save"]
-            if period <= 0 or (due is not None and t < due * (1 - 1e-12)):
+            if period <= 0 or (due is not None and not _reached(t, due)):
                 continue
             try:
                 self._save_ovf(cfg, record=False)
@@ -273,7 +273,7 @@ class DisplayMixin:
                 self.say(f"autosave of {cfg['quant']} stopped: {e}", "err")
                 continue
             due = t if due is None else due
-            cfg["_next_save"] = _next_due(due, t * (1 + 1e-12), period)
+            cfg["_next_save"] = _next_due(due, t * (1 + TIME_TOLERANCE), period)
 
     # ------------------------------------------------------------------- commands
     def _cmd_render(self, c):

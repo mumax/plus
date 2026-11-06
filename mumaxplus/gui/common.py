@@ -8,6 +8,8 @@ import re
 
 import numpy as np
 
+from mumaxplus import FP_PRECISION
+
 # what the numbers typed in the page may use besides the script's namespace
 MATH = {k: getattr(math, k) for k in dir(math) if not k.startswith("_")}
 
@@ -60,6 +62,18 @@ def _num(v):
         key=len,
         default=repr(v),
     )
+
+
+# the rounding of the solver's time, relative: a time that landed on a save time can end
+# up just below it (the time is a single precision number in a single precision build)
+TIME_TOLERANCE = (
+    8 * np.finfo(np.float32 if FP_PRECISION == "SINGLE" else np.float64).eps
+)
+
+
+def _reached(t, due):
+    """Return whether the time t has reached the time ``due``, within its rounding."""
+    return t >= due - TIME_TOLERANCE * abs(due)
 
 
 def _next_due(due, t, period):
