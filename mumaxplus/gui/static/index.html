@@ -146,6 +146,7 @@ select.searchsrc { display: none !important; } /* shown as a button that opens t
 #ptable td.n, #stable td.n, #wtable td.n, #moresolver td.n { padding-right: 14px; font: 13px var(--mono); }
 #moresolver input[type=text] { width: 9em; }
 #ptable input[type=text], #stable input[type=text], #wtable input[type=text] { width: 100%; min-width: 130px; }
+#psearch { width: 100%; margin-bottom: 4px; }
 #pwrap { max-height: 52vh; overflow: auto; padding-right: 4px; }
 .sub { margin: 14px 0 4px; font-weight: 650; color: var(--mute); font-size: .92em; }
 footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18px; }
@@ -315,10 +316,12 @@ footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 18
 </div></section>
 
 <section id="s-params"><h2 title="Click to show/hide">Parameters</h2><div class="body">
+  <input id="psearch" type="text" placeholder="search parameters, switches and world settings…" title="Search names, units and descriptions; Esc to clear" autocomplete="off" spellcheck="false">
   <div class="row" title="-1 = the whole magnet; 0… = set/show the value in this region only">Region: <input type="text" id="region" size="4" value="-1"></div>
   <div id="pwrap"><table id="ptable"></table></div>
   <div id="switchhead" class="sub"></div><table id="stable"></table>
   <div id="worldhead" class="sub"></div><table id="wtable"></table>
+  <div id="pnone" class="gray" hidden>nothing matches</div>
 </div></section>
 
 </div>
@@ -1597,7 +1600,25 @@ function buildParams() {
   const W = P.world;
   $("worldhead").textContent = W.vectors.length + W.numbers.length ? "World" : "";
   for (const v of [...W.vectors, ...W.numbers]) addRow($("wtable"), "w", v.name, v.doc, "", textInput((x) => send({ cmd: "world_set", name: v.name, text: x })));
+  filterParams();
 }
+function filterParams() { // show the rows with all the words typed in the search bar
+  const words = $("psearch").value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let total = 0;
+  for (const [table, head] of [["ptable", null], ["stable", "switchhead"], ["wtable", "worldhead"]]) {
+    let shown = 0;
+    for (const tr of $(table).rows) {
+      const text = `${tr.cells[0].textContent} ${tr.cells[2].textContent} ${tr.title}`.toLowerCase();
+      tr.hidden = !words.every((w) => text.includes(w));
+      if (!tr.hidden) shown++;
+    }
+    if (head) $(head).hidden = !shown;
+    total += shown;
+  }
+  $("pnone").hidden = total > 0;
+}
+$("psearch").oninput = filterParams;
+$("psearch").onkeydown = (e) => { if (e.key === "Escape") { e.target.value = ""; filterParams(); } };
 function showParams() {
   const t = cur(); if (!t) return;
   for (const p of t.params) {
