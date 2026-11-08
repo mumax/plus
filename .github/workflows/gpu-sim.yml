@@ -1,0 +1,99 @@
+name: CUDA tests on simulated H100
+
+# Optional, non-required check. The hosted runners have no GPU, so this builds
+# the Python package and runs the pytest suite on a simulated NVIDIA H100
+# (https://github.com/pantheongpu/pantheonsim). A simulator cannot reproduce
+# hardware-specific behavior or timing, so it complements real-GPU testing and
+# does not replace it.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ dev ]
+    paths:
+      - "src/**"
+      - "mumaxplus/**"
+      - "test/**"
+      - "CMakeLists.txt"
+      - "setup.py"
+      - "pyproject.toml"
+      - ".github/workflows/gpu-sim.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: pytest, CUDA 13.0, simulated H100
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Set up the simulated GPU and CUDA toolkit
+      uses: pantheongpu/setup-pantheonsim@ca87fe3143b29166822b923d6050945c5179408c # v0.1.5
+      with:
+        gpu: nvidia/h100
+        cuda-toolkit: "13.0"
+        # mumax+ links the toolkit's cuFFT and cuRAND
+        library-path: 'false'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends ccache python3-dev python3-venv
+        python3 -m venv "$RUNNER_TEMP/venv"
+        "$RUNNER_TEMP/venv/bin/pip" install --upgrade pip
+        "$RUNNER_TEMP/venv/bin/pip" install pytest pandas
+
+    - name: Restore ccache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/ccache
+        key: ccache-gpu-sim-${{ github.sha }}
+        restore-keys: |
+          ccache-gpu-sim-
+
+    # The simulator JIT-compiles PTX and does not run SASS, and it needs a
+    # shared CUDA runtime. CMakeLists.txt hardcodes
+    # CMAKE_CUDA_ARCHITECTURES to "native", which needs a GPU at configure
+    # time, so that one line is replaced here (in the CI checkout only).
+    - name: Build the Python package
+      env:
+        CMAKE_CUDA_COMPILER_LAUNCHER: ccache
+        CMAKE_CXX_COMPILER_LAUNCHER: ccache
+        # src/cmd installs its executable to $CONDA_PREFIX/bin, which is the
+        # root-owned /bin when unset, so point it at the venv
+        CONDA_PREFIX: ${{ runner.temp }}/venv
+      run: |
+        sed -i 's/^set(CMAKE_CUDA_ARCHITECTURES native)$/set(CMAKE_CUDA_ARCHITECTURES 90-virtual)\nset(CMAKE_CUDA_RUNTIME_LIBRARY Shared)/' CMakeLists.txt
+        grep -n -A1 'CMAKE_CUDA_ARCHITECTURES' CMakeLists.txt
+        ccache -z
+        vgpu run --preload "$RUNNER_TEMP/venv/bin/pip" install -v .
+        ccache -s
+
+    # Two tests are deselected because they compare single-precision results
+    # at a tolerance that only holds for one particular cuFFT rounding; they
+    # fail when the FFT rounds differently, which the simulated cuFFT does:
+    # - test_average_zeeman_energy_geometry: the stray field between the two
+    #   magnets (an FFT) adds float rounding noise, and the test expects
+    #   0.5 * E1 == E2 to rtol 1e-12. With the stray field source disabled,
+    #   the simulator gives exactly half, like a real GPU.
+    # - test_enable_as_stray_field_source: random grid sizes and an absolute
+    #   tolerance of 1e-10 on float32 sums; it is marginal on real hardware
+    #   too (differences up to 6e-11 seen on an RTX 3060).
+    - name: Test
+      run: |
+        vgpu run --preload "$RUNNER_TEMP/venv/bin/pytest" -p no:cacheprovider -rfE --durations=20 \
+          -m "not slow and not mumax3" test \
+          --deselect test/test_average.py::TestAverage::test_average_zeeman_energy_geometry \
+          --deselect test/test_strayfield.py::TestEnableStrayFields::test_enable_as_stray_field_source
