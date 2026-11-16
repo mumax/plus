@@ -13,7 +13,7 @@ If you don't have access to an NVIDIA GPU, you can run mumax⁺ online using Goo
 If you prefer to use your own GPU for more demanding simulations, you must install the mumax⁺ Python package.
 If your system has
 
-- Python 3.11-3.14
+- Python 3.11-3.15
 - an NVIDIA GPU with Compute Capability &geq;5.2
 - a CUDA driver of version &geq;550.54.15 on Linux or &geq;551.78 on Windows
 

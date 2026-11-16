@@ -58,7 +58,7 @@
             <mxPoint x="135" y="370" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="AW_GET76onBBrHUR9A3b-2" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rhombus;whiteSpace=wrap;html=1;align=center;" value="&lt;div align=&quot;center&quot;&gt;Do you have&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;(or can you install)&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;Python 3.11-3.14 &lt;i&gt;and&lt;/i&gt; a CUDA driver of&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;version ≥550.54.15 on Linux or&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;≥551.78 on Windows?&lt;/div&gt;" vertex="1">
+        <mxCell id="AW_GET76onBBrHUR9A3b-2" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rhombus;whiteSpace=wrap;html=1;align=center;" value="&lt;div align=&quot;center&quot;&gt;Do you have&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;(or can you install)&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;Python 3.11-3.15 &lt;i&gt;and&lt;/i&gt; a CUDA driver of&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;version ≥550.54.15 on Linux or&lt;/div&gt;&lt;div align=&quot;center&quot;&gt;≥551.78 on Windows?&lt;/div&gt;" vertex="1">
           <mxGeometry height="150" width="260" x="10" y="240" as="geometry" />
         </mxCell>
         <mxCell id="AW_GET76onBBrHUR9A3b-8" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="AW_GET76onBBrHUR9A3b-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="AW_GET76onBBrHUR9A3b-0" value="No">
