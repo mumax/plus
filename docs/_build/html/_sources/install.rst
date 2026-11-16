@@ -21,7 +21,7 @@ Option 2: Installing a pre-built wheel
 If you prefer to use your own GPU for more demanding simulations, you must install the mumax⁺ Python package.
 If your system has
 
-- Python 3.11-3.14
+- Python 3.11-3.15
 - an NVIDIA GPU with Compute Capability ≥5.2
 - a CUDA driver of version ≥550.54.15 on Linux or ≥551.78 on Windows
 
