@@ -1,0 +1,8 @@
+/* Force the logo in the navbar to be smaller */
+.bd-header .navbar-brand img,
+.navbar-brand img,
+header#site-navigation img {
+    height: 128px !important;
+    width: auto !important;
+    max-height: 128px !important;
+}
