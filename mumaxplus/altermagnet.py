@@ -23,7 +23,7 @@ class Altermagnet(Magnet):
         ----------
         world : World
             World in which the altermagnet lives.
-        grid : Grid or tuple[int] of size 3
+        grid : Grid or tuple[int, int, int]
             The number of cells in x, y, z the altermagnet should be divided into.
         geometry : None, ndarray, or callable (default=None)
             The geometry of the altermagnet can be set in three ways.

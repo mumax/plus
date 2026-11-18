@@ -1308,7 +1308,7 @@ def plot_field(
         The Axes instance to plot onto. If None (default), new Figure and Axes
         instances will be created.
 
-    figsize : tuple[float] of size 2, optional
+    figsize : tuple[float, float], optional
         The size of the figure, if a new figure has to be created.
 
     title : str, optional
@@ -1467,7 +1467,7 @@ def inspect_field(
         If None (default), `matplotlib.pyplot.show` will be called only if no
         `file_name` has been provided.
 
-    figsize : tuple[float] of size 2, optional
+    figsize : tuple[float, float], optional
         The size of the new figure created. Automatically tries to find suitable
         figsize if not given.
 
